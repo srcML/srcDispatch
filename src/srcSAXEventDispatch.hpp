@@ -38,36 +38,33 @@ namespace srcSAXEventDispatch {
     enum ElementState {open, close};
     class Listener{
         public:
-            virtual void handleEvent(){}
-            virtual void handleEvent(ParserState, ElementState){}
-            virtual ~Listener(){}
-            Listener(){}
+            virtual void handleEvent() = 0;
+            virtual void handleEvent(ParserState, ElementState) = 0;
     };
     class EventDispatcher{
     public:
-        virtual void addListener( Listener *l ){}
-        virtual void removeListener( Listener *l ){}
+        virtual void addListener(Listener *l) = 0;
+        virtual void removeListener(Listener *l) = 0;
     protected:
         std::vector<Listener*> mListeners;
-        virtual void dispatchEvent(ParserState, ElementState)=0;
-        virtual ~EventDispatcher(){}
-        EventDispatcher(){}
+        virtual void dispatchEvent(ParserState, ElementState) = 0;
     };
     class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    std::vector<unsigned short int> triggerField;
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
+        std::vector<unsigned short int> triggerField;
         std::vector<Listener*> mListeners;
         void dispatchEvent(ParserState, ElementState) override;
 
     public:
         void addListener(Listener* l) override;
         void removeListener(Listener* l) override;
-        ~srcSAXEventDispatcher(){}
+        ~srcSAXEventDispatcher() {}
         srcSAXEventDispatcher(){
+                triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
                 process_map = {
                     {"decl_stmt", [this](){
                         ++triggerField[declstmt];
@@ -333,7 +330,10 @@ namespace srcSAXEventDispatch {
         virtual void startElement(const char * localname, const char * prefix, const char * URI,
                                     int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                                     const struct srcsax_attribute * attributes) {
-
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            
+            if (process != process_map.end()) {
+                process->second();
+            }
     
         }
         /**
@@ -356,7 +356,10 @@ namespace srcSAXEventDispatch {
         }
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) {
-
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localname);            
+            if (process2 != process_map2.end()) {
+                process2->second();
+            }
         }
     #pragma GCC diagnostic pop
     
