@@ -33,21 +33,21 @@ namespace srcSAXEventDispatch {
         argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, 
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
-        preproc, whileloop, forloop, ifcond, nonterminal, macro, classblock, functionblock,
+        preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
         specifier, typedefexpr, empty, MAXENUMVALUE = empty};
     enum ElementState {open, close};
     class Listener{
         public:
-            virtual void handleEvent() = 0;
-            virtual void handleEvent(ParserState, ElementState) = 0;
+            virtual void HandleEvent() = 0;
+            virtual void HandleEvent(ParserState, ElementState, std::vector<unsigned short int>) = 0;
     };
     class EventDispatcher{
     public:
-        virtual void addListener(Listener *l) = 0;
-        virtual void removeListener(Listener *l) = 0;
+        virtual void AddListener(Listener *l) = 0;
+        virtual void RemoveListener(Listener *l) = 0;
     protected:
         std::vector<Listener*> mListeners;
-        virtual void dispatchEvent(ParserState, ElementState) = 0;
+        virtual void DispatchEvent(ParserState, ElementState, std::vector<unsigned short int>) = 0;
     };
     class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
@@ -57,213 +57,281 @@ namespace srcSAXEventDispatch {
     protected:
         std::vector<unsigned short int> triggerField;
         std::vector<Listener*> mListeners;
-        void dispatchEvent(ParserState, ElementState) override;
+        void DispatchEvent(ParserState, ElementState, std::vector<unsigned short int>) override;
 
     public:
-        void addListener(Listener* l) override;
-        void removeListener(Listener* l) override;
+        void AddListener(Listener* l) override;
+        void RemoveListener(Listener* l) override;
         ~srcSAXEventDispatcher() {}
         srcSAXEventDispatcher(){
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
                 process_map = {
                     {"decl_stmt", [this](){
                         ++triggerField[declstmt];
-                        dispatchEvent(declstmt, ElementState::open);
+                        DispatchEvent(declstmt, ElementState::open, triggerField);
                     } },
                     { "expr_stmt", [this](){
                         ++triggerField[exprstmt];
+                        DispatchEvent(exprstmt, ElementState::open, triggerField);
                     } },
                     { "parameter_list", [this](){
                         ++triggerField[parameterlist];
+                        DispatchEvent(parameterlist, ElementState::open, triggerField);
                     } },
                     { "if", [this](){
-                        ++triggerField[ifcond];
+                        ++triggerField[ifstmt];
+                        DispatchEvent(ifstmt, ElementState::open, triggerField);
                     } },
                     { "for", [this](){
-                        ++triggerField[forloop];
+                        ++triggerField[forstmt];
+                        DispatchEvent(forstmt, ElementState::open, triggerField);
                     } },
                     { "while", [this](){
-                        ++triggerField[whileloop];
+                        ++triggerField[whilestmt];
+                        DispatchEvent(whilestmt, ElementState::open, triggerField);
                     } },
                     { "template", [this](){
                         ++triggerField[templates];
+                        DispatchEvent(templates, ElementState::open, triggerField);
                     } },
                     { "argument_list", [this](){
+                        ++triggerField[argumentlist];
+                        DispatchEvent(argumentlist, ElementState::open, triggerField);
                     } },
                     { "call", [this](){
                         ++triggerField[call];
+                        DispatchEvent(call, ElementState::open, triggerField);
                     } },
                     { "function", [this](){
                         ++triggerField[function];
+                        DispatchEvent(function, ElementState::open, triggerField);
                     } },
                     { "constructor", [this](){
                         ++triggerField[constructor];
+                        DispatchEvent(constructor, ElementState::open, triggerField);
                     } },
                     { "function_decl", [this](){
                         ++triggerField[functiondecl];
+                        DispatchEvent(functiondecl, ElementState::open, triggerField);
                     } },
                     { "destructor_decl", [this](){
                         ++triggerField[destructordecl];
+                        DispatchEvent(destructordecl, ElementState::open, triggerField);
                     } },
                     { "constructor_decl", [this](){
                         ++triggerField[constructordecl];
+                        DispatchEvent(constructordecl, ElementState::open, triggerField);
                     } },
                     { "class", [this](){
                         ++triggerField[classn];
+                        DispatchEvent(classn, ElementState::open, triggerField);
                     } },
                     { "struct", [this](){
                         ++triggerField[classn];
+                        DispatchEvent(structn, ElementState::open, triggerField);
                     } },
                     { "destructor", [this](){
                         ++triggerField[destructor];
+                        DispatchEvent(destructor, ElementState::open, triggerField);
                     } },
                     { "parameter", [this](){
                         ++triggerField[parameter];
+                        DispatchEvent(parameter, ElementState::open, triggerField);
                     } },                
                     { "member_list", [this](){
                         ++triggerField[memberlist];
+                        DispatchEvent(memberlist, ElementState::open, triggerField);
                     } },
                     { "index", [this](){
                         ++triggerField[index];
+                        DispatchEvent(index, ElementState::open, triggerField);
                     } },
                     { "operator", [this](){
                         ++triggerField[op];
+                        DispatchEvent(op, ElementState::open, triggerField);
                     } },
                     { "block", [this](){ 
                         ++triggerField[block];
+                        DispatchEvent(block, ElementState::open, triggerField);
                     } },
                     { "init", [this](){
                         ++triggerField[init];
+                        DispatchEvent(init, ElementState::open, triggerField);
                     } },
                     { "argument", [this](){
                         ++triggerField[argument];
+                        DispatchEvent(argument, ElementState::open, triggerField);
                     } },
                     { "literal", [this](){
                         ++triggerField[literal];
+                        DispatchEvent(literal, ElementState::open, triggerField);
                     } },
                     { "modifier", [this](){
                         ++triggerField[modifier];
+                        DispatchEvent(modifier, ElementState::open, triggerField);
                     } },
                     { "decl", [this](){
                         ++triggerField[decl]; 
+                        DispatchEvent(decl, ElementState::open, triggerField);
                     } },
                     { "type", [this](){
                         ++triggerField[type]; 
+                        DispatchEvent(type, ElementState::open, triggerField);
                     } },
                     { "typedef", [this](){
                         ++triggerField[typedefexpr]; 
+                        DispatchEvent(typedefexpr, ElementState::open, triggerField);
                     } },          
                     { "expr", [this](){
                         ++triggerField[expr];
+                        DispatchEvent(expr, ElementState::open, triggerField);
                     } },
                     { "name", [this](){
                         ++triggerField[name];
+                        DispatchEvent(name, ElementState::open, triggerField);
                     } },
                     { "macro", [this](){
                         ++triggerField[macro];
+                        DispatchEvent(macro, ElementState::open, triggerField);
                     } },
                     { "specifier", [this](){
                         ++triggerField[specifier];
+                        DispatchEvent(specifier, ElementState::open, triggerField);
                     } }
                 };
                 process_map2 = {
                     {"decl_stmt", [this](){
                         --triggerField[declstmt];
+                        DispatchEvent(declstmt, ElementState::close, triggerField);
                     } },             
                     { "expr_stmt", [this](){
                         --triggerField[exprstmt];
+                        DispatchEvent(exprstmt, ElementState::close, triggerField);
                     } },            
                     { "parameter_list", [this](){
                         --triggerField[parameterlist];
+                        DispatchEvent(parameterlist, ElementState::close, triggerField);
                     } },            
                     { "if", [this](){
-                        --triggerField[ifcond];
+                        --triggerField[ifstmt];
+                        DispatchEvent(ifstmt, ElementState::close, triggerField);
                     } },            
                     { "for", [this](){
-                        --triggerField[forloop];
+                        --triggerField[forstmt];
+                        DispatchEvent(forstmt, ElementState::close, triggerField);
                     } },            
                     { "while", [this](){
-                        --triggerField[whileloop];
+                        --triggerField[whilestmt];
+                        DispatchEvent(whilestmt, ElementState::close, triggerField);
                     } },
                     { "template", [this](){
                         --triggerField[templates];
+                        DispatchEvent(templates, ElementState::close, triggerField);
                     } },            
                     { "argument_list", [this](){
+                        --triggerField[argumentlist];
+                        DispatchEvent(argumentlist, ElementState::close, triggerField);
                     } },            
                     { "call", [this](){
                         --triggerField[call];
+                        DispatchEvent(call, ElementState::close, triggerField);
                     } },            
                     { "function", [this](){
                         --triggerField[function];
+                        DispatchEvent(function, ElementState::close, triggerField);
                     } },
                     { "constructor", [this](){
                         --triggerField[constructor];
+                        DispatchEvent(constructor, ElementState::close, triggerField);
                     } },
                     { "destructor", [this](){
                         --triggerField[destructor];
+                        DispatchEvent(destructor, ElementState::close, triggerField);
                     } },
                     { "function_decl", [this](){
                         --triggerField[functiondecl];
+                        DispatchEvent(functiondecl, ElementState::close, triggerField);
                     } },
                     { "constructor_decl", [this](){
                         --triggerField[constructordecl];
+                        DispatchEvent(constructordecl, ElementState::close, triggerField);
                     } },
                     { "destructor_decl", [this](){
                         --triggerField[destructordecl];
+                        DispatchEvent(destructordecl, ElementState::close, triggerField);
                     } },
                     { "class", [this](){
                         --triggerField[classn];
+                        DispatchEvent(classn, ElementState::close, triggerField);
                     } },
                     { "struct", [this](){
                         --triggerField[classn];
+                        DispatchEvent(structn, ElementState::close, triggerField);
                     } },
                     { "parameter", [this](){
+                        --triggerField[parameterlist];
+                        DispatchEvent(parameter, ElementState::close, triggerField);
                     } },    
+
                     { "member_list", [this](){
                         --triggerField[memberlist];
+                        DispatchEvent(memberlist, ElementState::close, triggerField);
                     } },    
                     { "index", [this](){
                         --triggerField[index];
+                        DispatchEvent(index, ElementState::close, triggerField);
                     } },    
                     { "operator", [this](){
                         --triggerField[op];
+                        DispatchEvent(op, ElementState::close, triggerField);
                     } },
                     { "block", [this](){ 
                         --triggerField[block];
+                        DispatchEvent(block, ElementState::close, triggerField);
                     } },
                     { "init", [this](){
                         --triggerField[init];
+                        DispatchEvent(init, ElementState::close, triggerField);
                     } },    
                     { "argument", [this](){
                         --triggerField[argument];
+                        DispatchEvent(argument, ElementState::close, triggerField);
                     } },    
                     { "literal", [this](){
                         --triggerField[literal];
+                        DispatchEvent(literal, ElementState::close, triggerField);
                     } },    
                     { "modifier", [this](){
                         --triggerField[modifier];
+                        DispatchEvent(modifier, ElementState::close, triggerField);
                     } },    
                     { "decl", [this](){
-
                         --triggerField[decl]; 
+                        DispatchEvent(decl, ElementState::close, triggerField);
                     } },    
                     { "type", [this](){
                         --triggerField[type];
+                        DispatchEvent(type, ElementState::close, triggerField);
                     } },
                     { "typedef", [this](){
                         --triggerField[typedefexpr]; 
+                        DispatchEvent(typedefexpr, ElementState::close, triggerField);
                     } },    
                     { "expr", [this](){
                         --triggerField[expr];
+                        DispatchEvent(expr, ElementState::close, triggerField);
                     } },    
                     { "name", [this](){
                         --triggerField[name];
+                        DispatchEvent(name, ElementState::close, triggerField);
                     } },
                     { "macro", [this](){
                         --triggerField[macro];
+                        DispatchEvent(macro, ElementState::close, triggerField);
                     } },
                     { "specifier", [this](){
                         --triggerField[specifier];
+                        DispatchEvent(specifier, ElementState::close, triggerField);
                     } }
                 };
         }
