@@ -57,6 +57,10 @@ namespace srcSAXEventDispatch {
     protected:
         std::vector<unsigned short int> triggerField;
         std::vector<Listener*> mListeners;
+       
+        unsigned int currentLineNumber;
+        std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision;
+
         void DispatchEvent(ParserState, ElementState, std::vector<unsigned short int>) override;
 
     public:
@@ -379,7 +383,11 @@ namespace srcSAXEventDispatch {
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) {
-
+            if(num_attributes >= 3){
+                currentFilePath = std::string(attributes[2].value);
+                currentFileLanguage = std::string(attributes[1].value);
+                currentsrcMLRevision = std::string(attributes[0].value);
+            }
         }
         /**
         * startElementNs
@@ -398,11 +406,15 @@ namespace srcSAXEventDispatch {
         virtual void startElement(const char * localname, const char * prefix, const char * URI,
                                     int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                                     const struct srcsax_attribute * attributes) {
-            std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            
-            if (process != process_map.end()) {
-                process->second();
+            if(localname == "position"){
+                currentLineNumber = strtoul(attributes[0].value, NULL, 0);
             }
-    
+            if(localname != ""){
+                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            
+                if (process != process_map.end()) {
+                    process->second();
+                }
+            }
         }
         /**
         * charactersUnit
