@@ -29,6 +29,17 @@
 #include <vector>
 #include <algorithm>
 namespace srcSAXEventDispatch {
+    enum ParserState2 {ifstmt,whilestmt,forstmt,dowhilestmt,breakstmt,continuestmt,
+                       returnstmt,switchstmt,casestmt,defaultstmt,blockstmt,labelstmt,
+                       gotostmt,emptystmt,specifier,externspcfr,declstmt,decl,functiondecl,
+                       function,init,literal,lambda,namespace,usingstmt,typedefexpr,modifier,
+                       decl,init,range,call,classdef,classdecl,super,publicspcfr,privatespcfr,
+                       protectedspcfr,constructor,constructordecl,destructor,destructordecl,
+                       structdecl,structdef,unionspcfr,enumspcfr,op,sizeofkwrd,typeidkwrd,
+                       noexceptkwrd,alignofkwrd,alignaskwrd,decltypekwrd,attrkwrd,asmkwrd,
+                       templatekwrd,typenamekwrd,throwkwrd,trykwrd,catchkwrd,parameterlist,
+                       MAXENUMVALUE = empty};
+
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, 
         argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, 
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
