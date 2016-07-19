@@ -36,6 +36,8 @@ namespace srcSAXEventDispatch {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+    bool sawgeneric;
+    
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
         std::vector<Listener*> mListeners;
@@ -46,6 +48,7 @@ namespace srcSAXEventDispatch {
         void RemoveListener(Listener* l) override;
         ~srcSAXEventDispatcher() {}
         srcSAXEventDispatcher(){
+                sawgeneric = false;
                 process_map = {
                     {"decl_stmt", [this](){
                         ++ctx.triggerField[ParserState::declstmt];
@@ -291,6 +294,10 @@ namespace srcSAXEventDispatch {
                         DispatchEvent(ParserState::decl, ElementState::close, ctx);
                     } },    
                     { "type", [this](){
+                        sawgeneric = false;
+                        if(ctx.And({ParserState::declstmt})){
+                            std::cerr<<ctx.currentDeclName<<std::endl;
+                        }
                         --ctx.triggerField[ParserState::type];
                         DispatchEvent(ParserState::type, ElementState::close, ctx);
                     } },
@@ -388,10 +395,17 @@ namespace srcSAXEventDispatch {
         virtual void startElement(const char * localname, const char * prefix, const char * URI,
                                     int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                                     const struct srcsax_attribute * attributes) {
-            if(localname == "position"){
+            if(std::string(localname) == "position"){
                 ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
             }
-            if(localname != ""){
+            std::string name;
+            if(num_attributes){
+                name = attributes[0].value;
+            }
+            if(name == "generic" && std::string(localname) == "argument_list"){
+                sawgeneric = true;
+            }
+            if(std::string(localname) != ""){
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            
                 if (process != process_map.end()) {
                     process->second();
@@ -409,7 +423,10 @@ namespace srcSAXEventDispatch {
         virtual void charactersUnit(const char * ch, int len) {
             ctx.currentToken.clear();
             ctx.currentToken.append(ch, len);
-            
+            if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !sawgeneric){
+                ctx.currentDeclName.clear();
+                ctx.currentDeclName.append(ch, len);
+            }
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
             process->second();
         }

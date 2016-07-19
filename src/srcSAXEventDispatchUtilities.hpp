@@ -16,35 +16,35 @@ namespace srcSAXEventDispatch{
 	
         	unsigned int currentLineNumber;
         	std::vector<unsigned short int> triggerField;
-        	std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
+        	std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken, currentDeclName;
 			
 			inline bool And(std::vector<ParserState> vec) const{
 				for(auto field : vec){
-					if(true && field) continue;
+					if(triggerField[field]) continue;
 					else return false;
+				}
+				return true;
+			}
+			inline bool Nand(std::vector<ParserState> vec) const{
+				for(auto field : vec){
+					if(triggerField[field]) return false;
+					else continue;
 				}
 				return true;
 			}
 			inline bool Or(std::vector<ParserState> vec) const{
 				for(auto field : vec){
-					if(field) return true;
+					if(triggerField[field]) return true;
 					else continue;
 				}
 				return false;
 			}
 			inline bool Nor(std::vector<ParserState> vec) const{
 				for(auto field : vec){
-					if(true && !field) return true;
+					if(triggerField[field]) return false;
 					else continue;
 				}
 				return true;
-			}
-			inline bool Nand(std::vector<ParserState> vec) const{
-				for(auto field : vec){
-					if(!triggerField[field]) return true;
-					else continue;
-				}
-				return false;
 			}
 	};
     class Listener{
