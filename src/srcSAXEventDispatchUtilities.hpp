@@ -1,5 +1,6 @@
 namespace srcSAXEventDispatch{
 	#include <vector>
+	template <typename T, typename U>
     class srcSAXEventDispatcher;	    	
     enum ElementState {open, close};
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, 

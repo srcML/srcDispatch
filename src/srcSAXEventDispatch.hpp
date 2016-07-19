@@ -32,6 +32,7 @@
 #include <srcSAXEventDispatchUtilities.hpp>
 
 namespace srcSAXEventDispatch {
+    template <typename T, typename U>
     class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -41,11 +42,19 @@ namespace srcSAXEventDispatch {
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
         std::vector<Listener*> mListeners;
-        void DispatchEvent(ParserState, ElementState, const srcSAXEventContext&) override;
+        void DispatchEvent(ParserState pstate, ElementState estate, const srcSAXEventContext& ctx){
+            for(std::vector<Listener*>::iterator listener = mListeners.begin(); listener != mListeners.end(); ++listener ){
+                (*listener)->HandleEvent(pstate, estate, ctx);
+            }
+        }
     public:
+        void AddListener(Listener* l){
+            mListeners.push_back(l);
+        }
+        void RemoveListener(Listener* l){
+            mListeners.erase(std::remove(mListeners.begin(), mListeners.end(), l), mListeners.end());
+        }
         srcSAXEventContext ctx;
-        void AddListener(Listener* l) override;
-        void RemoveListener(Listener* l) override;
         ~srcSAXEventDispatcher() {}
         srcSAXEventDispatcher(){
                 sawgeneric = false;
