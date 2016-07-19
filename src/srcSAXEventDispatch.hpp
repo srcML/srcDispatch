@@ -30,34 +30,45 @@
 #include <vector>
 #include <algorithm>
 #include <srcSAXEventDispatchUtilities.hpp>
-
+#include <vector>
+#include <memory>
 namespace srcSAXEventDispatch {
-    template <typename T, typename U>
+    template <typename ...policies>
     class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     bool sawgeneric;
+
+    std::vector<std::unique_ptr<Listener>> v;
     
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
-        std::vector<Listener*> mListeners;
+        std::vector<std::unique_ptr<Listener>> mListeners;
         void DispatchEvent(ParserState pstate, ElementState estate, const srcSAXEventContext& ctx){
-            for(std::vector<Listener*>::iterator listener = mListeners.begin(); listener != mListeners.end(); ++listener ){
-                (*listener)->HandleEvent(pstate, estate, ctx);
+            for(std::vector<std::unique_ptr<Listener>>::iterator listener = mListeners.begin(); listener != mListeners.end(); ++listener ){
+                listener->get()->HandleEvent(pstate, estate, ctx);
             }
         }
     public:
-        void AddListener(Listener* l){
-            mListeners.push_back(l);
+        void AddListener(std::unique_ptr<Listener> l){
+            mListeners.push_back(std::move(l));
         }
-        void RemoveListener(Listener* l){
+        void RemoveListener(std::unique_ptr<Listener> l){
             mListeners.erase(std::remove(mListeners.begin(), mListeners.end(), l), mListeners.end());
         }
         srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
+    
+        srcSAXEventDispatcher(policies... t2) : v{t2...}{
+            mListeners.push_back(v.at(0));
+            InitializeHandlers();
+        }
         srcSAXEventDispatcher(){
                 sawgeneric = false;
+                InitializeHandlers();
+        }
+        void InitializeHandlers(){
                 process_map = {
                     {"decl_stmt", [this](){
                         ++ctx.triggerField[ParserState::declstmt];
@@ -335,7 +346,7 @@ namespace srcSAXEventDispatch {
                         --ctx.triggerField[ParserState::specifier];
                         DispatchEvent(ParserState::specifier, ElementState::close, ctx);
                     } }
-                };
+                };            
         }
     
         /*
