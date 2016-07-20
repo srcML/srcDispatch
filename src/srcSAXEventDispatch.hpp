@@ -34,11 +34,9 @@
 #include <memory>
 namespace srcSAXEventDispatch {
     template <typename ...policies>
-    class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
+    class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher{
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
-
-    bool sawgeneric;
 
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
@@ -58,8 +56,8 @@ namespace srcSAXEventDispatch {
         srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
         
-        srcSAXEventDispatcher(policies... t2) : elementListeners{t2...}{
-            sawgeneric = false;
+        srcSAXEventDispatcher(policies*... t2) : elementListeners{t2...}{
+            ctx.sawgeneric = false;
             InitializeHandlers();
         }
         void InitializeHandlers(){
@@ -307,10 +305,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::decl, ElementState::close, ctx);
                 } },    
                 { "type", [this](){
-                    sawgeneric = false;
-                    if(ctx.And({ParserState::declstmt})){
-                        //std::cerr<<ctx.currentDeclName<<std::endl;
-                    }
+                    ctx.sawgeneric = false;
                     --ctx.triggerField[ParserState::type];
                     DispatchEvent(ParserState::type, ElementState::close, ctx);
                 } },
@@ -416,7 +411,7 @@ namespace srcSAXEventDispatch {
                 name = attributes[0].value;
             }
             if(name == "generic" && std::string(localname) == "argument_list"){
-                sawgeneric = true;
+                ctx.sawgeneric = true;
             }
             if(std::string(localname) != ""){
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            
@@ -436,10 +431,6 @@ namespace srcSAXEventDispatch {
         virtual void charactersUnit(const char * ch, int len) {
             ctx.currentToken.clear();
             ctx.currentToken.append(ch, len);
-            if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !sawgeneric){
-                ctx.currentDeclName.clear();
-                ctx.currentDeclName.append(ch, len);
-            }
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
             process->second();
         }

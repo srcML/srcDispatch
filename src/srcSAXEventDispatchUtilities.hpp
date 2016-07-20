@@ -18,7 +18,8 @@ namespace srcSAXEventDispatch{
 	
         	unsigned int currentLineNumber;
         	std::vector<unsigned short int> triggerField;
-        	std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken, currentDeclName;
+        	std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
+			bool sawgeneric;
 			
 			inline bool And(std::vector<ParserState> vec) const{
 				for(auto field : vec){
@@ -47,6 +48,14 @@ namespace srcSAXEventDispatch{
 					else continue;
 				}
 				return true;
+			}
+			inline bool IsOpen(ParserState field) const{
+				if(triggerField[field]) return true;
+				else return false;
+			}
+			inline bool IsClosed(ParserState field) const{
+				if(triggerField[field]) return false;
+				else return true;
 			}
 	};
     class Listener{
