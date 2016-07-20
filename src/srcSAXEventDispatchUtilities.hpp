@@ -1,7 +1,7 @@
 #include <memory>
 namespace srcSAXEventDispatch{
 	#include <vector>
-	template <typename ...Trest>
+	template <typename ...policies>
     class srcSAXEventDispatcher;	    	
     enum ElementState {open, close};
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, 
@@ -56,10 +56,10 @@ namespace srcSAXEventDispatch{
     };
     class EventDispatcher{
     public:
-        virtual void AddListener(std::unique_ptr<Listener> l) = 0;
-        virtual void RemoveListener(std::unique_ptr<Listener> l) = 0;
+        virtual void AddListener(Listener* l) = 0;
+        virtual void RemoveListener(Listener* l) = 0;
     protected:
-        std::vector<std::unique_ptr<Listener>> mListeners;
+        std::vector<Listener*> elementListeners;
         virtual void DispatchEvent(ParserState, ElementState, const srcSAXEventContext&) = 0;
     };
 }
