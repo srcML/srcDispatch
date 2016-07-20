@@ -2,6 +2,6 @@ file(GLOB SRCSAXHANDLER_SOURCE ../../srcSAX/src/srcsax/*.cpp ../../srcSAX/src/cp
 file(GLOB SRCSAXHANDLER_INCLUDE ../../srcSAX/src/srcsax/*.h* ../../srcSAX/src/cpp/*.h*)
 
 link_directories(/usr/local/lib/)
-include_directories(${LIBXML2_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/srcType/src/headers ${CMAKE_SOURCE_DIR}/srcType/src/cpp ${CMAKE_SOURCE_DIR}/srcSAX/src/srcsax ${CMAKE_SOURCE_DIR}/srcSAX/src/cpp)
+include_directories(${LIBXML2_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/srcSAX/src/srcsax ${CMAKE_SOURCE_DIR}/srcSAX/src/cpp ../policy_classes)
 
 add_library(srcsaxeventdispatch ./src/srcSAXEventDispatch.cpp ./src/srcSAXEventDispatch.hpp)
