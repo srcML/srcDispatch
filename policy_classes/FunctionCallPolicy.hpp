@@ -2,8 +2,8 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <unordered_map>
-class DeclTypePolicy : public srcSAXEventDispatch::Listener{
-    struct TypeData{
+class CallPolicy : public srcSAXEventDispatch::Listener{
+    struct CallData{
         std::string nameoftype;
         std::string nameofidentifier;
         bool isConst;
@@ -13,8 +13,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
     };
     public:
         TypeData data;
-        ~DeclTypePolicy(){}
-        DeclTypePolicy(){InitializeEventHandlers();}
+        ~CallPolicy(){}
+        CallPolicy(){InitializeEventHandlers();}
         void HandleEvent(){}
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
@@ -39,7 +39,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
             using namespace srcSAXEventDispatch;
             EventToHandlerMap = {  
                 { ParserState::modifier, [this](const srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::declstmt)){
+                    if(ctx.IsOpen(ParserState::parameter)){
                         if(currentModifier == "*"){
                             data.isPointer = true;
                         }
@@ -49,35 +49,35 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
                     }
                 } },    
                 { ParserState::decl, [this](const srcSAXEventContext& ctx){
-                    if(ctx.And({ParserState::declstmt})){
+                    if(ctx.And({ParserState::parameter})){
                         data.nameofidentifier = currentDeclName;
                     }
                 } },    
                 { ParserState::type, [this](const srcSAXEventContext& ctx){
-                    if(ctx.And({ParserState::declstmt})){
+                    if(ctx.And({ParserState::parameter})){
                         data.nameoftype = currentTypeName;
                     }
                 } },
                 { ParserState::tokenstring, [this](const srcSAXEventContext& ctx){
                     if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
-                        if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
+                        if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
                             currentTypeName = ctx.currentToken;
                         }
-                        if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) && 
+                        if(ctx.And({ParserState::name, ParserState::decl, ParserState::parameter}) && 
                            ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier}) && 
                            !ctx.sawgeneric){
                             currentDeclName = ctx.currentToken;
                         }
-                        if(ctx.And({ParserState::specifier, ParserState::type, ParserState::declstmt})){
+                        if(ctx.And({ParserState::specifier, ParserState::type, ParserState::parameter})){
                             currentSpecifier = ctx.currentToken;
                         }
-                        if(ctx.And({ParserState::modifier, ParserState::type, ParserState::declstmt})){
+                        if(ctx.And({ParserState::modifier, ParserState::type, ParserState::parameter})){
                             currentModifier = ctx.currentToken;
                         }
                     }
                 } },
                 { ParserState::specifier, [this](const srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::declstmt)){
+                    if(ctx.IsOpen(ParserState::parameter)){
                         if(currentSpecifier == "const"){
                             data.isStatic = true;
                         }
