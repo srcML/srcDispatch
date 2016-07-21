@@ -3,16 +3,17 @@
 #include <exception>
 #include <unordered_map>
 class ParamTypePolicy : public srcSAXEventDispatch::Listener{
-    struct CallData{
+    struct ParamData{
         std::string nameoftype;
         std::string nameofidentifier;
+        int linenumber;
         bool isConst;
         bool isReference;
         bool isPointer;
         bool isStatic;
     };
     public:
-        CallData data;
+        ParamData data;
         ~ParamTypePolicy(){}
         ParamTypePolicy(){InitializeEventHandlers();}
         void HandleEvent(){}
@@ -50,17 +51,17 @@ class ParamTypePolicy : public srcSAXEventDispatch::Listener{
                 } },    
                 { ParserState::decl, [this](const srcSAXEventContext& ctx){
                     if(ctx.And({ParserState::parameter})){
-                        std::cerr<<"Name: "<<currentDeclName<<std::endl;
+                        data.linenumber = ctx.currentLineNumber;
                         data.nameofidentifier = currentDeclName;
                     }
                 } },    
                 { ParserState::type, [this](const srcSAXEventContext& ctx){
                     if(ctx.And({ParserState::parameter})){
-                        std::cerr<<"Type: "<<currentTypeName<<std::endl;
                         data.nameoftype = currentTypeName;
                     }
                 } },
                 { ParserState::tokenstring, [this](const srcSAXEventContext& ctx){
+                    //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                     if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
                         if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
                             currentTypeName = ctx.currentToken;

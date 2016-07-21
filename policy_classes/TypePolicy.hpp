@@ -6,6 +6,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
     struct TypeData{
         std::string nameoftype;
         std::string nameofidentifier;
+        int linenumber;
         bool isConst;
         bool isReference;
         bool isPointer;
@@ -50,6 +51,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
                 } },    
                 { ParserState::decl, [this](const srcSAXEventContext& ctx){
                     if(ctx.And({ParserState::declstmt})){
+                        data.linenumber = ctx.currentLineNumber;
                         data.nameofidentifier = currentDeclName;
                     }
                 } },    
@@ -59,6 +61,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
                     }
                 } },
                 { ParserState::tokenstring, [this](const srcSAXEventContext& ctx){
+                    //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                     if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
                         if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
                             currentTypeName = ctx.currentToken;

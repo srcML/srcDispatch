@@ -59,6 +59,7 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
                     }
                 } },
                 { ParserState::tokenstring, [this](const srcSAXEventContext& ctx){
+                    //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                     if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
                         if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
                             currentTypeName = ctx.currentToken;
