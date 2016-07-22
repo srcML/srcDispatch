@@ -225,6 +225,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::templates, ElementState::close, ctx);
                 } },            
                 { "argument_list", [this](){
+                    ctx.sawgeneric = false; //TODO investigate how to make this work properly
                     --ctx.triggerField[ParserState::argumentlist];
                     DispatchEvent(ParserState::argumentlist, ElementState::close, ctx);
                 } },            
@@ -305,7 +306,6 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::decl, ElementState::close, ctx);
                 } },    
                 { "type", [this](){
-                    ctx.sawgeneric = false;
                     --ctx.triggerField[ParserState::type];
                     DispatchEvent(ParserState::type, ElementState::close, ctx);
                 } },

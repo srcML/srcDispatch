@@ -49,6 +49,21 @@ namespace srcSAXEventDispatch{
 				}
 				return true;
 			}
+			inline bool IsEqualTo(ParserState lhs, ParserState rhs) const{
+				return triggerField[lhs] == triggerField[rhs] ? true : false;
+			}
+			inline bool IsGreaterThan(ParserState lhs, ParserState rhs) const{
+				return triggerField[lhs] > triggerField[rhs] ? true : false;
+			}
+			inline bool IsGreaterThanOrEqualTo(ParserState lhs, ParserState rhs) const{
+				return triggerField[lhs] >= triggerField[rhs] ? true : false;	
+			}
+			inline bool IsLessThan(ParserState lhs, ParserState rhs) const{
+				return triggerField[lhs] < triggerField[rhs] ? true : false;	
+			}
+			inline bool IsLessThanOrEqualTo(ParserState lhs, ParserState rhs) const{
+				return triggerField[lhs] <= triggerField[rhs] ? true : false;	
+			}
 			inline bool IsOpen(ParserState field) const{
 				if(triggerField[field]) return true;
 				else return false;

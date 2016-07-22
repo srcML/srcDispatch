@@ -2,27 +2,22 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <unordered_map>
-/*
- *Record current function being called
- *Record argument names and positions
- */
-class CallPolicy : public srcSAXEventDispatch::Listener{
-    struct CallData{
-        /*
-        {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},
-         NestedCalledFunction1{arg1, line#},{arg2, line#}, ..., {argn, line#}
-         }
-        */
-        std::map<std::string, std::vector<std::pair<std::string, unsigned int>>> CallArgumentLineNumberMap;
+class FunctionSignaturePolicy : public srcSAXEventDispatch::Listener{
+    struct SignatureData{
+        std::string nameoftype;
+        std::string nameofidentifier;
+        bool isConst;
+        bool isReference;
+        bool isPointer;
+        bool isStatic;
     };
     public:
-        CallData data;
-        ~CallPolicy(){}
-        CallPolicy(){InitializeEventHandlers();}
+        SignatureData data;
+        ~FunctionSignaturePolicy(){}
+        FunctionSignaturePolicy(){InitializeEventHandlers();}
         void HandleEvent(){}
     private:
-        int currentArgPosition;
-        std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
+        std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> EventToHandlerMap;
         void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, const srcSAXEventDispatch::srcSAXEventContext& ctx) override{
             switch(estate){
@@ -60,7 +55,7 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
                 { ParserState::argumentlist, [this](const srcSAXEventContext& ctx){
                 } },            
                 { ParserState::call, [this](const srcSAXEventContext& ctx){
-                } },
+                } },            
                 { ParserState::function, [this](const srcSAXEventContext& ctx){
                 } },
                 { ParserState::constructor, [this](const srcSAXEventContext& ctx){
@@ -78,7 +73,7 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
                 { ParserState::structn, [this](const srcSAXEventContext& ctx){
                 } },
                 { ParserState::parameter, [this](const srcSAXEventContext& ctx){
-                } },    
+                } },
                 { ParserState::memberlist, [this](const srcSAXEventContext& ctx){
                 } },    
                 { ParserState::index, [this](const srcSAXEventContext& ctx){
@@ -94,8 +89,8 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
                 { ParserState::literal, [this](const srcSAXEventContext& ctx){
                 } },    
                 { ParserState::modifier, [this](const srcSAXEventContext& ctx){
-                    if(currentModifier == "*"){}
-                    else if(currentModifier == "&"){}
+                    if(currentModifier.first == "*"){}
+                    else if(currentModifier.first == "&"){}
                 } },    
                 { ParserState::decl, [this](const srcSAXEventContext& ctx){
                 } },    
@@ -110,12 +105,6 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
                 { ParserState::macro, [this](const srcSAXEventContext& ctx){
                 } },
                 { ParserState::tokenstring, [this](const srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist)){
-                        std::cerr<<"Call: "<<ctx.currentToken<<std::endl;
-                    }
-                    if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && !ctx.sawgeneric){
-                        std::cerr<<"F Argument: "<<ctx.currentToken<<std::endl;
-                    }
                 } },
                 { ParserState::specifier, [this](const srcSAXEventContext& ctx){
                 } }
