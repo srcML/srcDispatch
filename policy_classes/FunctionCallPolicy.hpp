@@ -2,6 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <unordered_map>
+#include <stack>
 /*
  *Record current function being called
  *Record argument names and positions
@@ -18,9 +19,13 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
     public:
         CallData data;
         ~CallPolicy(){}
-        CallPolicy(){InitializeEventHandlers();}
+        CallPolicy(){
+            currentArgPosition = 1;
+            InitializeEventHandlers();
+        }
         void HandleEvent(){}
     private:
+        std::stack<std::pair<std::string, int>> callstack;
         int currentArgPosition;
         std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
         std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> EventToHandlerMap;
@@ -60,6 +65,7 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
                 { ParserState::argumentlist, [this](const srcSAXEventContext& ctx){
                 } },            
                 { ParserState::call, [this](const srcSAXEventContext& ctx){
+                    currentArgPosition = callstack.top().second;
                 } },
                 { ParserState::function, [this](const srcSAXEventContext& ctx){
                 } },
@@ -112,9 +118,12 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
                 { ParserState::tokenstring, [this](const srcSAXEventContext& ctx){
                     if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist)){
                         std::cerr<<"Call: "<<ctx.currentToken<<std::endl;
+                        callstack.push(std::make_pair(ctx.currentToken, currentArgPosition));
+                        currentArgPosition = 1;
                     }
                     if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && !ctx.sawgeneric){
-                        std::cerr<<"F Argument: "<<ctx.currentToken<<std::endl;
+                        std::cerr<<"F Argument: "<<ctx.currentToken<<callstack.top().second<<std::endl;
+                        ++callstack.top().second;
                     }
                 } },
                 { ParserState::specifier, [this](const srcSAXEventContext& ctx){
