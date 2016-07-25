@@ -1,0 +1,1 @@
+add_library(srcsaxeventdispatch srcSAXEventDispatch.cpp srcSAXEventDispatch.hpp)
