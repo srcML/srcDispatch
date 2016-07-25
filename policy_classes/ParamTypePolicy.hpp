@@ -16,7 +16,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::Listener{
         ParamData data;
         ~ParamTypePolicy(){}
         ParamTypePolicy(){InitializeEventHandlers();}
-        void HandleEvent(){}
+        void HandleEvent() override {}
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> EventToHandlerMap;

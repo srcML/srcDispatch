@@ -16,7 +16,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
         TypeData data;
         ~DeclTypePolicy(){}
         DeclTypePolicy(){InitializeEventHandlers();}
-        void HandleEvent(){}
+        void HandleEvent() override {}
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> EventToHandlerMap;

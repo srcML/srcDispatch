@@ -23,7 +23,7 @@ class CallPolicy : public srcSAXEventDispatch::Listener{
             currentArgPosition = 1;
             InitializeEventHandlers();
         }
-        void HandleEvent(){}
+        void HandleEvent() override {}
     private:
         std::stack<std::pair<std::string, int>> callstack;
         int currentArgPosition;
