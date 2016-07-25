@@ -47,11 +47,12 @@ namespace srcSAXEventDispatch {
             }
         }
     public:
-        void AddListener(Listener* l){
-            elementListeners.push_back(l);
+        void AddListener(Listener* listener){
+            listener->InitializeEventHandlers();
+            elementListeners.push_back(listener);
         }
-        void RemoveListener(Listener* l){
-            elementListeners.erase(std::remove(elementListeners.begin(), elementListeners.end(), l), elementListeners.end());
+        void RemoveListener(Listener* listener){
+            elementListeners.erase(std::remove(elementListeners.begin(), elementListeners.end(), listener), elementListeners.end());
         }
         srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
