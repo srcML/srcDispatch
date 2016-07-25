@@ -1,7 +1,7 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
-#include <unordered_map>
+
 class DeclTypePolicy : public srcSAXEventDispatch::Listener{
     struct TypeData{
         std::string nameoftype;

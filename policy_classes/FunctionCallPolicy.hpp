@@ -1,7 +1,6 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
-#include <unordered_map>
 #include <stack>
 /*
  *Record current function being called

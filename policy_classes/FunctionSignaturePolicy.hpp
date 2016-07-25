@@ -1,7 +1,7 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
-#include <unordered_map>
+
 class FunctionSignaturePolicy : public srcSAXEventDispatch::Listener{
     struct SignatureData{
         std::string nameoftype;
