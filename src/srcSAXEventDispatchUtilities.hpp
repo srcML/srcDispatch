@@ -3,6 +3,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
@@ -82,7 +83,7 @@ namespace srcSAXEventDispatch{
 	};
     class Listener {
 
-        private:
+        protected:
            std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> open_event_map, close_event_map;
 
 
@@ -92,8 +93,33 @@ namespace srcSAXEventDispatch{
                 DefaultEventHandlers();
             }
 
-            virtual void HandleEvent() = 0;
-            virtual void HandleEvent(ParserState, ElementState, const srcSAXEventContext&) = 0;
+            virtual void HandleEvent() {}
+            virtual void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, const srcSAXEventDispatch::srcSAXEventContext& ctx) {
+
+                switch(estate){
+
+                    case srcSAXEventDispatch::ElementState::open: {
+                        auto event = open_event_map.find(pstate);
+                        if(event != open_event_map.end()){
+                            event->second(ctx);
+                        }
+                        break;
+                    }
+
+                    case srcSAXEventDispatch::ElementState::close: {
+                        auto event = close_event_map.find(pstate);
+                        if(event != close_event_map.end()){
+                            event->second(ctx);
+                        }
+                        break;
+                    }
+
+                    default:
+                        throw std::runtime_error("Something went terribly, terribly wrong");
+
+                }
+
+            }
 
         private:
 
@@ -254,4 +280,3 @@ namespace srcSAXEventDispatch{
 }
 
 #endif
-

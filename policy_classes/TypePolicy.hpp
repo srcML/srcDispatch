@@ -16,79 +16,65 @@ class DeclTypePolicy : public srcSAXEventDispatch::Listener{
         TypeData data;
         ~DeclTypePolicy(){}
         DeclTypePolicy(){InitializeEventHandlers();}
-        void HandleEvent() override {}
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
-        std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> EventToHandlerMap;
-        void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, const srcSAXEventDispatch::srcSAXEventContext& ctx) override{
-            switch(estate){
-                case srcSAXEventDispatch::ElementState::open:{
-                    return; //do nothing
-                }
-                case srcSAXEventDispatch::ElementState::close:{
-                    auto event = EventToHandlerMap.find(pstate);
-                    if(event != EventToHandlerMap.end()){
-                        event->second(ctx);
-                    }
-                    break;
-                }
-                default:
-                    throw std::runtime_error("Something went terribly, terribly wrong"); 
-            }
-        }
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-            EventToHandlerMap = {  
-                { ParserState::modifier, [this](const srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::declstmt)){
-                        if(currentModifier == "*"){
-                            data.isPointer = true;
-                        }
-                        else if(currentModifier == "&"){
-                            data.isReference = true;
-                        }
+
+            close_event_map[ParserState::modifier] = [this](const srcSAXEventContext& ctx){
+                if(ctx.IsOpen(ParserState::declstmt)){
+                    if(currentModifier == "*"){
+                        data.isPointer = true;
                     }
-                } },    
-                { ParserState::decl, [this](const srcSAXEventContext& ctx){
-                    if(ctx.And({ParserState::declstmt})){
-                        data.linenumber = ctx.currentLineNumber;
-                        data.nameofidentifier = currentDeclName;
+                    else if(currentModifier == "&"){
+                        data.isReference = true;
                     }
-                } },    
-                { ParserState::type, [this](const srcSAXEventContext& ctx){
-                    if(ctx.And({ParserState::declstmt})){
-                        data.nameoftype = currentTypeName;
-                    }
-                } },
-                { ParserState::tokenstring, [this](const srcSAXEventContext& ctx){
-                    //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
-                    if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
-                        if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
-                            currentTypeName = ctx.currentToken;
-                        }
-                        if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) && 
-                           ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier}) && 
-                           !ctx.sawgeneric){
-                            currentDeclName = ctx.currentToken;
-                        }
-                        if(ctx.And({ParserState::specifier, ParserState::type, ParserState::declstmt})){
-                            currentSpecifier = ctx.currentToken;
-                        }
-                        if(ctx.And({ParserState::modifier, ParserState::type, ParserState::declstmt})){
-                            currentModifier = ctx.currentToken;
-                        }
-                    }
-                } },
-                { ParserState::specifier, [this](const srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::declstmt)){
-                        if(currentSpecifier == "const"){
-                            data.isStatic = true;
-                        }
-                        else if(currentSpecifier == "static"){
-                            data.isConst = true;
-                        }
-                    }
-                } }
+                }
             };
+
+            close_event_map[ParserState::decl] = [this](const srcSAXEventContext& ctx){
+                if(ctx.And({ParserState::declstmt})){
+                    data.linenumber = ctx.currentLineNumber;
+                    data.nameofidentifier = currentDeclName;
+                }
+            };
+
+            close_event_map[ParserState::type] = [this](const srcSAXEventContext& ctx){
+                if(ctx.And({ParserState::declstmt})){
+                    data.nameoftype = currentTypeName;
+                }
+            };
+
+            close_event_map[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx){
+                //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
+                if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
+                    if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
+                        currentTypeName = ctx.currentToken;
+                    }
+                    if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) && 
+                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier}) && 
+                       !ctx.sawgeneric){
+                        currentDeclName = ctx.currentToken;
+                    }
+                    if(ctx.And({ParserState::specifier, ParserState::type, ParserState::declstmt})){
+                        currentSpecifier = ctx.currentToken;
+                    }
+                    if(ctx.And({ParserState::modifier, ParserState::type, ParserState::declstmt})){
+                        currentModifier = ctx.currentToken;
+                    }
+                }
+            };
+
+            close_event_map[ParserState::specifier] = [this](const srcSAXEventContext& ctx){
+                if(ctx.IsOpen(ParserState::declstmt)){
+                    if(currentSpecifier == "const"){
+                        data.isStatic = true;
+                    }
+                    else if(currentSpecifier == "static"){
+                        data.isConst = true;
+                    }
+                }
+            };
+
         }
 };
