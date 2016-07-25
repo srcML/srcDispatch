@@ -3,7 +3,6 @@
 #include <functional>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
