@@ -1,4 +1,5 @@
 #include <srcSAXEventDispatch.hpp>
+#include <srcSAXEventDispatchUtilities.hpp>
 #include <TypePolicy.hpp>
 #include <FunctionSignaturePolicy.hpp>
 
@@ -25,8 +26,8 @@ class ClassPolicy : public srcSAXEventDispatch::Listener {
 
             std::vector<ParentData> parents;
 
-            std::vector<TypeData> fields;
-            std::vector<SignatureData> methods;
+            std::vector<DeclTypePolicy> fields;
+            std::vector<FunctionSignaturePolicy> methods;
 
         } data;
 
@@ -44,51 +45,42 @@ class ClassPolicy : public srcSAXEventDispatch::Listener {
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
 
-            open_event_map[ParserState::super] = [this](const srcSAXEventContext& ctx) {
+            // open_event_map[ParserState::super] = [this](const srcSAXEventContext& ctx) {
 
-                parents.emplace_back({ "", false, PUBLIC });
+            //     data.parents.emplace_back({ "", false, PUBLIC });
 
-            };
+            // };
 
             close_event_map[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {
 
-                if(And({ ParserState::classn, ParserState::name }) && Nor({ ParserState::block })) {
+                if(ctx.And({ ParserState::classn, ParserState::name }) && ctx.Nor({ ParserState::block })) {
 
                     data.name += ctx.currentToken;
 
-                } else if(And({ ParserState::classn, ParserState::super }) && Nor({ ParserState::block })) {
+                } else if(ctx.And({ ParserState::classn/*, ParserState::super*/ }) && ctx.Nor({ ParserState::block })) {
 
-                    if(And({ ParserState::specifier })) {
+                    if(ctx.And({ ParserState::specifier })) {
 
-                        switch(ctx.currentToken)
-                            
-                            case "virtual": {
-                                data.parents.back().isVirtual = true;
-                                break;
-                            }
-                            case "public": {
-                                data.parents.back().accessSpecifier = PUBLIC;
-                                break;
-                            }
-                            case "private": {
-                                data.parents.back().accessSpecifier = PRIVATE;
-                                break;
-                            }
-                            case "protected": {
-                                data.parents.back().accessSpecifier = PROTECTED;
-                                break;
-                            }
-                            default: {}
 
-                    } else if(AND({ ParserState::name })) {
+                        if(ctx.currentToken == "virtual") {
+                            data.parents.back().isVirtual = true;
+                        } else if(ctx.currentToken == "public") {
+                            data.parents.back().accessSpecifier = PUBLIC;
+                        } else if(ctx.currentToken == "private") {
+                            data.parents.back().accessSpecifier = PRIVATE;
+                        } else if(ctx.currentToken == "protected") {
+                            data.parents.back().accessSpecifier = PROTECTED;
+                        }
 
-                        data.parents.name += ctx.currentToken;
+                    } else if(ctx.And({ ParserState::name })) {
+
+                        data.parents.back().name += ctx.currentToken;
 
                     }
 
                 }
 
-            }
+            };
 
         }
 
