@@ -1,6 +1,14 @@
 #include <memory>
+#include <unordered_map>
+#include <functional>
+#include <string>
+#include <vector>
+#include <iostream>
+
+#ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
+#define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
+
 namespace srcSAXEventDispatch{
-	#include <vector>
 	template <typename ...policies>
     class srcSAXEventDispatcher;	    	
     enum ElementState {open, close};
@@ -76,13 +84,21 @@ namespace srcSAXEventDispatch{
     class Listener {
 
         private:
-            std::unordered_map< std::string, std::function<void()>> open_event_map, close_event_map;
+           std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> open_event_map, close_event_map;
+
 
         public:
+
+            Listener() {
+                DefaultEventHandlers();
+            }
+
             virtual void HandleEvent() = 0;
             virtual void HandleEvent(ParserState, ElementState, const srcSAXEventContext&) = 0;
 
-            void InitializeEventHandlers() {
+        private:
+
+            void DefaultEventHandlers() {
 
                 using namespace srcSAXEventDispatch;
                 open_event_map = {
@@ -237,3 +253,6 @@ namespace srcSAXEventDispatch{
         virtual void DispatchEvent(ParserState, ElementState, const srcSAXEventContext&) = 0;
     };
 }
+
+#endif
+

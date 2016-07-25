@@ -48,7 +48,6 @@ namespace srcSAXEventDispatch {
         }
     public:
         void AddListener(Listener* listener){
-            listener->InitializeEventHandlers();
             elementListeners.push_back(listener);
         }
         void RemoveListener(Listener* listener){
