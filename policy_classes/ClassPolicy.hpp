@@ -57,6 +57,7 @@ class ClassPolicy : public srcSAXEventDispatch::Listener {
 
                     data.name += ctx.currentToken;
 
+                /** @todo wont work.  Nested/local classes always in block.  Need to use depth */
                 } else if(ctx.And({ ParserState::classn/*, ParserState::super*/ }) && ctx.Nor({ ParserState::block })) {
 
                     if(ctx.And({ ParserState::specifier })) {
