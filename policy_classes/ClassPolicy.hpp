@@ -36,7 +36,20 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
     public:
 
-        ClassPolicy() : classDepth(0) { InitializeEventHandlers(); }
+
+        ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+            : srcSAXEventDispatch::PolicyDispatcher(listeners),
+              classDepth(0) { 
+        
+            InitializeEventHandlers();
+
+        }
+
+        void * dataInner() const override {
+
+            return new ClassData(data);
+
+        }
 
     private:
 
@@ -86,8 +99,12 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
             // end of policy
             closeEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
 
-                if(classDepth == ctx.depth)
+                if(classDepth == ctx.depth) {
+
                     classDepth = 0;
+                    notifyAll();    
+
+                }
                
 
             };

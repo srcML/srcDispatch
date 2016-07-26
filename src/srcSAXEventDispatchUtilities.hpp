@@ -3,6 +3,8 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <initializer_list>
+
 
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
@@ -84,7 +86,7 @@ namespace srcSAXEventDispatch{
     class EventListener {
 
         protected:
-           std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> open_event_map, close_event_map;
+           std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> openEventMap, closeEventMap;
 
 
         public:
@@ -99,16 +101,16 @@ namespace srcSAXEventDispatch{
                 switch(estate){
 
                     case srcSAXEventDispatch::ElementState::open: {
-                        auto event = open_event_map.find(pstate);
-                        if(event != open_event_map.end()){
+                        auto event = openEventMap.find(pstate);
+                        if(event != openEventMap.end()){
                             event->second(ctx);
                         }
                         break;
                     }
 
                     case srcSAXEventDispatch::ElementState::close: {
-                        auto event = close_event_map.find(pstate);
-                        if(event != close_event_map.end()){
+                        auto event = closeEventMap.find(pstate);
+                        if(event != closeEventMap.end()){
                             event->second(ctx);
                         }
                         break;
@@ -126,7 +128,7 @@ namespace srcSAXEventDispatch{
             void DefaultEventHandlers() {
 
                 using namespace srcSAXEventDispatch;
-                open_event_map = {
+                openEventMap = {
                     { ParserState::declstmt, [this](const srcSAXEventContext& ctx) {
                     } },
                     { ParserState::exprstmt, [this](const srcSAXEventContext& ctx) {
@@ -195,7 +197,7 @@ namespace srcSAXEventDispatch{
                     } }
                 };
 
-                close_event_map = {
+                closeEventMap = {
                     { ParserState::declstmt, [this](const srcSAXEventContext& ctx) {
                     } },             
                     { ParserState::exprstmt, [this](const srcSAXEventContext& ctx) {
@@ -286,16 +288,26 @@ namespace srcSAXEventDispatch{
         std::vector<EventListener*> elementListeners;
         virtual void DispatchEvent(ParserState, ElementState, const srcSAXEventContext&) = 0;
     };
+
     class PolicyDispatcher{
     public:
+        PolicyDispatcher(std::initializer_list<PolicyListener *> listeners) : policyListeners(listeners){}
         virtual void AddListener(PolicyListener* listener){
             policyListeners.push_back(listener);
         }
         virtual void RemoveListener(PolicyListener* listener){
             policyListeners.erase(std::remove(policyListeners.begin(), policyListeners.end(), listener), policyListeners.end());
         }
+
         template<typename T>
-        T data() {}
+        T * data() const {
+
+            return static_cast<T *>(dataInner());
+
+        }
+
+        virtual void * dataInner() const = 0;
+
     protected:
         std::vector<PolicyListener*> policyListeners;
         virtual void notifyAll() {
@@ -306,6 +318,7 @@ namespace srcSAXEventDispatch{
         }
 
     };
+
 }
 
 #endif
