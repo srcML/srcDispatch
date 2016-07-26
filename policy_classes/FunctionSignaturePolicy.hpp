@@ -2,7 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
-class FunctionSignaturePolicy : public srcSAXEventDispatch::Listener{
+class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener{
     struct SignatureData{
         std::string nameoftype;
         std::string nameofidentifier;

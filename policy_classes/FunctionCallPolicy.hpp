@@ -6,7 +6,7 @@
  *Record current function being called
  *Record argument names and positions
  */
-class CallPolicy : public srcSAXEventDispatch::Listener{
+class CallPolicy : public srcSAXEventDispatch::EventListener{
     struct CallData{
         /*
         {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},

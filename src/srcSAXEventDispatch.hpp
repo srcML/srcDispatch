@@ -40,17 +40,17 @@ namespace srcSAXEventDispatch {
 
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
-        std::vector<Listener*> elementListeners;
+        std::vector<EventListener*> elementListeners;
         void DispatchEvent(ParserState pstate, ElementState estate, const srcSAXEventContext& ctx){
-            for(std::vector<Listener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
+            for(std::vector<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
                 (*listener)->HandleEvent(pstate, estate, ctx);
             }
         }
     public:
-        void AddListener(Listener* listener){
+        void AddListener(EventListener* listener){
             elementListeners.push_back(listener);
         }
-        void RemoveListener(Listener* listener){
+        void RemoveListener(EventListener* listener){
             elementListeners.erase(std::remove(elementListeners.begin(), elementListeners.end(), listener), elementListeners.end());
         }
         srcSAXEventContext ctx;

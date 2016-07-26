@@ -5,9 +5,8 @@
 
 #include <string>
 #include <vector>
-#include <optional>
 
-class ClassPolicy : public srcSAXEventDispatch::Listener {
+class ClassPolicy : public srcSAXEventDispatch::EventListener {
 
     public:
 
@@ -85,7 +84,7 @@ class ClassPolicy : public srcSAXEventDispatch::Listener {
             };
 
             // end of policy
-            end_event_map[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+            close_event_map[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
 
                 if(class_depth == ctx.depth)
                     class_depth = 0;

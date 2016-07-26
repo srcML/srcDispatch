@@ -8,8 +8,8 @@
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 
 namespace srcSAXEventDispatch{
-	template <typename ...policies>
-    class srcSAXEventDispatcher;	    	
+    template <typename ...policies>
+    class srcSAXEventDispatcher;            
     enum ElementState {open, close};
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, 
         argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, 
@@ -17,71 +17,71 @@ namespace srcSAXEventDispatch{
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
         specifier, typedefexpr, empty, tokenstring, MAXENUMVALUE = empty};
-	class srcSAXEventContext{
-    	public:
-    		srcSAXEventContext(){
-    			triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
-    		}
-	
-        	unsigned int currentLineNumber;
-        	std::vector<unsigned short int> triggerField;
-        	std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
-			bool sawgeneric;
+    class srcSAXEventContext{
+        public:
+            srcSAXEventContext(){
+                triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
+            }
+    
+            unsigned int currentLineNumber;
+            std::vector<unsigned short int> triggerField;
+            std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
+            bool sawgeneric;
             std::size_t depth;
-			
-			inline bool And(std::vector<ParserState> vec) const{
-				for(auto field : vec){
-					if(triggerField[field]) continue;
-					else return false;
-				}
-				return true;
-			}
-			inline bool Nand(std::vector<ParserState> vec) const{
-				for(auto field : vec){
-					if(triggerField[field]) return false;
-					else continue;
-				}
-				return true;
-			}
-			inline bool Or(std::vector<ParserState> vec) const{
-				for(auto field : vec){
-					if(triggerField[field]) return true;
-					else continue;
-				}
-				return false;
-			}
-			inline bool Nor(std::vector<ParserState> vec) const{
-				for(auto field : vec){
-					if(triggerField[field]) return false;
-					else continue;
-				}
-				return true;
-			}
-			inline bool IsEqualTo(ParserState lhs, ParserState rhs) const{
-				return triggerField[lhs] == triggerField[rhs] ? true : false;
-			}
-			inline bool IsGreaterThan(ParserState lhs, ParserState rhs) const{
-				return triggerField[lhs] > triggerField[rhs] ? true : false;
-			}
-			inline bool IsGreaterThanOrEqualTo(ParserState lhs, ParserState rhs) const{
-				return triggerField[lhs] >= triggerField[rhs] ? true : false;	
-			}
-			inline bool IsLessThan(ParserState lhs, ParserState rhs) const{
-				return triggerField[lhs] < triggerField[rhs] ? true : false;	
-			}
-			inline bool IsLessThanOrEqualTo(ParserState lhs, ParserState rhs) const{
-				return triggerField[lhs] <= triggerField[rhs] ? true : false;	
-			}
-			inline bool IsOpen(ParserState field) const{
-				if(triggerField[field]) return true;
-				else return false;
-			}
-			inline bool IsClosed(ParserState field) const{
-				if(triggerField[field]) return false;
-				else return true;
-			}
-	};
-    class Listener {
+            
+            inline bool And(std::vector<ParserState> vec) const{
+                for(auto field : vec){
+                    if(triggerField[field]) continue;
+                    else return false;
+                }
+                return true;
+            }
+            inline bool Nand(std::vector<ParserState> vec) const{
+                for(auto field : vec){
+                    if(triggerField[field]) return false;
+                    else continue;
+                }
+                return true;
+            }
+            inline bool Or(std::vector<ParserState> vec) const{
+                for(auto field : vec){
+                    if(triggerField[field]) return true;
+                    else continue;
+                }
+                return false;
+            }
+            inline bool Nor(std::vector<ParserState> vec) const{
+                for(auto field : vec){
+                    if(triggerField[field]) return false;
+                    else continue;
+                }
+                return true;
+            }
+            inline bool IsEqualTo(ParserState lhs, ParserState rhs) const{
+                return triggerField[lhs] == triggerField[rhs] ? true : false;
+            }
+            inline bool IsGreaterThan(ParserState lhs, ParserState rhs) const{
+                return triggerField[lhs] > triggerField[rhs] ? true : false;
+            }
+            inline bool IsGreaterThanOrEqualTo(ParserState lhs, ParserState rhs) const{
+                return triggerField[lhs] >= triggerField[rhs] ? true : false;   
+            }
+            inline bool IsLessThan(ParserState lhs, ParserState rhs) const{
+                return triggerField[lhs] < triggerField[rhs] ? true : false;    
+            }
+            inline bool IsLessThanOrEqualTo(ParserState lhs, ParserState rhs) const{
+                return triggerField[lhs] <= triggerField[rhs] ? true : false;   
+            }
+            inline bool IsOpen(ParserState field) const{
+                if(triggerField[field]) return true;
+                else return false;
+            }
+            inline bool IsClosed(ParserState field) const{
+                if(triggerField[field]) return false;
+                else return true;
+            }
+    };
+    class EventListener {
 
         protected:
            std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> open_event_map, close_event_map;
@@ -89,7 +89,7 @@ namespace srcSAXEventDispatch{
 
         public:
 
-            Listener() {
+            EventListener() {
                 DefaultEventHandlers();
             }
 
@@ -269,13 +269,42 @@ namespace srcSAXEventDispatch{
         }
 
     };
+    class PolicyDispatcher;
+    class PolicyListener{
+
+        public:
+
+            PolicyListener() {}
+            virtual void notify(const PolicyDispatcher * policy) = 0;
+
+        };
     class EventDispatcher{
     public:
-        virtual void AddListener(Listener* l) = 0;
-        virtual void RemoveListener(Listener* l) = 0;
+        virtual void AddListener(EventListener* l) = 0;
+        virtual void RemoveListener(EventListener* l) = 0;
     protected:
-        std::vector<Listener*> elementListeners;
+        std::vector<EventListener*> elementListeners;
         virtual void DispatchEvent(ParserState, ElementState, const srcSAXEventContext&) = 0;
+    };
+    class PolicyDispatcher{
+    public:
+        virtual void AddListener(PolicyListener* listener){
+            policyListeners.push_back(listener);
+        }
+        virtual void RemoveListener(PolicyListener* listener){
+            policyListeners.erase(std::remove(policyListeners.begin(), policyListeners.end(), listener), policyListeners.end());
+        }
+        template<typename T>
+        T data() {}
+    protected:
+        std::vector<PolicyListener*> policyListeners;
+        virtual void notifyAll() {
+
+            for( PolicyListener * const listener : policyListeners)
+                listener->notify(this);
+
+        }
+
     };
 }
 

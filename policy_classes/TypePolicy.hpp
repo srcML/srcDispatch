@@ -2,7 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
-class DeclTypePolicy : public srcSAXEventDispatch::Listener{
+class DeclTypePolicy : public srcSAXEventDispatch::EventListener{
     struct TypeData{
         std::string nameoftype;
         std::string nameofidentifier;

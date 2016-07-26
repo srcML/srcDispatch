@@ -2,7 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
-class ParamTypePolicy : public srcSAXEventDispatch::Listener{
+class ParamTypePolicy : public srcSAXEventDispatch::EventListener{
     struct ParamData{
         std::string nameoftype;
         std::string nameofidentifier;
