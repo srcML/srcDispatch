@@ -37,7 +37,6 @@ namespace srcSAXEventDispatch {
     class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher{
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
-
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
         std::vector<Listener*> elementListeners;
@@ -91,7 +90,12 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::templates, ElementState::open, ctx);
                 } },
                 { "argument_list", [this](){
-                    ++ctx.triggerField[ParserState::argumentlist];
+                    if(!ctx.sawgeneric){
+                        ++ctx.triggerField[ParserState::argumentlist];
+                    }else{
+                        ctx.genericDepth.push_back(ctx.depth);
+                        ++ctx.triggerField[ParserState::genericargumentlist];
+                    }
                     DispatchEvent(ParserState::argumentlist, ElementState::open, ctx);
                 } },
                 { "call", [this](){
@@ -233,8 +237,12 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::templates, ElementState::close, ctx);
                 } },            
                 { "argument_list", [this](){
-                    ctx.sawgeneric = false; //TODO investigate how to make this work properly
-                    --ctx.triggerField[ParserState::argumentlist];
+                    if(ctx.genericDepth.back() == ctx.depth){
+                        ctx.sawgeneric = false; //TODO investigate how to make this work properly
+                        --ctx.triggerField[ParserState::genericargumentlist];    
+                    }else{
+                        --ctx.triggerField[ParserState::argumentlist];
+                    }
                     DispatchEvent(ParserState::argumentlist, ElementState::close, ctx);
                 } },            
                 { "call", [this](){
