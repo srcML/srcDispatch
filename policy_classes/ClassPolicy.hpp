@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-class ClassPolicy : public srcSAXEventDispatch::EventListener {
+class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
 
     public:
 
@@ -32,18 +32,18 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener {
 
     private:
 
-        std::size_t class_depth;
+        std::size_t classDepth;
 
     public:
 
-        ClassPolicy() : class_depth(0) { InitializeEventHandlers(); }
+        ClassPolicy() : classDepth(0) { InitializeEventHandlers(); }
 
     private:
 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
 
-            close_event_map[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {
 
                 if(ctx.And({ ParserState::classn, ParserState::name }) && ctx.Nor({ ParserState::block })) {
 
@@ -76,23 +76,23 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener {
             };
 
             // start of policy
-            open_event_map[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+            openEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
 
-                if(!class_depth)
-                    class_depth = ctx.depth;
+                if(!classDepth)
+                    classDepth = ctx.depth;
 
             };
 
             // end of policy
-            close_event_map[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
 
-                if(class_depth == ctx.depth)
-                    class_depth = 0;
+                if(classDepth == ctx.depth)
+                    classDepth = 0;
                
 
             };
 
-            open_event_map[ParserState::super] = [this](const srcSAXEventContext& ctx) {
+            openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {
 
                 data.parents.emplace_back(ParentData{ "", false, PUBLIC });
 

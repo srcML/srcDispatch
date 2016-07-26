@@ -21,7 +21,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener{
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
 
-            close_event_map[ParserState::modifier] = [this](const srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::modifier] = [this](const srcSAXEventContext& ctx) {
                     if(currentModifier == "*") {}
                     else if(currentModifier == "&") {}
                 };
