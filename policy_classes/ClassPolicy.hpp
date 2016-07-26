@@ -5,7 +5,7 @@
 
 #include <string>
 #include <vector>
-#include <exception>
+#include <optional>
 
 class ClassPolicy : public srcSAXEventDispatch::Listener {
 
@@ -33,23 +33,16 @@ class ClassPolicy : public srcSAXEventDispatch::Listener {
 
     private:
 
+        std::size_t class_depth;
 
     public:
 
-        ClassPolicy(){ InitializeEventHandlers(); }
+        ClassPolicy() : class_depth(0) { InitializeEventHandlers(); }
 
     private:
 
-
-
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-
-            // open_event_map[ParserState::super] = [this](const srcSAXEventContext& ctx) {
-
-            //     data.parents.emplace_back({ "", false, PUBLIC });
-
-            // };
 
             close_event_map[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {
 
@@ -58,7 +51,7 @@ class ClassPolicy : public srcSAXEventDispatch::Listener {
                     data.name += ctx.currentToken;
 
                 /** @todo wont work.  Nested/local classes always in block.  Need to use depth */
-                } else if(ctx.And({ ParserState::classn/*, ParserState::super*/ }) && ctx.Nor({ ParserState::block })) {
+                } else if(ctx.And({ ParserState::classn, ParserState::super }) && ctx.Nor({ ParserState::block })) {
 
                     if(ctx.And({ ParserState::specifier })) {
 
@@ -80,6 +73,29 @@ class ClassPolicy : public srcSAXEventDispatch::Listener {
                     }
 
                 }
+
+            };
+
+            // start of policy
+            open_event_map[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+
+                if(!class_depth)
+                    class_depth = ctx.depth;
+
+            };
+
+            // end of policy
+            end_event_map[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+
+                if(class_depth == ctx.depth)
+                    class_depth = 0;
+               
+
+            };
+
+            open_event_map[ParserState::super] = [this](const srcSAXEventContext& ctx) {
+
+                data.parents.emplace_back(ParentData{ "", false, PUBLIC });
 
             };
 

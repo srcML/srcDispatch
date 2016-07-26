@@ -15,7 +15,7 @@ namespace srcSAXEventDispatch{
         argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, 
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
-        preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
+        super_list, super, preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
         specifier, typedefexpr, empty, tokenstring, MAXENUMVALUE = empty};
 	class srcSAXEventContext{
     	public:
@@ -27,6 +27,7 @@ namespace srcSAXEventDispatch{
         	std::vector<unsigned short int> triggerField;
         	std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
 			bool sawgeneric;
+            std::size_t depth;
 			
 			inline bool And(std::vector<ParserState> vec) const{
 				for(auto field : vec){

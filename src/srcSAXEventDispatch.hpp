@@ -126,6 +126,14 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::structn, ElementState::open, ctx);
                 } },
+                { "super_list", [this](){
+                    ++ctx.triggerField[ParserState::super_list];
+                    DispatchEvent(ParserState::super_list, ElementState::open, ctx);
+                } },
+                { "super", [this](){
+                    ++ctx.triggerField[ParserState::super];
+                    DispatchEvent(ParserState::super, ElementState::open, ctx);
+                } },
                 { "destructor", [this](){
                     ++ctx.triggerField[ParserState::destructor];
                     DispatchEvent(ParserState::destructor, ElementState::open, ctx);
@@ -265,6 +273,14 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::structn, ElementState::close, ctx);
                 } },
+                { "super_list", [this](){
+                    ++ctx.triggerField[ParserState::super_list];
+                    DispatchEvent(ParserState::super_list, ElementState::close, ctx);
+                } },
+                { "super", [this](){
+                    ++ctx.triggerField[ParserState::super];
+                    DispatchEvent(ParserState::super, ElementState::close, ctx);
+                } },
                 { "parameter", [this](){
                     --ctx.triggerField[ParserState::parameterlist];
                     DispatchEvent(ParserState::parameter, ElementState::close, ctx);
@@ -403,6 +419,9 @@ namespace srcSAXEventDispatch {
         virtual void startElement(const char * localname, const char * prefix, const char * URI,
                                     int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                                     const struct srcsax_attribute * attributes) {
+
+            ++ctx.depth;
+
             if(std::string(localname) == "position"){
                 ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
             }
@@ -444,10 +463,14 @@ namespace srcSAXEventDispatch {
         }
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) {
+
             std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localname);            
             if (process2 != process_map2.end()) {
                 process2->second();
             }
+
+            --ctx.depth;
+
         }
     #pragma GCC diagnostic pop
     
