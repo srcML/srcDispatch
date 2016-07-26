@@ -12,7 +12,7 @@ namespace srcSAXEventDispatch{
     class srcSAXEventDispatcher;            
     enum ElementState {open, close};
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, 
-        argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, 
+        argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, genericargumentlist,
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
@@ -22,7 +22,7 @@ namespace srcSAXEventDispatch{
             srcSAXEventContext(){
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
             }
-    
+            std::vector<int> genericDepth;
             unsigned int currentLineNumber;
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
