@@ -13,10 +13,15 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener{
         bool isStatic;
     };
     public:
-        ParamData data;
-        ~ParamTypePolicy(){}
-        ParamTypePolicy(){InitializeEventHandlers();}
+        ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+            InitializeEventHandlers();
+        }
+    protected:
+        void * DataInner() const override {
+            return new ParamData(data);
+        }
     private:
+        ParamData data;
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
 
         void InitializeEventHandlers(){

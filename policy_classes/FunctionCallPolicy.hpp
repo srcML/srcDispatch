@@ -2,34 +2,39 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <stack>
+#include <list>
 /*
  *Record current function being called
  *Record argument names and positions
  */
-class CallPolicy : public srcSAXEventDispatch::EventListener{
+class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
+    /*
+    {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},
+        NestedCalledFunction1{arg1, line#},{arg2, line#}, ..., {argn, line#}
+        }
+    */
     struct CallData{
-        /*
-        {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},
-         NestedCalledFunction1{arg1, line#},{arg2, line#}, ..., {argn, line#}
-         }
-        */
-        std::map<std::string, std::vector<std::pair<std::string, unsigned int>>> CallArgumentLineNumberMap;
+        std::string fnName;
+        std::list<std::pair<std::string, unsigned int>> CallArgumentLineNumberMap;
     };
     public:
-        CallData data;
         ~CallPolicy(){}
-        CallPolicy(){
+        CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             currentArgPosition = 1;
             InitializeEventHandlers();
         }
+    protected:
+        void * DataInner() const override {
+            return new CallData(data);
+        }
     private:
-        std::stack<std::pair<std::string, int>> callstack;
+        CallData data;
         int currentArgPosition;
         std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                    currentArgPosition = callstack.top().second;
+                    currentArgPosition = --(data.CallArgumentLineNumberMap.back()).second;
                 };
 
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
@@ -40,13 +45,14 @@ class CallPolicy : public srcSAXEventDispatch::EventListener{
             closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx){
                     if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                         std::cerr<<"Call: "<<ctx.currentToken<<std::endl;
-                        callstack.push(std::make_pair(ctx.currentToken, currentArgPosition));
+                        data.fnName = ctx.currentToken;
                         currentArgPosition = 1;
                     }
-                    std::cerr<<ctx.IsOpen(ParserState::name)<<" "<<ctx.IsOpen(ParserState::argument)<<" "<<ctx.IsOpen(ParserState::argumentlist)<<" "<<ctx.IsOpen(ParserState::genericargumentlist)<<std::endl;
-                    if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && ctx.IsClosed(ParserState::genericargumentlist)){
-                        std::cerr<<"F Argument: "<<ctx.currentToken<<callstack.top().second<<std::endl;
-                        ++callstack.top().second;
+                    //std::cerr<<ctx.IsOpen(ParserState::name)<<" "<<ctx.IsOpen(ParserState::argument)<<" "<<ctx.IsOpen(ParserState::argumentlist)<<" "<<ctx.IsOpen(ParserState::genericargumentlist)<<std::endl;
+                    if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
+                        data.CallArgumentLineNumberMap.push_back(std::make_pair(ctx.currentToken, currentArgPosition));
+                        std::cerr<<"F Argument: "<<ctx.currentToken<<data.CallArgumentLineNumberMap.back().second<<std::endl;
+                        ++currentArgPosition;
                     }
                 };
         }

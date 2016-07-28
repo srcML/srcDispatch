@@ -2,8 +2,8 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
-class DeclTypePolicy : public srcSAXEventDispatch::EventListener{
-    struct TypeData{
+class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
+    struct DeclTypeData{
         std::string nameoftype;
         std::string nameofidentifier;
         int linenumber;
@@ -13,9 +13,15 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener{
         bool isStatic;
     };
     public:
-        TypeData data;
+        DeclTypeData data;
         ~DeclTypePolicy(){}
-        DeclTypePolicy(){InitializeEventHandlers();}
+        DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+            InitializeEventHandlers();
+        }
+    protected:
+        void * DataInner() const override {
+            return new DeclTypeData(data);
+        }
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         void InitializeEventHandlers(){

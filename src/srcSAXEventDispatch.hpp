@@ -235,7 +235,6 @@ namespace srcSAXEventDispatch {
                 } },            
                 { "argument_list", [this](){
                     if(!ctx.genericDepth.empty()){
-                        std::cerr<<ctx.genericDepth.back()<<" "<<ctx.depth<<std::endl;
                         if(ctx.genericDepth.back() == ctx.depth){
                             --ctx.triggerField[ParserState::genericargumentlist];
                             ctx.genericDepth.pop_back();

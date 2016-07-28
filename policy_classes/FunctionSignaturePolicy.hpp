@@ -2,7 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
-class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener{
+class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
     struct SignatureData{
         std::string nameoftype;
         std::string nameofidentifier;
@@ -12,10 +12,17 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener{
         bool isStatic;
     };
     public:
-        SignatureData data;
         ~FunctionSignaturePolicy(){}
-        FunctionSignaturePolicy(){InitializeEventHandlers();}
+        FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+            currentArgPosition = 1;
+            InitializeEventHandlers();
+        }
+    protected:
+        void * DataInner() const override {
+            return new SignatureData(data);
+        }
     private:
+        SignatureData data;
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
 
         void InitializeEventHandlers(){
