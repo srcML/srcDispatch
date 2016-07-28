@@ -32,7 +32,9 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     if(currentModifier == "*") {}
                     else if(currentModifier == "&") {}
                 };
-
+            closeEventMap[ParserState::functiondecl] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
+                    NotifyAll(ctx);
+            };
         }
 
 };

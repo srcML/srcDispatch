@@ -35,14 +35,14 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     currentArgPosition = --(data.CallArgumentLineNumberMap.back()).second;
-                };
+            };
 
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                     if(currentModifier == "*"){}
                     else if(currentModifier == "&"){}
-                };
+            };
 
-            closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                     if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                         std::cerr<<"Call: "<<ctx.currentToken<<std::endl;
                         data.fnName = ctx.currentToken;
@@ -54,6 +54,11 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                         std::cerr<<"F Argument: "<<ctx.currentToken<<data.CallArgumentLineNumberMap.back().second<<std::endl;
                         ++currentArgPosition;
                     }
-                };
+            };
+            closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
+                if(ctx.IsClosed(ParserState::call)){
+                    NotifyAll(ctx);
+                }
+            };
         }
 };

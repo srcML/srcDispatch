@@ -70,7 +70,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     }
                 }
             };
-
+            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
+                    NotifyAll(ctx);
+            };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentSpecifier == "const"){

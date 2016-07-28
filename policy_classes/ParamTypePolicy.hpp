@@ -70,7 +70,9 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener{
                     }
                 }
             };
-
+            closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
+                    NotifyAll(ctx);
+            };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
                     if(currentSpecifier == "const"){
