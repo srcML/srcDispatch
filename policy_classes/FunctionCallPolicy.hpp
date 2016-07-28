@@ -38,12 +38,13 @@ class CallPolicy : public srcSAXEventDispatch::EventListener{
                 };
 
             closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist)){
+                    if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                         std::cerr<<"Call: "<<ctx.currentToken<<std::endl;
                         callstack.push(std::make_pair(ctx.currentToken, currentArgPosition));
                         currentArgPosition = 1;
                     }
-                    if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && !ctx.sawgeneric){
+                    std::cerr<<ctx.IsOpen(ParserState::name)<<" "<<ctx.IsOpen(ParserState::argument)<<" "<<ctx.IsOpen(ParserState::argumentlist)<<" "<<ctx.IsOpen(ParserState::genericargumentlist)<<std::endl;
+                    if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && ctx.IsClosed(ParserState::genericargumentlist)){
                         std::cerr<<"F Argument: "<<ctx.currentToken<<callstack.top().second<<std::endl;
                         ++callstack.top().second;
                     }
