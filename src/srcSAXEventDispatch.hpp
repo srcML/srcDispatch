@@ -138,6 +138,18 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::super];
                     DispatchEvent(ParserState::super, ElementState::open, ctx);
                 } },
+                { "public", [this](){
+                    ++ctx.triggerField[ParserState::publicaccess];
+                    DispatchEvent(ParserState::publicaccess, ElementState::open, ctx);
+                } },
+                { "protected", [this](){
+                    ++ctx.triggerField[ParserState::protectedaccess];
+                    DispatchEvent(ParserState::protectedaccess, ElementState::open, ctx);
+                } },
+                { "private", [this](){
+                    ++ctx.triggerField[ParserState::privateaccess];
+                    DispatchEvent(ParserState::privateaccess, ElementState::open, ctx);
+                } },
                 { "destructor", [this](){
                     ++ctx.triggerField[ParserState::destructor];
                     DispatchEvent(ParserState::destructor, ElementState::open, ctx);
@@ -288,6 +300,18 @@ namespace srcSAXEventDispatch {
                 { "super", [this](){
                     ++ctx.triggerField[ParserState::super];
                     DispatchEvent(ParserState::super, ElementState::close, ctx);
+                } },
+                { "public", [this](){
+                    ++ctx.triggerField[ParserState::publicaccess];
+                    DispatchEvent(ParserState::publicaccess, ElementState::close, ctx);
+                } },
+                { "protected", [this](){
+                    ++ctx.triggerField[ParserState::protectedaccess];
+                    DispatchEvent(ParserState::protectedaccess, ElementState::close, ctx);
+                } },
+                { "private", [this](){
+                    ++ctx.triggerField[ParserState::privateaccess];
+                    DispatchEvent(ParserState::privateaccess, ElementState::close, ctx);
                 } },
                 { "parameter", [this](){
                     --ctx.triggerField[ParserState::parameterlist];

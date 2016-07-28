@@ -17,7 +17,7 @@ namespace srcSAXEventDispatch{
         argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, genericargumentlist,
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
-        super_list, super, preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
+        super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
         specifier, typedefexpr, empty, tokenstring, MAXENUMVALUE = empty};
     class srcSAXEventContext{
         public:
@@ -165,6 +165,9 @@ namespace srcSAXEventDispatch{
                     ParserState::constructordecl,
                     ParserState::classn,
                     ParserState::structn,
+                    ParserState::publicaccess,
+                    ParserState::protectedaccess,
+                    ParserState::privateaccess,
                     ParserState::destructor,
                     ParserState::parameter,
                     ParserState::memberlist,
@@ -202,6 +205,9 @@ namespace srcSAXEventDispatch{
                     ParserState::destructordecl,
                     ParserState::classn,
                     ParserState::structn,
+                    ParserState::publicaccess,
+                    ParserState::protectedaccess,                  
+                    ParserState::privateaccess,
                     ParserState::parameter,
                     ParserState::memberlist,
                     ParserState::index,

@@ -34,6 +34,7 @@ private:
 
     ClassData data;
     std::size_t classDepth;
+    AccessSpecifier currentRegion;
 
 public:
 
@@ -41,7 +42,8 @@ public:
     ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
-          classDepth(0) { 
+          classDepth(0),
+          currentRegion(PUBLIC) { 
     
         InitializeClassPolicyHandlers();
 
@@ -68,6 +70,7 @@ private:
                 data = ClassData{};
                 CollectNameHandlers();
                 CollectSuperHanders();
+                CollectBlockHanders();
 
             }
 
@@ -93,7 +96,7 @@ private:
 
         openEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
 
-            if(classDepth && (classDepth + 1) == ctx.depth) {
+            if((classDepth + 1) == ctx.depth) {
 
                 closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) { data.name += ctx.currentToken; };
 
@@ -103,7 +106,7 @@ private:
 
         closeEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
 
-            if(classDepth && (classDepth + 1) == ctx.depth) {
+            if((classDepth + 1) == ctx.depth) {
 
                 NopOpenEvents({ParserState::name});
                 NopCloseEvents({ParserState::name, ParserState::tokenstring});
@@ -119,7 +122,7 @@ private:
 
         openEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
 
-            if(classDepth && (classDepth + 1) == ctx.depth) {
+            if((classDepth + 1) == ctx.depth) {
 
                 openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {
 
@@ -156,10 +159,70 @@ private:
 
         closeEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
 
-            if(classDepth && (classDepth + 1) == ctx.depth) {
+            if((classDepth + 1) == ctx.depth) {
 
                 NopOpenEvents({ParserState::super_list, ParserState::super});
                 NopCloseEvents({ParserState::super_list, ParserState::tokenstring});
+
+            }
+
+        };
+
+    }
+
+    void CollectBlockHanders() {
+        using namespace srcSAXEventDispatch;
+
+        openEventMap[ParserState::block] = [this](const srcSAXEventContext& ctx) {
+
+            if((classDepth + 1) == ctx.depth) {
+
+                NopOpenEvents({ParserState::name, ParserState::super_list, ParserState::super});
+                NopCloseEvents({ParserState::name, ParserState::super_list, ParserState::tokenstring});
+
+                // set up to listen to decl_stmt, member, and class policies
+
+            }
+
+        };
+
+        // should always be in a region once block starts, so should not have to close
+        openEventMap[ParserState::publicaccess] = [this](const srcSAXEventContext& ctx) {
+
+            if((classDepth + 2) == ctx.depth) {
+
+                currentRegion = PUBLIC;
+
+            }
+
+        };
+
+        openEventMap[ParserState::protectedaccess] = [this](const srcSAXEventContext& ctx) {
+
+            if((classDepth + 2) == ctx.depth) {
+
+                currentRegion = PROTECTED;
+
+            }
+
+        };
+
+        openEventMap[ParserState::privateaccess] = [this](const srcSAXEventContext& ctx) {
+
+            if((classDepth + 2) == ctx.depth) {
+
+                currentRegion = PRIVATE;
+
+            }
+
+        };
+
+        openEventMap[ParserState::block] = [this](const srcSAXEventContext& ctx) {
+
+            if((classDepth + 1) == ctx.depth) {
+
+                NopOpenEvents({ParserState::block, ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
+                NopCloseEvents({ParserState::block});
 
             }
 
