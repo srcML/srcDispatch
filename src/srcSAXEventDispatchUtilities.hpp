@@ -174,7 +174,7 @@ namespace srcSAXEventDispatch{
         public:
 
             PolicyListener() {}
-            virtual void Notify(const PolicyDispatcher * policy) = 0;
+            virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventContext & ctx) = 0;
 
         };
     class EventDispatcher{
@@ -206,9 +206,9 @@ namespace srcSAXEventDispatch{
     protected:
         std::list<PolicyListener*> policyListeners;
         virtual void * DataInner() const = 0;
-        virtual void NotifyAll() {
+        virtual void NotifyAll(const srcSAXEventContext & ctx) {
             for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){
-                (*listener)->Notify(this);
+                (*listener)->Notify(this, ctx);
             }
 
         }

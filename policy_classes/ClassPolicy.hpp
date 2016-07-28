@@ -56,7 +56,7 @@ public:
 
     }
 
-    void Notify(const PolicyDispatcher * policy) override {
+    void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
         data.name = policy->Data<NamePolicy::NameData>();
 
@@ -103,7 +103,7 @@ private:
             if(classDepth && classDepth == ctx.depth) {
 
                 classDepth = 0;
-                NotifyAll();
+                NotifyAll(ctx);
                 InitializeClassPolicyHandlers();
 
             }
