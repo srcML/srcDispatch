@@ -47,6 +47,7 @@ public:
 
     }
 
+protected:
     void * dataInner() const override {
 
         return new ClassData(data);

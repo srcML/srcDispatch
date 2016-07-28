@@ -306,10 +306,9 @@ namespace srcSAXEventDispatch{
 
         }
 
-        virtual void * dataInner() const = 0;
-
     protected:
         std::vector<PolicyListener*> policyListeners;
+        virtual void * dataInner() const = 0;
         virtual void notifyAll() {
 
             for( PolicyListener * const listener : policyListeners)
