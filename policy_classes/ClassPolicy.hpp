@@ -105,9 +105,8 @@ private:
 
             if(classDepth && (classDepth + 1) == ctx.depth) {
 
-                openEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {};
-                closeEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {};
-                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {};
+                NopOpenEvents({ParserState::name});
+                NopCloseEvents({ParserState::name, ParserState::tokenstring});
 
             }
 
@@ -159,16 +158,13 @@ private:
 
             if(classDepth && (classDepth + 1) == ctx.depth) {
 
-                openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {};
-                openEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {};
-                closeEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {};
-                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {};
+                NopOpenEvents({ParserState::super_list, ParserState::super});
+                NopCloseEvents({ParserState::super_list, ParserState::tokenstring});
 
             }
 
         };
 
     }
-
 
 };
