@@ -277,7 +277,7 @@ namespace srcSAXEventDispatch{
         public:
 
             PolicyListener() {}
-            virtual void notify(const PolicyDispatcher * policy) = 0;
+            virtual void Notify(const PolicyDispatcher * policy) = 0;
 
         };
     class EventDispatcher{
@@ -300,19 +300,19 @@ namespace srcSAXEventDispatch{
         }
 
         template<typename T>
-        T * data() const {
+        T * Data() const {
 
-            return static_cast<T *>(dataInner());
+            return static_cast<T *>(DataInner());
 
         }
 
     protected:
         std::vector<PolicyListener*> policyListeners;
-        virtual void * dataInner() const = 0;
-        virtual void notifyAll() {
+        virtual void * DataInner() const = 0;
+        virtual void NotifyAll() {
 
             for( PolicyListener * const listener : policyListeners)
-                listener->notify(this);
+                listener->Notify(this);
 
         }
 

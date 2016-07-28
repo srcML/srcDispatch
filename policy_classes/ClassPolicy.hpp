@@ -48,7 +48,7 @@ public:
     }
 
 protected:
-    void * dataInner() const override {
+    void * DataInner() const override {
 
         return new ClassData(data);
 
@@ -79,7 +79,7 @@ private:
             if(classDepth && classDepth == ctx.depth) {
 
                 classDepth = 0;
-                notifyAll();
+                NotifyAll();
                 InitializeClassPolicyHandlers();
 
             }
