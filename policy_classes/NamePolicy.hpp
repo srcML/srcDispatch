@@ -17,7 +17,19 @@ public:
 
         friend std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
 
-            return out << nameData.name;
+            if(!nameData.name.empty()) {
+                return out << nameData.name;
+            }
+
+            for(size_t pos = 0; pos < nameData.names.size(); ++pos) {
+
+                if(pos != 0) out << "::";
+                out << (*nameData.names[pos]);
+
+            }
+
+            return out;
+
 
         }
 
@@ -70,8 +82,8 @@ private:
 
             } else if((nameDepth + 1) == ctx.depth) {
 
-                // namePolicy = new NamePolicy{this};
-                // ctx.AddListener(namePolicy);
+                namePolicy = new NamePolicy{this};
+                ctx.AddListener(namePolicy);
 
             }
 
@@ -88,9 +100,15 @@ private:
 
             } else if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                // ctx.RemoveListener(namePolicy);
-                // delete namePolicy;
-                // namePolicy = nullptr;
+                if(namePolicy) {
+
+                    namePolicy->HandleEvent(ParserState::name, ElementState::close, ctx);
+                    ctx.RemoveListener(namePolicy);
+                    delete namePolicy;
+                    namePolicy = nullptr;
+
+                }
+
 
             }
            
