@@ -34,213 +34,204 @@
 #include <memory>
 namespace srcSAXEventDispatch {
     template <typename ...policies>
-    class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher{
+    class srcSAXEventDispatcher : public srcSAXHandler{
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     protected:
-        std::vector<EventListener*> elementListeners;
-        void DispatchEvent(ParserState pstate, ElementState estate, const srcSAXEventContext& ctx){
-            for(std::vector<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
-                (*listener)->HandleEvent(pstate, estate, ctx);
-            }
+        void DispatchEvent(ParserState pstate, ElementState estate){
+            ctx.DispatchEvent(pstate, estate);
         }
     public:
-        void AddListener(EventListener* listener){
-            elementListeners.push_back(listener);
-        }
-        void RemoveListener(EventListener* listener){
-            elementListeners.erase(std::remove(elementListeners.begin(), elementListeners.end(), listener), elementListeners.end());
-        }
         srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
-        
-        srcSAXEventDispatcher(policies*... t2) : elementListeners{t2...}, ctx(srcml_element_stack){
+        srcSAXEventDispatcher(policies*... t2) : ctx(srcml_element_stack){
+            ctx.elementListeners = {t2...};
             InitializeHandlers();
         }
         void InitializeHandlers(){
             process_map = {
                 {"decl_stmt", [this](){
                     ++ctx.triggerField[ParserState::declstmt];
-                    DispatchEvent(ParserState::declstmt, ElementState::open, ctx);
+                    DispatchEvent(ParserState::declstmt, ElementState::open);
                 } },
                 { "expr_stmt", [this](){
                     ++ctx.triggerField[ParserState::exprstmt];
-                    DispatchEvent(ParserState::exprstmt, ElementState::open, ctx);
+                    DispatchEvent(ParserState::exprstmt, ElementState::open);
                 } },
                 { "parameter_list", [this](){
                     ++ctx.triggerField[ParserState::parameterlist];
-                    DispatchEvent(ParserState::parameterlist, ElementState::open, ctx);
+                    DispatchEvent(ParserState::parameterlist, ElementState::open);
                 } },
                 { "if", [this](){
                     ++ctx.triggerField[ParserState::ifstmt];
-                    DispatchEvent(ParserState::ifstmt, ElementState::open, ctx);
+                    DispatchEvent(ParserState::ifstmt, ElementState::open);
                 } },
                 { "for", [this](){
                     ++ctx.triggerField[ParserState::forstmt];
-                    DispatchEvent(ParserState::forstmt, ElementState::open, ctx);
+                    DispatchEvent(ParserState::forstmt, ElementState::open);
                 } },
                 { "while", [this](){
                     ++ctx.triggerField[ParserState::whilestmt];
-                    DispatchEvent(ParserState::whilestmt, ElementState::open, ctx);
+                    DispatchEvent(ParserState::whilestmt, ElementState::open);
                 } },
                 { "template", [this](){
                     ++ctx.triggerField[ParserState::templates];
-                    DispatchEvent(ParserState::templates, ElementState::open, ctx);
+                    DispatchEvent(ParserState::templates, ElementState::open);
                 } },
                 { "argument_list", [this](){
                     ++ctx.triggerField[ParserState::argumentlist];
-                    DispatchEvent(ParserState::argumentlist, ElementState::open, ctx);
+                    DispatchEvent(ParserState::argumentlist, ElementState::open);
                 } },
                 { "call", [this](){
                     ++ctx.triggerField[ParserState::call];
-                    DispatchEvent(ParserState::call, ElementState::open, ctx);
+                    DispatchEvent(ParserState::call, ElementState::open);
                 } },
                 { "function", [this](){
                     ++ctx.triggerField[ParserState::function];
-                    DispatchEvent(ParserState::function, ElementState::open, ctx);
+                    DispatchEvent(ParserState::function, ElementState::open);
                 } },
                 { "constructor", [this](){
                     ++ctx.triggerField[ParserState::constructor];
-                    DispatchEvent(ParserState::constructor, ElementState::open, ctx);
+                    DispatchEvent(ParserState::constructor, ElementState::open);
                 } },
                 { "function_decl", [this](){
                     ++ctx.triggerField[ParserState::functiondecl];
-                    DispatchEvent(ParserState::functiondecl, ElementState::open, ctx);
+                    DispatchEvent(ParserState::functiondecl, ElementState::open);
                 } },
                 { "destructor_decl", [this](){
                     ++ctx.triggerField[ParserState::destructordecl];
-                    DispatchEvent(ParserState::destructordecl, ElementState::open, ctx);
+                    DispatchEvent(ParserState::destructordecl, ElementState::open);
                 } },
                 { "constructor_decl", [this](){
                     ++ctx.triggerField[ParserState::constructordecl];
-                    DispatchEvent(ParserState::constructordecl, ElementState::open, ctx);
+                    DispatchEvent(ParserState::constructordecl, ElementState::open);
                 } },
                 { "class", [this](){
                     ++ctx.triggerField[ParserState::classn];
-                    DispatchEvent(ParserState::classn, ElementState::open, ctx);
+                    DispatchEvent(ParserState::classn, ElementState::open);
                 } },
                 { "struct", [this](){
                     ++ctx.triggerField[ParserState::classn];
-                    DispatchEvent(ParserState::structn, ElementState::open, ctx);
+                    DispatchEvent(ParserState::structn, ElementState::open);
                 } },
                 { "super_list", [this](){
                     ++ctx.triggerField[ParserState::super_list];
-                    DispatchEvent(ParserState::super_list, ElementState::open, ctx);
+                    DispatchEvent(ParserState::super_list, ElementState::open);
                 } },
                 { "super", [this](){
                     ++ctx.triggerField[ParserState::super];
-                    DispatchEvent(ParserState::super, ElementState::open, ctx);
+                    DispatchEvent(ParserState::super, ElementState::open);
                 } },
                 { "public", [this](){
                     ++ctx.triggerField[ParserState::publicaccess];
-                    DispatchEvent(ParserState::publicaccess, ElementState::open, ctx);
+                    DispatchEvent(ParserState::publicaccess, ElementState::open);
                 } },
                 { "protected", [this](){
                     ++ctx.triggerField[ParserState::protectedaccess];
-                    DispatchEvent(ParserState::protectedaccess, ElementState::open, ctx);
+                    DispatchEvent(ParserState::protectedaccess, ElementState::open);
                 } },
                 { "private", [this](){
                     ++ctx.triggerField[ParserState::privateaccess];
-                    DispatchEvent(ParserState::privateaccess, ElementState::open, ctx);
+                    DispatchEvent(ParserState::privateaccess, ElementState::open);
                 } },
                 { "destructor", [this](){
                     ++ctx.triggerField[ParserState::destructor];
-                    DispatchEvent(ParserState::destructor, ElementState::open, ctx);
+                    DispatchEvent(ParserState::destructor, ElementState::open);
                 } },
                 { "parameter", [this](){
                     ++ctx.triggerField[ParserState::parameter];
-                    DispatchEvent(ParserState::parameter, ElementState::open, ctx);
+                    DispatchEvent(ParserState::parameter, ElementState::open);
                 } },                
                 { "member_list", [this](){
                     ++ctx.triggerField[ParserState::memberlist];
-                    DispatchEvent(ParserState::memberlist, ElementState::open, ctx);
+                    DispatchEvent(ParserState::memberlist, ElementState::open);
                 } },
                 { "index", [this](){
                     ++ctx.triggerField[ParserState::index];
-                    DispatchEvent(ParserState::index, ElementState::open, ctx);
+                    DispatchEvent(ParserState::index, ElementState::open);
                 } },
                 { "operator", [this](){
                     ++ctx.triggerField[ParserState::op];
-                    DispatchEvent(ParserState::op, ElementState::open, ctx);
+                    DispatchEvent(ParserState::op, ElementState::open);
                 } },
                 { "block", [this](){ 
                     ++ctx.triggerField[ParserState::block];
-                    DispatchEvent(ParserState::block, ElementState::open, ctx);
+                    DispatchEvent(ParserState::block, ElementState::open);
                 } },
                 { "init", [this](){
                     ++ctx.triggerField[ParserState::init];
-                    DispatchEvent(ParserState::init, ElementState::open, ctx);
+                    DispatchEvent(ParserState::init, ElementState::open);
                 } },
                 { "argument", [this](){
                     ++ctx.triggerField[ParserState::argument];
-                    DispatchEvent(ParserState::argument, ElementState::open, ctx);
+                    DispatchEvent(ParserState::argument, ElementState::open);
                 } },
                 { "literal", [this](){
                     ++ctx.triggerField[ParserState::literal];
-                    DispatchEvent(ParserState::literal, ElementState::open, ctx);
+                    DispatchEvent(ParserState::literal, ElementState::open);
                 } },
                 { "modifier", [this](){
                     ++ctx.triggerField[ParserState::modifier];
-                    DispatchEvent(ParserState::modifier, ElementState::open, ctx);
+                    DispatchEvent(ParserState::modifier, ElementState::open);
                 } },
                 { "decl", [this](){
                     ++ctx.triggerField[ParserState::decl]; 
-                    DispatchEvent(ParserState::decl, ElementState::open, ctx);
+                    DispatchEvent(ParserState::decl, ElementState::open);
                 } },
                 { "type", [this](){
                     ++ctx.triggerField[ParserState::type]; 
-                    DispatchEvent(ParserState::type, ElementState::open, ctx);
+                    DispatchEvent(ParserState::type, ElementState::open);
                 } },
                 { "typedef", [this](){
                     ++ctx.triggerField[ParserState::typedefexpr]; 
-                    DispatchEvent(ParserState::typedefexpr, ElementState::open, ctx);
+                    DispatchEvent(ParserState::typedefexpr, ElementState::open);
                 } },          
                 { "expr", [this](){
                     ++ctx.triggerField[ParserState::expr];
-                    DispatchEvent(ParserState::expr, ElementState::open, ctx);
+                    DispatchEvent(ParserState::expr, ElementState::open);
                 } },
                 { "name", [this](){
                     ++ctx.triggerField[ParserState::name];
-                    DispatchEvent(ParserState::name, ElementState::open, ctx);
+                    DispatchEvent(ParserState::name, ElementState::open);
                 } },
                 { "macro", [this](){
                     ++ctx.triggerField[ParserState::macro];
-                    DispatchEvent(ParserState::macro, ElementState::open, ctx);
+                    DispatchEvent(ParserState::macro, ElementState::open);
                 } },
                 { "specifier", [this](){
                     ++ctx.triggerField[ParserState::specifier];
-                    DispatchEvent(ParserState::specifier, ElementState::open, ctx);
+                    DispatchEvent(ParserState::specifier, ElementState::open);
                 } }
             };
             process_map2 = {
                 {"decl_stmt", [this](){
                     --ctx.triggerField[ParserState::declstmt];
-                    DispatchEvent(ParserState::declstmt, ElementState::close, ctx);
+                    DispatchEvent(ParserState::declstmt, ElementState::close);
                 } },             
                 { "expr_stmt", [this](){
                     --ctx.triggerField[ParserState::exprstmt];
-                    DispatchEvent(ParserState::exprstmt, ElementState::close, ctx);
+                    DispatchEvent(ParserState::exprstmt, ElementState::close);
                 } },            
                 { "parameter_list", [this](){
                     --ctx.triggerField[ParserState::parameterlist];
-                    DispatchEvent(ParserState::parameterlist, ElementState::close, ctx);
+                    DispatchEvent(ParserState::parameterlist, ElementState::close);
                 } },            
                 { "if", [this](){
                     --ctx.triggerField[ParserState::ifstmt];
-                    DispatchEvent(ParserState::ifstmt, ElementState::close, ctx);
+                    DispatchEvent(ParserState::ifstmt, ElementState::close);
                 } },            
                 { "for", [this](){
                     --ctx.triggerField[ParserState::forstmt];
-                    DispatchEvent(ParserState::forstmt, ElementState::close, ctx);
+                    DispatchEvent(ParserState::forstmt, ElementState::close);
                 } },            
                 { "while", [this](){
                     --ctx.triggerField[ParserState::whilestmt];
-                    DispatchEvent(ParserState::whilestmt, ElementState::close, ctx);
+                    DispatchEvent(ParserState::whilestmt, ElementState::close);
                 } },
                 { "template", [this](){
                     --ctx.triggerField[ParserState::templates];
-                    DispatchEvent(ParserState::templates, ElementState::close, ctx);
+                    DispatchEvent(ParserState::templates, ElementState::close);
                 } },            
                 { "argument_list", [this](){
                     if(!ctx.genericDepth.empty()){
@@ -251,132 +242,132 @@ namespace srcSAXEventDispatch {
                         }
                     }
                     --ctx.triggerField[ParserState::argumentlist];
-                    DispatchEvent(ParserState::argumentlist, ElementState::close, ctx);
+                    DispatchEvent(ParserState::argumentlist, ElementState::close);
                 } },            
                 { "call", [this](){
                     --ctx.triggerField[ParserState::call];
-                    DispatchEvent(ParserState::call, ElementState::close, ctx);
+                    DispatchEvent(ParserState::call, ElementState::close);
                 } },            
                 { "function", [this](){
                     --ctx.triggerField[ParserState::function];
-                    DispatchEvent(ParserState::function, ElementState::close, ctx);
+                    DispatchEvent(ParserState::function, ElementState::close);
                 } },
                 { "constructor", [this](){
                     --ctx.triggerField[ParserState::constructor];
-                    DispatchEvent(ParserState::constructor, ElementState::close, ctx);
+                    DispatchEvent(ParserState::constructor, ElementState::close);
                 } },
                 { "destructor", [this](){
                     --ctx.triggerField[ParserState::destructor];
-                    DispatchEvent(ParserState::destructor, ElementState::close, ctx);
+                    DispatchEvent(ParserState::destructor, ElementState::close);
                 } },
                 { "function_decl", [this](){
                     --ctx.triggerField[ParserState::functiondecl];
-                    DispatchEvent(ParserState::functiondecl, ElementState::close, ctx);
+                    DispatchEvent(ParserState::functiondecl, ElementState::close);
                 } },
                 { "constructor_decl", [this](){
                     --ctx.triggerField[ParserState::constructordecl];
-                    DispatchEvent(ParserState::constructordecl, ElementState::close, ctx);
+                    DispatchEvent(ParserState::constructordecl, ElementState::close);
                 } },
                 { "destructor_decl", [this](){
                     --ctx.triggerField[ParserState::destructordecl];
-                    DispatchEvent(ParserState::destructordecl, ElementState::close, ctx);
+                    DispatchEvent(ParserState::destructordecl, ElementState::close);
                 } },
                 { "class", [this](){
                     --ctx.triggerField[ParserState::classn];
-                    DispatchEvent(ParserState::classn, ElementState::close, ctx);
+                    DispatchEvent(ParserState::classn, ElementState::close);
                 } },
                 { "struct", [this](){
                     --ctx.triggerField[ParserState::classn];
-                    DispatchEvent(ParserState::structn, ElementState::close, ctx);
+                    DispatchEvent(ParserState::structn, ElementState::close);
                 } },
                 { "super_list", [this](){
                     ++ctx.triggerField[ParserState::super_list];
-                    DispatchEvent(ParserState::super_list, ElementState::close, ctx);
+                    DispatchEvent(ParserState::super_list, ElementState::close);
                 } },
                 { "super", [this](){
                     ++ctx.triggerField[ParserState::super];
-                    DispatchEvent(ParserState::super, ElementState::close, ctx);
+                    DispatchEvent(ParserState::super, ElementState::close);
                 } },
                 { "public", [this](){
                     ++ctx.triggerField[ParserState::publicaccess];
-                    DispatchEvent(ParserState::publicaccess, ElementState::close, ctx);
+                    DispatchEvent(ParserState::publicaccess, ElementState::close);
                 } },
                 { "protected", [this](){
                     ++ctx.triggerField[ParserState::protectedaccess];
-                    DispatchEvent(ParserState::protectedaccess, ElementState::close, ctx);
+                    DispatchEvent(ParserState::protectedaccess, ElementState::close);
                 } },
                 { "private", [this](){
                     ++ctx.triggerField[ParserState::privateaccess];
-                    DispatchEvent(ParserState::privateaccess, ElementState::close, ctx);
+                    DispatchEvent(ParserState::privateaccess, ElementState::close);
                 } },
                 { "parameter", [this](){
                     --ctx.triggerField[ParserState::parameterlist];
-                    DispatchEvent(ParserState::parameter, ElementState::close, ctx);
+                    DispatchEvent(ParserState::parameter, ElementState::close);
                 } },    
                 { "member_list", [this](){
                     --ctx.triggerField[ParserState::memberlist];
-                    DispatchEvent(ParserState::memberlist, ElementState::close, ctx);
+                    DispatchEvent(ParserState::memberlist, ElementState::close);
                 } },    
                 { "index", [this](){
                     --ctx.triggerField[ParserState::index];
-                    DispatchEvent(ParserState::index, ElementState::close, ctx);
+                    DispatchEvent(ParserState::index, ElementState::close);
                 } },    
                 { "operator", [this](){
                     --ctx.triggerField[ParserState::op];
-                    DispatchEvent(ParserState::op, ElementState::close, ctx);
+                    DispatchEvent(ParserState::op, ElementState::close);
                 } },
                 { "block", [this](){ 
                     --ctx.triggerField[ParserState::block];
-                    DispatchEvent(ParserState::block, ElementState::close, ctx);
+                    DispatchEvent(ParserState::block, ElementState::close);
                 } },
                 { "init", [this](){
                     --ctx.triggerField[ParserState::init];
-                    DispatchEvent(ParserState::init, ElementState::close, ctx);
+                    DispatchEvent(ParserState::init, ElementState::close);
                 } },    
                 { "argument", [this](){
                     --ctx.triggerField[ParserState::argument];
-                    DispatchEvent(ParserState::argument, ElementState::close, ctx);
+                    DispatchEvent(ParserState::argument, ElementState::close);
                 } },    
                 { "literal", [this](){
                     --ctx.triggerField[ParserState::literal];
-                    DispatchEvent(ParserState::literal, ElementState::close, ctx);
+                    DispatchEvent(ParserState::literal, ElementState::close);
                 } },    
                 { "modifier", [this](){
                     --ctx.triggerField[ParserState::modifier];
-                    DispatchEvent(ParserState::modifier, ElementState::close, ctx);
+                    DispatchEvent(ParserState::modifier, ElementState::close);
                 } },    
                 { "decl", [this](){
                     --ctx.triggerField[ParserState::decl]; 
-                    DispatchEvent(ParserState::decl, ElementState::close, ctx);
+                    DispatchEvent(ParserState::decl, ElementState::close);
                 } },    
                 { "type", [this](){
                     --ctx.triggerField[ParserState::type];
-                    DispatchEvent(ParserState::type, ElementState::close, ctx);
+                    DispatchEvent(ParserState::type, ElementState::close);
                 } },
                 { "typedef", [this](){
                     --ctx.triggerField[ParserState::typedefexpr]; 
-                    DispatchEvent(ParserState::typedefexpr, ElementState::close, ctx);
+                    DispatchEvent(ParserState::typedefexpr, ElementState::close);
                 } },    
                 { "expr", [this](){
                     --ctx.triggerField[ParserState::expr];
-                    DispatchEvent(ParserState::expr, ElementState::close, ctx);
+                    DispatchEvent(ParserState::expr, ElementState::close);
                 } },    
                 { "name", [this](){
                     --ctx.triggerField[ParserState::name];
-                    DispatchEvent(ParserState::name, ElementState::close, ctx);
+                    DispatchEvent(ParserState::name, ElementState::close);
                 } },
                 { "macro", [this](){
                     --ctx.triggerField[ParserState::macro];
-                    DispatchEvent(ParserState::macro, ElementState::close, ctx);
+                    DispatchEvent(ParserState::macro, ElementState::close);
                 } },
                 { "tokenstring", [this](){
                     ctx.triggerField[ParserState::tokenstring] = 1;
-                    DispatchEvent(ParserState::tokenstring, ElementState::close, ctx);
+                    DispatchEvent(ParserState::tokenstring, ElementState::close);
                     ctx.triggerField[ParserState::tokenstring] = 0;
                 } },
                 { "specifier", [this](){
                     --ctx.triggerField[ParserState::specifier];
-                    DispatchEvent(ParserState::specifier, ElementState::close, ctx);
+                    DispatchEvent(ParserState::specifier, ElementState::close);
                 } }
             };            
         }

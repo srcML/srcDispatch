@@ -28,11 +28,11 @@ class CallPolicy : public srcSAXEventDispatch::EventListener{
         std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-            closeEventMap[ParserState::call] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                     currentArgPosition = callstack.top().second;
                 };
 
-            closeEventMap[ParserState::modifier] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                     if(currentModifier == "*"){}
                     else if(currentModifier == "&"){}
                 };
