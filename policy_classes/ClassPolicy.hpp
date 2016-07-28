@@ -8,153 +8,166 @@
 
 class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
 
-    public:
+public:
 
-        enum AccessSpecifier { PUBLIC, PRIVATE, PROTECTED };
-        struct ParentData {
+    enum AccessSpecifier { PUBLIC, PRIVATE, PROTECTED };
+    struct ParentData {
 
-            std::string name;
-            bool isVirtual;
-            AccessSpecifier accessSpecifier;
+        std::string name;
+        bool isVirtual;
+        AccessSpecifier accessSpecifier;
+
+    };
+
+    struct ClassData {
+
+        std::string name;
+
+        std::vector<ParentData> parents;
+
+        std::vector<DeclTypePolicy> fields;
+        std::vector<FunctionSignaturePolicy> methods;
+
+    };
+
+private:
+
+    ClassData data;
+    std::size_t classDepth;
+
+public:
+
+
+    ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+          data{},
+          classDepth(0) { 
+    
+        InitializeClassPolicyHandlers();
+
+    }
+
+    void * dataInner() const override {
+
+        return new ClassData(data);
+
+    }
+
+private:
+
+    void InitializeClassPolicyHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        // start of policy
+        openEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+
+            if(!classDepth) {
+
+                classDepth = ctx.depth;
+                data = ClassData{};
+                CollectNameHandlers();
+                CollectSuperHanders();
+
+            }
 
         };
 
-        struct ClassData {
+        // end of policy
+        closeEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
 
-            std::string name;
+            if(classDepth && classDepth == ctx.depth) {
 
-            std::vector<ParentData> parents;
+                classDepth = 0;
+                notifyAll();
+                InitializeClassPolicyHandlers();
 
-            std::vector<DeclTypePolicy> fields;
-            std::vector<FunctionSignaturePolicy> methods;
+            }
+           
+        };
+
+    }
+
+    void CollectNameHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        openEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
+
+            if(classDepth && (classDepth + 1) == ctx.depth) {
+
+                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) { data.name += ctx.currentToken; };
+
+            }
 
         };
 
-    private:
+        closeEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
 
-        ClassData data;
-        std::size_t classDepth;
+            if(classDepth && (classDepth + 1) == ctx.depth) {
 
-    public:
+                openEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {};
+                closeEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {};
+                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {};
 
+            }
 
-        ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-            : srcSAXEventDispatch::PolicyDispatcher(listeners),
-              data{},
-              classDepth(0) { 
-        
-            InitializeEventHandlers();
+        };
 
-        }
+    }
 
-        void * dataInner() const override {
+    void CollectSuperHanders() {
+        using namespace srcSAXEventDispatch;
 
-            return new ClassData(data);
+        openEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
 
-        }
+            if(classDepth && (classDepth + 1) == ctx.depth) {
 
-    private:
+                openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {
 
-        void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+                    data.parents.emplace_back(ParentData{ "", false, PUBLIC });
 
-            // start of policy
-            openEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+                };
 
-                if(!classDepth) {
+                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {
 
-                    classDepth = ctx.depth;
-                    data = ClassData{};
+                    if(ctx.And({ ParserState::specifier })) {
 
-                }
+                            if(ctx.currentToken == "virtual") {
+                                data.parents.back().isVirtual = true;
+                            } else if(ctx.currentToken == "public") {
+                                data.parents.back().accessSpecifier = PUBLIC;
+                            } else if(ctx.currentToken == "private") {
+                                data.parents.back().accessSpecifier = PRIVATE;
+                            } else if(ctx.currentToken == "protected") {
+                                data.parents.back().accessSpecifier = PROTECTED;
+                            }
 
-            };
+                    } else if(ctx.And({ ParserState::name })) {
 
-            // end of policy
-            closeEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+                        data.parents.back().name += ctx.currentToken;
 
-                if(classDepth && classDepth == ctx.depth) {
-
-                    classDepth = 0;
-                    notifyAll();
-                    InitializeEventHandlers();
-
-                }
-               
-            };
-
-            openEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
-
-                if(classDepth && (classDepth + 1) == ctx.depth) {
-
-                    closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) { data.name += ctx.currentToken; };
-
-                }
-
-            };
-
-            closeEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
-
-                if(classDepth && (classDepth + 1) == ctx.depth) {
-
-                    openEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {};
-                    closeEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {};
-                    closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {};
-
-                }
-
-            };
-
-            openEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
-
-                if(classDepth && (classDepth + 1) == ctx.depth) {
-
-                    openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {
-
-                        data.parents.emplace_back(ParentData{ "", false, PUBLIC });
-
-                    };
-
-                    closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {
-
-                        if(ctx.And({ ParserState::specifier })) {
-
-                                if(ctx.currentToken == "virtual") {
-                                    data.parents.back().isVirtual = true;
-                                } else if(ctx.currentToken == "public") {
-                                    data.parents.back().accessSpecifier = PUBLIC;
-                                } else if(ctx.currentToken == "private") {
-                                    data.parents.back().accessSpecifier = PRIVATE;
-                                } else if(ctx.currentToken == "protected") {
-                                    data.parents.back().accessSpecifier = PROTECTED;
-                                }
-
-                        } else if(ctx.And({ ParserState::name })) {
-
-                            data.parents.back().name += ctx.currentToken;
-
-                        }
+                    }
 
 
-                    };              
+                };              
 
-                }
+            }
 
-            };
+        };
 
-            closeEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
 
-                if(classDepth && (classDepth + 1) == ctx.depth) {
+            if(classDepth && (classDepth + 1) == ctx.depth) {
 
-                    openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {};
-                    openEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {};
-                    closeEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {};
-                    closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {};
+                openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {};
+                openEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {};
+                closeEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {};
+                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {};
 
-                }
+            }
 
-            };
+        };
 
-        }
+    }
+
 
 };
