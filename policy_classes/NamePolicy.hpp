@@ -80,13 +80,8 @@ private:
 
                 nameDepth = ctx.depth;
                 data = NameData{};
-
-            } else if((nameDepth + 1) == ctx.depth) {
-
-                if(!namePolicy) {
-                    namePolicy = new NamePolicy{this};
-                    ctx.AddListener(namePolicy);
-                }
+                namePolicy = new NamePolicy{this};
+                ctx.AddListenerNoDispatch(namePolicy);
 
             }
 
@@ -99,7 +94,7 @@ private:
 
                 nameDepth = 0;
                 if(namePolicy) {
-                    ctx.RemoveListener(namePolicy);
+                    ctx.RemoveListenerNoDispatch(namePolicy);
                     delete namePolicy;
                     namePolicy = nullptr;
                 }

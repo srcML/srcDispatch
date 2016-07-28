@@ -22,19 +22,25 @@ namespace srcSAXEventDispatch{
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, classblock, functionblock,
         specifier, typedefexpr, empty, tokenstring, MAXENUMVALUE = empty};
     class EventListener {
-
+        private:
+            bool dispatched;
         protected:
            std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> openEventMap, closeEventMap;
 
 
         public:
+            friend srcSAXEventContext;
 
-            EventListener() {
+            EventListener() : dispatched(false) {
                 DefaultEventHandlers();
             }
 
-            virtual void HandleEvent() {}
+            virtual void HandleEvent() { dispatched = true; }
             virtual void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, srcSAXEventDispatch::srcSAXEventContext& ctx) {
+
+                if(dispatched) return;
+
+                dispatched = true;
 
                 switch(estate){
 
@@ -219,6 +225,7 @@ namespace srcSAXEventDispatch{
             srcSAXEventContext(const std::vector<std::string> & elementStack) : elementStack(elementStack) {
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
                 depth = 0;
+                dispatching = false;
             }
             std::list<EventListener*> elementListeners;
             const std::vector<std::string> & elementStack;
@@ -229,16 +236,53 @@ namespace srcSAXEventDispatch{
             bool sawgeneric;
             std::size_t depth;
 
+        private:
+            bool dispatching;
+            ParserState currentPState;
+            ElementState currentEState;
+        public:
+
             void AddListener(EventListener* listener){
                 elementListeners.push_back(listener);
+            }
+            void AddListenerDispatch(EventListener* listener){
+                if(dispatching)
+                    listener->HandleEvent(currentPState, currentEState, *this);
+                AddListener(listener);
+            }
+            void AddListenerNoDispatch(EventListener* listener){
+                if(dispatching)
+                    listener->dispatched = true;
+                AddListener(listener);
             }
             void RemoveListener(EventListener* listener){
                 elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
             }
+            void RemoveListenerDispatch(EventListener* listener){
+                if(dispatching)
+                    listener->HandleEvent(currentPState, currentEState, *this);
+                RemoveListener(listener);
+            }
+            void RemoveListenerNoDispatch(EventListener* listener){
+                if(dispatching)
+                    listener->dispatched = true;
+                RemoveListener(listener);
+            }
             void DispatchEvent(ParserState pstate, ElementState estate){
+
+                dispatching = true;
+                currentPState = pstate;
+                currentEState = estate;
+
                 for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
                     (*listener)->HandleEvent(pstate, estate, *this);
                 }
+                for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
+                    (*listener)->dispatched = false;
+                }
+
+                dispatching = false;
+
             }
             inline bool And(std::vector<ParserState> vec) const{
                 for(auto field : vec){

@@ -126,7 +126,7 @@ private:
             if((classDepth + 1) == ctx.depth) {
 
                 namePolicy = new NamePolicy{this};
-                ctx.AddListener(namePolicy);
+                ctx.AddListenerDispatch(namePolicy);
 
             }
 
@@ -138,11 +138,7 @@ private:
 
                 if(namePolicy) {
 
-                    if(!data.name) {
-                        namePolicy->HandleEvent(ParserState::name, ElementState::close, ctx);
-                    }
-
-                    ctx.RemoveListener(namePolicy);
+                    ctx.RemoveListenerDispatch(namePolicy);
                     delete namePolicy;
                     namePolicy = nullptr;
 
