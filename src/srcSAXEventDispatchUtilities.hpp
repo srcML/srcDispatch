@@ -123,150 +123,103 @@ namespace srcSAXEventDispatch{
 
             }
 
+        protected:
+            void NopOpenEvents(std::initializer_list<ParserState> states) {
+
+                for(ParserState state : states) {
+
+                    openEventMap[state] = [this](const srcSAXEventContext& ctx) {};
+
+                }
+
+            }            
+            void NopCloseEvents(std::initializer_list<ParserState> states) {
+
+                for(ParserState state : states) {
+
+                    closeEventMap[state] = [this](const srcSAXEventContext& ctx) {};
+
+                }
+
+            } 
+
         private:
 
             void DefaultEventHandlers() {
-
                 using namespace srcSAXEventDispatch;
-                openEventMap = {
-                    { ParserState::declstmt, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::exprstmt, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::parameterlist, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::ifstmt, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::forstmt, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::whilestmt, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::templates, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::argumentlist, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::call, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::function, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::constructor, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::functiondecl, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::destructordecl, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::constructordecl, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::classn, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::structn, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::destructor, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::parameter, [this](const srcSAXEventContext& ctx) {
-                    } },                
-                    { ParserState::memberlist, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::index, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::op, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::block, [this](const srcSAXEventContext& ctx) { 
-                    } },
-                    { ParserState::init, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::argument, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::literal, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::modifier, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::decl, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::type, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::typedefexpr, [this](const srcSAXEventContext& ctx) {
-                    } },          
-                    { ParserState::expr, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::name, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::macro, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::specifier, [this](const srcSAXEventContext& ctx) {
-                    } }
-                };
 
-                closeEventMap = {
-                    { ParserState::declstmt, [this](const srcSAXEventContext& ctx) {
-                    } },             
-                    { ParserState::exprstmt, [this](const srcSAXEventContext& ctx) {
-                    } },            
-                    { ParserState::parameterlist, [this](const srcSAXEventContext& ctx) {
-                    } },            
-                    { ParserState::ifstmt, [this](const srcSAXEventContext& ctx) {
-                    } },            
-                    { ParserState::forstmt, [this](const srcSAXEventContext& ctx) {
-                    } },            
-                    { ParserState::whilestmt, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::templates, [this](const srcSAXEventContext& ctx) {
-                    } },            
-                    { ParserState::argumentlist, [this](const srcSAXEventContext& ctx) {
-                    } },            
-                    { ParserState::call, [this](const srcSAXEventContext& ctx) {
-                    } },            
-                    { ParserState::function, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::constructor, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::destructor, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::functiondecl, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::constructordecl, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::destructordecl, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::classn, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::structn, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::parameter, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::memberlist, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::index, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::op, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::block, [this](const srcSAXEventContext& ctx) { 
-                    } },
-                    { ParserState::init, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::argument, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::literal, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::modifier, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::decl, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::type, [this](const srcSAXEventContext& ctx) {                    
-                    } },
-                    { ParserState::typedefexpr, [this](const srcSAXEventContext& ctx) {
-                    } },    
-                    { ParserState::expr, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::name, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::macro, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::tokenstring, [this](const srcSAXEventContext& ctx) {
-                    } },
-                    { ParserState::specifier, [this](const srcSAXEventContext& ctx) {
-                    } }
-                };
+                NopOpenEvents({
+                    ParserState::declstmt,
+                    ParserState::exprstmt,
+                    ParserState::parameterlist,
+                    ParserState::ifstmt,
+                    ParserState::forstmt,
+                    ParserState::whilestmt,
+                    ParserState::templates,
+                    ParserState::argumentlist,
+                    ParserState::call,
+                    ParserState::function,
+                    ParserState::constructor,
+                    ParserState::functiondecl,
+                    ParserState::destructordecl,
+                    ParserState::constructordecl,
+                    ParserState::classn,
+                    ParserState::structn,
+                    ParserState::destructor,
+                    ParserState::parameter,
+                    ParserState::memberlist,
+                    ParserState::index,
+                    ParserState::op,
+                    ParserState::block,
+                    ParserState::init,
+                    ParserState::argument,
+                    ParserState::literal,
+                    ParserState::modifier,
+                    ParserState::decl,
+                    ParserState::type,
+                    ParserState::typedefexpr,
+                    ParserState::expr,
+                    ParserState::name,
+                    ParserState::macro,
+                    ParserState::specifier,
+                });
+
+                NopCloseEvents({
+                    ParserState::declstmt,
+                    ParserState::exprstmt,
+                    ParserState::parameterlist,
+                    ParserState::ifstmt,
+                    ParserState::forstmt,
+                    ParserState::whilestmt,
+                    ParserState::templates,
+                    ParserState::argumentlist,
+                    ParserState::call,
+                    ParserState::function,
+                    ParserState::constructor,
+                    ParserState::destructor,
+                    ParserState::functiondecl,
+                    ParserState::constructordecl,
+                    ParserState::destructordecl,
+                    ParserState::classn,
+                    ParserState::structn,
+                    ParserState::parameter,
+                    ParserState::memberlist,
+                    ParserState::index,
+                    ParserState::op,
+                    ParserState::block,
+                    ParserState::init,
+                    ParserState::argument,
+                    ParserState::literal,
+                    ParserState::modifier,
+                    ParserState::decl,
+                    ParserState::type,
+                    ParserState::typedefexpr,
+                    ParserState::expr,
+                    ParserState::name,
+                    ParserState::macro,
+                    ParserState::tokenstring,
+                    ParserState::specifier,
+                });
 
         }
 
@@ -311,7 +264,7 @@ namespace srcSAXEventDispatch{
         virtual void * DataInner() const = 0;
         virtual void NotifyAll() {
 
-            for( PolicyListener * const listener : policyListeners)
+            for(PolicyListener * const listener : policyListeners)
                 listener->Notify(this);
 
         }
