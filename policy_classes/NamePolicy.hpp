@@ -61,9 +61,10 @@ protected:
         return new NameData(data);
 
     }
-    virtual void Notify(const PolicyDispatcher * policy) override {
+    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
-        data.names.push_back(policy->Data<NameData>());
+        if((nameDepth + 1) == ctx.depth)
+            data.names.push_back(policy->Data<NameData>());
 
     }
 
@@ -82,8 +83,10 @@ private:
 
             } else if((nameDepth + 1) == ctx.depth) {
 
-                namePolicy = new NamePolicy{this};
-                ctx.AddListener(namePolicy);
+                if(!namePolicy) {
+                    namePolicy = new NamePolicy{this};
+                    ctx.AddListener(namePolicy);
+                }
 
             }
 
@@ -95,20 +98,14 @@ private:
             if(nameDepth && nameDepth == ctx.depth) {
 
                 nameDepth = 0;
-                NotifyAll();
-                InitializeNamePolicyHandlers();
-
-            } else if(nameDepth && (nameDepth + 1) == ctx.depth) {
-
                 if(namePolicy) {
-
-                    namePolicy->HandleEvent(ParserState::name, ElementState::close, ctx);
                     ctx.RemoveListener(namePolicy);
                     delete namePolicy;
                     namePolicy = nullptr;
-
                 }
 
+                NotifyAll(ctx);
+                InitializeNamePolicyHandlers();
 
             }
            
