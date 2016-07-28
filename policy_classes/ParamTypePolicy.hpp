@@ -22,7 +22,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener{
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
 
-            closeEventMap[ParserState::modifier] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
                     if(currentModifier == "*"){
                         data.isPointer = true;
@@ -33,20 +33,20 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener{
                 }
             };
 
-            closeEventMap[ParserState::decl] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::parameter})){
                     data.linenumber = ctx.currentLineNumber;
                     data.nameofidentifier = currentDeclName;
                 }
             };
 
-            closeEventMap[ParserState::type] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::parameter})){
                     data.nameoftype = currentTypeName;
                 }
             };
 
-            closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
                     if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
@@ -66,7 +66,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener{
                 }
             };
 
-            closeEventMap[ParserState::specifier] = [this](const srcSAXEventContext& ctx){
+            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
                     if(currentSpecifier == "const"){
                         data.isStatic = true;

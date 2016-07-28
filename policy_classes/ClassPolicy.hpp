@@ -1,5 +1,6 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
+#include <NamePolicy.hpp>
 #include <TypePolicy.hpp>
 #include <FunctionSignaturePolicy.hpp>
 
@@ -65,7 +66,7 @@ private:
         using namespace srcSAXEventDispatch;
 
         // start of policy
-        std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)> startPolicy = [this](const srcSAXEventContext& ctx) {
+        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> startPolicy = [this](srcSAXEventContext& ctx) {
 
             if(!classDepth) {
 
@@ -86,7 +87,7 @@ private:
         };
 
         // end of policy
-        std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)> endPolicy = [this](const srcSAXEventContext& ctx) {
+        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> endPolicy = [this](srcSAXEventContext& ctx) {
 
             if(classDepth && classDepth == ctx.depth) {
 
@@ -109,17 +110,17 @@ private:
     void CollectNameHandlers() {
         using namespace srcSAXEventDispatch;
 
-        openEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
+        openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
-                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) { data.name += ctx.currentToken; };
+                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) { data.name += ctx.currentToken; };
 
             }
 
         };
 
-        closeEventMap[ParserState::name] = [this](const srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
@@ -135,17 +136,17 @@ private:
     void CollectSuperHanders() {
         using namespace srcSAXEventDispatch;
 
-        openEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
+        openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
-                openEventMap[ParserState::super] = [this](const srcSAXEventContext& ctx) {
+                openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
 
                     data.parents.emplace_back(ParentData{ "", false, PUBLIC });
 
                 };
 
-                closeEventMap[ParserState::tokenstring] = [this](const srcSAXEventContext& ctx) {
+                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
 
                     if(ctx.And({ ParserState::specifier })) {
 
@@ -172,7 +173,7 @@ private:
 
         };
 
-        closeEventMap[ParserState::super_list] = [this](const srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
@@ -188,7 +189,7 @@ private:
     void CollectBlockHanders() {
         using namespace srcSAXEventDispatch;
 
-        openEventMap[ParserState::block] = [this](const srcSAXEventContext& ctx) {
+        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
@@ -202,7 +203,7 @@ private:
         };
 
         // should always be in a region once block starts, so should not have to close
-        openEventMap[ParserState::publicaccess] = [this](const srcSAXEventContext& ctx) {
+        openEventMap[ParserState::publicaccess] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 2) == ctx.depth) {
 
@@ -212,7 +213,7 @@ private:
 
         };
 
-        openEventMap[ParserState::protectedaccess] = [this](const srcSAXEventContext& ctx) {
+        openEventMap[ParserState::protectedaccess] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 2) == ctx.depth) {
 
@@ -222,7 +223,7 @@ private:
 
         };
 
-        openEventMap[ParserState::privateaccess] = [this](const srcSAXEventContext& ctx) {
+        openEventMap[ParserState::privateaccess] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 2) == ctx.depth) {
 
@@ -232,7 +233,7 @@ private:
 
         };
 
-        openEventMap[ParserState::block] = [this](const srcSAXEventContext& ctx) {
+        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
