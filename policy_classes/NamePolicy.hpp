@@ -11,9 +11,15 @@ public:
     struct NameData {
 
         std::string name;
-        bool isCompound;
-        std::vector<NameData> templateArguments;
+        std::vector<NameData *> names;
+        std::vector<NameData *> templateArguments;
         std::vector<std::string> arrayIndices;
+
+        friend std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
+
+            return out << nameData.name;
+
+        }
 
     };
 
@@ -21,7 +27,8 @@ private:
 
     NameData data;
     std::size_t nameDepth;
-    NamePolicy * policy;
+
+    NamePolicy * namePolicy;
 
 public:
 
@@ -29,7 +36,8 @@ public:
     NamePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
-          nameDepth(0) { 
+          nameDepth(0),
+          namePolicy(nullptr) { 
     
         InitializeNamePolicyHandlers();
 
@@ -43,6 +51,7 @@ protected:
     }
     virtual void Notify(const PolicyDispatcher * policy) override {
 
+        data.names.push_back(policy->Data<NameData>());
 
     }
 
@@ -58,7 +67,11 @@ private:
 
                 nameDepth = ctx.depth;
                 data = NameData{};
-                data.isCompound = false;
+
+            } else if((nameDepth + 1) == ctx.depth) {
+
+                // namePolicy = new NamePolicy{this};
+                // ctx.AddListener(namePolicy);
 
             }
 
@@ -73,22 +86,21 @@ private:
                 NotifyAll();
                 InitializeNamePolicyHandlers();
 
+            } else if(nameDepth && (nameDepth + 1) == ctx.depth) {
+
+                // ctx.RemoveListener(namePolicy);
+                // delete namePolicy;
+                // namePolicy = nullptr;
+
             }
            
         };
 
+        closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
 
-    }
+            if(nameDepth && nameDepth == ctx.depth) {
 
-    void InnerNameHanders() {
-        using namespace srcSAXEventDispatch;
-
-        openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-
-            if(ctx.depth == (nameDepth + 1)) {
-
-                policy = new NamePolicy{this};
-
+                data.name += ctx.currentToken;
 
             }
 
