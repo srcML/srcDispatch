@@ -3,6 +3,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <list>
 #include <initializer_list>
 
 
@@ -181,7 +182,7 @@ namespace srcSAXEventDispatch{
         virtual void AddListener(EventListener* l) = 0;
         virtual void RemoveListener(EventListener* l) = 0;
     protected:
-        std::vector<EventListener*> elementListeners;
+        std::list<EventListener*> elementListeners;
         virtual void DispatchEvent(ParserState, ElementState) = 0;
     };
 
@@ -192,7 +193,7 @@ namespace srcSAXEventDispatch{
             policyListeners.push_back(listener);
         }
         virtual void RemoveListener(PolicyListener* listener){
-            policyListeners.erase(std::remove(policyListeners.begin(), policyListeners.end(), listener), policyListeners.end());
+            policyListeners.erase(std::find(policyListeners.begin(), policyListeners.end(), listener));
         }
 
         template<typename T>
@@ -203,12 +204,12 @@ namespace srcSAXEventDispatch{
         }
 
     protected:
-        std::vector<PolicyListener*> policyListeners;
+        std::list<PolicyListener*> policyListeners;
         virtual void * DataInner() const = 0;
         virtual void NotifyAll() {
-
-            for(PolicyListener * const listener : policyListeners)
-                listener->Notify(this);
+            for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){
+                (*listener)->Notify(this);
+            }
 
         }
 
@@ -219,7 +220,7 @@ namespace srcSAXEventDispatch{
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
                 depth = 0;
             }
-            std::vector<EventListener*> elementListeners;
+            std::list<EventListener*> elementListeners;
             const std::vector<std::string> & elementStack;
             std::vector<int> genericDepth;
             unsigned int currentLineNumber;
@@ -232,10 +233,10 @@ namespace srcSAXEventDispatch{
                 elementListeners.push_back(listener);
             }
             void RemoveListener(EventListener* listener){
-                elementListeners.erase(std::remove(elementListeners.begin(), elementListeners.end(), listener), elementListeners.end());
+                elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
             }
             void DispatchEvent(ParserState pstate, ElementState estate){
-                for(std::vector<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
+                for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
                     (*listener)->HandleEvent(pstate, estate, *this);
                 }
             }

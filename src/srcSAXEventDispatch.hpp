@@ -45,8 +45,10 @@ namespace srcSAXEventDispatch {
     public:
         srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
+        
         srcSAXEventDispatcher(policies*... t2) : ctx(srcml_element_stack){
             ctx.elementListeners = {t2...};
+            ctx.sawgeneric = false;
             InitializeHandlers();
         }
         void InitializeHandlers(){
@@ -80,7 +82,12 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::templates, ElementState::open);
                 } },
                 { "argument_list", [this](){
-                    ++ctx.triggerField[ParserState::argumentlist];
+                    if(!ctx.sawgeneric){
+                        ++ctx.triggerField[ParserState::argumentlist];
+                    }else{
+                        ctx.genericDepth.push_back(ctx.depth);
+                        ++ctx.triggerField[ParserState::genericargumentlist];
+                    }
                     DispatchEvent(ParserState::argumentlist, ElementState::open);
                 } },
                 { "call", [this](){
@@ -240,7 +247,6 @@ namespace srcSAXEventDispatch {
                             ctx.genericDepth.pop_back();
                         }
                     }
-                    --ctx.triggerField[ParserState::argumentlist];
                     DispatchEvent(ParserState::argumentlist, ElementState::close);
                 } },            
                 { "call", [this](){
@@ -448,8 +454,7 @@ namespace srcSAXEventDispatch {
                 name = attributes[0].value;
             }
             if(name == "generic" && std::string(localname) == "argument_list"){
-                ctx.genericDepth.push_back(ctx.depth);
-                ++ctx.triggerField[ParserState::genericargumentlist];
+                ctx.sawgeneric = true;
             }
             if(std::string(localname) != ""){
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            

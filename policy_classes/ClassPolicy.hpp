@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
+class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 
@@ -25,7 +25,7 @@ public:
 
         ClassType type;
 
-        std::string name;
+        NamePolicy::NameData * name;
 
         std::vector<ParentData> parents;
 
@@ -40,6 +40,8 @@ private:
     std::size_t classDepth;
     AccessSpecifier currentRegion;
 
+    NamePolicy * namePolicy;
+
 public:
 
 
@@ -47,9 +49,16 @@ public:
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           classDepth(0),
-          currentRegion(PUBLIC) { 
+          currentRegion(PUBLIC),
+          namePolicy(nullptr) { 
     
         InitializeClassPolicyHandlers();
+
+    }
+
+    void Notify(const PolicyDispatcher * policy) override {
+
+        data.name = policy->Data<NamePolicy::NameData>();
 
     }
 
@@ -77,6 +86,8 @@ private:
                     data.type = CLASS;
                 else if(ctx.elementStack.back() == "struct")
                     data.type = STRUCT;
+
+                data.name = nullptr;
 
                 CollectNameHandlers();
                 CollectSuperHanders();
@@ -114,7 +125,8 @@ private:
 
             if((classDepth + 1) == ctx.depth) {
 
-                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) { data.name += ctx.currentToken; };
+                namePolicy = new NamePolicy{this};
+                ctx.AddListener(namePolicy);
 
             }
 
@@ -124,8 +136,20 @@ private:
 
             if((classDepth + 1) == ctx.depth) {
 
+                if(namePolicy) {
+
+                    if(!data.name) {
+                        namePolicy->HandleEvent(ParserState::name, ElementState::close, ctx);
+                    }
+
+                    ctx.RemoveListener(namePolicy);
+                    delete namePolicy;
+                    namePolicy = nullptr;
+
+                }
+
                 NopOpenEvents({ParserState::name});
-                NopCloseEvents({ParserState::name, ParserState::tokenstring});
+                NopCloseEvents({ParserState::name});
 
             }
 
