@@ -55,7 +55,7 @@ namespace srcSAXEventDispatch {
         srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
         
-        srcSAXEventDispatcher(policies*... t2) : elementListeners{t2...}{
+        srcSAXEventDispatcher(policies*... t2) : elementListeners{t2...}, ctx(srcml_element_stack){
             ctx.sawgeneric = false;
             InitializeHandlers();
         }

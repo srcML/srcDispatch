@@ -10,6 +10,7 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
 public:
 
+    enum ClassType { CLASS, STRUCT/*, UNION, ENUM*/ };
     enum AccessSpecifier { PUBLIC, PRIVATE, PROTECTED };
     struct ParentData {
 
@@ -20,6 +21,8 @@ public:
     };
 
     struct ClassData {
+
+        ClassType type;
 
         std::string name;
 
@@ -62,12 +65,18 @@ private:
         using namespace srcSAXEventDispatch;
 
         // start of policy
-        openEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+        std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)> startPolicy = [this](const srcSAXEventContext& ctx) {
 
             if(!classDepth) {
 
                 classDepth = ctx.depth;
+
                 data = ClassData{};
+                if(ctx.elementStack.back() == "class")
+                    data.type = CLASS;
+                else if(ctx.elementStack.back() == "struct")
+                    data.type = STRUCT;
+
                 CollectNameHandlers();
                 CollectSuperHanders();
                 CollectBlockHanders();
@@ -77,7 +86,7 @@ private:
         };
 
         // end of policy
-        closeEventMap[ParserState::classn] = [this](const srcSAXEventContext& ctx) {
+        std::function<void(const srcSAXEventDispatch::srcSAXEventContext&)> endPolicy = [this](const srcSAXEventContext& ctx) {
 
             if(classDepth && classDepth == ctx.depth) {
 
@@ -88,6 +97,12 @@ private:
             }
            
         };
+
+
+        openEventMap[ParserState::classn] = startPolicy;
+        closeEventMap[ParserState::classn] = endPolicy;
+        openEventMap[ParserState::structn] = startPolicy;
+        closeEventMap[ParserState::structn] = endPolicy;
 
     }
 

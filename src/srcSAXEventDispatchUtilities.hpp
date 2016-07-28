@@ -21,9 +21,10 @@ namespace srcSAXEventDispatch{
         specifier, typedefexpr, empty, tokenstring, MAXENUMVALUE = empty};
     class srcSAXEventContext{
         public:
-            srcSAXEventContext(){
+            srcSAXEventContext(const std::vector<std::string> & elementStack) : elementStack(elementStack) {
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
             }
+            const std::vector<std::string> & elementStack;
             std::vector<int> genericDepth;
             unsigned int currentLineNumber;
             std::vector<unsigned short int> triggerField;
