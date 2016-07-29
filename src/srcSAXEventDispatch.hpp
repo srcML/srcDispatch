@@ -38,6 +38,7 @@ namespace srcSAXEventDispatch {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
+    bool classflag, functionflag, whileflag, ifflag, elseflag, ifelseflag;
     protected:
         void DispatchEvent(ParserState pstate, ElementState estate){
             ctx.DispatchEvent(pstate, estate);
@@ -157,6 +158,12 @@ namespace srcSAXEventDispatch {
                 } },
                 { "block", [this](){ 
                     ++ctx.triggerField[ParserState::block];
+/*                    if((triggerField[function] || triggerField[constructor])){
+                        ++triggerField[functionblock];
+                    }
+                    if(triggerField[classn] && !(triggerField[function] || triggerField[constructor])){
+                        ++triggerField[classblock];
+                    }*/
                     DispatchEvent(ParserState::block, ElementState::open);
                 } },
                 { "init", [this](){

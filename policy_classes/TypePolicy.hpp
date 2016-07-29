@@ -2,7 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
-class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
+class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     struct DeclTypeData{
         std::string nameoftype;
         std::string nameofidentifier;
@@ -17,6 +17,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         ~DeclTypePolicy(){}
         DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
+        }
+        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    
+            //data.name = policy->Data<NamePolicy::NameData>();
+    
         }
     protected:
         void * DataInner() const override {

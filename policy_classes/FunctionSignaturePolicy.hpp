@@ -1,8 +1,9 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXHandler.hpp>
+#include <ParamTypePolicy.hpp>
 #include <exception>
 
-class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
+class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     struct SignatureData{
         std::string nameoftype;
         std::string nameofidentifier;
@@ -13,15 +14,22 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
     };
     public:
         ~FunctionSignaturePolicy(){}
-        FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
+            AddListener(&ptdata);
             currentArgPosition = 1;
             InitializeEventHandlers();
         }
+        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    
+            //data.name = policy->Data<NamePolicy::NameData>();
+    
+        }
     protected:
-        void * DataInner() const override {
+        void * DataInner() const {
             return new SignatureData(data);
         }
     private:
+        ParamTypePolicy ptdata;
         SignatureData data;
         size_t currentArgPosition;       
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;

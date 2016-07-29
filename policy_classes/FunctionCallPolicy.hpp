@@ -7,7 +7,7 @@
  *Record current function being called
  *Record argument names and positions
  */
-class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher {
+class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     /*
     {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},
         NestedCalledFunction1{arg1, line#},{arg2, line#}, ..., {argn, line#}
@@ -21,6 +21,11 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         ~CallPolicy(){}
         CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
+        }
+        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    
+            //data.name = policy->Data<NamePolicy::NameData>();
+    
         }
     protected:
         void * DataInner() const override {
