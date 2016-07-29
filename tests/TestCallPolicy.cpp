@@ -2,7 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <unordered_map>
 #include <unordered_set>
-#include <TypePolicy.hpp>
+#include <DeclTypePolicy.hpp>
 #include <srcSAXHandler.hpp>
 #include <srcSAXEventDispatch.hpp>
 #include <FunctionCallPolicy.hpp>

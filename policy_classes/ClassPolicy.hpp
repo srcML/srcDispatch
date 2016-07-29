@@ -1,7 +1,7 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
 #include <NamePolicy.hpp>
-#include <TypePolicy.hpp>
+#include <DeclTypePolicy.hpp>
 #include <FunctionSignaturePolicy.hpp>
 
 #include <string>
