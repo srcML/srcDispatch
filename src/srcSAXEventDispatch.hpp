@@ -38,7 +38,8 @@ namespace srcSAXEventDispatch {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
-    bool classflag, functionflag, whileflag, ifflag, elseflag, ifelseflag;
+    bool classflagopen, functionflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
+    bool classflagclose, functionflagclose, whileflagclose, ifflagclose, elseflagclose, ifelseflagclose, forflagclose, switchflagclose;
     protected:
         void DispatchEvent(ParserState pstate, ElementState estate){
             ctx.DispatchEvent(pstate, estate);
@@ -48,6 +49,8 @@ namespace srcSAXEventDispatch {
         ~srcSAXEventDispatcher() {}
         srcSAXEventDispatcher(policies*... t2) : ctx(srcml_element_stack){
             ctx.elementListeners = {t2...};
+            classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            classflagclose = functionflagclose = whileflagclose = ifflagclose = elseflagclose = ifelseflagclose = forflagclose = switchflagclose = false;
             InitializeHandlers();
         }
         void InitializeHandlers(){
@@ -89,6 +92,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::call, ElementState::open);
                 } },
                 { "function", [this](){
+                    functionflagopen = true;
                     ++ctx.triggerField[ParserState::function];
                     DispatchEvent(ParserState::function, ElementState::open);
                 } },
@@ -109,10 +113,12 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::constructordecl, ElementState::open);
                 } },
                 { "class", [this](){
+                    classflagopen = true;
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::classn, ElementState::open);
                 } },
                 { "struct", [this](){
+                    classflagopen = true;
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::structn, ElementState::open);
                 } },
@@ -158,12 +164,14 @@ namespace srcSAXEventDispatch {
                 } },
                 { "block", [this](){ 
                     ++ctx.triggerField[ParserState::block];
-/*                    if((triggerField[function] || triggerField[constructor])){
-                        ++triggerField[functionblock];
+                    if(functionflagopen){
+                        functionflagopen = false;
+                        ++ctx.triggerField[ParserState::functionblock];
                     }
-                    if(triggerField[classn] && !(triggerField[function] || triggerField[constructor])){
-                        ++triggerField[classblock];
-                    }*/
+                    if(classflagopen){
+                        classflagopen = false; //next time it's set to true, we definitely are in a new one.
+                        ++ctx.triggerField[ParserState::classblock];
+                    }
                     DispatchEvent(ParserState::block, ElementState::open);
                 } },
                 { "init", [this](){
@@ -255,6 +263,8 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::call];
                 } },            
                 { "function", [this](){
+                    functionflagclose = true;
+                    --ctx.triggerField[ParserState::functionblock];
                     DispatchEvent(ParserState::function, ElementState::close);
                     --ctx.triggerField[ParserState::function];
                 } },
@@ -279,6 +289,8 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::destructordecl];
                 } },
                 { "class", [this](){
+                    classflagclose = true;
+                    --ctx.triggerField[ParserState::classblock];
                     DispatchEvent(ParserState::classn, ElementState::close);
                     --ctx.triggerField[ParserState::classn];
                 } },
