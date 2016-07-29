@@ -23,6 +23,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         }
     private:
         SignatureData data;
+        size_t currentArgPosition;       
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
 
         void InitializeEventHandlers(){
