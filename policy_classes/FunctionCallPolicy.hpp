@@ -15,12 +15,11 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
     */
     struct CallData{
         std::string fnName;
-        std::list<std::pair<std::string, unsigned int>> CallArgumentLineNumberMap;
+        std::list<std::string> CallArgumentLineNumberMap;
     };
     public:
         ~CallPolicy(){}
         CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
-            currentArgPosition = 1;
             InitializeEventHandlers();
         }
     protected:
@@ -29,35 +28,34 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         }
     private:
         CallData data;
-        int currentArgPosition;
         std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                    currentArgPosition = --(data.CallArgumentLineNumberMap.back()).second;
+                if(ctx.IsClosed(ParserState::call)){
+                    data.CallArgumentLineNumberMap.push_back(")");
+                    NotifyAll(ctx);
+                    data.CallArgumentLineNumberMap.clear();
+                    data.fnName.clear();
+                }else{
+                    data.CallArgumentLineNumberMap.push_back(")");
+                }
             };
 
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
-                    if(currentModifier == "*"){}
-                    else if(currentModifier == "&"){}
+                if(currentModifier == "*"){}
+                else if(currentModifier == "&"){}
             };
 
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
-                    if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
-                        std::cerr<<"Call: "<<ctx.currentToken<<std::endl;
-                        data.fnName = ctx.currentToken;
-                        currentArgPosition = 1;
-                    }
-                    //std::cerr<<ctx.IsOpen(ParserState::name)<<" "<<ctx.IsOpen(ParserState::argument)<<" "<<ctx.IsOpen(ParserState::argumentlist)<<" "<<ctx.IsOpen(ParserState::genericargumentlist)<<std::endl;
-                    if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
-                        data.CallArgumentLineNumberMap.push_back(std::make_pair(ctx.currentToken, currentArgPosition));
-                        std::cerr<<"F Argument: "<<ctx.currentToken<<data.CallArgumentLineNumberMap.back().second<<std::endl;
-                        ++currentArgPosition;
-                    }
-            };
-            closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                if(ctx.IsClosed(ParserState::call)){
-                    NotifyAll(ctx);
+                if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
+                    data.fnName = ctx.currentToken;
+                    data.CallArgumentLineNumberMap.push_back("(");
+                    data.CallArgumentLineNumberMap.push_back(ctx.currentToken);
+                }
+                //std::cerr<<ctx.IsOpen(ParserState::name)<<" "<<ctx.IsOpen(ParserState::argument)<<" "<<ctx.IsOpen(ParserState::argumentlist)<<" "<<ctx.IsOpen(ParserState::genericargumentlist)<<std::endl;
+                if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
+                    data.CallArgumentLineNumberMap.push_back(ctx.currentToken);
                 }
             };
         }
