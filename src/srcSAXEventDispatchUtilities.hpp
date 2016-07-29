@@ -222,6 +222,7 @@ namespace srcSAXEventDispatch{
     };
     class srcSAXEventContext : public EventDispatcher {
         public:
+            srcSAXEventContext() = delete;
             srcSAXEventContext(const std::vector<std::string> & elementStack) : elementStack(elementStack) {
                 triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
                 depth = 0;

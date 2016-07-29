@@ -301,7 +301,7 @@ namespace srcSAXEventDispatch {
                 } },
                 { "parameter", [this](){
                     DispatchEvent(ParserState::parameter, ElementState::close);
-                    --ctx.triggerField[ParserState::parameterlist];
+                    --ctx.triggerField[ParserState::parameter];
                 } },    
                 { "member_list", [this](){
                     DispatchEvent(ParserState::memberlist, ElementState::close);

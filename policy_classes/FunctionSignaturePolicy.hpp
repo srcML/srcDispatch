@@ -32,7 +32,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
                     if(currentModifier == "*") {}
                     else if(currentModifier == "&") {}
-                };
+            };
             closeEventMap[ParserState::functiondecl] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
                     NotifyAll(ctx);
             };
@@ -43,10 +43,10 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 if(ctx.And({ParserState::name, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::block, ParserState::parameterlist, ParserState::genericargumentlist})){
                     std::cerr<<"Typename: "<<ctx.currentToken<<std::endl;
                 }
-                if(ctx.And({ParserState::modifier, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::block, ParserState::parameterlist, ParserState::genericargumentlist})){
+                if(ctx.And({ParserState::modifier, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::genericargumentlist})){
                     std::cerr<<"Type mod: "<<ctx.currentToken<<std::endl;
                 }
-                if(ctx.And({ParserState::specifier, ParserState::function}) && ctx.Nor({ParserState::block, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+                if(ctx.And({ParserState::specifier, ParserState::function}) && ctx.Nor({ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
                     std::cerr<<"Func mod: "<<ctx.currentToken<<std::endl;
                 }
             };
