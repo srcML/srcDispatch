@@ -18,7 +18,7 @@ public:
         friend std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
 
             if(!nameData.name.empty()) {
-                return out << nameData.name;
+                out << nameData.name;
             }
 
             for(size_t pos = 0; pos < nameData.names.size(); ++pos) {
@@ -26,6 +26,10 @@ public:
                 if(pos != 0) out << "::";
                 out << (*nameData.names[pos]);
 
+            }
+
+            for(const std::string & index : nameData.arrayIndices) {
+                out << '[' << index << ']';
             }
 
             return out;
@@ -83,6 +87,8 @@ private:
                 namePolicy = new NamePolicy{this};
                 ctx.AddListenerNoDispatch(namePolicy);
 
+                CollectArrayIndicesHandlers();
+
             }
 
         };
@@ -118,8 +124,54 @@ private:
 
     }
 
-    void TemplateHandler() {}
+    void CollectTemplateHandlers() {}
 
-    void ArrayIndicesHandler() {}
+    void CollectArrayIndicesHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {
+
+            if(nameDepth && (nameDepth + 1) == ctx.depth) {
+
+                data.arrayIndices.push_back(std::string());
+
+            }
+
+        };
+
+        closeEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {
+
+            if(nameDepth && (nameDepth + 1) == ctx.depth) {
+
+                NopOpenEvents({ParserState::expr});
+                NopCloseEvents({ParserState::expr});
+
+            }
+
+        };
+
+        openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+
+            size_t num_elements = ctx.elementStack.size();
+            if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 1 && ctx.elementStack[num_elements - 2] == "index") {
+
+                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) { data.arrayIndices.back() += ctx.currentToken; };
+
+            }
+
+        };
+
+        closeEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+
+            size_t num_elements = ctx.elementStack.size();
+            if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 0 && ctx.elementStack.back() == "index") {
+
+                NopCloseEvents({ParserState::tokenstring});
+
+            }
+
+        };
+
+    }
 
 };
