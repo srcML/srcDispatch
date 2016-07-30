@@ -45,10 +45,12 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     NotifyAll(ctx);
             };
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
-                if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::block, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+                //std::cerr<<"current: "<<ctx.currentToken<<std::endl;
+                //std::cerr<<ctx.IsOpen(ParserState::modifier)<<" "<<ctx.IsOpen(ParserState::type)<<" "<<ctx.IsOpen(ParserState::functionblock)<<" "<<ctx.IsOpen(ParserState::genericargumentlist)<<" "<<ctx.IsOpen(ParserState::parameterlist)<<std::endl;
+                if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
                     std::cerr<<"Fname: "<<ctx.currentToken<<std::endl;
                 }
-                if(ctx.And({ParserState::name, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::block, ParserState::parameterlist, ParserState::genericargumentlist})){
+                if(ctx.And({ParserState::name, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::parameterlist, ParserState::genericargumentlist})){
                     std::cerr<<"Typename: "<<ctx.currentToken<<std::endl;
                 }
                 if(ctx.And({ParserState::modifier, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::genericargumentlist})){
