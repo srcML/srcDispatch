@@ -1,6 +1,8 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
 
+#include <TypePolicy.hpp>
+
 #include <string>
 #include <vector>
 
