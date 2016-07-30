@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+#ifndef INCLUDED_CLASS_POLICY_HPP
+#define INCLUDED_CLASS_POLICY_HPP
+
 class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
@@ -267,3 +270,5 @@ private:
     }
 
 };
+
+#endif

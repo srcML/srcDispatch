@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+#ifndef INCLUDED_NAME_POLICY_HPP
+#define INCLUDED_NAME_POLICY_HPP
+
 class NamePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
@@ -229,3 +232,5 @@ private:
     }
 
 };
+
+#endif
