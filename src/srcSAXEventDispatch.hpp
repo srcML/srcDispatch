@@ -39,7 +39,6 @@ namespace srcSAXEventDispatch {
     #pragma GCC diagnostic ignored "-Wunused-parameter"
     std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
     bool classflagopen, functionflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
-    bool classflagclose, functionflagclose, whileflagclose, ifflagclose, elseflagclose, ifelseflagclose, forflagclose, switchflagclose;
     protected:
         void DispatchEvent(ParserState pstate, ElementState estate){
             ctx.DispatchEvent(pstate, estate);
@@ -50,7 +49,6 @@ namespace srcSAXEventDispatch {
         srcSAXEventDispatcher(policies*... t2) : ctx(srcml_element_stack){
             ctx.elementListeners = {t2...};
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
-            classflagclose = functionflagclose = whileflagclose = ifflagclose = elseflagclose = ifelseflagclose = forflagclose = switchflagclose = false;
             InitializeHandlers();
         }
         void InitializeHandlers(){
@@ -68,6 +66,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::parameterlist, ElementState::open);
                 } },
                 { "if", [this](){
+                    ifflagopen = true;
                     ++ctx.triggerField[ParserState::ifstmt];
                     DispatchEvent(ParserState::ifstmt, ElementState::open);
                 } },
@@ -76,6 +75,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::forstmt, ElementState::open);
                 } },
                 { "while", [this](){
+                    whileflagopen = true;
                     ++ctx.triggerField[ParserState::whilestmt];
                     DispatchEvent(ParserState::whilestmt, ElementState::open);
                 } },
@@ -97,6 +97,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::function, ElementState::open);
                 } },
                 { "constructor", [this](){
+                    functionflagopen = true;
                     ++ctx.triggerField[ParserState::constructor];
                     DispatchEvent(ParserState::constructor, ElementState::open);
                 } },
@@ -143,6 +144,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::privateaccess, ElementState::open);
                 } },
                 { "destructor", [this](){
+                    functionflagopen = true;
                     ++ctx.triggerField[ParserState::destructor];
                     DispatchEvent(ParserState::destructor, ElementState::open);
                 } },
@@ -171,6 +173,18 @@ namespace srcSAXEventDispatch {
                     if(classflagopen){
                         classflagopen = false; //next time it's set to true, we definitely are in a new one.
                         ++ctx.triggerField[ParserState::classblock];
+                    }
+                    if(whileflagopen){
+                        whileflagopen = false;
+                        ++ctx.triggerField[ParserState::whileblock];
+                    }
+                    if(ifelseflagopen){
+                        ifflagopen = false;
+                        ++ctx.triggerField[ParserState::ifblock];
+                    }
+                    if(forflagopen){
+                        forflagopen = false;
+                        ++ctx.triggerField[ParserState::forblock];
                     }
                     DispatchEvent(ParserState::block, ElementState::open);
                 } },
@@ -233,14 +247,17 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::parameterlist];
                 } },            
                 { "if", [this](){
+                    --ctx.triggerField[ParserState::ifblock];
                     DispatchEvent(ParserState::ifstmt, ElementState::close);
                     --ctx.triggerField[ParserState::ifstmt];
                 } },            
                 { "for", [this](){
+                    --ctx.triggerField[ParserState::forblock];
                     DispatchEvent(ParserState::forstmt, ElementState::close);
                     --ctx.triggerField[ParserState::forstmt];
                 } },            
                 { "while", [this](){
+                    --ctx.triggerField[ParserState::whileblock];
                     DispatchEvent(ParserState::whilestmt, ElementState::close);
                     --ctx.triggerField[ParserState::whilestmt];
                 } },
@@ -263,7 +280,6 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::call];
                 } },            
                 { "function", [this](){
-                    functionflagclose = true;
                     --ctx.triggerField[ParserState::functionblock];
                     DispatchEvent(ParserState::function, ElementState::close);
                     --ctx.triggerField[ParserState::function];
@@ -289,7 +305,6 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::destructordecl];
                 } },
                 { "class", [this](){
-                    classflagclose = true;
                     --ctx.triggerField[ParserState::classblock];
                     DispatchEvent(ParserState::classn, ElementState::close);
                     --ctx.triggerField[ParserState::classn];

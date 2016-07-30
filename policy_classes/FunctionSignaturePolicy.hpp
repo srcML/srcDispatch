@@ -38,11 +38,11 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             using namespace srcSAXEventDispatch;
 
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
-                    if(currentModifier == "*") {}
-                    else if(currentModifier == "&") {}
+                if(currentModifier == "*") {}
+                else if(currentModifier == "&") {}
             };
             closeEventMap[ParserState::functiondecl] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
-                    NotifyAll(ctx);
+                NotifyAll(ctx);
             };
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //std::cerr<<"current: "<<ctx.currentToken<<std::endl;
