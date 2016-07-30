@@ -59,12 +59,12 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
-                    if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
+                    if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                         currentTypeName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::name, ParserState::decl, ParserState::parameter}) && 
-                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier}) && 
-                       !ctx.sawgeneric){
+                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, 
+                        ParserState::init, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                         currentDeclName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::specifier, ParserState::type, ParserState::parameter})){

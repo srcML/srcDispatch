@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <srcSAXHandler.hpp>
 #include <srcSAXEventDispatch.hpp>
-#include <FunctionCallPolicy.hpp>
+#include <DeclTypePolicy.hpp>
 #include <srcml.h>
 std::string StringToSrcML(std::string str){
 	struct srcml_archive* archive;
@@ -31,16 +31,16 @@ std::string StringToSrcML(std::string str){
 	return std::string(ch);
 }
 
-class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
-        ~TestCalls(){}
-        TestCalls(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
+        ~TestDeclType(){}
+        TestDeclType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
-            callpolicy.AddListener(this);
+            declpolicy.AddListener(this);
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            calldata = policy->Data<CallPolicy::CallData>();
-            std::cerr<<calldata->callargumentlist.size();
+            decltypedata = policy->Data<DeclTypePolicy::DeclTypeData>();
+            std::cerr<<decltypedata->nameofidentifier;
         }
     protected:
         void * DataInner() const {
@@ -49,17 +49,17 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
     private:
 		void InitializeEventHandlers(){
     		using namespace srcSAXEventDispatch;
-        	openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
-            	ctx.AddListener(&callpolicy);
+        	openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+            	ctx.AddListener(&declpolicy);
         	};
-            closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
+            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsClosed(ParserState::call)){
-                    ctx.RemoveListener(&callpolicy);
+                    ctx.RemoveListener(&declpolicy);
                 }
             };
 		}
-        CallPolicy callpolicy;
-        CallPolicy::CallData* calldata;
+        DeclTypePolicy declpolicy;
+        DeclTypePolicy::DeclTypeData* decltypedata;
 
 };
 
@@ -67,8 +67,8 @@ int main(int argc, char** filename){
 	std::string codestr = "void foo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
 	std::string srcmlstr = StringToSrcML(codestr);
 
-    TestCalls calldata;
+    TestDeclType decltypedata;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<TestCalls> handler {&calldata};
+    srcSAXEventDispatch::srcSAXEventDispatcher<TestDeclType> handler {&decltypedata};
     control.parse(&handler); //Start parsing
 }

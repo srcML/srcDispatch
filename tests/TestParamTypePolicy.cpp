@@ -1,10 +1,10 @@
+#include <cassert>
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <srcSAXHandler.hpp>
-#include <srcSAXEventDispatch.hpp>
-#include <FunctionCallPolicy.hpp>
+#include <ParamTypePolicy.hpp>
 #include <srcml.h>
 std::string StringToSrcML(std::string str){
 	struct srcml_archive* archive;
@@ -31,16 +31,16 @@ std::string StringToSrcML(std::string str){
 	return std::string(ch);
 }
 
-class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
-        ~TestCalls(){}
-        TestCalls(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
+        ~TestParamType(){}
+        TestParamType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
-            callpolicy.AddListener(this);
+            parampolicy.AddListener(this);
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            calldata = policy->Data<CallPolicy::CallData>();
-            std::cerr<<calldata->callargumentlist.size();
+            paramdata = policy->Data<ParamTypePolicy::ParamData>();
+            std::cerr<<paramdata->nameoftype;
         }
     protected:
         void * DataInner() const {
@@ -49,17 +49,15 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
     private:
 		void InitializeEventHandlers(){
     		using namespace srcSAXEventDispatch;
-        	openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
-            	ctx.AddListener(&callpolicy);
+        	openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+            	ctx.AddListener(&parampolicy);
         	};
-            closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                if(ctx.IsClosed(ParserState::call)){
-                    ctx.RemoveListener(&callpolicy);
-                }
-            };
+        	closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+            	ctx.RemoveListener(&parampolicy);
+        	};
 		}
-        CallPolicy callpolicy;
-        CallPolicy::CallData* calldata;
+        ParamTypePolicy parampolicy;
+        ParamTypePolicy::ParamData* paramdata;
 
 };
 
@@ -67,8 +65,8 @@ int main(int argc, char** filename){
 	std::string codestr = "void foo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
 	std::string srcmlstr = StringToSrcML(codestr);
 
-    TestCalls calldata;
+    TestParamType paramData;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<TestCalls> handler {&calldata};
+    srcSAXEventDispatch::srcSAXEventDispatcher<TestParamType> handler {&paramData};
     control.parse(&handler); //Start parsing
 }

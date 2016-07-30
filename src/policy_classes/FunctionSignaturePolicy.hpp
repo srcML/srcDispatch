@@ -4,25 +4,25 @@
 #include <vector>
 #include <ParamTypePolicy.hpp>
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
-    struct SignatureData{
-        std::string returntype;
-        std::string functionName;
-        std::vector<std::pair<std::string, std::string>> parameters;
-        std::string returntypeModifier;
-        bool isConst;
-        bool isMethod;
-        bool isStatic;
-        void clear(){
-            returntype.clear();
-            functionName.clear();
-            parameters.clear();
-            returntypeModifier.clear();
-            isConst = false;
-            isMethod = false;
-            isStatic = false;
-        }
-    };
     public:
+        struct SignatureData{
+            std::string returntype;
+            std::string functionName;
+            std::vector<std::pair<std::string, std::string>> parameters;
+            std::string returntypeModifier;
+            bool isConst;
+            bool isMethod;
+            bool isStatic;
+            void clear(){
+                returntype.clear();
+                functionName.clear();
+                parameters.clear();
+                returntypeModifier.clear();
+                isConst = false;
+                isMethod = false;
+                isStatic = false;
+            }
+        };
         ~FunctionSignaturePolicy(){}
         FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
             currentArgPosition = 1;
