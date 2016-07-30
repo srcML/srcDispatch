@@ -1,4 +1,6 @@
-# find needed libraries
+ cmake_minimum_required(VERSION 3.5)
+
+ # find needed libraries
 find_package(LibXml2 REQUIRED)
 
 add_definitions("-std=c++11")
@@ -12,8 +14,8 @@ include_directories(${LIBXML2_INCLUDE_DIR}
                     ${CMAKE_SOURCE_DIR}/srcSAX/src/srcsax
                     ${CMAKE_SOURCE_DIR}/srcSAX/src/cpp
                     ${CMAKE_SOURCE_DIR}/srcSAX/src/windows 
-                    src
-                    policy_classes
+                    src/dispatcher
+                    src/policy_classes
                     tests)
 
 add_subdirectory(srcSAX/src)
