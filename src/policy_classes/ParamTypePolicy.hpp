@@ -3,16 +3,16 @@
 #include <exception>
 
 class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
-    struct ParamData{
-        std::string nameoftype;
-        std::string nameofidentifier;
-        int linenumber;
-        bool isConst;
-        bool isReference;
-        bool isPointer;
-        bool isStatic;
-    };
     public:
+        struct ParamData{
+            std::string nameoftype;
+            std::string nameofidentifier;
+            int linenumber;
+            bool isConst;
+            bool isReference;
+            bool isPointer;
+            bool isStatic;
+        };
         ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
@@ -76,7 +76,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                 }
             };
             closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
-                    NotifyAll(ctx);
+                NotifyAll(ctx);
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
