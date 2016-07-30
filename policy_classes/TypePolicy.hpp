@@ -1,6 +1,8 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXHandler.hpp>
 
+#include <NamePolicy.hpp>
+
 #include <exception>
 
 #ifndef INCLUDED_TYPE_POLICY_HPP
@@ -31,6 +33,8 @@ public:
                     out << "&&";
                 else if(type.second == SPECIFIER)
                     out << *static_cast<std::string *>(type.first);
+                else if(type.second == NAME)
+                    out << *static_cast<NamePolicy::NameData *>(type.first);
 
             }
 
@@ -43,18 +47,21 @@ public:
         TypeData data;
         std::size_t typeDepth;
 
+        NamePolicy * namePolicy;
+
     public:
         TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {})
             : srcSAXEventDispatch::PolicyDispatcher(listeners),
               data{},
-              typeDepth(0) {
+              typeDepth(0),
+              namePolicy(nullptr) {
 
             InitializeTypePolicyHandlers();
 
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
     
-            // data.name = policy->Data<NamePolicy::NameData>();
+            data.types.back().first = policy->Data<NamePolicy::NameData>();
     
         }
     protected:
@@ -62,7 +69,6 @@ public:
             return new TypeData(data);
         }
     private:
-        std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         void InitializeTypePolicyHandlers() {
             using namespace srcSAXEventDispatch;
 
@@ -105,6 +111,10 @@ public:
 
             if(typeDepth && (typeDepth + 1) == ctx.depth) {
 
+                data.types.push_back(std::make_pair(nullptr, SPECIFIER));
+                namePolicy = new NamePolicy{this};
+                ctx.AddListenerDispatch(namePolicy);
+
             }
 
         };
@@ -112,6 +122,14 @@ public:
         closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
             if(typeDepth && (typeDepth + 1) == ctx.depth) {
+
+                if(namePolicy) {
+
+                    ctx.RemoveListenerDispatch(namePolicy);
+                    delete namePolicy;
+                    namePolicy = nullptr;
+
+                }
 
             }
 
