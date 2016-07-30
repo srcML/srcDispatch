@@ -40,11 +40,11 @@ class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEv
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             paramdata = policy->Data<ParamTypePolicy::ParamData>();
-            std::cerr<<paramdata->nameoftype;
+            datatotest.push_back(paramdata);
         }
     protected:
         void * DataInner() const {
-            //return new SignatureData(data);
+            return (void*)0;
         }
     private:
 		void InitializeEventHandlers(){
@@ -56,8 +56,14 @@ class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEv
             	ctx.RemoveListener(&parampolicy);
         	};
 		}
+        void RunTest(){
+            for(ParamTypePolicy::ParamData* testdata : datatotest){
+                //do the thing
+            }
+        }		
         ParamTypePolicy parampolicy;
         ParamTypePolicy::ParamData* paramdata;
+        std::vector<ParamTypePolicy::ParamData*> datatotest;
 
 };
 

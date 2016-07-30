@@ -40,11 +40,11 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             decltypedata = policy->Data<DeclTypePolicy::DeclTypeData>();
-            std::cerr<<decltypedata->nameofidentifier;
+            datatotest.push_back(decltypedata);
         }
     protected:
         void * DataInner() const {
-            //return new SignatureData(data);
+            return (void*)0;
         }
     private:
 		void InitializeEventHandlers(){
@@ -55,11 +55,18 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsClosed(ParserState::call)){
                     ctx.RemoveListener(&declpolicy);
+                    RunTest();
                 }
             };
 		}
+		void RunTest(){
+			for(DeclTypePolicy::DeclTypeData* testdata : datatotest){
+				//do the thing
+			}
+		}
         DeclTypePolicy declpolicy;
         DeclTypePolicy::DeclTypeData* decltypedata;
+        std::vector<DeclTypePolicy::DeclTypeData*> datatotest;
 
 };
 

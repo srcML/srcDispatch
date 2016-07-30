@@ -40,11 +40,11 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             calldata = policy->Data<CallPolicy::CallData>();
-            std::cerr<<calldata->callargumentlist.size();
+            datatotest.push_back(calldata);
         }
     protected:
         void * DataInner() const {
-            //return new SignatureData(data);
+            return (void*)0;
         }
     private:
 		void InitializeEventHandlers(){
@@ -55,11 +55,18 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
             closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsClosed(ParserState::call)){
                     ctx.RemoveListener(&callpolicy);
+                    RunTest();
                 }
             };
 		}
+		void RunTest(){
+			for(CallPolicy::CallData* testdata : datatotest){
+				//do the thing
+			}
+		}
         CallPolicy callpolicy;
         CallPolicy::CallData* calldata;
+        std::vector<CallPolicy::CallData*> datatotest;
 
 };
 

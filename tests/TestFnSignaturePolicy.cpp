@@ -40,11 +40,11 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             signaturedata = policy->Data<FunctionSignaturePolicy::SignatureData>();
-            std::cerr<<signaturedata->functionName;
+            datatotest.push_back(signaturedata);
         }
     protected:
         void * DataInner() const {
-            //return new SignatureData(data);
+            return (void*)0;
         }
     private:
         void InitializeEventHandlers(){
@@ -54,11 +54,17 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             };
             closeEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx) {
                 ctx.RemoveListener(&parampolicy);
+                RunTest();
             };
         }
+        void RunTest(){
+            for(FunctionSignaturePolicy::SignatureData* testdata : datatotest){
+                //do the thing
+            }
+        }    
         FunctionSignaturePolicy parampolicy;
         FunctionSignaturePolicy::SignatureData* signaturedata;
-
+        std::vector<FunctionSignaturePolicy::SignatureData*> datatotest;
 };
 
 int main(int argc, char** filename){
