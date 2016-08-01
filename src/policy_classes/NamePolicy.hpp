@@ -18,7 +18,7 @@ public:
 
         std::string name;
         std::vector<NameData *> names;
-        // std::vector<TemplateArgumentPolicy::TemplateArgumentData *> templateArguments;
+        std::vector<TemplateArgumentPolicy::TemplateArgumentData *> templateArguments;
         std::vector<std::string> arrayIndices;
 
         friend std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
@@ -34,13 +34,13 @@ public:
 
             }
 
-            // if(!nameData.templateArguments.empty()) {
-            //     out << '<';
-            //     for(const std::string & arg : nameData.templateArguments) {
-            //         out << arg;
-            //     }
-            //     out << '>';
-            // }
+            if(!nameData.templateArguments.empty()) {
+                out << '<';
+                for(const TemplateArgumentPolicy::TemplateArgumentData * arg : nameData.templateArguments) {
+                    out << *arg;
+                }
+                out << '>';
+            }
 
             for(const std::string & index : nameData.arrayIndices) {
                 out << '[' << index << ']';
@@ -148,7 +148,7 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                // data.templateArguments.push_back(nullptr);
+                data.templateArguments.push_back(nullptr);
                 openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
 
                     size_t num_elements = ctx.elementStack.size();

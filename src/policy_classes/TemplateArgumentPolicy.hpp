@@ -3,8 +3,8 @@
 
 #include <exception>
 
-#ifndef INCLUDED_TYPE_POLICY_HPP
-#define INCLUDED_TYPE_POLICY_HPP
+#ifndef INCLUDED_TEMPLATE_ARGUMENT_POLICY_HPP
+#define INCLUDED_TEMPLATE_ARGUMENT_POLICY_HPP
 
 class NamePolicy;
 class TemplateArgumentPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
@@ -33,8 +33,8 @@ public:
         void InitializeTemplateArgumentPolicyHandlers();
 
         void CollectNamesHandler();
-        void CollectModifersHandler();
-        void CollectSpecifiersHandler();
+        void CollectLiteralsHandler();
+        void CollectOthersHandler();
 
 };
 

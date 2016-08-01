@@ -4,8 +4,6 @@
 
 std::ostream & operator<<(std::ostream & out, const TemplateArgumentPolicy::TemplateArgumentData & argumentData) {
 
-    }
-
     return out;
 
 }
@@ -22,7 +20,7 @@ TemplateArgumentPolicy::TemplateArgumentPolicy(std::initializer_list<srcSAXEvent
 
 void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
 
-    data.types.back().first = policy->Data<NamePolicy::NameData>();
+    data.templateArgument.back().first = policy->Data<NamePolicy::NameData>();
 
 }
 
@@ -71,10 +69,10 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
         // C++ has depth of 2 others 1
-        if(   (argumentDepth && (argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || argumentDepth && (argumentDepth + 1) == ctx.depth) {
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
 
-            data.types.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
+            data.templateArgument.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
             namePolicy = new NamePolicy{this};
             ctx.AddListenerDispatch(namePolicy);
 
@@ -84,8 +82,8 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
 
     closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
-        if(   (argumentDepth && (argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || argumentDepth && (argumentDepth + 1) == ctx.depth) {
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
 
             if(namePolicy) {
 
