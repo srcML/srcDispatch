@@ -119,7 +119,7 @@ private:
 
         closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
 
-            if(declDepth && (declDepth + 1) == ctx.depth) {
+            if(declDepth && (declDepth + 2) == ctx.depth) {
 
                 if(typePolicy) {
                     ctx.RemoveListenerDispatch(typePolicy);
@@ -149,7 +149,7 @@ private:
 
         closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
-            if(declDepth && (declDepth + 1) == ctx.depth) {
+            if(declDepth && (declDepth + 2) == ctx.depth) {
 
                 if(namePolicy) {
                     ctx.RemoveListenerDispatch(namePolicy);

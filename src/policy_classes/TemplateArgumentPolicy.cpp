@@ -95,8 +95,7 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
 
     closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
-        std::size_t elementStackSize = ctx.elementStack.size();
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
             || (argumentDepth + 1) == ctx.depth)) {
 
             if(namePolicy) {
@@ -119,8 +118,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
 
         // C++ has depth of 2 others 1
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+        std::size_t elementStackSize = ctx.elementStack.size();
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+            || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -134,7 +134,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     closeEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
 
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+            || (argumentDepth + 1) == ctx.depth)) {
 
             NopCloseEvents({ParserState::tokenstring});
 
@@ -145,8 +145,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
 
         // C++ has depth of 2 others 1
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+        std::size_t elementStackSize = ctx.elementStack.size();
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+            || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -160,7 +161,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
 
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+            || (argumentDepth + 1) == ctx.depth)) {
 
             NopCloseEvents({ParserState::tokenstring});
 
@@ -171,8 +172,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     openEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
 
         // C++ has depth of 2 others 1
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+        std::size_t elementStackSize = ctx.elementStack.size();
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+            || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -186,7 +188,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
 
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+            || (argumentDepth + 1) == ctx.depth)) {
 
             NopCloseEvents({ParserState::tokenstring});
 
@@ -197,8 +199,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
 
         // C++ has depth of 2 others 1
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+        std::size_t elementStackSize = ctx.elementStack.size();
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+            || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -212,7 +215,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
     closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
 
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+            || (argumentDepth + 1) == ctx.depth)) {
 
             NopCloseEvents({ParserState::tokenstring});
 

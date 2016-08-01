@@ -274,6 +274,7 @@ namespace srcSAXEventDispatch {
                 { "argument_list", [this](){
                     if(!ctx.genericDepth.empty()){
                         if(ctx.genericDepth.back() == ctx.depth){
+                            DispatchEvent(ParserState::genericargumentlist, ElementState::close);
                             --ctx.triggerField[ParserState::genericargumentlist];
                             ctx.genericDepth.pop_back();
                         }
@@ -496,7 +497,7 @@ namespace srcSAXEventDispatch {
                 ctx.genericDepth.push_back(ctx.depth);
             }
             if(localName != ""){
-                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localName);            
+                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();
                 }
@@ -532,7 +533,7 @@ namespace srcSAXEventDispatch {
                 localName += prefix;
             localName += localname;
 
-            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localName);            
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localName);
             if (process2 != process_map2.end()) {
                 process2->second();
             }
