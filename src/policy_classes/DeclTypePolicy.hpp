@@ -3,16 +3,16 @@
 #include <exception>
 
 class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
-    struct DeclTypeData{
-        std::string nameoftype;
-        std::string nameofidentifier;
-        int linenumber;
-        bool isConst;
-        bool isReference;
-        bool isPointer;
-        bool isStatic;
-    };
     public:
+        struct DeclTypeData{
+            std::string nameoftype;
+            std::string nameofidentifier;
+            int linenumber;
+            bool isConst;
+            bool isReference;
+            bool isPointer;
+            bool isStatic;
+        };
         DeclTypeData data;
         ~DeclTypePolicy(){}
         DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
@@ -59,7 +59,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
-                    if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier}) && !ctx.sawgeneric){
+                    if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                         currentTypeName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) && 
