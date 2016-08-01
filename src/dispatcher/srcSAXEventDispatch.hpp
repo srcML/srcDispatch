@@ -84,8 +84,14 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::templates, ElementState::open);
                 } },
                 { "argument_list", [this](){
-                    ++ctx.triggerField[ParserState::argumentlist];
+                    if(!ctx.genericDepth.empty()){
+                        if(ctx.genericDepth.back() == ctx.depth){
+                            ++ctx.triggerField[ParserState::genericargumentlist];
+                            DispatchEvent(ParserState::genericargumentlist, ElementState::open);
+                        }
+                    }
                     DispatchEvent(ParserState::argumentlist, ElementState::open);
+                    ++ctx.triggerField[ParserState::argumentlist];
                 } },
                 { "call", [this](){
                     ++ctx.triggerField[ParserState::call];
@@ -483,7 +489,6 @@ namespace srcSAXEventDispatch {
             }
             if(name == "generic" && std::string(localname) == "argument_list"){
                 ctx.genericDepth.push_back(ctx.depth);
-                ++ctx.triggerField[ParserState::genericargumentlist];
             }
             if(std::string(localname) != ""){
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            

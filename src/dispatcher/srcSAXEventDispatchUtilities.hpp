@@ -235,7 +235,6 @@ namespace srcSAXEventDispatch{
             unsigned int currentLineNumber;
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
-            bool sawgeneric;
             std::size_t depth;
 
         private:
