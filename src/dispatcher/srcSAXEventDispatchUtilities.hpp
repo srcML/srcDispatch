@@ -20,8 +20,10 @@ namespace srcSAXEventDispatch{
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
-        ifstmt, nonterminal, macro, classblock, functionblock, specifier, typedefexpr, empty, tokenstring,
-        ifblock, whileblock, forblock, MAXENUMVALUE = empty};
+        ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr, empty,
+
+        // do not put anything after these
+        tokenstring, MAXENUMVALUE = empty};
     class EventListener {
         private:
             bool dispatched;
