@@ -33,7 +33,6 @@ public:
         void InitializeTemplateArgumentPolicyHandlers();
 
         void CollectNamesHandler();
-        void CollectLiteralsHandler();
         void CollectOthersHandler();
 
 };

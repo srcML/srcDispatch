@@ -40,7 +40,6 @@ void TemplateArgumentPolicy::InitializeTemplateArgumentPolicyHandlers() {
             data = TemplateArgumentPolicy::TemplateArgumentData{};
 
             CollectNamesHandler();
-            CollectLiteralsHandler();
             CollectOthersHandler();
 
         }
@@ -99,10 +98,111 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
 
 }
 
-void TemplateArgumentPolicy::CollectLiteralsHandler() {
-    using namespace srcSAXEventDispatch;
-}
-
 void TemplateArgumentPolicy::CollectOthersHandler() {
     using namespace srcSAXEventDispatch;
+
+    openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
+
+        // C++ has depth of 2 others 1
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+            };
+
+        }
+
+    };
+
+    closeEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
+
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            NopCloseEvents({ParserState::tokenstring});
+
+        }
+
+    };
+
+    openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
+
+        // C++ has depth of 2 others 1
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+            };
+
+        }
+
+    };
+
+    closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
+
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            NopCloseEvents({ParserState::tokenstring});
+
+        }
+
+    };
+
+    openEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
+
+        // C++ has depth of 2 others 1
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+            };
+
+        }
+
+    };
+
+    closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
+
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            NopCloseEvents({ParserState::tokenstring});
+
+        }
+
+    };
+
+    openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
+
+        // C++ has depth of 2 others 1
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+            };
+
+        }
+
+    };
+
+    closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
+
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
+            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+
+            NopCloseEvents({ParserState::tokenstring});
+
+        }
+
+    };
+
 }
