@@ -47,7 +47,7 @@ void TemplateArgumentPolicy::InitializeTemplateArgumentPolicyHandlers() {
     // start of policy
     openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
 
-        if(!argumentDepth && ctx.sawgeneric) {
+        if(!argumentDepth) {
 
             argumentDepth = ctx.depth;
             data = TemplateArgumentPolicy::TemplateArgumentData{};
@@ -81,8 +81,9 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
         // C++ has depth of 2 others 1
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+        std::size_t elementStackSize = ctx.elementStack.size();
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+            || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
             namePolicy = new NamePolicy{this};
@@ -94,8 +95,9 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
 
     closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
+        std::size_t elementStackSize = ctx.elementStack.size();
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+            || (argumentDepth + 1) == ctx.depth)) {
 
             if(namePolicy) {
 

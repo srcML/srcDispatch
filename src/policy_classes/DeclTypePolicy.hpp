@@ -63,8 +63,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         currentTypeName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) && 
-                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier}) && 
-                       !ctx.sawgeneric){
+                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier}) 
+                        // && !ctx.sawgeneric
+                       ){
                         currentDeclName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::specifier, ParserState::type, ParserState::declstmt})){

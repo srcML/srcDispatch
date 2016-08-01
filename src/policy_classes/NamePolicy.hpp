@@ -83,11 +83,11 @@ protected:
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
-        if(typeid(policy) == typeid(NamePolicy)) {
+        if(typeid(NamePolicy) == typeid(*policy)) {
 
             data.names.push_back(policy->Data<NameData>());
 
-        } else if(typeid(policy) == typeid(TemplateArgumentPolicy)) {
+        } else if(typeid(TemplateArgumentPolicy) == typeid(*policy)) {
 
             data.templateArguments.push_back(policy->Data<TemplateArgumentPolicy::TemplateArgumentData>());
 
@@ -113,6 +113,7 @@ private:
 
             } else if((nameDepth + 1) == ctx.depth) {
 
+                NopCloseEvents({ParserState::tokenstring});
                 namePolicy = new NamePolicy{this};
                 ctx.AddListenerDispatch(namePolicy); 
 
@@ -153,7 +154,7 @@ private:
     void CollectTemplateArgumentsHandlers() {
         using namespace srcSAXEventDispatch;
 
-        openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx) {
+        openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext& ctx) {
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
@@ -164,7 +165,7 @@ private:
 
         };
 
-        closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext& ctx) {
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
