@@ -13,7 +13,7 @@ public:
     enum TemplateArgumentType { NAME, LITERAL, OTHER };
 
     struct TemplateArgumentData {
-        std::vector<std::pair<void *, TemplateArgumentType>> templateArgument;
+        std::vector<std::pair<void *, TemplateArgumentType>> data;
 
         friend std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argumentData);
 

@@ -169,7 +169,7 @@ private:
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
                 if(templateArgumentPolicy) {
-                    ctx.RemoveListenerNoDispatch(namePolicy);
+                    ctx.RemoveListenerNoDispatch(templateArgumentPolicy);
                     delete templateArgumentPolicy;
                     templateArgumentPolicy = nullptr;
                 }

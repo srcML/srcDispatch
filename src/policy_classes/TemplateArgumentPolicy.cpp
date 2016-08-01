@@ -4,6 +4,19 @@
 
 std::ostream & operator<<(std::ostream & out, const TemplateArgumentPolicy::TemplateArgumentData & argumentData) {
 
+    for(std::size_t pos = 0; pos < argumentData.data.size(); ++pos) {
+
+        if(pos != 0)
+            out << ' ';
+
+        const std::pair<void *, TemplateArgumentPolicy::TemplateArgumentType> & element = argumentData.data[pos];
+        if(element.second == TemplateArgumentPolicy::NAME)
+            out << *static_cast<NamePolicy::NameData *>(element.first);
+        else
+            out << *static_cast<std::string *>(element.first);
+
+    }
+
     return out;
 
 }
@@ -20,7 +33,7 @@ TemplateArgumentPolicy::TemplateArgumentPolicy(std::initializer_list<srcSAXEvent
 
 void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
 
-    data.templateArgument.back().first = policy->Data<NamePolicy::NameData>();
+    data.data.back().first = policy->Data<NamePolicy::NameData>();
 
 }
 
@@ -71,7 +84,7 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
             || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
 
-            data.templateArgument.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
+            data.data.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
             namePolicy = new NamePolicy{this};
             ctx.AddListenerDispatch(namePolicy);
 
@@ -107,9 +120,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
             || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
 
-            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
             };
 
         }
@@ -133,9 +146,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
             || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
 
-            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
             };
 
         }
@@ -159,9 +172,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
             || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
 
-            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
             };
 
         }
@@ -185,9 +198,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
             || (argumentDepth && (argumentDepth + 1) == ctx.depth))) {
 
-            data.templateArgument.push_back(std::make_pair(new std::string(), LITERAL));
+            data.data.push_back(std::make_pair(new std::string(), LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.templateArgument.back().first)) += ctx.currentToken;
+                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
             };
 
         }
