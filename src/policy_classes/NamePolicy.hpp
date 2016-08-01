@@ -59,6 +59,7 @@ private:
     std::size_t nameDepth;
 
     NamePolicy * namePolicy;
+    TemplateArgumentPolicy * templateArgumentPolicy;
 
 public:
 
@@ -67,7 +68,8 @@ public:
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           nameDepth(0),
-          namePolicy(nullptr) { 
+          namePolicy(nullptr),
+          templateArgumentPolicy(nullptr) { 
     
         InitializeNamePolicyHandlers();
 
@@ -81,8 +83,15 @@ protected:
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
-        if((nameDepth + 1) == ctx.depth)
+        if(typeid(policy) == typeid(NamePolicy)) {
+
             data.names.push_back(policy->Data<NameData>());
+
+        } else if(typeid(policy) == typeid(TemplateArgumentPolicy)) {
+
+            data.templateArguments.push_back(policy->Data<TemplateArgumentPolicy::TemplateArgumentData>());
+
+        }
 
     }
 
@@ -96,15 +105,16 @@ private:
 
             if(!nameDepth) {
 
-                NopCloseEvents({ParserState::tokenstring});
-
                 nameDepth = ctx.depth;
                 data = NameData{};
-                namePolicy = new NamePolicy{this};
-                ctx.AddListenerNoDispatch(namePolicy);
 
                 CollectTemplateArgumentsHandlers();
                 CollectArrayIndicesHandlers();
+
+            } else if((nameDepth + 1) == ctx.depth) {
+
+                namePolicy = new NamePolicy{this};
+                ctx.AddListenerDispatch(namePolicy); 
 
             }
 
@@ -116,15 +126,14 @@ private:
             if(nameDepth && nameDepth == ctx.depth) {
 
                 nameDepth = 0;
-                if(namePolicy) {
-                    ctx.RemoveListenerNoDispatch(namePolicy);
-                    delete namePolicy;
-                    namePolicy = nullptr;
-                }
-
+ 
                 NotifyAll(ctx);
                 InitializeNamePolicyHandlers();
 
+            } else if(nameDepth && (nameDepth + 1) == ctx.depth && namePolicy) {
+                ctx.RemoveListenerDispatch(namePolicy);
+                delete namePolicy;
+                namePolicy = nullptr;
             }
            
         };
@@ -148,20 +157,8 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                data.templateArguments.push_back(nullptr);
-                openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
-
-                    size_t num_elements = ctx.elementStack.size();
-                    if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 1 && ctx.elementStack[num_elements - 2] == "argument_list") {}
-
-                };
-
-                closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
-
-                    size_t num_elements = ctx.elementStack.size();
-                    if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 0 && ctx.elementStack.back() == "argument_list") {}
-
-                };
+                templateArgumentPolicy = new TemplateArgumentPolicy{this};
+                ctx.AddListenerNoDispatch(templateArgumentPolicy);
 
             }
 
@@ -171,8 +168,11 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                NopOpenEvents({ParserState::argumentlist, ParserState::argument});
-                NopCloseEvents({ParserState::argumentlist, ParserState::argument});
+                if(templateArgumentPolicy) {
+                    ctx.RemoveListenerNoDispatch(namePolicy);
+                    delete templateArgumentPolicy;
+                    templateArgumentPolicy = nullptr;
+                }
 
             }
 
