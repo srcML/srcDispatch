@@ -2,6 +2,7 @@
 #include <srcSAXEventDispatchUtilities.hpp>
 
 #include <TypePolicy.hpp>
+#include <TemplateArgumentPolicy.hpp>
 
 #include <string>
 #include <vector>
@@ -17,7 +18,7 @@ public:
 
         std::string name;
         std::vector<NameData *> names;
-        std::vector<std::string> templateArguments;
+        // std::vector<TemplateArgumentPolicy::TemplateArgumentData *> templateArguments;
         std::vector<std::string> arrayIndices;
 
         friend std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
@@ -33,13 +34,13 @@ public:
 
             }
 
-            if(!nameData.templateArguments.empty()) {
-                out << '<';
-                for(const std::string & arg : nameData.templateArguments) {
-                    out << arg;
-                }
-                out << '>';
-            }
+            // if(!nameData.templateArguments.empty()) {
+            //     out << '<';
+            //     for(const std::string & arg : nameData.templateArguments) {
+            //         out << arg;
+            //     }
+            //     out << '>';
+            // }
 
             for(const std::string & index : nameData.arrayIndices) {
                 out << '[' << index << ']';
@@ -95,6 +96,8 @@ private:
 
             if(!nameDepth) {
 
+                NopCloseEvents({ParserState::tokenstring});
+
                 nameDepth = ctx.depth;
                 data = NameData{};
                 namePolicy = new NamePolicy{this};
@@ -145,26 +148,18 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                data.templateArguments.push_back(std::string());
+                // data.templateArguments.push_back(nullptr);
                 openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
 
                     size_t num_elements = ctx.elementStack.size();
-                    if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 1 && ctx.elementStack[num_elements - 2] == "argument_list") {
-
-                        closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) { data.templateArguments.back() += ctx.currentToken; };
-
-                    }
+                    if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 1 && ctx.elementStack[num_elements - 2] == "argument_list") {}
 
                 };
 
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
 
                     size_t num_elements = ctx.elementStack.size();
-                    if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 0 && ctx.elementStack.back() == "argument_list") {
-
-                        NopCloseEvents({ParserState::tokenstring});
-
-                    }
+                    if(nameDepth && (nameDepth + 2) == ctx.depth && num_elements > 0 && ctx.elementStack.back() == "argument_list") {}
 
                 };
 
