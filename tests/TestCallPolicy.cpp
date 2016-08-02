@@ -44,7 +44,7 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
         }
     protected:
         void * DataInner() const {
-            return (void*)0;
+            return (void*)0; //To silence the warning
         }
     private:
 		void InitializeEventHandlers(){

@@ -6,18 +6,20 @@
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         struct SignatureData{
-            std::string returntype;
+            SignatureData():isConst{false}, isMethod{false}, isStatic{false} {}
+            int linenumber;
+            std::string returnType;
             std::string functionName;
-            std::vector<std::pair<std::string, std::string>> parameters;
-            std::string returntypeModifier;
+            std::vector<ParamTypePolicy::ParamData> parameters;
+            std::string returnTypeModifier;
             bool isConst;
             bool isMethod;
             bool isStatic;
             void clear(){
-                returntype.clear();
+                returnType.clear();
                 functionName.clear();
                 parameters.clear();
-                returntypeModifier.clear();
+                returnTypeModifier.clear();
                 isConst = false;
                 isMethod = false;
                 isStatic = false;
@@ -31,7 +33,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             paramdata = policy->Data<ParamTypePolicy::ParamData>();
-            data.parameters.push_back(std::make_pair(paramdata->nameoftype, paramdata->nameofidentifier));
+            data.parameters.push_back(*paramdata);
         }
     protected:
         void * DataInner() const {
@@ -47,6 +49,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+                data.linenumber = ctx.currentLineNumber;
                 ctx.AddListener(&parampolicy);
             };
             openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
@@ -54,7 +57,6 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     NotifyAll(ctx);
                 }
                 data.clear();
-
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
                 if(currentModifier == "*") {}
@@ -68,13 +70,22 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     data.functionName = ctx.currentToken;
                 }
                 if(ctx.And({ParserState::name, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::parameterlist, ParserState::genericargumentlist})){
-                    data.returntype = ctx.currentToken;
+                    data.returnType = ctx.currentToken;
                 }
                 if(ctx.And({ParserState::modifier, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::genericargumentlist})){
-                    data.returntypeModifier = ctx.currentToken;
+                    data.returnTypeModifier = ctx.currentToken;
                 }
                 if(ctx.And({ParserState::specifier, ParserState::function}) && ctx.Nor({ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+                    std::cerr<<"Spec: "<<ctx.currentToken<<std::endl;
+                    currentSpecifier = ctx.currentToken;
+                }
+            };
+            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+                if(currentSpecifier == "const"){
                     data.isConst = true;
+                }
+                if(currentSpecifier == "static"){
+                    data.isStatic = true;
                 }
             };
             closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {

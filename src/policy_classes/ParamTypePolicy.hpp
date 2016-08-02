@@ -5,6 +5,16 @@
 class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         struct ParamData{
+            ParamData(): linenumber{0}, isConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
+            void clear(){
+                nameoftype.clear();
+                nameofidentifier.clear();
+                linenumber = -1;
+                isConst = false;
+                isReference = false;
+                isPointer = false;
+                isStatic = false;
+            }
             std::string nameoftype;
             std::string nameofidentifier;
             int linenumber;
@@ -67,7 +77,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                         ParserState::init, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                         currentDeclName = ctx.currentToken;
                     }
-                    if(ctx.And({ParserState::specifier, ParserState::type, ParserState::parameter})){
+                    if(ctx.And({ParserState::specifier, ParserState::decl, ParserState::parameter})){
                         currentSpecifier = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::modifier, ParserState::type, ParserState::parameter})){
@@ -77,13 +87,14 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             };
             closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);
+                data.clear();
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
-                    if(currentSpecifier == "const"){
+                    if(currentSpecifier == "static"){
                         data.isStatic = true;
                     }
-                    else if(currentSpecifier == "static"){
+                    if(currentSpecifier == "const"){
                         data.isConst = true;
                     }
                 }

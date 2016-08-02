@@ -15,6 +15,10 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
     */
     public:
         struct CallData{
+            void clear(){
+                fnName.clear();
+                callargumentlist.clear();
+            }
             std::string fnName;
             std::list<std::string> callargumentlist;
         };

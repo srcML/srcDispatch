@@ -39,12 +39,46 @@ class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEv
             parampolicy.AddListener(this);
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            paramdata = policy->Data<ParamTypePolicy::ParamData>();
+            paramdata = *policy->Data<ParamTypePolicy::ParamData>();
             datatotest.push_back(paramdata);
         }
+		void RunTest(){
+			assert(datatotest.size() == 4);
+			assert(datatotest[0].nameoftype == "int");
+			assert(datatotest[0].nameofidentifier == "abc");
+			assert(datatotest[0].linenumber == 1);
+			assert(datatotest[0].isConst == false);
+			assert(datatotest[0].isReference == true);
+			assert(datatotest[0].isPointer == false);
+			assert(datatotest[0].isStatic == false);
+
+			assert(datatotest[1].nameoftype == "Object");
+			assert(datatotest[1].nameofidentifier == "onetwothree");
+			assert(datatotest[1].linenumber == 1);
+			assert(datatotest[1].isConst == false);
+			assert(datatotest[1].isReference == false);
+			assert(datatotest[1].isPointer == false);
+			assert(datatotest[1].isStatic == false);
+
+			assert(datatotest[2].nameoftype == "Object");
+			assert(datatotest[2].nameofidentifier == "DoReiMe");
+			assert(datatotest[2].linenumber == 1);
+			assert(datatotest[2].isConst == false);
+			assert(datatotest[2].isReference == false);
+			assert(datatotest[2].isPointer == true);
+			assert(datatotest[2].isStatic == true);
+
+			assert(datatotest[3].nameoftype == "Object");
+			assert(datatotest[3].nameofidentifier == "aybeecee");
+			assert(datatotest[3].linenumber == 1);
+			assert(datatotest[3].isConst == true);
+			assert(datatotest[3].isReference == false);
+			assert(datatotest[3].isPointer == true);
+			assert(datatotest[3].isStatic == false);
+		}
     protected:
         void * DataInner() const {
-            return (void*)0;
+            return (void*)0; //To silence the warning
         }
     private:
 		void InitializeEventHandlers(){
@@ -52,27 +86,19 @@ class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEv
         	openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
             	ctx.AddListener(&parampolicy);
         	};
-        	closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-            	ctx.RemoveListener(&parampolicy);
-        	};
 		}
-        void RunTest(){
-            for(ParamTypePolicy::ParamData* testdata : datatotest){
-                //do the thing
-            }
-        }		
         ParamTypePolicy parampolicy;
-        ParamTypePolicy::ParamData* paramdata;
-        std::vector<ParamTypePolicy::ParamData*> datatotest;
-
+        ParamTypePolicy::ParamData paramdata;
+        std::vector<ParamTypePolicy::ParamData> datatotest;
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "void foo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
+	std::string codestr = "void foo(int& abc, Object<int> onetwothree, static Object* DoReiMe, const Object* aybeecee){}";
 	std::string srcmlstr = StringToSrcML(codestr);
 
     TestParamType paramData;
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<TestParamType> handler {&paramData};
     control.parse(&handler); //Start parsing
+    paramData.RunTest();
 }
