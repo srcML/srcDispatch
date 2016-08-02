@@ -274,6 +274,7 @@ namespace srcSAXEventDispatch {
                 { "argument_list", [this](){
                     if(!ctx.genericDepth.empty()){
                         if(ctx.genericDepth.back() == ctx.depth){
+                            DispatchEvent(ParserState::genericargumentlist, ElementState::close);
                             --ctx.triggerField[ParserState::genericargumentlist];
                             ctx.genericDepth.pop_back();
                         }
@@ -480,18 +481,23 @@ namespace srcSAXEventDispatch {
 
             ++ctx.depth;
 
-            if(std::string(localname) == "position"){
+            std::string localName;
+            if(prefix)
+                localName += prefix;
+            localName += localname;
+
+            if(localName == "position"){
                 ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
             }
             std::string name;
             if(num_attributes){
                 name = attributes[0].value;
             }
-            if(name == "generic" && std::string(localname) == "argument_list"){
+            if(name == "generic" && localName == "argument_list"){
                 ctx.genericDepth.push_back(ctx.depth);
             }
-            if(std::string(localname) != ""){
-                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);            
+            if(localName != ""){
+                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();
                 }
@@ -522,7 +528,12 @@ namespace srcSAXEventDispatch {
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) {
 
-            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localname);            
+            std::string localName;
+            if(prefix)
+                localName += prefix;
+            localName += localname;
+
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localName);
             if (process2 != process_map2.end()) {
                 process2->second();
             }
