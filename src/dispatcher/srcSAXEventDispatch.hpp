@@ -482,8 +482,10 @@ namespace srcSAXEventDispatch {
             ++ctx.depth;
 
             std::string localName;
-            if(prefix)
+            if(prefix) {
                 localName += prefix;
+                localName += ':';
+            }
             localName += localname;
 
             if(localName == "position"){
@@ -529,8 +531,10 @@ namespace srcSAXEventDispatch {
         virtual void endElement(const char * localname, const char * prefix, const char * URI) {
 
             std::string localName;
-            if(prefix)
+            if(prefix) {
                 localName += prefix;
+                localName += ':';
+            }
             localName += localname;
 
             std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localName);
