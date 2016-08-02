@@ -95,6 +95,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         data.isStatic = true;
                     }
                 }
+                currentSpecifier.clear();
             };
 
         }

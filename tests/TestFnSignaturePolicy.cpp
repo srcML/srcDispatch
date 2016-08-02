@@ -52,6 +52,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[0].isConst == false);
             assert(datatotest[0].isMethod == false);
             assert(datatotest[0].isStatic == false);
+            assert(datatotest[0].parameters.size() == 4);
 
             assert(datatotest[1].returnType == "void");
             assert(datatotest[1].functionName == "bar");
@@ -60,6 +61,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[1].isConst == false);
             assert(datatotest[1].isMethod == false);
             assert(datatotest[1].isStatic == true);
+            assert(datatotest[1].parameters.size() == 4);
 
             assert(datatotest[2].returnType == "int");
             assert(datatotest[2].functionName == "bloo");
@@ -68,14 +70,17 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[2].isConst == false);
             assert(datatotest[2].isMethod == false);
             assert(datatotest[2].isStatic == false);
+            assert(datatotest[2].parameters.size() == 4);
 
-            assert(datatotest[3].returnType == "Object");
-            assert(datatotest[3].functionName == "aybeecee");
-            assert(datatotest[3].returnTypeModifier == "aybeecee");
+            assert(datatotest[3].returnType == "void");
+            assert(datatotest[3].functionName == "bleep");
+            assert(datatotest[3].returnTypeModifier == std::string());
             assert(datatotest[3].linenumber == 4);
             assert(datatotest[3].isConst == true);
             assert(datatotest[3].isMethod == false);
             assert(datatotest[3].isStatic == false);
+            assert(datatotest[3].parameters.size() == 4);
+
         }
     protected:
         void * DataInner() const {
@@ -86,10 +91,6 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx) {
                 ctx.AddListener(&parampolicy);
-            };
-            closeEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx) {
-                ctx.RemoveListener(&parampolicy);
-                RunTest();
             };
         }
         FunctionSignaturePolicy parampolicy;
@@ -103,7 +104,7 @@ int main(int argc, char** filename){
                           "int* bloo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}\n"
                           "class{void bleep(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee)const{}};";
     std::string srcmlstr = StringToSrcML(codestr);
-    std::cerr<<srcmlstr<<std::endl;
+    
     TestFunctionSignature sigData;
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<TestFunctionSignature> handler {&sigData};

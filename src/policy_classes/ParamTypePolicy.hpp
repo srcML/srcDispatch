@@ -98,6 +98,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                         data.isConst = true;
                     }
                 }
+                currentSpecifier.clear();
             };
 
         }

@@ -5,6 +5,7 @@
 #include <srcSAXHandler.hpp>
 #include <srcSAXEventDispatch.hpp>
 #include <FunctionCallPolicy.hpp>
+#include <cassert>
 #include <srcml.h>
 std::string StringToSrcML(std::string str){
 	struct srcml_archive* archive;
@@ -39,9 +40,12 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
             callpolicy.AddListener(this);
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            calldata = policy->Data<CallPolicy::CallData>();
+            calldata = *policy->Data<CallPolicy::CallData>();
             datatotest.push_back(calldata);
         }
+		void RunTest(){
+			assert(datatotest[0].fnName == "bin"); //TODO: Fix, figure out way to test.
+		}
     protected:
         void * DataInner() const {
             return (void*)0; //To silence the warning
@@ -52,30 +56,20 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
         	openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
             	ctx.AddListener(&callpolicy);
         	};
-            closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                if(ctx.IsClosed(ParserState::call)){
-                    ctx.RemoveListener(&callpolicy);
-                    RunTest();
-                }
-            };
-		}
-		void RunTest(){
-			for(CallPolicy::CallData* testdata : datatotest){
-				//do the thing
-			}
 		}
         CallPolicy callpolicy;
-        CallPolicy::CallData* calldata;
-        std::vector<CallPolicy::CallData*> datatotest;
+        CallPolicy::CallData calldata;
+        std::vector<CallPolicy::CallData> datatotest;
 
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "void foo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
+	std::string codestr = "void foo(){foo(bar, baz, bin(), beep);}";
 	std::string srcmlstr = StringToSrcML(codestr);
-
+	
     TestCalls calldata;
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<TestCalls> handler {&calldata};
     control.parse(&handler); //Start parsing
+    calldata.RunTest();
 }

@@ -52,18 +52,13 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 data.linenumber = ctx.currentLineNumber;
                 ctx.AddListener(&parampolicy);
             };
-            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
-                if(ctx.IsOpen(ParserState::functionblock)){
-                    NotifyAll(ctx);
-                }
+            openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
+                NotifyAll(ctx);
                 data.clear();
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
                 if(currentModifier == "*") {}
                 else if(currentModifier == "&") {}
-            };
-            closeEventMap[ParserState::functiondecl] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
-                NotifyAll(ctx);
             };
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
@@ -76,7 +71,6 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     data.returnTypeModifier = ctx.currentToken;
                 }
                 if(ctx.And({ParserState::specifier, ParserState::function}) && ctx.Nor({ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
-                    std::cerr<<"Spec: "<<ctx.currentToken<<std::endl;
                     currentSpecifier = ctx.currentToken;
                 }
             };
@@ -87,6 +81,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 if(currentSpecifier == "static"){
                     data.isStatic = true;
                 }
+                currentSpecifier.clear();
             };
             closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
                 ctx.RemoveListener(&parampolicy);
