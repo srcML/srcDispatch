@@ -12,6 +12,8 @@ private:
 
    std::stack<srcSAXEventDispatch::EventListener *> listenerStack;
 
+
+
 public:
 
     SingleEventPolicyDispatcher() : srcSAXEventDispatch::EventListener() {}
@@ -28,31 +30,48 @@ public:
 
     }
 
+    void PushListenerDispatch(srcSAXEventDispatch::EventListener * listener) {
+
+        listenerStack.push(listener);
+        dispatched = false;
+
+    }
+
+    void PopListenerDispatch() {
+
+        listenerStack.pop();
+        dispatched = false;
+
+    }
+
     virtual void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, srcSAXEventDispatch::srcSAXEventContext& ctx) override {
 
-        if(dispatched) return;
-        dispatched = true;
+        while(!dispatched) {
 
-        switch(estate){
+            dispatched = true;
 
-            case srcSAXEventDispatch::ElementState::open: {
-                auto event = listenerStack.top()->GetOpenEventMap().find(pstate);
-                if(event != listenerStack.top()->GetOpenEventMap().end()){
-                    event->second(ctx);
+            switch(estate) {
+
+                case srcSAXEventDispatch::ElementState::open: {
+                    auto event = listenerStack.top()->GetOpenEventMap().find(pstate);
+                    if(event != listenerStack.top()->GetOpenEventMap().end()){
+                        event->second(ctx);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            case srcSAXEventDispatch::ElementState::close: {
-                auto event = listenerStack.top()->GetCloseEventMap().find(pstate);
-                if(event != listenerStack.top()->GetCloseEventMap().end()){
-                    event->second(ctx);
+                case srcSAXEventDispatch::ElementState::close: {
+                    auto event = listenerStack.top()->GetCloseEventMap().find(pstate);
+                    if(event != listenerStack.top()->GetCloseEventMap().end()){
+                        event->second(ctx);
+                    }
+                    break;
                 }
-                break;
-            }
 
-            default:
-                throw std::runtime_error("Something went terribly, terribly wrong");
+                default:
+                    throw std::runtime_error("Something went terribly, terribly wrong");
+
+            }
 
         }
 

@@ -1,6 +1,8 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
 
+#include <SingleEventPolicyDispatcher.hpp>
+
 #include <TypePolicy.hpp>
 #include <NamePolicy.hpp>
 
@@ -27,17 +29,20 @@ public:
 
 private:
 
+
     DeclTypeRecursiveData data;
     std::size_t declDepth;
+
+    SingleEventPolicyDispatcher & policy_handler;
 
     TypePolicy * typePolicy;
     NamePolicy * namePolicy;
 
 public:
 
-
-    DeclTypePolicyRecursive(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    DeclTypePolicyRecursive(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
+          policy_handler(policy_handler),
           data{},
           declDepth(0),
           typePolicy(nullptr),
@@ -58,6 +63,7 @@ protected:
         if(typeid(TypePolicy) == typeid(*policy)) {
 
             data.type = policy->Data<TypePolicy::TypeData>();
+            policy_handler.PopListenerDispatch();
 
         } else if(typeid(NamePolicy) == typeid(*policy)) {
 
@@ -81,7 +87,7 @@ private:
                 data = DeclTypeRecursiveData{};
 
                 CollectTypeHandlers();
-                // CollectNameHandlers();
+                CollectNameHandlers();
 
             }
 
@@ -111,7 +117,7 @@ private:
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
                 typePolicy = new TypePolicy{this};
-                ctx.AddListenerDispatch(typePolicy);
+                policy_handler.PushListenerDispatch(typePolicy);
 
             }
 
@@ -122,7 +128,6 @@ private:
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
                 if(typePolicy) {
-                    ctx.RemoveListenerDispatch(typePolicy);
                     delete typePolicy;
                     typePolicy = nullptr;
                 }
