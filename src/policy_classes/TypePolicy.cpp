@@ -38,6 +38,12 @@ TypePolicy::TypePolicy(SingleEventPolicyDispatcher & policy_handler, std::initia
 
 }
 
+TypePolicy::~TypePolicy(){
+
+    if(namePolicy) delete namePolicy;
+
+}
+
 void TypePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
 
     data.types.back().first = policy->Data<NamePolicy::NameData>();
@@ -92,23 +98,8 @@ void TypePolicy::CollectNamesHandler() {
         if(typeDepth && (typeDepth + 1) == ctx.depth) {
 
             data.types.push_back(std::make_pair(nullptr, TypePolicy::NAME));
-            namePolicy = new NamePolicy(policy_handler, {this});
+            if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
             policy_handler.PushListenerDispatch(namePolicy);
-
-        }
-
-    };
-
-    closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-
-        if(typeDepth && (typeDepth + 1) == ctx.depth) {
-
-            if(namePolicy) {
-
-                delete namePolicy;
-                namePolicy = nullptr;
-
-            }
 
         }
 

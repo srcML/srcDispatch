@@ -32,6 +32,12 @@ TemplateArgumentPolicy::TemplateArgumentPolicy(SingleEventPolicyDispatcher & pol
 
 }
 
+TemplateArgumentPolicy::~TemplateArgumentPolicy() {
+
+    if(namePolicy) delete namePolicy;
+
+}
+
 void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
 
     data.data.back().first = policy->Data<NamePolicy::NameData>();
@@ -88,24 +94,8 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
             || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
-            namePolicy = new NamePolicy(policy_handler, {this});
+            if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
             policy_handler.PushListenerDispatch(namePolicy);
-
-        }
-
-    };
-
-    closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && ctx.elementStack.back() == "expr")
-            || (argumentDepth + 1) == ctx.depth)) {
-
-            if(namePolicy) {
-
-                delete namePolicy;
-                namePolicy = nullptr;
-
-            }
 
         }
 

@@ -52,6 +52,13 @@ public:
 
     }
 
+    ~DeclTypePolicyRecursive() {
+
+        if(typePolicy) delete typePolicy;
+        if(namePolicy) delete namePolicy;
+
+    }
+
 protected:
     void * DataInner() const override {
 
@@ -117,21 +124,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                typePolicy = new TypePolicy(policy_handler, {this});
+                if(!typePolicy) typePolicy = new TypePolicy(policy_handler, {this});
                 policy_handler.PushListenerDispatch(typePolicy);
-
-            }
-
-        };
-
-        closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
-
-            if(declDepth && (declDepth + 2) == ctx.depth) {
-
-                if(typePolicy) {
-                    delete typePolicy;
-                    typePolicy = nullptr;
-                }
 
             }
 
@@ -146,21 +140,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                namePolicy = new NamePolicy(policy_handler, {this});
+                if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
                 policy_handler.PushListenerDispatch(namePolicy);
-
-            }
-
-        };
-
-        closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-
-            if(declDepth && (declDepth + 2) == ctx.depth) {
-
-                if(namePolicy) {
-                    delete namePolicy;
-                    namePolicy = nullptr;
-                }
 
             }
 
