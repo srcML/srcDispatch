@@ -43,7 +43,7 @@ class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEv
             datatotest.push_back(paramdata);
         }
 		void RunTest(){
-			assert(datatotest.size() == 4);
+			assert(datatotest.size() == 5);
 			assert(datatotest[0].nameoftype == "int");
 			assert(datatotest[0].nameofidentifier == "abc");
 			assert(datatotest[0].linenumber == 1);
@@ -93,7 +93,7 @@ class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEv
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "void foo(int& abc, Object<int> onetwothree, static Object* DoReiMe, const Object* aybeecee){}";
+	std::string codestr = "void foo(int& abc, Object<int> onetwothree, static Object* DoReiMe, const Object* aybeecee, nlp::std::vector<std::string> spaces){}";
 	std::string srcmlstr = StringToSrcML(codestr);
 
     TestParamType paramData;

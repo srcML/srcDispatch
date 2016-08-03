@@ -44,7 +44,7 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
             datatotest.push_back(decltypedata);
         }
 		void RunTest(){
-			assert(datatotest.size() == 4);
+			assert(datatotest.size() == 5);
 			assert(datatotest[0].nameoftype == "int");
 			assert(datatotest[0].nameofidentifier == "abc");
 			assert(datatotest[0].linenumber == 1);
@@ -94,9 +94,9 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;}";
+	std::string codestr = "void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;\n nlp::std::vector<std::string> spaces;}";
 	std::string srcmlstr = StringToSrcML(codestr);
-
+	std::cerr<<srcmlstr<<std::endl;
     TestDeclType decltypedata;
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<TestDeclType> handler {&decltypedata};

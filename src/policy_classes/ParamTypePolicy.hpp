@@ -9,6 +9,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             void clear(){
                 nameoftype.clear();
                 nameofidentifier.clear();
+                namespaces.clear();
                 linenumber = -1;
                 isConst = false;
                 isReference = false;
@@ -17,6 +18,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             }
             std::string nameoftype;
             std::string nameofidentifier;
+            std::vector<std::string> namespaces;
             int linenumber;
             bool isConst;
             bool isReference;
@@ -41,7 +43,11 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-
+            openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                if(ctx.And({ParserState::type, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                    std::cerr<<"Ns: "<<ctx.currentToken<<std::endl;
+                }
+            };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
                     if(currentModifier == "*"){

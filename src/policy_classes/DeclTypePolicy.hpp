@@ -9,6 +9,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             void clear(){
                 nameoftype.clear();
                 nameofidentifier.clear();
+                namespaces.clear();
                 linenumber = -1;
                 isConst = false;
                 isReference = false;
@@ -17,6 +18,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             }
             std::string nameoftype;
             std::string nameofidentifier;
+            std::vector<std::string> namespaces;
             int linenumber;
             bool isConst;
             bool isReference;
@@ -39,7 +41,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-
+            openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                if(ctx.And({ParserState::type, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                    std::cerr<<"Ns: "<<ctx.currentToken<<std::endl;
+                }
+            };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentModifier == "*"){
