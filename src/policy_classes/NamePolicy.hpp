@@ -101,6 +101,7 @@ protected:
         } else if(typeid(TemplateArgumentPolicy) == typeid(*policy)) {
 
             data.templateArguments.push_back(policy->Data<TemplateArgumentPolicy::TemplateArgumentData>());
+            policy_handler.PopListener();
 
         }
 
