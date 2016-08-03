@@ -78,6 +78,13 @@ public:
 
     }
 
+    ~NamePolicy() {
+
+        if(namePolicy) delete namePolicy;
+        if(templateArgumentPolicy) delete templateArgumentPolicy;
+
+    }
+
 protected:
     void * DataInner() const override {
 
@@ -94,7 +101,6 @@ protected:
         } else if(typeid(TemplateArgumentPolicy) == typeid(*policy)) {
 
             data.templateArguments.push_back(policy->Data<TemplateArgumentPolicy::TemplateArgumentData>());
-            policy_handler.PopListener();
 
         }
 
@@ -119,7 +125,7 @@ private:
             } else if((nameDepth + 1) == ctx.depth) {
 
                 NopCloseEvents({ParserState::tokenstring});
-                namePolicy = new NamePolicy(policy_handler, {this});
+                if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
                 policy_handler.PushListenerDispatch(namePolicy); 
 
             }
@@ -136,9 +142,6 @@ private:
                 NotifyAll(ctx);
                 InitializeNamePolicyHandlers();
 
-            } else if(nameDepth && (nameDepth + 1) == ctx.depth && namePolicy) {
-                delete namePolicy;
-                namePolicy = nullptr;
             }
            
         };
@@ -162,7 +165,7 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                templateArgumentPolicy = new TemplateArgumentPolicy(policy_handler, {this});
+                if(!templateArgumentPolicy) templateArgumentPolicy = new TemplateArgumentPolicy(policy_handler, {this});
                 policy_handler.PushListener(templateArgumentPolicy);
 
             }
@@ -173,10 +176,7 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                if(templateArgumentPolicy) {
-                    delete templateArgumentPolicy;
-                    templateArgumentPolicy = nullptr;
-                }
+                policy_handler.PopListener();
 
             }
 
