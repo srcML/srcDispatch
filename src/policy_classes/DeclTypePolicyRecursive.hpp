@@ -55,7 +55,7 @@ public:
 protected:
     void * DataInner() const override {
 
-        return nullptr;//new DeclTypeRecursiveData(data);
+        return new DeclTypeRecursiveData(data);
 
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {

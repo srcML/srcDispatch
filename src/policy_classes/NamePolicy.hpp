@@ -96,7 +96,7 @@ protected:
         if(typeid(NamePolicy) == typeid(*policy)) {
 
             data.names.push_back(policy->Data<NameData>());
-            policy_handler.PopListenerDispatch();
+            policy_handler.PopListener();
 
         } else if(typeid(TemplateArgumentPolicy) == typeid(*policy)) {
 
@@ -165,8 +165,16 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                if(!templateArgumentPolicy) templateArgumentPolicy = new TemplateArgumentPolicy(policy_handler, {this});
-                policy_handler.PushListener(templateArgumentPolicy);
+                openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
+
+                    if(nameDepth && (nameDepth + 2) == ctx.depth) {
+
+                        if(!templateArgumentPolicy) templateArgumentPolicy = new TemplateArgumentPolicy(policy_handler, {this});
+                        policy_handler.PushListenerDispatch(templateArgumentPolicy);
+
+                    }
+
+                };
 
             }
 
@@ -176,7 +184,7 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                policy_handler.PopListener();
+                NopOpenEvents({ParserState::argument});
 
             }
 
