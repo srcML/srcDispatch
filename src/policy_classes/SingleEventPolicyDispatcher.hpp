@@ -12,8 +12,6 @@ private:
 
    std::stack<srcSAXEventDispatch::EventListener *> listenerStack;
 
-
-
 public:
 
     SingleEventPolicyDispatcher() : srcSAXEventDispatch::EventListener() {}
@@ -24,7 +22,7 @@ public:
 
     }
 
-    void PopListener(srcSAXEventDispatch::EventListener * listener) {
+    void PopListener() {
 
         listenerStack.pop();
 

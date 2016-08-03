@@ -27,8 +27,9 @@ std::ostream & operator<<(std::ostream & out, const TypePolicy::TypeData & typeD
 
 }
 
-TypePolicy::TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+TypePolicy::TypePolicy(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
     : srcSAXEventDispatch::PolicyDispatcher(listeners),
+      policy_handler(policy_handler),
       data{},
       typeDepth(0),
       namePolicy(nullptr) {
@@ -40,6 +41,7 @@ TypePolicy::TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener
 void TypePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
 
     data.types.back().first = policy->Data<NamePolicy::NameData>();
+    policy_handler.PopListenerDispatch();
 
 }
 
@@ -90,8 +92,8 @@ void TypePolicy::CollectNamesHandler() {
         if(typeDepth && (typeDepth + 1) == ctx.depth) {
 
             data.types.push_back(std::make_pair(nullptr, TypePolicy::NAME));
-            namePolicy = new NamePolicy{this};
-            ctx.AddListenerDispatch(namePolicy);
+            namePolicy = new NamePolicy(policy_handler, {this});
+            policy_handler.PushListenerDispatch(namePolicy);
 
         }
 
@@ -103,7 +105,6 @@ void TypePolicy::CollectNamesHandler() {
 
             if(namePolicy) {
 
-                ctx.RemoveListenerDispatch(namePolicy);
                 delete namePolicy;
                 namePolicy = nullptr;
 

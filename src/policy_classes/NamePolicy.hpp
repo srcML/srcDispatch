@@ -1,6 +1,7 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
 
+#include <SingleEventPolicyDispatcher.hpp>
 #include <TypePolicy.hpp>
 #include <TemplateArgumentPolicy.hpp>
 
@@ -58,14 +59,16 @@ private:
     NameData data;
     std::size_t nameDepth;
 
+    SingleEventPolicyDispatcher & policy_handler;
     NamePolicy * namePolicy;
     TemplateArgumentPolicy * templateArgumentPolicy;
 
 public:
 
 
-    NamePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    NamePolicy(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
+          policy_handler(policy_handler),
           data{},
           nameDepth(0),
           namePolicy(nullptr),
@@ -86,10 +89,12 @@ protected:
         if(typeid(NamePolicy) == typeid(*policy)) {
 
             data.names.push_back(policy->Data<NameData>());
+            policy_handler.PopListenerDispatch();
 
         } else if(typeid(TemplateArgumentPolicy) == typeid(*policy)) {
 
             data.templateArguments.push_back(policy->Data<TemplateArgumentPolicy::TemplateArgumentData>());
+            policy_handler.PopListener();
 
         }
 
@@ -114,8 +119,8 @@ private:
             } else if((nameDepth + 1) == ctx.depth) {
 
                 NopCloseEvents({ParserState::tokenstring});
-                namePolicy = new NamePolicy{this};
-                ctx.AddListenerDispatch(namePolicy); 
+                namePolicy = new NamePolicy(policy_handler, {this});
+                policy_handler.PushListenerDispatch(namePolicy); 
 
             }
 
@@ -132,7 +137,6 @@ private:
                 InitializeNamePolicyHandlers();
 
             } else if(nameDepth && (nameDepth + 1) == ctx.depth && namePolicy) {
-                ctx.RemoveListenerDispatch(namePolicy);
                 delete namePolicy;
                 namePolicy = nullptr;
             }
@@ -158,8 +162,8 @@ private:
 
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
-                templateArgumentPolicy = new TemplateArgumentPolicy{this};
-                ctx.AddListenerNoDispatch(templateArgumentPolicy);
+                templateArgumentPolicy = new TemplateArgumentPolicy(policy_handler, {this});
+                policy_handler.PushListener(templateArgumentPolicy);
 
             }
 
@@ -170,7 +174,6 @@ private:
             if(nameDepth && (nameDepth + 1) == ctx.depth) {
 
                 if(templateArgumentPolicy) {
-                    ctx.RemoveListenerNoDispatch(templateArgumentPolicy);
                     delete templateArgumentPolicy;
                     templateArgumentPolicy = nullptr;
                 }

@@ -55,7 +55,7 @@ public:
 protected:
     void * DataInner() const override {
 
-        return new DeclTypeRecursiveData(data);
+        return nullptr;//new DeclTypeRecursiveData(data);
 
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
@@ -68,6 +68,7 @@ protected:
         } else if(typeid(NamePolicy) == typeid(*policy)) {
 
             data.name = policy->Data<NamePolicy::NameData>(); 
+            policy_handler.PopListenerDispatch();
 
         }
 
@@ -116,7 +117,7 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                typePolicy = new TypePolicy{this};
+                typePolicy = new TypePolicy(policy_handler, {this});
                 policy_handler.PushListenerDispatch(typePolicy);
 
             }
@@ -145,8 +146,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                namePolicy = new NamePolicy{this};
-                ctx.AddListenerDispatch(namePolicy);
+                namePolicy = new NamePolicy(policy_handler, {this});
+                policy_handler.PushListenerDispatch(namePolicy);
 
             }
 
@@ -157,7 +158,6 @@ private:
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
                 if(namePolicy) {
-                    ctx.RemoveListenerDispatch(namePolicy);
                     delete namePolicy;
                     namePolicy = nullptr;
                 }
