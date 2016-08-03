@@ -81,7 +81,7 @@ private:
                 data = DeclTypeRecursiveData{};
 
                 CollectTypeHandlers();
-                CollectNameHandlers();
+                // CollectNameHandlers();
 
             }
 

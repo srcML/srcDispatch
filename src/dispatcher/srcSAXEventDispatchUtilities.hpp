@@ -25,10 +25,10 @@ namespace srcSAXEventDispatch{
         // do not put anything after these
         tokenstring, MAXENUMVALUE = empty};
     class EventListener {
-        private:
-            bool dispatched;
+        typedef std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
         protected:
-           std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> openEventMap, closeEventMap;
+           bool dispatched;
+           EventMap openEventMap, closeEventMap;
 
 
         public:
@@ -37,6 +37,9 @@ namespace srcSAXEventDispatch{
             EventListener() : dispatched(false) {
                 DefaultEventHandlers();
             }
+
+            virtual const EventMap & GetOpenEventMap() const { return openEventMap; }
+            virtual const EventMap & GetCloseEventMap() const { return closeEventMap; }
 
             virtual void HandleEvent() { dispatched = true; }
             virtual void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, srcSAXEventDispatch::srcSAXEventContext& ctx) {
