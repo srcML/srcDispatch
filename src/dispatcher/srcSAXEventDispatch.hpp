@@ -64,9 +64,8 @@ namespace srcSAXEventDispatch {
 
         }
     public:
-        srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
-        srcSAXEventDispatcher(policies*... t2) : EventDispatcher{t2...}, ctx(this, srcml_element_stack) {
+        srcSAXEventDispatcher(policies*... t2) : EventDispatcher({t2...}, srcml_element_stack) {
             ;
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
