@@ -255,7 +255,11 @@ namespace srcSAXEventDispatch{
     class EventDispatcher {
     public:
         virtual void AddListener(EventListener* l) = 0;
+        virtual void AddListenerDispatch(EventListener* listener) = 0;
+        virtual void AddListenerNoDispatch(EventListener* listener) = 0;
         virtual void RemoveListener(EventListener* l) = 0;
+        virtual void RemoveListenerDispatch(EventListener* listener) = 0;
+        virtual void RemoveListenerNoDispatch(EventListener* listener) = 0;
     protected:
         srcSAXEventContext ctx;
         std::list<EventListener*> elementListeners;

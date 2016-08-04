@@ -21,9 +21,8 @@ std::ostream & operator<<(std::ostream & out, const TemplateArgumentPolicy::Temp
 
 }
 
-TemplateArgumentPolicy::TemplateArgumentPolicy(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+TemplateArgumentPolicy::TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
     : srcSAXEventDispatch::PolicyDispatcher(listeners),
-      policy_handler(policy_handler),
       data{},
       argumentDepth(0),
       namePolicy(nullptr) {
@@ -41,7 +40,7 @@ TemplateArgumentPolicy::~TemplateArgumentPolicy() {
 void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
 
     data.data.back().first = policy->Data<NamePolicy::NameData>();
-    policy_handler.PopListenerDispatch();
+    ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
 }
 
@@ -94,8 +93,8 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
             || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
-            if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
-            policy_handler.PushListenerDispatch(namePolicy);
+            if(!namePolicy) namePolicy = new NamePolicy{this};
+            ctx.dispatcher->AddListenerDispatch(namePolicy);
 
         }
 

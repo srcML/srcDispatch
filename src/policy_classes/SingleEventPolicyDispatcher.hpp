@@ -1,80 +1,55 @@
 #include <srcSAXEventDispatch.hpp>
-#include <srcSAXEventDispatchUtilities.hpp>
-
-#include <stack>
 
 #ifndef INCLUDED_SINGLE_EVENT_POLICY_DISPATCHER_HPP
 #define INCLUDED_SINGLE_EVENT_POLICY_DISPATCHER_HPP
 
-class SingleEventPolicyDispatcher : public srcSAXEventDispatch::EventListener {
+namespace srcSAXEventDispatch {
+    template <typename ...policies>
+    class SingleEventPolicyDispatcher : public srcSAXEventDispatcher<policies...> {
 
-private:
+    private:
+        bool dispatched;
 
-   std::stack<srcSAXEventDispatch::EventListener *> listenerStack;
+    public:
 
-public:
+       SingleEventPolicyDispatcher(policies*... t2) : srcSAXEventDispatcher<policies...>{t2...}, dispatched(false) {}
+        void AddListener(EventListener * listener) override {
+            EventDispatcher::elementListeners.push_back(listener);
+        }
+        void AddListenerDispatch(EventListener * listener) override {
+            EventDispatcher::elementListeners.push_back(listener);
+            dispatched = false;
+        }
+        void AddListenerNoDispatch(EventListener * listener) override {
+            AddListener(listener);
+        }
+        void RemoveListener(EventListener * listener) override {
+            EventDispatcher::elementListeners.pop_back();
+        }
+        void RemoveListenerDispatch(EventListener * listener) override {
+            EventDispatcher::elementListeners.pop_back();
+            dispatched = false;
+        }
+        void RemoveListenerNoDispatch(EventListener * listener) override {
+            RemoveListener(listener);
+        }
+    protected:
+        virtual void DispatchEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate) override {
 
-    SingleEventPolicyDispatcher() : srcSAXEventDispatch::EventListener() {}
+            while(!dispatched) {
 
-    void PushListener(srcSAXEventDispatch::EventListener * listener) {
+                dispatched = true;
 
-        listenerStack.push(listener);
-
-    }
-
-    void PopListener() {
-
-        listenerStack.pop();
-
-    }
-
-    void PushListenerDispatch(srcSAXEventDispatch::EventListener * listener) {
-
-        listenerStack.push(listener);
-        dispatched = false;
-
-    }
-
-    void PopListenerDispatch() {
-
-        listenerStack.pop();
-        dispatched = false;
-
-    }
-
-    virtual void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, srcSAXEventDispatch::srcSAXEventContext& ctx) override {
-
-        while(!dispatched) {
-
-            dispatched = true;
-
-            switch(estate) {
-
-                case srcSAXEventDispatch::ElementState::open: {
-                    auto event = listenerStack.top()->GetOpenEventMap().find(pstate);
-                    if(event != listenerStack.top()->GetOpenEventMap().end()){
-                        event->second(ctx);
-                    }
-                    break;
-                }
-
-                case srcSAXEventDispatch::ElementState::close: {
-                    auto event = listenerStack.top()->GetCloseEventMap().find(pstate);
-                    if(event != listenerStack.top()->GetCloseEventMap().end()){
-                        event->second(ctx);
-                    }
-                    break;
-                }
-
-                default:
-                    throw std::runtime_error("Something went terribly, terribly wrong");
+                EventDispatcher::elementListeners.back()->HandleEvent(pstate, estate, EventDispatcher::ctx);
 
             }
 
+            dispatched = false;
+
         }
 
-    }
+    };
 
-};
+}
 
 #endif

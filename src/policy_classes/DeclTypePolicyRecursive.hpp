@@ -1,8 +1,6 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
 
-#include <SingleEventPolicyDispatcher.hpp>
-
 #include <TypePolicy.hpp>
 #include <NamePolicy.hpp>
 
@@ -33,16 +31,13 @@ private:
     DeclTypeRecursiveData data;
     std::size_t declDepth;
 
-    SingleEventPolicyDispatcher & policy_handler;
-
     TypePolicy * typePolicy;
     NamePolicy * namePolicy;
 
 public:
 
-    DeclTypePolicyRecursive(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    DeclTypePolicyRecursive(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
-          policy_handler(policy_handler),
           data{},
           declDepth(0),
           typePolicy(nullptr),
@@ -70,12 +65,12 @@ protected:
         if(typeid(TypePolicy) == typeid(*policy)) {
 
             data.type = policy->Data<TypePolicy::TypeData>();
-            policy_handler.PopListenerDispatch();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         } else if(typeid(NamePolicy) == typeid(*policy)) {
 
             data.name = policy->Data<NamePolicy::NameData>(); 
-            policy_handler.PopListenerDispatch();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         }
 
@@ -124,8 +119,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                if(!typePolicy) typePolicy = new TypePolicy(policy_handler, {this});
-                policy_handler.PushListenerDispatch(typePolicy);
+                if(!typePolicy) typePolicy = new TypePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(typePolicy);
 
             }
 
@@ -140,8 +135,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
-                policy_handler.PushListenerDispatch(namePolicy);
+                if(!namePolicy) namePolicy = new NamePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(namePolicy);
 
             }
 

@@ -74,12 +74,12 @@ namespace srcSAXEventDispatch {
         void AddListener(EventListener* listener) override {
             elementListeners.push_back(listener);
         }
-        void AddListenerDispatch(EventListener* listener){
+        void AddListenerDispatch(EventListener* listener) override {
             if(dispatching)
-                listener->HandleEvent(currentPState, currentEState, *this);
+                listener->HandleEvent(currentPState, currentEState, ctx);
             AddListener(listener);
         }
-        void AddListenerNoDispatch(EventListener* listener){
+        void AddListenerNoDispatch(EventListener* listener) override {
             if(dispatching)
                 listener->SetDispatched(true);
             AddListener(listener);
@@ -87,12 +87,12 @@ namespace srcSAXEventDispatch {
         void RemoveListener(EventListener* listener) override {
             elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
         }
-        void RemoveListenerDispatch(EventListener* listener){
+        void RemoveListenerDispatch(EventListener* listener) override {
             if(dispatching)
-                listener->HandleEvent(currentPState, currentEState, *this);
+                listener->HandleEvent(currentPState, currentEState, ctx);
             RemoveListener(listener);
         }
-        void RemoveListenerNoDispatch(EventListener* listener){
+        void RemoveListenerNoDispatch(EventListener* listener) override {
             if(dispatching)
                 listener->SetDispatched(true);
             RemoveListener(listener);
