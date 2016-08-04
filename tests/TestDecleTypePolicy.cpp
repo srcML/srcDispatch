@@ -52,6 +52,7 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 			assert(datatotest[0].isReference == true);
 			assert(datatotest[0].isPointer == false);
 			assert(datatotest[0].isStatic == false);
+			assert(datatotest[0].namespaces.empty());
 
 			assert(datatotest[1].nameoftype == "Object");
 			assert(datatotest[1].nameofidentifier == "onetwothree");
@@ -60,6 +61,7 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 			assert(datatotest[1].isReference == false);
 			assert(datatotest[1].isPointer == false);
 			assert(datatotest[1].isStatic == false);
+			assert(datatotest[1].namespaces.empty());
 
 			assert(datatotest[2].nameoftype == "Object");
 			assert(datatotest[2].nameofidentifier == "DoReiMe");
@@ -68,6 +70,7 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 			assert(datatotest[2].isReference == false);
 			assert(datatotest[2].isPointer == true);
 			assert(datatotest[2].isStatic == true);
+			assert(datatotest[2].namespaces.empty());
 
 			assert(datatotest[3].nameoftype == "Object");
 			assert(datatotest[3].nameofidentifier == "aybeecee");
@@ -76,6 +79,16 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 			assert(datatotest[3].isReference == false);
 			assert(datatotest[3].isPointer == true);
 			assert(datatotest[3].isStatic == false);
+			assert(datatotest[3].namespaces.empty());
+
+			assert(datatotest[4].nameoftype == "vector");
+			assert(datatotest[4].nameofidentifier == "spaces");
+			assert(datatotest[4].linenumber == 2);
+			assert(datatotest[4].isConst == false);
+			assert(datatotest[4].isReference == false);
+			assert(datatotest[4].isPointer == false);
+			assert(datatotest[4].isStatic == false);
+			assert(datatotest[4].namespaces.size() == 2);
 		}
     protected:
         void * DataInner() const {
@@ -96,7 +109,7 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 int main(int argc, char** filename){
 	std::string codestr = "void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;\n nlp::std::vector<std::string> spaces;}";
 	std::string srcmlstr = StringToSrcML(codestr);
-	std::cerr<<srcmlstr<<std::endl;
+
     TestDeclType decltypedata;
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<TestDeclType> handler {&decltypedata};

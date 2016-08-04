@@ -10,11 +10,16 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             int linenumber;
             std::string returnType;
             std::string functionName;
-            std::vector<ParamTypePolicy::ParamData> parameters;
             std::string returnTypeModifier;
+            std::vector<std::string> functionNamespaces;
+            std::vector<std::string> returnTypeNamespaces;
+            std::vector<ParamTypePolicy::ParamData> parameters;
             bool isConst;
             bool isMethod;
             bool isStatic;
+            bool hasStaticReturn;
+            bool hasConstReturn;
+            bool hasAliasedReturn;
             void clear(){
                 returnType.clear();
                 functionName.clear();
@@ -51,6 +56,14 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
                 data.linenumber = ctx.currentLineNumber;
                 ctx.AddListener(&parampolicy);
+            };
+            openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                if(ctx.And({ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                    data.returnTypeNamespaces.push_back(ctx.currentToken);
+                }
+                if(ctx.IsOpen(ParserState::function) && ctx.Nor({ParserState::type, ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                    data.functionNamespaces.push_back(ctx.currentToken);
+                }
             };
             openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
                 NotifyAll(ctx);
