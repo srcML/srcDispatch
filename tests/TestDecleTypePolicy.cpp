@@ -1,9 +1,8 @@
-#include <srcSAXEventDispatch.hpp>
+#include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <srcSAXHandler.hpp>
-#include <srcSAXEventDispatch.hpp>
 #include <DeclTypePolicy.hpp>
 #include <cassert>
 #include <srcml.h>

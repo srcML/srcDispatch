@@ -1,5 +1,4 @@
-#include <srcSAXEventDispatch.hpp>
-#include <srcSAXHandler.hpp>
+#include <srcSAXEventDispatchUtilities.hpp>
 
 #include <exception>
 

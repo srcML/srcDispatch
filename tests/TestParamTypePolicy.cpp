@@ -1,5 +1,5 @@
 #include <cassert>
-#include <srcSAXEventDispatch.hpp>
+#include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <unordered_map>
 #include <unordered_set>

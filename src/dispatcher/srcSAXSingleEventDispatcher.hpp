@@ -1,18 +1,18 @@
-#include <srcSAXEventDispatch.hpp>
+#include <srcSAXEventDispatcher.hpp>
 
-#ifndef INCLUDED_SINGLE_EVENT_POLICY_DISPATCHER_HPP
-#define INCLUDED_SINGLE_EVENT_POLICY_DISPATCHER_HPP
+#ifndef INCLUDED_SRCSAX_SINGLE_EVENT_DISPATCHER_HPP
+#define INCLUDED_SRCSAX_SINGLE_EVENT_DISPATCHER_HPP
 
 namespace srcSAXEventDispatch {
     template <typename ...policies>
-    class SingleEventPolicyDispatcher : public srcSAXEventDispatcher<policies...> {
+    class srcSAXSingleEventDispatcher : public srcSAXEventDispatcher<policies...> {
 
     private:
         bool dispatched;
 
     public:
 
-       SingleEventPolicyDispatcher(policies*... t2) : srcSAXEventDispatcher<policies...>{t2...}, dispatched(false) {}
+       srcSAXSingleEventDispatcher(policies*... t2) : srcSAXEventDispatcher<policies...>{t2...}, dispatched(false) {}
         void AddListener(EventListener * listener) override {
             EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.push_back(listener);
