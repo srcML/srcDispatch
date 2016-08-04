@@ -5,8 +5,20 @@
 class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct DeclTypeData{
+            DeclTypeData(): linenumber{0}, isConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
+            void clear(){
+                nameoftype.clear();
+                nameofidentifier.clear();
+                namespaces.clear();
+                linenumber = -1;
+                isConst = false;
+                isReference = false;
+                isPointer = false;
+                isStatic = false;
+            }
             std::string nameoftype;
             std::string nameofidentifier;
+            std::vector<std::string> namespaces;
             int linenumber;
             bool isConst;
             bool isReference;
@@ -19,9 +31,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             InitializeEventHandlers();
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-    
             //data.name = policy->Data<NamePolicy::NameData>();
-    
         }
     protected:
         void * DataInner() const override {
@@ -31,13 +41,17 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-
+            openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                if(ctx.And({ParserState::type, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                    std::cerr<<"Ns: "<<ctx.currentToken<<std::endl;
+                }
+            };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentModifier == "*"){
                         data.isPointer = true;
                     }
-                    else if(currentModifier == "&"){
+                    if(currentModifier == "&"){
                         data.isReference = true;
                     }
                 }
@@ -63,12 +77,10 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         currentTypeName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) && 
-                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier}) 
-                        // && !ctx.sawgeneric
-                       ){
+                       ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier})){
                         currentDeclName = ctx.currentToken;
                     }
-                    if(ctx.And({ParserState::specifier, ParserState::type, ParserState::declstmt})){
+                    if(ctx.And({ParserState::specifier, ParserState::decl, ParserState::declstmt})){
                         currentSpecifier = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::modifier, ParserState::type, ParserState::declstmt})){
@@ -77,17 +89,19 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 }
             };
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
-                    NotifyAll(ctx);
+                NotifyAll(ctx);
+                data.clear();
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentSpecifier == "const"){
-                        data.isStatic = true;
-                    }
-                    else if(currentSpecifier == "static"){
                         data.isConst = true;
                     }
+                    if(currentSpecifier == "static"){
+                        data.isStatic = true;
+                    }
                 }
+                currentSpecifier.clear();
             };
 
         }

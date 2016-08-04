@@ -15,6 +15,10 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
     */
     public:
         struct CallData{
+            void clear(){
+                fnName.clear();
+                callargumentlist.clear();
+            }
             std::string fnName;
             std::list<std::string> callargumentlist;
         };
@@ -37,7 +41,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
-                if(ctx.IsClosed(ParserState::call)){
+                if(ctx.triggerField[ParserState::call] == 1){ //TODO: Fix
                     data.callargumentlist.push_back(")");
                     NotifyAll(ctx);
                     data.callargumentlist.clear();

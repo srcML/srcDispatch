@@ -175,6 +175,7 @@ namespace srcSAXEventDispatch {
                     if(functionflagopen){
                         functionflagopen = false;
                         ++ctx.triggerField[ParserState::functionblock];
+                        DispatchEvent(ParserState::functionblock, ElementState::open);
                     }
                     if(classflagopen){
                         classflagopen = false; //next time it's set to true, we definitely are in a new one.
@@ -287,7 +288,9 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::call];
                 } },            
                 { "function", [this](){
+                    DispatchEvent(ParserState::functionblock, ElementState::close);
                     --ctx.triggerField[ParserState::functionblock];
+
                     DispatchEvent(ParserState::function, ElementState::close);
                     --ctx.triggerField[ParserState::function];
                 } },
@@ -488,7 +491,7 @@ namespace srcSAXEventDispatch {
             }
             localName += localname;
 
-            if(localName == "position"){
+            if(localName == "pos:position"){
                 ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
             }
             std::string name;

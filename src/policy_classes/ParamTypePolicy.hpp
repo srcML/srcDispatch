@@ -5,8 +5,20 @@
 class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         struct ParamData{
+            ParamData(): linenumber{0}, isConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
+            void clear(){
+                nameoftype.clear();
+                nameofidentifier.clear();
+                namespaces.clear();
+                linenumber = -1;
+                isConst = false;
+                isReference = false;
+                isPointer = false;
+                isStatic = false;
+            }
             std::string nameoftype;
             std::string nameofidentifier;
+            std::vector<std::string> namespaces;
             int linenumber;
             bool isConst;
             bool isReference;
@@ -31,7 +43,11 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-
+            openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
+                if(ctx.And({ParserState::type, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                    std::cerr<<"Ns: "<<ctx.currentToken<<std::endl;
+                }
+            };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
                     if(currentModifier == "*"){
@@ -67,7 +83,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                         ParserState::init, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                         currentDeclName = ctx.currentToken;
                     }
-                    if(ctx.And({ParserState::specifier, ParserState::type, ParserState::parameter})){
+                    if(ctx.And({ParserState::specifier, ParserState::decl, ParserState::parameter})){
                         currentSpecifier = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::modifier, ParserState::type, ParserState::parameter})){
@@ -77,16 +93,18 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             };
             closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);
+                data.clear();
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
-                    if(currentSpecifier == "const"){
+                    if(currentSpecifier == "static"){
                         data.isStatic = true;
                     }
-                    else if(currentSpecifier == "static"){
+                    if(currentSpecifier == "const"){
                         data.isConst = true;
                     }
                 }
+                currentSpecifier.clear();
             };
 
         }
