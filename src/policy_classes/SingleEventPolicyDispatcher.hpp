@@ -14,20 +14,22 @@ namespace srcSAXEventDispatch {
 
        SingleEventPolicyDispatcher(policies*... t2) : srcSAXEventDispatcher<policies...>{t2...}, dispatched(false) {}
         void AddListener(EventListener * listener) override {
+            EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.push_back(listener);
         }
         void AddListenerDispatch(EventListener * listener) override {
-            EventDispatcher::elementListeners.push_back(listener);
+            AddListener(listener);
             dispatched = false;
         }
         void AddListenerNoDispatch(EventListener * listener) override {
             AddListener(listener);
         }
         void RemoveListener(EventListener * listener) override {
+            EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.pop_back();
         }
         void RemoveListenerDispatch(EventListener * listener) override {
-            EventDispatcher::elementListeners.pop_back();
+            RemoveListener(listener);
             dispatched = false;
         }
         void RemoveListenerNoDispatch(EventListener * listener) override {
@@ -41,6 +43,7 @@ namespace srcSAXEventDispatch {
                 dispatched = true;
 
                 EventDispatcher::elementListeners.back()->HandleEvent(pstate, estate, EventDispatcher::ctx);
+                EventDispatcher::elementListeners.back()->SetDispatched(false);
 
             }
 
