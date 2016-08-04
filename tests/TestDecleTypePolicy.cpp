@@ -23,7 +23,7 @@ std::string StringToSrcML(std::string str){
 	srcml_unit_set_filename(unit, "testsrcType.cpp");
 
 	srcml_unit_parse_memory(unit, str.c_str(), str.size());
-	srcml_write_unit(archive, unit);
+	srcml_archive_write_unit(archive, unit);
 	
 	srcml_unit_free(unit);
 	srcml_archive_close(archive);
@@ -85,7 +85,7 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 		void InitializeEventHandlers(){
     		using namespace srcSAXEventDispatch;
         	openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-            	ctx.AddListener(&declpolicy);
+            	ctx.dispatcher->AddListener(&declpolicy);
         	};
 		}
         DeclTypePolicy declpolicy;

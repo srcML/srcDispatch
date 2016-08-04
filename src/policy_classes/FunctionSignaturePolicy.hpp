@@ -50,7 +50,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
                 data.linenumber = ctx.currentLineNumber;
-                ctx.AddListener(&parampolicy);
+                ctx.dispatcher->AddListener(&parampolicy);
             };
             openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
                 NotifyAll(ctx);
@@ -84,7 +84,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 currentSpecifier.clear();
             };
             closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-                ctx.RemoveListener(&parampolicy);
+                ctx.dispatcher->RemoveListener(&parampolicy);
             };
         }
 

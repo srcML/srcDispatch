@@ -32,11 +32,12 @@ namespace srcSAXEventDispatch{
 
 
         public:
-            friend srcSAXEventContext;
 
             EventListener() : dispatched(false) {
                 DefaultEventHandlers();
             }
+
+            void SetDispatched(bool isDispatched) { dispatched = isDispatched; }
 
             virtual const EventMap & GetOpenEventMap() const { return openEventMap; }
             virtual const EventMap & GetCloseEventMap() const { return closeEventMap; }
@@ -191,11 +192,12 @@ namespace srcSAXEventDispatch{
             virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventContext & ctx) = 0;
 
         };
-    class EventDispatcher{
+    class EventDispatcher {
     public:
         virtual void AddListener(EventListener* l) = 0;
         virtual void RemoveListener(EventListener* l) = 0;
     protected:
+        EventDispatcher(std::initializer_list<EventListener *> listeners) : elementListeners(listeners) {}
         std::list<EventListener*> elementListeners;
         virtual void DispatchEvent(ParserState, ElementState) = 0;
     };
@@ -228,15 +230,16 @@ namespace srcSAXEventDispatch{
         }
 
     };
-    class srcSAXEventContext : public EventDispatcher {
+    class srcSAXEventContext {
         public:
             srcSAXEventContext() = delete;
-            srcSAXEventContext(const std::vector<std::string> & elementStack) : elementStack(elementStack) {
-                triggerField = std::vector<unsigned short int>(MAXENUMVALUE, 0);
-                depth = 0;
-                dispatching = false;
-            }
-            std::list<EventListener*> elementListeners;
+            srcSAXEventContext(EventDispatcher * dispatcher, const std::vector<std::string> & elementStack)
+                : dispatcher(dispatcher),
+                  elementStack(elementStack),
+                  triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
+                  depth(0) {}
+
+            EventDispatcher * dispatcher;
             const std::vector<std::string> & elementStack;
             std::vector<int> genericDepth;
             unsigned int currentLineNumber;
@@ -244,54 +247,7 @@ namespace srcSAXEventDispatch{
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
             std::size_t depth;
 
-        private:
-            bool dispatching;
-            ParserState currentPState;
-            ElementState currentEState;
         public:
-
-            void AddListener(EventListener* listener){
-                elementListeners.push_back(listener);
-            }
-            void AddListenerDispatch(EventListener* listener){
-                if(dispatching)
-                    listener->HandleEvent(currentPState, currentEState, *this);
-                AddListener(listener);
-            }
-            void AddListenerNoDispatch(EventListener* listener){
-                if(dispatching)
-                    listener->dispatched = true;
-                AddListener(listener);
-            }
-            void RemoveListener(EventListener* listener){
-                elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
-            }
-            void RemoveListenerDispatch(EventListener* listener){
-                if(dispatching)
-                    listener->HandleEvent(currentPState, currentEState, *this);
-                RemoveListener(listener);
-            }
-            void RemoveListenerNoDispatch(EventListener* listener){
-                if(dispatching)
-                    listener->dispatched = true;
-                RemoveListener(listener);
-            }
-            void DispatchEvent(ParserState pstate, ElementState estate){
-
-                dispatching = true;
-                currentPState = pstate;
-                currentEState = estate;
-
-                for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
-                    (*listener)->HandleEvent(pstate, estate, *this);
-                }
-                for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
-                    (*listener)->dispatched = false;
-                }
-
-                dispatching = false;
-
-            }
             inline bool And(std::vector<ParserState> vec) const{
                 for(auto field : vec){
                     if(triggerField[field]) continue;

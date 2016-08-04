@@ -34,22 +34,69 @@
 #include <memory>
 namespace srcSAXEventDispatch {
     template <typename ...policies>
-    class srcSAXEventDispatcher : public srcSAXHandler{
+    class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
-    std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
-    bool classflagopen, functionflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
+
+    private:
+        std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
+        bool classflagopen, functionflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
+
+        bool dispatching;
+        ParserState currentPState;
+        ElementState currentEState;
+
     protected:
-        void DispatchEvent(ParserState pstate, ElementState estate){
-            ctx.DispatchEvent(pstate, estate);
+        void DispatchEvent(ParserState pstate, ElementState estate) override {
+
+            dispatching = true;
+            currentPState = pstate;
+            currentEState = estate;
+
+            for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
+                (*listener)->HandleEvent(pstate, estate, ctx);
+            }
+            for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ){
+                (*listener)->SetDispatched(false);
+            }
+
+            dispatching = false;
+
         }
     public:
         srcSAXEventContext ctx;
         ~srcSAXEventDispatcher() {}
-        srcSAXEventDispatcher(policies*... t2) : ctx(srcml_element_stack){
-            ctx.elementListeners = {t2...};
+        srcSAXEventDispatcher(policies*... t2) : EventDispatcher{t2...}, ctx(this, srcml_element_stack) {
+            ;
+            dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             InitializeHandlers();
+        }
+        void AddListener(EventListener* listener) override {
+            elementListeners.push_back(listener);
+        }
+        void AddListenerDispatch(EventListener* listener){
+            if(dispatching)
+                listener->HandleEvent(currentPState, currentEState, *this);
+            AddListener(listener);
+        }
+        void AddListenerNoDispatch(EventListener* listener){
+            if(dispatching)
+                listener->SetDispatched(true);
+            AddListener(listener);
+        }
+        void RemoveListener(EventListener* listener) override {
+            elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
+        }
+        void RemoveListenerDispatch(EventListener* listener){
+            if(dispatching)
+                listener->HandleEvent(currentPState, currentEState, *this);
+            RemoveListener(listener);
+        }
+        void RemoveListenerNoDispatch(EventListener* listener){
+            if(dispatching)
+                listener->SetDispatched(true);
+            RemoveListener(listener);
         }
         void InitializeHandlers(){
             process_map = {
@@ -437,7 +484,7 @@ namespace srcSAXEventDispatch {
         */
         virtual void startRoot(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
-                            const struct srcsax_attribute * attributes) {
+                            const struct srcsax_attribute * attributes) override {
             
         }
         /**
@@ -457,7 +504,7 @@ namespace srcSAXEventDispatch {
         */
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
-                            const struct srcsax_attribute * attributes) {
+                            const struct srcsax_attribute * attributes) override {
             if(num_attributes >= 3){
                 ctx.currentFilePath = std::string(attributes[2].value);
                 ctx.currentFileLanguage = std::string(attributes[1].value);
@@ -480,7 +527,7 @@ namespace srcSAXEventDispatch {
         */
         virtual void startElement(const char * localname, const char * prefix, const char * URI,
                                     int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
-                                    const struct srcsax_attribute * attributes) {
+                                    const struct srcsax_attribute * attributes) override {
 
             ++ctx.depth;
 
@@ -516,7 +563,7 @@ namespace srcSAXEventDispatch {
         * SAX handler function for character handling within a unit.
         * Overide for desired behaviour.
         */
-        virtual void charactersUnit(const char * ch, int len) {
+        virtual void charactersUnit(const char * ch, int len) override {
             ctx.currentToken.clear();
             ctx.currentToken.append(ch, len);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
@@ -524,14 +571,14 @@ namespace srcSAXEventDispatch {
         }
     
         // end elements may need to be used if you want to collect only on per file basis or some other granularity.
-        virtual void endRoot(const char * localname, const char * prefix, const char * URI) {
+        virtual void endRoot(const char * localname, const char * prefix, const char * URI) override {
     
         }
-        virtual void endUnit(const char * localname, const char * prefix, const char * URI) {
+        virtual void endUnit(const char * localname, const char * prefix, const char * URI) override {
     
         }
     
-        virtual void endElement(const char * localname, const char * prefix, const char * URI) {
+        virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
 
             std::string localName;
             if(prefix) {
