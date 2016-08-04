@@ -30,9 +30,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            //data.name = policy->Data<NamePolicy::NameData>();
-        }
+        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new DeclTypeData(data);
@@ -43,7 +41,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::type, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
-                    std::cerr<<"Ns: "<<ctx.currentToken<<std::endl;
+                    data.namespaces.push_back(ctx.currentToken);
                 }
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){

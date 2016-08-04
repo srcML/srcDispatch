@@ -45,7 +45,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::type, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
-                    std::cerr<<"Ns: "<<ctx.currentToken<<std::endl;
+                    data.namespaces.push_back(ctx.currentToken);
                 }
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
