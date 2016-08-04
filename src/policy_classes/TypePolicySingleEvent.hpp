@@ -1,7 +1,4 @@
-#include <srcSAXEventDispatch.hpp>
-#include <srcSAXHandler.hpp>
-
-#include <SingleEventPolicyDispatcher.hpp>
+#include <srcSAXEventDispatchUtilities.hpp>
 
 #include <exception>
 
@@ -24,11 +21,10 @@ public:
         TypeData data;
         std::size_t typeDepth;
 
-        SingleEventPolicyDispatcher & policy_handler;
         NamePolicy * namePolicy;
 
     public:
-        TypePolicy(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
+        TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
         ~TypePolicy();
         virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
     protected:

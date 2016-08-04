@@ -1,4 +1,4 @@
-#include <srcSAXEventDispatch.hpp>
+#include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <vector>
@@ -56,7 +56,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
                 data.linenumber = ctx.currentLineNumber;
-                ctx.AddListener(&parampolicy);
+                ctx.dispatcher->AddListener(&parampolicy);
             };
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
@@ -108,7 +108,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 currentSpecifier.clear();
             };
             closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-                ctx.RemoveListener(&parampolicy);
+                ctx.dispatcher->RemoveListener(&parampolicy);
             };
         }
 

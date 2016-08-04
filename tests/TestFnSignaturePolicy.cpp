@@ -1,9 +1,8 @@
-#include <srcSAXEventDispatch.hpp>
+#include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <srcSAXHandler.hpp>
-#include <srcSAXEventDispatch.hpp>
 #include <FunctionSignaturePolicy.hpp>
 #include <cassert>
 #include <srcml.h>
@@ -23,7 +22,7 @@ std::string StringToSrcML(std::string str){
     srcml_unit_set_filename(unit, "testsrcType.cpp");
 
     srcml_unit_parse_memory(unit, str.c_str(), str.size());
-    srcml_write_unit(archive, unit);
+    srcml_archive_write_unit(archive, unit);
     
     srcml_unit_free(unit);
     srcml_archive_close(archive);
@@ -119,7 +118,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx) {
-                ctx.AddListener(&parampolicy);
+                ctx.dispatcher->AddListener(&parampolicy);
             };
         }
         FunctionSignaturePolicy parampolicy;

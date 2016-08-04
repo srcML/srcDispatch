@@ -1,10 +1,7 @@
-#include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
 
-#include <SingleEventPolicyDispatcher.hpp>
-
-#include <TypePolicy.hpp>
-#include <NamePolicy.hpp>
+#include <TypePolicySingleEvent.hpp>
+#include <NamePolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -12,16 +9,16 @@
 #ifndef INCLUDED_DECL_TYPE_POLICY_RECURSIVE_HPP
 #define INCLUDED_DECL_TYPE_POLICY_RECURSIVE_HPP
 
-class DeclTypePolicyRecursive : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 
-    struct DeclTypeRecursiveData {
+    struct DeclTypeData {
 
         TypePolicy::TypeData * type;
         NamePolicy::NameData * name;
 
-        friend std::ostream & operator<<(std::ostream & out, const DeclTypeRecursiveData & nameData) {
+        friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & nameData) {
             return out;
         }
 
@@ -30,29 +27,26 @@ public:
 private:
 
 
-    DeclTypeRecursiveData data;
+    DeclTypeData data;
     std::size_t declDepth;
-
-    SingleEventPolicyDispatcher & policy_handler;
 
     TypePolicy * typePolicy;
     NamePolicy * namePolicy;
 
 public:
 
-    DeclTypePolicyRecursive(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
-          policy_handler(policy_handler),
           data{},
           declDepth(0),
           typePolicy(nullptr),
           namePolicy(nullptr) { 
     
-        InitializeDeclTypePolicyRecursiveHandlers();
+        InitializeDeclTypePolicyHandlers();
 
     }
 
-    ~DeclTypePolicyRecursive() {
+    ~DeclTypePolicy() {
 
         if(typePolicy) delete typePolicy;
         if(namePolicy) delete namePolicy;
@@ -62,7 +56,7 @@ public:
 protected:
     void * DataInner() const override {
 
-        return new DeclTypeRecursiveData(data);
+        return new DeclTypeData(data);
 
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
@@ -70,12 +64,12 @@ protected:
         if(typeid(TypePolicy) == typeid(*policy)) {
 
             data.type = policy->Data<TypePolicy::TypeData>();
-            policy_handler.PopListenerDispatch();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         } else if(typeid(NamePolicy) == typeid(*policy)) {
 
             data.name = policy->Data<NamePolicy::NameData>(); 
-            policy_handler.PopListenerDispatch();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         }
 
@@ -83,7 +77,7 @@ protected:
 
 private:
 
-    void InitializeDeclTypePolicyRecursiveHandlers() {
+    void InitializeDeclTypePolicyHandlers() {
         using namespace srcSAXEventDispatch;
 
         // start of policy
@@ -92,7 +86,7 @@ private:
             if(!declDepth) {
 
                 declDepth = ctx.depth;
-                data = DeclTypeRecursiveData{};
+                data = DeclTypeData{};
 
                 CollectTypeHandlers();
                 CollectNameHandlers();
@@ -109,7 +103,7 @@ private:
                 declDepth = 0;
  
                 NotifyAll(ctx);
-                InitializeDeclTypePolicyRecursiveHandlers();
+                InitializeDeclTypePolicyHandlers();
 
             }
            
@@ -124,8 +118,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                if(!typePolicy) typePolicy = new TypePolicy(policy_handler, {this});
-                policy_handler.PushListenerDispatch(typePolicy);
+                if(!typePolicy) typePolicy = new TypePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(typePolicy);
 
             }
 
@@ -140,8 +134,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
-                policy_handler.PushListenerDispatch(namePolicy);
+                if(!namePolicy) namePolicy = new NamePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(namePolicy);
 
             }
 
