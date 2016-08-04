@@ -6,7 +6,7 @@
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         struct SignatureData{
-            SignatureData():isConst{false}, isMethod{false}, isStatic{false} {}
+            SignatureData():isConst{false}, isMethod{false}, isStatic{false}, hasConstReturn{false}, hasAliasedReturn{false} {}
             int linenumber;
             std::string returnType;
             std::string functionName;
@@ -17,7 +17,6 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             bool isConst;
             bool isMethod;
             bool isStatic;
-            bool hasStaticReturn;
             bool hasConstReturn;
             bool hasAliasedReturn;
             void clear(){
@@ -28,6 +27,8 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 isConst = false;
                 isMethod = false;
                 isStatic = false;
+                hasConstReturn = false;
+                hasAliasedReturn = false;
             }
         };
         ~FunctionSignaturePolicy(){}
@@ -66,11 +67,18 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 }
             };
             openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
+                if(ctx.IsOpen(ParserState::classn)){
+                    data.isMethod = true;
+                }
                 NotifyAll(ctx);
                 data.clear();
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
-                if(currentModifier == "*") {}
+                if(currentModifier == "*") {
+                    if(ctx.And({ParserState::type, ParserState::function})){
+                        data.hasAliasedReturn = true;
+                    }
+                }
                 else if(currentModifier == "&") {}
             };
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
@@ -83,15 +91,18 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 if(ctx.And({ParserState::modifier, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::genericargumentlist})){
                     data.returnTypeModifier = ctx.currentToken;
                 }
-                if(ctx.And({ParserState::specifier, ParserState::function}) && ctx.Nor({ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+                if(ctx.And({ParserState::specifier, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::genericargumentlist})){
                     currentSpecifier = ctx.currentToken;
                 }
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
-                if(currentSpecifier == "const"){
+                if(currentSpecifier == "const" && ctx.Nor({ParserState::parameterlist, ParserState::type})){
                     data.isConst = true;
                 }
-                if(currentSpecifier == "static"){
+                if(currentSpecifier == "const" && ctx.IsOpen(ParserState::function) && ctx.IsOpen(ParserState::type)){
+                    data.hasConstReturn = true;
+                }
+                if(currentSpecifier == "static" && ctx.Nor({ParserState::parameterlist, ParserState::type})){
                     data.isStatic = true;
                 }
                 currentSpecifier.clear();
