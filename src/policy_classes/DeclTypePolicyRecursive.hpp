@@ -1,6 +1,8 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
 
+#include <SingleEventPolicyDispatcher.hpp>
+
 #include <TypePolicy.hpp>
 #include <NamePolicy.hpp>
 
@@ -27,23 +29,33 @@ public:
 
 private:
 
+
     DeclTypeRecursiveData data;
     std::size_t declDepth;
+
+    SingleEventPolicyDispatcher & policy_handler;
 
     TypePolicy * typePolicy;
     NamePolicy * namePolicy;
 
 public:
 
-
-    DeclTypePolicyRecursive(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    DeclTypePolicyRecursive(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
+          policy_handler(policy_handler),
           data{},
           declDepth(0),
           typePolicy(nullptr),
           namePolicy(nullptr) { 
     
         InitializeDeclTypePolicyRecursiveHandlers();
+
+    }
+
+    ~DeclTypePolicyRecursive() {
+
+        if(typePolicy) delete typePolicy;
+        if(namePolicy) delete namePolicy;
 
     }
 
@@ -58,10 +70,12 @@ protected:
         if(typeid(TypePolicy) == typeid(*policy)) {
 
             data.type = policy->Data<TypePolicy::TypeData>();
+            policy_handler.PopListenerDispatch();
 
         } else if(typeid(NamePolicy) == typeid(*policy)) {
 
             data.name = policy->Data<NamePolicy::NameData>(); 
+            policy_handler.PopListenerDispatch();
 
         }
 
@@ -110,22 +124,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                typePolicy = new TypePolicy{this};
-                ctx.AddListenerDispatch(typePolicy);
-
-            }
-
-        };
-
-        closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
-
-            if(declDepth && (declDepth + 2) == ctx.depth) {
-
-                if(typePolicy) {
-                    ctx.RemoveListenerDispatch(typePolicy);
-                    delete typePolicy;
-                    typePolicy = nullptr;
-                }
+                if(!typePolicy) typePolicy = new TypePolicy(policy_handler, {this});
+                policy_handler.PushListenerDispatch(typePolicy);
 
             }
 
@@ -140,22 +140,8 @@ private:
 
             if(declDepth && (declDepth + 2) == ctx.depth) {
 
-                namePolicy = new NamePolicy{this};
-                ctx.AddListenerDispatch(namePolicy);
-
-            }
-
-        };
-
-        closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-
-            if(declDepth && (declDepth + 2) == ctx.depth) {
-
-                if(namePolicy) {
-                    ctx.RemoveListenerDispatch(namePolicy);
-                    delete namePolicy;
-                    namePolicy = nullptr;
-                }
+                if(!namePolicy) namePolicy = new NamePolicy(policy_handler, {this});
+                policy_handler.PushListenerDispatch(namePolicy);
 
             }
 

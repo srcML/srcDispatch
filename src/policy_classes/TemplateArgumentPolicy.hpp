@@ -1,6 +1,8 @@
 #include <srcSAXEventDispatch.hpp>
 #include <srcSAXHandler.hpp>
 
+#include <SingleEventPolicyDispatcher.hpp>
+
 #include <exception>
 
 #ifndef INCLUDED_TEMPLATE_ARGUMENT_POLICY_HPP
@@ -22,10 +24,12 @@ public:
         TemplateArgumentData data;
         std::size_t argumentDepth;
 
+        SingleEventPolicyDispatcher & policy_handler;
         NamePolicy * namePolicy;
 
     public:
-        TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {});
+        TemplateArgumentPolicy(SingleEventPolicyDispatcher & policy_handler, std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
+        ~TemplateArgumentPolicy();
         virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
     protected:
         virtual void * DataInner() const override;
