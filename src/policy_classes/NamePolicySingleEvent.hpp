@@ -1,10 +1,11 @@
 #include <srcSAXEventDispatchUtilities.hpp>
 
-#include <TypePolicy.hpp>
-#include <TemplateArgumentPolicy.hpp>
+#include <TypePolicySingleEvent.hpp>
+#include <TemplateArgumentPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #ifndef INCLUDED_NAME_POLICY_HPP
 #define INCLUDED_NAME_POLICY_HPP

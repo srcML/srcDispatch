@@ -1,6 +1,6 @@
-#include <TypePolicy.hpp>
+#include <TypePolicySingleEvent.hpp>
 
-#include <NamePolicy.hpp>
+#include <NamePolicySingleEvent.hpp>
 
 std::ostream & operator<<(std::ostream & out, const TypePolicy::TypeData & typeData) {
 

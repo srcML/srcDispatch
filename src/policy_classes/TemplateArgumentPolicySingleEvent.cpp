@@ -1,6 +1,6 @@
-#include <TemplateArgumentPolicy.hpp>
+#include <TemplateArgumentPolicySingleEvent.hpp>
 
-#include <NamePolicy.hpp>
+#include <NamePolicySingleEvent.hpp>
 
 std::ostream & operator<<(std::ostream & out, const TemplateArgumentPolicy::TemplateArgumentData & argumentData) {
 

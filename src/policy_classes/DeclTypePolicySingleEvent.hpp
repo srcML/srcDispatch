@@ -1,7 +1,7 @@
 #include <srcSAXEventDispatchUtilities.hpp>
 
-#include <TypePolicy.hpp>
-#include <NamePolicy.hpp>
+#include <TypePolicySingleEvent.hpp>
+#include <NamePolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -9,16 +9,16 @@
 #ifndef INCLUDED_DECL_TYPE_POLICY_RECURSIVE_HPP
 #define INCLUDED_DECL_TYPE_POLICY_RECURSIVE_HPP
 
-class DeclTypePolicyRecursive : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 
-    struct DeclTypeRecursiveData {
+    struct DeclTypeData {
 
         TypePolicy::TypeData * type;
         NamePolicy::NameData * name;
 
-        friend std::ostream & operator<<(std::ostream & out, const DeclTypeRecursiveData & nameData) {
+        friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & nameData) {
             return out;
         }
 
@@ -27,7 +27,7 @@ public:
 private:
 
 
-    DeclTypeRecursiveData data;
+    DeclTypeData data;
     std::size_t declDepth;
 
     TypePolicy * typePolicy;
@@ -35,18 +35,18 @@ private:
 
 public:
 
-    DeclTypePolicyRecursive(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           declDepth(0),
           typePolicy(nullptr),
           namePolicy(nullptr) { 
     
-        InitializeDeclTypePolicyRecursiveHandlers();
+        InitializeDeclTypePolicyHandlers();
 
     }
 
-    ~DeclTypePolicyRecursive() {
+    ~DeclTypePolicy() {
 
         if(typePolicy) delete typePolicy;
         if(namePolicy) delete namePolicy;
@@ -56,7 +56,7 @@ public:
 protected:
     void * DataInner() const override {
 
-        return new DeclTypeRecursiveData(data);
+        return new DeclTypeData(data);
 
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
@@ -77,7 +77,7 @@ protected:
 
 private:
 
-    void InitializeDeclTypePolicyRecursiveHandlers() {
+    void InitializeDeclTypePolicyHandlers() {
         using namespace srcSAXEventDispatch;
 
         // start of policy
@@ -86,7 +86,7 @@ private:
             if(!declDepth) {
 
                 declDepth = ctx.depth;
-                data = DeclTypeRecursiveData{};
+                data = DeclTypeData{};
 
                 CollectTypeHandlers();
                 CollectNameHandlers();
@@ -103,7 +103,7 @@ private:
                 declDepth = 0;
  
                 NotifyAll(ctx);
-                InitializeDeclTypePolicyRecursiveHandlers();
+                InitializeDeclTypePolicyHandlers();
 
             }
            
