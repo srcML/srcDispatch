@@ -5,7 +5,7 @@
 class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         struct ParamData{
-            ParamData(): linenumber{0}, isConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
+            ParamData(): linenumber{0}, isConst{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
             void clear(){
                 nameoftype.clear();
                 nameofidentifier.clear();
@@ -21,6 +21,8 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             std::vector<std::string> namespaces;
             int linenumber;
             bool isConst;
+            bool isConstAlias;
+            bool isAliasToConst;
             bool isReference;
             bool isPointer;
             bool isStatic;

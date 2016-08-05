@@ -36,7 +36,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
         ~TestFunctionSignature(){}
         TestFunctionSignature(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
-            parampolicy.AddListener(this);
+            fnpolicy.AddListener(this);
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             signaturedata = *policy->Data<FunctionSignaturePolicy::SignatureData>();
@@ -54,7 +54,8 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[0].parameters.size() == 4);
             assert(datatotest[0].returnTypeNamespaces.size() == 0);
             assert(datatotest[0].functionNamespaces.size() == 0);
-            assert(datatotest[0].hasConstReturn == false);
+            assert(datatotest[0].pointerToConstReturn == false);
+            assert(datatotest[0].constPointerReturn == false);
             assert(datatotest[0].hasAliasedReturn == false);
 
             assert(datatotest[1].returnType == "void");
@@ -67,7 +68,8 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[1].parameters.size() == 4);
             assert(datatotest[1].returnTypeNamespaces.size() == 0);
             assert(datatotest[1].functionNamespaces.size() == 0);
-            assert(datatotest[1].hasConstReturn == false);
+            assert(datatotest[1].pointerToConstReturn == false);
+            assert(datatotest[1].constPointerReturn == false);
             assert(datatotest[1].hasAliasedReturn == false);
 
             assert(datatotest[2].returnType == "int");
@@ -80,8 +82,9 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[2].parameters.size() == 4);
             assert(datatotest[2].returnTypeNamespaces.size() == 0);
             assert(datatotest[2].functionNamespaces.size() == 0);
-            assert(datatotest[2].hasConstReturn == false);
-            assert(datatotest[2].hasAliasedReturn == false);
+            assert(datatotest[2].pointerToConstReturn == false);
+            assert(datatotest[2].constPointerReturn == false);
+            assert(datatotest[2].hasAliasedReturn == true);
 
             assert(datatotest[3].returnType == "void");
             assert(datatotest[3].functionName == "bleep");
@@ -93,7 +96,8 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[3].parameters.size() == 4);
             assert(datatotest[3].returnTypeNamespaces.size() == 0);
             assert(datatotest[3].functionNamespaces.size() == 0);
-            assert(datatotest[3].hasConstReturn == false);
+            assert(datatotest[3].pointerToConstReturn == false);
+            assert(datatotest[3].constPointerReturn == false);
             assert(datatotest[3].hasAliasedReturn == false);
 
             assert(datatotest[4].returnType == "object");
@@ -106,8 +110,9 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[4].parameters.size() == 3);
             assert(datatotest[4].returnTypeNamespaces.size() == 2);
             assert(datatotest[4].functionNamespaces.size() == 1);
-            assert(datatotest[4].hasConstReturn == true);
-            assert(datatotest[4].hasAliasedReturn == false);
+            assert(datatotest[4].pointerToConstReturn == true);
+            assert(datatotest[4].constPointerReturn == true);
+            assert(datatotest[4].hasAliasedReturn == true);
 
         }
     protected:
@@ -118,10 +123,10 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx) {
-                ctx.dispatcher->AddListener(&parampolicy);
+                ctx.dispatcher->AddListener(&fnpolicy);
             };
         }
-        FunctionSignaturePolicy parampolicy;
+        FunctionSignaturePolicy fnpolicy;
         FunctionSignaturePolicy::SignatureData signaturedata;
         std::vector<FunctionSignaturePolicy::SignatureData> datatotest;
 };
@@ -131,7 +136,7 @@ int main(int argc, char** filename){
                           "static void bar(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}\n"
                           "int* bloo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}\n"
                           "class{void bleep(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee)const{}};\n"
-                          "static const GameDes::std::object* std::bloo(Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
+                          "static const GameDes::std::object* const std::bloo(Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
     std::string srcmlstr = StringToSrcML(codestr);
 
     TestFunctionSignature sigData;
