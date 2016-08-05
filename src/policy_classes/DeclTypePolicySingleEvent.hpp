@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#ifndef INCLUDED_DECL_TYPE_POLICY_RECURSIVE_HPP
-#define INCLUDED_DECL_TYPE_POLICY_RECURSIVE_HPP
+#ifndef INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
 
 class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 

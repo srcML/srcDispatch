@@ -2,8 +2,8 @@
 
 #include <exception>
 
-#ifndef INCLUDED_TEMPLATE_ARGUMENT_POLICY_HPP
-#define INCLUDED_TEMPLATE_ARGUMENT_POLICY_HPP
+#ifndef INCLUDED_TEMPLATE_ARGUMENT_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_TEMPLATE_ARGUMENT_POLICY_SINGLE_EVENT_HPP
 
 class NamePolicy;
 class TemplateArgumentPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {

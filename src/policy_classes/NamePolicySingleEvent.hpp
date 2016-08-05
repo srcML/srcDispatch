@@ -7,8 +7,8 @@
 #include <vector>
 #include <iostream>
 
-#ifndef INCLUDED_NAME_POLICY_HPP
-#define INCLUDED_NAME_POLICY_HPP
+#ifndef INCLUDED_NAME_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_NAME_POLICY_SINGLE_EVENT_HPP
 
 class NamePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
