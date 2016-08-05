@@ -18,10 +18,10 @@ namespace srcSAXEventDispatch{
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
-        ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr, empty,
+        ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
 
         // do not put anything after these
-        tokenstring, MAXENUMVALUE = empty};
+        tokenstring, empty, MAXENUMVALUE = empty};
     class srcSAXEventContext {
         public:
             srcSAXEventContext() = delete;
