@@ -29,6 +29,7 @@ public:
         bool isFinal;
         bool isOverride;
         bool isConstExpr;
+        bool isDelete;
 
         friend std::ostream & operator<<(std::ostream & out, const FunctionSignatureData & functionData) {
 
@@ -241,7 +242,43 @@ private:
     }
 
 
-    void CollectOtherHandlers() {}
+    void CollectOtherHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+
+             if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                if(ctx.And({ParserState::specifier})) {
+
+                    if(ctx.currentToken == "virtual")
+                        data.isVirtual = true;
+                    else if(ctx.currentToken == "static")
+                        data.isStatic = true;
+                    else if(ctx.currentToken == "const")
+                        data.isConst = true;
+                    else if(ctx.currentToken == "final")
+                        data.isFinal = true;
+                    else if(ctx.currentToken == "override")
+                        data.isOverride = true;
+                    else if(ctx.currentToken == "delete")
+                        data.isDelete = true;
+                    else if(ctx.currentToken == "inline")
+                        data.isInline = true;
+                    else if(ctx.currentToken == "constexpr")
+                        data.isConstExpr = true;
+
+                } else if(ctx.And({ParserState::literal})) {
+
+                    data.isPureVirtual = true;
+
+                }
+
+             }
+
+        };
+
+    }
 
 };
 
