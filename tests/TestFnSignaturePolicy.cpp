@@ -103,7 +103,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
             assert(datatotest[4].isConst == false);
             assert(datatotest[4].isMethod == false);
             assert(datatotest[4].isStatic == true);
-            assert(datatotest[4].parameters.size() == 4);
+            assert(datatotest[4].parameters.size() == 3);
             assert(datatotest[4].returnTypeNamespaces.size() == 2);
             assert(datatotest[4].functionNamespaces.size() == 1);
             assert(datatotest[4].hasConstReturn == true);
@@ -131,7 +131,7 @@ int main(int argc, char** filename){
                           "static void bar(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}\n"
                           "int* bloo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}\n"
                           "class{void bleep(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee)const{}};\n"
-                          "static const GameDes::std::object* std::bloo(int abc, Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
+                          "static const GameDes::std::object* std::bloo(Object<int> onetwothree, Object* DoReiMe, const Object* aybeecee){}";
     std::string srcmlstr = StringToSrcML(codestr);
 
     TestFunctionSignature sigData;
