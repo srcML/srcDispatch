@@ -18,8 +18,15 @@ public:
         TypePolicy::TypeData * type;
         NamePolicy::NameData * name;
 
-        friend std::ostream & operator<<(std::ostream & out, const ParamTypeData & nameData) {
+        friend std::ostream & operator<<(std::ostream & out, const ParamTypeData & paramData) {
+
+            out << *paramData.type;
+
+            if(paramData.name)
+                out << ' ' << *paramData.name;
+
             return out;
+
         }
 
     };
@@ -28,7 +35,7 @@ private:
 
 
     ParamTypeData data;
-    std::size_t declDepth;
+    std::size_t paramDepth;
 
     TypePolicy * typePolicy;
     NamePolicy * namePolicy;
@@ -38,7 +45,7 @@ public:
     ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
-          declDepth(0),
+          paramDepth(0),
           typePolicy(nullptr),
           namePolicy(nullptr) { 
     
@@ -83,9 +90,9 @@ private:
         // start of policy
         openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
 
-            if(!declDepth) {
+            if(!paramDepth) {
 
-                declDepth = ctx.depth;
+                paramDepth = ctx.depth;
                 data = ParamTypeData{};
 
                 CollectTypeHandlers();
@@ -98,9 +105,9 @@ private:
         // end of policy
         closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
 
-            if(declDepth && declDepth == ctx.depth) {
+            if(paramDepth && paramDepth == ctx.depth) {
 
-                declDepth = 0;
+                paramDepth = 0;
  
                 NotifyAll(ctx);
                 InitializeParamTypePolicyHandlers();
@@ -116,7 +123,7 @@ private:
 
         openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
 
-            if(declDepth && (declDepth + 2) == ctx.depth) {
+            if(paramDepth && (paramDepth + 2) == ctx.depth) {
 
                 if(!typePolicy) typePolicy = new TypePolicy{this};
                 ctx.dispatcher->AddListenerDispatch(typePolicy);
@@ -132,7 +139,7 @@ private:
 
         openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
-            if(declDepth && (declDepth + 2) == ctx.depth) {
+            if(paramDepth && (paramDepth + 2) == ctx.depth) {
 
                 if(!namePolicy) namePolicy = new NamePolicy{this};
                 ctx.dispatcher->AddListenerDispatch(namePolicy);

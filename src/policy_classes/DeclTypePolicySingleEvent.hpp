@@ -18,8 +18,15 @@ public:
         TypePolicy::TypeData * type;
         NamePolicy::NameData * name;
 
-        friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & nameData) {
+        friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
+
+            out << *declData.type;
+
+            if(declData.name)
+                out << ' ' << *declData.name;
+
             return out;
+
         }
 
     };
