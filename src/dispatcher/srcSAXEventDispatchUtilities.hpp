@@ -5,7 +5,7 @@
 #include <vector>
 #include <list>
 #include <initializer_list>
-
+#include <algorithm>
 
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
