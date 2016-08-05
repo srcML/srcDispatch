@@ -190,15 +190,15 @@ private:
 
                     if(ctx.And({ ParserState::specifier })) {
 
-                            if(ctx.currentToken == "virtual") {
-                                data.parents.back().isVirtual = true;
-                            } else if(ctx.currentToken == "public") {
-                                data.parents.back().accessSpecifier = PUBLIC;
-                            } else if(ctx.currentToken == "private") {
-                                data.parents.back().accessSpecifier = PRIVATE;
-                            } else if(ctx.currentToken == "protected") {
-                                data.parents.back().accessSpecifier = PROTECTED;
-                            }
+                        if(ctx.currentToken == "virtual") {
+                            data.parents.back().isVirtual = true;
+                        } else if(ctx.currentToken == "public") {
+                            data.parents.back().accessSpecifier = PUBLIC;
+                        } else if(ctx.currentToken == "private") {
+                            data.parents.back().accessSpecifier = PRIVATE;
+                        } else if(ctx.currentToken == "protected") {
+                            data.parents.back().accessSpecifier = PROTECTED;
+                        }
 
                     } else if(ctx.And({ ParserState::name })) {
 
