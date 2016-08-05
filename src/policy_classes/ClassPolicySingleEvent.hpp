@@ -71,7 +71,7 @@ public:
         if(namePolicy)     delete namePolicy;
         if(declPolicy)     delete declPolicy;
         if(functionPolicy) delete functionPolicy;
-        if(classPolicy) delete classPolicy;
+        if(classPolicy)    delete classPolicy;
 
     }
 
