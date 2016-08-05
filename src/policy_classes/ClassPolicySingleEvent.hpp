@@ -35,6 +35,8 @@ public:
         std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
         std::vector<FunctionSignaturePolicy::FunctionSignatureData *> methods[3];
 
+        std::vector<ClassPolicy::ClassData *> innerClasses[3];
+
     };
 
 private:
@@ -46,6 +48,7 @@ private:
     NamePolicy * namePolicy;
     DeclTypePolicy * declPolicy;
     FunctionSignaturePolicy * functionPolicy;
+    ClassPolicy * classPolicy;
 
 public:
 
@@ -56,7 +59,8 @@ public:
           currentRegion(PUBLIC),
           namePolicy(nullptr),
           declPolicy(nullptr),
-          functionPolicy(nullptr) { 
+          functionPolicy(nullptr),
+          classPolicy(nullptr) { 
     
         InitializeClassPolicyHandlers();
 
@@ -67,6 +71,7 @@ public:
         if(namePolicy)     delete namePolicy;
         if(declPolicy)     delete declPolicy;
         if(functionPolicy) delete functionPolicy;
+        if(classPolicy) delete classPolicy;
 
     }
 
@@ -86,6 +91,11 @@ public:
 
             data.methods[currentRegion].emplace_back(policy->Data<FunctionSignaturePolicy::FunctionSignatureData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        } else if(typeid(ClassPolicy) == typeid(*policy)) {
+
+            data.innerClasses[currentRegion].emplace_back(policy->Data<ClassPolicy::ClassData>());
+            ctx.dispatcher->RemoveListener(nullptr);
 
         }
 
@@ -121,6 +131,11 @@ private:
                 CollectNameHandlers();
                 CollectSuperHanders();
                 CollectBlockHanders();
+
+            } else if((classDepth + 3) == ctx.depth) {
+
+                if(!classPolicy) classPolicy = new ClassPolicy{this};
+                ctx.dispatcher->AddListenerDispatch(classPolicy); 
 
             }
 
