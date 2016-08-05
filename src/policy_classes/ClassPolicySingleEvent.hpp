@@ -229,7 +229,7 @@ private:
     void CollectBlockHanders() {
         using namespace srcSAXEventDispatch;
 
-       openEventMap[ParserState::classblock] = [this](srcSAXEventContext& ctx) {
+       openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
@@ -237,7 +237,7 @@ private:
                 NopCloseEvents({ParserState::name, ParserState::super_list, ParserState::tokenstring});
 
                 // set up to listen to decl_stmt, member, and class policies
-                std::function<void (srcSAXEventContext& ctx)> declEvent = [this](srcSAXEventContext& ctx) {
+                openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
 
                     if((classDepth + 3) == ctx.depth) {
 
@@ -300,7 +300,7 @@ private:
 
         };
 
-        closeEventMap[ParserState::classblock] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
