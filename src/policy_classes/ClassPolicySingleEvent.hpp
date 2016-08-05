@@ -1,21 +1,21 @@
-#include <srcSAXEventDispatch.hpp>
 #include <srcSAXEventDispatchUtilities.hpp>
-#include <NamePolicy.hpp>
-#include <DeclTypePolicy.hpp>
-#include <FunctionSignaturePolicy.hpp>
+
+#include <NamePolicySingleEvent.hpp>
+#include <DeclTypePolicySingleEvent.hpp>
+#include <FunctionSignaturePolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
 
-#ifndef INCLUDED_CLASS_POLICY_HPP
-#define INCLUDED_CLASS_POLICY_HPP
+#ifndef INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
 
 class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 
     enum ClassType { CLASS, STRUCT/*, UNION, ENUM*/ };
-    enum AccessSpecifier { PUBLIC, PRIVATE, PROTECTED };
+    enum AccessSpecifier { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
     struct ParentData {
 
         std::string name;
@@ -32,8 +32,8 @@ public:
 
         std::vector<ParentData> parents;
 
-        std::vector<DeclTypePolicy> fields;
-        std::vector<FunctionSignaturePolicy> methods;
+        std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
+        std::vector<FunctionSignaturePolicy::FunctionSignatureData *> methods[3];
 
     };
 
@@ -44,24 +44,50 @@ private:
     AccessSpecifier currentRegion;
 
     NamePolicy * namePolicy;
+    DeclTypePolicy * declPolicy;
+    FunctionSignaturePolicy * functionPolicy;
 
 public:
-
 
     ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           classDepth(0),
           currentRegion(PUBLIC),
-          namePolicy(nullptr) { 
+          namePolicy(nullptr),
+          declPolicy(nullptr),
+          functionPolicy(nullptr) { 
     
         InitializeClassPolicyHandlers();
 
     }
 
+    ~ClassPolicy() {
+
+        if(namePolicy)     delete namePolicy;
+        if(declPolicy)     delete declPolicy;
+        if(functionPolicy) delete functionPolicy;
+
+    }
+
     void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
-        data.name = policy->Data<NamePolicy::NameData>();
+        if(typeid(NamePolicy) == typeid(*policy)) {
+
+            data.name = policy->Data<NamePolicy::NameData>();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        } else if(typeid(DeclTypePolicy) == typeid(*policy)) {
+
+            data.fields[currentRegion].emplace_back(policy->Data<DeclTypePolicy::DeclTypeData>());
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        } else if(typeid(FunctionSignaturePolicy) == typeid(*policy)) {
+
+            data.methods[currentRegion].emplace_back(policy->Data<FunctionSignaturePolicy::FunctionSignatureData>());
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        }
 
     }
 
@@ -113,7 +139,6 @@ private:
            
         };
 
-
         openEventMap[ParserState::classn] = startPolicy;
         closeEventMap[ParserState::classn] = endPolicy;
         openEventMap[ParserState::structn] = startPolicy;
@@ -128,8 +153,8 @@ private:
 
             if((classDepth + 1) == ctx.depth) {
 
-                namePolicy = new NamePolicy{this};
-                ctx.AddListenerDispatch(namePolicy);
+                if(!namePolicy) namePolicy = new NamePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(namePolicy);
 
             }
 
@@ -138,14 +163,6 @@ private:
         closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
-
-                if(namePolicy) {
-
-                    ctx.RemoveListenerDispatch(namePolicy);
-                    delete namePolicy;
-                    namePolicy = nullptr;
-
-                }
 
                 NopOpenEvents({ParserState::name});
                 NopCloseEvents({ParserState::name});
@@ -212,7 +229,7 @@ private:
     void CollectBlockHanders() {
         using namespace srcSAXEventDispatch;
 
-        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+       openEventMap[ParserState::classblock] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
@@ -220,10 +237,37 @@ private:
                 NopCloseEvents({ParserState::name, ParserState::super_list, ParserState::tokenstring});
 
                 // set up to listen to decl_stmt, member, and class policies
+                std::function<void (srcSAXEventContext& ctx)> declEvent = [this](srcSAXEventContext& ctx) {
+
+                    if((classDepth + 3) == ctx.depth) {
+
+                        if(!declPolicy) declPolicy = new DeclTypePolicy{this};
+                        ctx.dispatcher->AddListenerDispatch(declPolicy);
+
+                    }
+
+                };
+                std::function<void (srcSAXEventContext& ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
+
+                    if((classDepth + 3) == ctx.depth) {
+
+                        if(!functionPolicy) functionPolicy = new FunctionSignaturePolicy{this};
+                        ctx.dispatcher->AddListenerDispatch(functionPolicy);
+
+                    }
+
+                };
+                openEventMap[ParserState::function] = functionEvent;
+                openEventMap[ParserState::functiondecl] = functionEvent;
+                openEventMap[ParserState::constructor] = functionEvent;
+                openEventMap[ParserState::constructordecl] = functionEvent;
+                openEventMap[ParserState::destructor] = functionEvent;
+                openEventMap[ParserState::destructordecl] = functionEvent;
 
             }
 
         };
+
 
         // should always be in a region once block starts, so should not have to close
         openEventMap[ParserState::publicaccess] = [this](srcSAXEventContext& ctx) {
@@ -256,11 +300,14 @@ private:
 
         };
 
-        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::classblock] = [this](srcSAXEventContext& ctx) {
 
             if((classDepth + 1) == ctx.depth) {
 
-                NopOpenEvents({ParserState::block, ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
+                NopOpenEvents({ParserState::block, ParserState::function, ParserState::functiondecl, 
+                               ParserState::constructor, ParserState::constructordecl, ParserState::destructor, ParserState::destructordecl,
+                               ParserState::declstmt,
+                               ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
                 NopCloseEvents({ParserState::block});
 
             }
