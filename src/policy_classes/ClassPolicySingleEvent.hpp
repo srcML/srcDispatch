@@ -33,6 +33,8 @@ public:
         std::vector<ParentData> parents;
 
         std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
+        std::vector<FunctionSignaturePolicy::FunctionSignatureData *> constructors[3];
+        bool hasDestructor;
         std::vector<FunctionSignaturePolicy::FunctionSignatureData *> methods[3];
 
         std::vector<ClassPolicy::ClassData *> innerClasses[3];
@@ -89,7 +91,11 @@ public:
 
         } else if(typeid(FunctionSignaturePolicy) == typeid(*policy)) {
 
-            data.methods[currentRegion].emplace_back(policy->Data<FunctionSignaturePolicy::FunctionSignatureData>());
+            FunctionSignaturePolicy::FunctionSignatureData * f_data = policy->Data<FunctionSignaturePolicy::FunctionSignatureData>();
+            if(f_data->type == FunctionSignaturePolicy::CONSTRUCTOR)
+                data.constructors[currentRegion].emplace_back(f_data);
+            else
+                data.methods[currentRegion].emplace_back(f_data);
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         } else if(typeid(ClassPolicy) == typeid(*policy)) {
@@ -276,8 +282,19 @@ private:
                 openEventMap[ParserState::functiondecl] = functionEvent;
                 openEventMap[ParserState::constructor] = functionEvent;
                 openEventMap[ParserState::constructordecl] = functionEvent;
-                openEventMap[ParserState::destructor] = functionEvent;
-                openEventMap[ParserState::destructordecl] = functionEvent;
+
+                std::function<void (srcSAXEventContext& ctx)> destructorEvent = [this](srcSAXEventContext& ctx) {
+
+                    if((classDepth + 3) == ctx.depth) {
+
+                        data.hasDestructor = true;
+
+                    }
+
+                };
+
+                openEventMap[ParserState::destructor] = destructorEvent;
+                openEventMap[ParserState::destructordecl] = destructorEvent;
 
             }
 

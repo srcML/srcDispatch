@@ -14,7 +14,11 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
 
 public:
 
+    enum FunctionSignatureType { CONSTRUCTOR, DESTURCTOR, FUNCTION };
+
     struct FunctionSignatureData {
+
+        FunctionSignatureType type;
 
         TypePolicy::TypeData * returnType;
         NamePolicy::NameData * name;
@@ -124,6 +128,13 @@ private:
 
                 functionDepth = ctx.depth;
                 data = FunctionSignatureData{};
+
+                if(ctx.elementStack.back() == "function" || ctx.elementStack.back() == "function_decl")
+                    data.type = FUNCTION;
+                else if(ctx.elementStack.back() == "constructor" || ctx.elementStack.back() == "constructor_decl")
+                    data.type = CONSTRUCTOR;
+                else if(ctx.elementStack.back() == "destructor" || ctx.elementStack.back() == "destructor_decl")
+                    data.type = DESTURCTOR;
 
                 CollectTypeHandlers();
                 CollectNameHandlers();
