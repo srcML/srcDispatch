@@ -30,6 +30,22 @@ public:
 
         }
 
+        std::string ToString() {
+
+            std::string str = name;
+
+            for(std::size_t pos = 0; pos < names.size(); ++pos) {
+
+                if(pos != 0)
+                    str += ' ';
+                str += names[pos]->ToString();
+
+            }
+
+            return str;
+
+        }
+
         friend std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
 
             if(!nameData.name.empty()) {

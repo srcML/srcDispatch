@@ -14,7 +14,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
 
 public:
 
-    enum FunctionSignatureType { CONSTRUCTOR, DESTURCTOR, FUNCTION };
+    enum FunctionSignatureType { CONSTRUCTOR, DESTURCTOR, OPERATOR, FUNCTION };
 
     struct FunctionSignatureData {
 
