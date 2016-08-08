@@ -12,6 +12,12 @@ std::ostream & operator<<(std::ostream & out, const TemplateArgumentPolicy::Temp
         const std::pair<void *, TemplateArgumentPolicy::TemplateArgumentType> & element = argumentData.data[pos];
         if(element.second == TemplateArgumentPolicy::NAME)
             out << *static_cast<NamePolicy::NameData *>(element.first);
+        else if(element.second == TemplateArgumentPolicy::POINTER)
+            out << '*';
+        else if(element.second == TemplateArgumentPolicy::REFERENCE)
+            out << '&';
+        else if(element.second == TemplateArgumentPolicy::RVALUE)
+            out << "&&";
         else
             out << *static_cast<std::string *>(element.first);
 
@@ -139,7 +145,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
             || (argumentDepth + 1) == ctx.depth)) {
 
-            data.data.push_back(std::make_pair(new std::string(), LITERAL));
+            data.data.push_back(std::make_pair(new std::string(), OPERATOR));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
                 (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
             };
@@ -166,9 +172,16 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
             || (argumentDepth + 1) == ctx.depth)) {
 
-            data.data.push_back(std::make_pair(new std::string(), LITERAL));
+            data.data.push_back(std::make_pair(nullptr, MODIFIER));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
+
+                if(ctx.currentToken == "*")
+                    data.data.back().second = POINTER;
+                else if(ctx.currentToken == "&")
+                    data.data.back().second = REFERENCE;
+                else if(ctx.currentToken == "&&")
+                    data.data.back().second = RVALUE;
+
             };
 
         }
@@ -193,7 +206,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
             || (argumentDepth + 1) == ctx.depth)) {
 
-            data.data.push_back(std::make_pair(new std::string(), LITERAL));
+            data.data.push_back(std::make_pair(new std::string(), CALL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
                 (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
             };

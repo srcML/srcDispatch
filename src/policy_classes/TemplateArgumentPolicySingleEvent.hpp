@@ -9,7 +9,7 @@ class NamePolicy;
 class TemplateArgumentPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
-    enum TemplateArgumentType { NAME, LITERAL, OTHER };
+    enum TemplateArgumentType { NAME, LITERAL, MODIFIER, POINTER, REFERENCE, RVALUE, OPERATOR, CALL };
 
     struct TemplateArgumentData {
         std::vector<std::pair<void *, TemplateArgumentType>> data;

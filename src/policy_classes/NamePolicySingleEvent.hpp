@@ -21,7 +21,7 @@ public:
         std::vector<TemplateArgumentPolicy::TemplateArgumentData *> templateArguments;
         std::vector<std::string> arrayIndices;
 
-        std::string SimpleName() {
+        std::string SimpleName() const {
 
             if(!name.empty())
                 return name;
@@ -30,7 +30,7 @@ public:
 
         }
 
-        std::string ToString() {
+        std::string ToString() const {
 
             std::string str = name;
 
