@@ -21,6 +21,15 @@ public:
         std::vector<TemplateArgumentPolicy::TemplateArgumentData *> templateArguments;
         std::vector<std::string> arrayIndices;
 
+        std::string SimpleName() {
+
+            if(!name.empty())
+                return name;
+
+            return names.back()->SimpleName();
+
+        }
+
         friend std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
 
             if(!nameData.name.empty()) {
