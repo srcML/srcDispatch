@@ -29,7 +29,8 @@ namespace srcSAXEventDispatch{
                 : dispatcher(dispatcher),
                   elementStack(elementStack),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
-                  depth(0) {}
+                  depth(0),
+                  isOperator(false) {}
 
             EventDispatcher * dispatcher;
             const std::vector<std::string> & elementStack;
@@ -38,6 +39,7 @@ namespace srcSAXEventDispatch{
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
             std::size_t depth;
+            bool isOperator;
 
         public:
             inline bool And(std::vector<ParserState> vec) const{

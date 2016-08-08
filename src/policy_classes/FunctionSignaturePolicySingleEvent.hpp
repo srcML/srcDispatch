@@ -129,12 +129,18 @@ private:
                 functionDepth = ctx.depth;
                 data = FunctionSignatureData{};
 
-                if(ctx.elementStack.back() == "function" || ctx.elementStack.back() == "function_decl")
-                    data.type = FUNCTION;
-                else if(ctx.elementStack.back() == "constructor" || ctx.elementStack.back() == "constructor_decl")
+                if(ctx.elementStack.back() == "function" || ctx.elementStack.back() == "function_decl") {
+
+                    if(ctx.isOperator)
+                        data.type = OPERATOR;
+                    else
+                        data.type = FUNCTION;
+
+                } else if(ctx.elementStack.back() == "constructor" || ctx.elementStack.back() == "constructor_decl") {
                     data.type = CONSTRUCTOR;
-                else if(ctx.elementStack.back() == "destructor" || ctx.elementStack.back() == "destructor_decl")
+                } else if(ctx.elementStack.back() == "destructor" || ctx.elementStack.back() == "destructor_decl") {
                     data.type = DESTURCTOR;
+                }
 
                 CollectTypeHandlers();
                 CollectNameHandlers();

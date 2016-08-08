@@ -35,6 +35,7 @@ public:
         std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
         std::vector<FunctionSignaturePolicy::FunctionSignatureData *> constructors[3];
         bool hasDestructor;
+        std::vector<FunctionSignaturePolicy::FunctionSignatureData *> operators[3];
         std::vector<FunctionSignaturePolicy::FunctionSignatureData *> methods[3];
 
         std::vector<ClassPolicy::ClassData *> innerClasses[3];
@@ -94,7 +95,9 @@ public:
             FunctionSignaturePolicy::FunctionSignatureData * f_data = policy->Data<FunctionSignaturePolicy::FunctionSignatureData>();
             if(f_data->type == FunctionSignaturePolicy::CONSTRUCTOR)
                 data.constructors[currentRegion].emplace_back(f_data);
-            else
+            else if(f_data->type == FunctionSignaturePolicy::OPERATOR)
+                data.operators[currentRegion].emplace_back(f_data);
+            else 
                 data.methods[currentRegion].emplace_back(f_data);
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 

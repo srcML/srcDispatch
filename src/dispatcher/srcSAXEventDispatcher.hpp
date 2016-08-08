@@ -553,12 +553,20 @@ namespace srcSAXEventDispatch {
             if(name == "generic" && localName == "argument_list"){
                 ctx.genericDepth.push_back(ctx.depth);
             }
+
+            if(name == "operator" && (localName == "function" || localName == "function_decl")) {
+                ctx.isOperator = true;
+            }
+
             if(localName != ""){
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();
                 }
             }
+
+            ctx.isOperator = false;
+
         }
         /**
         * charactersUnit
