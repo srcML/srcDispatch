@@ -14,10 +14,11 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
 public:
 
-    enum ClassType { CLASS, STRUCT/*, UNION, ENUM*/ };
+    enum ClassType : std::size_t { CLASS, STRUCT/*, UNION, ENUM*/ };
     enum AccessSpecifier { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
     struct ParentData {
 
+        // should this be a NamePolicy::NameData?
         std::string name;
         bool isVirtual;
         AccessSpecifier accessSpecifier;
