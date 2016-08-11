@@ -35,6 +35,23 @@ public:
         bool isConstExpr;
         bool isDelete;
 
+        std::string ToString() const {
+
+            std::string signature = name->ToString();
+            signature += '(';
+            for(std::size_t pos = 0; pos < parameters.size(); ++pos) {
+                if(pos > 0)
+                    signature += ", ";
+                signature += parameters[pos]->type->ToString();
+            }
+            signature += ')';
+            if(isConst)
+                signature += " const";
+
+            return signature;
+
+        }
+
         friend std::ostream & operator<<(std::ostream & out, const FunctionSignatureData & functionData) {
 
             out << *functionData.returnType << ' ' << *functionData.name;

@@ -14,6 +14,7 @@ public:
     struct TypeData {
         std::vector<std::pair<void *, TypeType>> types;
 
+        std::string ToString() const;
         friend std::ostream & operator<<(std::ostream & out, const TypeData & typeData);
 
     };
