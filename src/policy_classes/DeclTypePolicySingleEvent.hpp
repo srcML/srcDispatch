@@ -17,6 +17,7 @@ public:
 
         TypePolicy::TypeData * type;
         NamePolicy::NameData * name;
+        bool isStatic;
 
         friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
 
@@ -97,6 +98,7 @@ private:
 
                 CollectTypeHandlers();
                 CollectNameHandlers();
+                CollectSpecifiersHandlers();
 
             }
 
@@ -149,6 +151,38 @@ private:
         };
 
     }
+
+
+
+void CollectSpecifiersHandlers() {
+    using namespace srcSAXEventDispatch;
+
+    openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+
+        if(declDepth && (declDepth + 2) == ctx.depth) {
+
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+
+                if(ctx.currentToken == "static")
+                    data.isStatic = true;
+
+            };
+
+        }
+
+    };
+
+    closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+
+        if(declDepth && (declDepth + 1) == ctx.depth) {
+
+            NopCloseEvents({ParserState::tokenstring});
+
+        }
+
+    };
+
+}
 
 };
 
