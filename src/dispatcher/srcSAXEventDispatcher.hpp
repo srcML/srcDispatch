@@ -1,5 +1,5 @@
 /**
- * @file srcSliceHandler.hpp
+ * @file srcSAXEventDispatcher.hpp
  *
  * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef INCLUDED_SRCSAXEVENTDISPATCH_HPP
-#define INCLUDED_SRCSAXEVENTDISPATCH_HPP
+#ifndef INCLUDED_SRCSAXEVENTDISPATCHER_HPP
+#define INCLUDED_SRCSAXEVENTDISPATCHER_HPP
 
 #include <srcSAXHandler.hpp>
 #include <functional>
