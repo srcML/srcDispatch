@@ -35,14 +35,22 @@
 namespace srcSAXEventDispatch {
 
     template<typename policy, typename... remaining>
-    std::list<EventListener*> create_listeners(PolicyListener * listener) {
+    static std::list<EventListener*> create_listeners_impl(PolicyListener * listener);
+
+    template<typename... policies>
+    static std::list<EventListener*> create_listeners(PolicyListener * listener) {
+        return create_listeners_impl<policies...>(listener);
+    }
+
+    template<typename policy, typename... remaining>
+    static std::list<EventListener*> create_listeners_impl(PolicyListener * listener) {
         std::list<EventListener*> listeners{new policy{listener}};
         std::list<EventListener*> remaining_listeners = create_listeners<remaining...>(listener);
         listeners.insert(listeners.end(), remaining_listeners.begin(), remaining_listeners.end());
         return listeners;
     }
     template<>
-    std::list<EventListener*> create_listeners<void>(PolicyListener * listener) {
+    std::list<EventListener*> create_listeners<>(PolicyListener * listener) {
         return std::list<EventListener*>();
     }
 
@@ -77,18 +85,10 @@ namespace srcSAXEventDispatch {
 
         }
 
-        // struct policy_pack {
-        //     std::list<EventListener*> create_listeners(PolicyListener * listener) {
-        //         return std::list<EventListener*>{new policy{listener}};
-        //     }
-        // };
-        // struct policy_pack {
-
     public:
         ~srcSAXEventDispatcher() {}
         srcSAXEventDispatcher(PolicyListener * listener) : EventDispatcher(srcml_element_stack) {
-            // policy_pack<policies...> pack;
-            elementListeners = create_listeners<policies..., void>(listener);
+            elementListeners = create_listeners<policies...>(listener);
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             InitializeHandlers();
