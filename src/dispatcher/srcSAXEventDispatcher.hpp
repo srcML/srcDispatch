@@ -89,7 +89,6 @@ namespace srcSAXEventDispatch {
         srcSAXEventDispatcher(PolicyListener * listener) : EventDispatcher(srcml_element_stack) {
             // policy_pack<policies...> pack;
             elementListeners = create_listeners<policies..., void>(listener);
-            std::cerr << "HERE: " << __FILE__ << ' ' << __FUNCTION__ << ' ' << __LINE__ << ' ' << elementListeners.size() << '\n';
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             InitializeHandlers();
