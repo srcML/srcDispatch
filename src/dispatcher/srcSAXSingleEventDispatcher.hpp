@@ -12,7 +12,7 @@ namespace srcSAXEventDispatch {
 
     public:
 
-       srcSAXSingleEventDispatcher(policies*... t2) : srcSAXEventDispatcher<policies...>{t2...}, dispatched(false) {}
+       srcSAXSingleEventDispatcher(PolicyListener * listener) : srcSAXEventDispatcher<policies...>(listener), dispatched(false) {}
         void AddListener(EventListener * listener) override {
             EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.push_back(listener);

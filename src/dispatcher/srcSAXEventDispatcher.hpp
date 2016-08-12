@@ -63,14 +63,34 @@ namespace srcSAXEventDispatch {
             dispatching = false;
 
         }
+
+        template<typename policy>
+        struct policy_back {
+            std::list<EventListener*> create_listeners(PolicyListener * listener) {
+                return std::list<EventListener*>{new policy{listener}};
+            }
+        };
+
+        template<typename policy, typename... remaining>
+        struct policy_pack {
+            std::list<EventListener*> create_listeners(PolicyListener * listener) {
+                std::list<EventListener*> listeners{new policy{listener}};
+                policy_pack<remaining...> pack;
+                listeners.insert(listeners.end(), pack.create_listeners());
+                return listeners;
+            }
+        };
+
     public:
         ~srcSAXEventDispatcher() {}
-        srcSAXEventDispatcher(policies*... t2) : EventDispatcher({t2...}, srcml_element_stack) {
-            ;
+        srcSAXEventDispatcher(PolicyListener * listener) : EventDispatcher({}, srcml_element_stack) {
+            policy_back<policies...> pack;
+            elementListeners = pack.create_listeners(listener);
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             InitializeHandlers();
         }
+
         void AddListener(EventListener* listener) override {
             elementListeners.push_back(listener);
         }
