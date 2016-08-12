@@ -44,7 +44,7 @@ namespace srcSAXEventDispatch {
 
     template<typename policy, typename... remaining>
     static std::list<EventListener*> create_listeners_impl(PolicyListener * listener) {
-        std::list<EventListener*> listeners{new policy{listener}};
+        std::list<EventListener*> listeners{new policy({listener})};
         std::list<EventListener*> remaining_listeners = create_listeners<remaining...>(listener);
         listeners.insert(listeners.end(), remaining_listeners.begin(), remaining_listeners.end());
         return listeners;
@@ -67,6 +67,8 @@ namespace srcSAXEventDispatch {
         ParserState currentPState;
         ElementState currentEState;
 
+        std::size_t number_allocated_listeners;
+
     protected:
         void DispatchEvent(ParserState pstate, ElementState estate) override {
 
@@ -86,9 +88,16 @@ namespace srcSAXEventDispatch {
         }
 
     public:
-        ~srcSAXEventDispatcher() {}
+        ~srcSAXEventDispatcher() {
+            for(std::size_t count = 0; count < number_allocated_listeners; ++count) {
+                delete elementListeners.front();
+                elementListeners.pop_front();
+            }
+        }
+
         srcSAXEventDispatcher(PolicyListener * listener) : EventDispatcher(srcml_element_stack) {
             elementListeners = create_listeners<policies...>(listener);
+            number_allocated_listeners = elementListeners.size();
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             InitializeHandlers();
