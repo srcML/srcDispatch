@@ -41,6 +41,8 @@ public:
 
         std::vector<ClassPolicy::ClassData *> innerClasses[3];
 
+        bool hasPureVirtual;
+
     };
 
 private:
@@ -94,6 +96,10 @@ public:
         } else if(typeid(FunctionSignaturePolicy) == typeid(*policy)) {
 
             FunctionSignaturePolicy::FunctionSignatureData * f_data = policy->Data<FunctionSignaturePolicy::FunctionSignatureData>();
+
+            if(f_data->isPureVirtual)
+                data.hasPureVirtual = true;
+
             if(f_data->type == FunctionSignaturePolicy::CONSTRUCTOR)
                 data.constructors[currentRegion].emplace_back(f_data);
             else if(f_data->type == FunctionSignaturePolicy::OPERATOR)

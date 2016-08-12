@@ -2,6 +2,34 @@
 
 #include <NamePolicySingleEvent.hpp>
 
+std::string TypePolicy::TypeData::ToString() const {
+
+    std::string type_str;
+
+    for(std::size_t pos = 0; pos < types.size(); ++pos) {
+
+        if(pos != 0) type_str += ' ';
+
+        const std::pair<void *, TypePolicy::TypeType> & type = types[pos];
+
+        if(type.second == TypePolicy::POINTER)
+            type_str += '*';
+        else if(type.second == TypePolicy::REFERENCE)
+            type_str += '&';
+        else if(type.second == TypePolicy::RVALUE)
+            type_str += "&&";
+        else if(type.second == TypePolicy::SPECIFIER)
+            type_str += *static_cast<std::string *>(type.first);
+        else if(type.second == TypePolicy::NAME)
+            type_str += static_cast<NamePolicy::NameData *>(type.first)->ToString();
+
+    }
+
+    return type_str;
+
+
+}
+
 std::ostream & operator<<(std::ostream & out, const TypePolicy::TypeData & typeData) {
 
     for(std::size_t pos = 0; pos < typeData.types.size(); ++pos) {
