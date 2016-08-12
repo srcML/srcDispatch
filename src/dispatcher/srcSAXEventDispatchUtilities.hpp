@@ -266,8 +266,8 @@ namespace srcSAXEventDispatch{
         srcSAXEventContext ctx;
         std::list<EventListener*> elementListeners;
 
-        EventDispatcher(std::initializer_list<EventListener *> listeners, const std::vector<std::string> & elementStack)
-            : elementListeners(listeners), ctx(this, elementStack) {}
+        EventDispatcher(const std::vector<std::string> & elementStack)
+            : elementListeners(), ctx(this, elementStack) {}
         virtual void DispatchEvent(ParserState, ElementState) = 0;
     };
     class PolicyDispatcher;
