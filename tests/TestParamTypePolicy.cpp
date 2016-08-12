@@ -31,13 +31,10 @@ std::string StringToSrcML(std::string str){
 	return std::string(ch);
 }
 
-class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         ~TestParamType(){}
-        TestParamType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
-            InitializeEventHandlers();
-            parampolicy.AddListener(this);
-        }
+        TestParamType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             paramdata = *policy->Data<ParamTypePolicy::ParamData>();
             datatotest.push_back(paramdata);
@@ -90,16 +87,11 @@ class TestParamType : public srcSAXEventDispatch::EventListener, public srcSAXEv
 			assert(datatotest[4].namespaces.size() == 1);
 		}
     protected:
-        void * DataInner() const {
+        void * DataInner() const override {
             return (void*)0; //To silence the warning
         }
     private:
-		void InitializeEventHandlers(){
-    		using namespace srcSAXEventDispatch;
-        	openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-            	ctx.dispatcher->AddListener(&parampolicy);
-        	};
-		}
+
         ParamTypePolicy parampolicy;
         ParamTypePolicy::ParamData paramdata;
         std::vector<ParamTypePolicy::ParamData> datatotest;
@@ -111,7 +103,7 @@ int main(int argc, char** filename){
 
     TestParamType paramData;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<TestParamType> handler {&paramData};
+    srcSAXEventDispatch::srcSAXEventDispatcher<ParamTypePolicy> handler {&paramData};
     control.parse(&handler); //Start parsing
     paramData.RunTest();
 }

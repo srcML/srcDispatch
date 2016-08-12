@@ -31,13 +31,10 @@ std::string StringToSrcML(std::string str){
 	return std::string(ch);
 }
 
-class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class TestCalls : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         ~TestCalls(){}
-        TestCalls(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
-            InitializeEventHandlers();
-            callpolicy.AddListener(this);
-        }
+        TestCalls(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             calldata = *policy->Data<CallPolicy::CallData>();
             datatotest.push_back(calldata);
@@ -46,16 +43,10 @@ class TestCalls : public srcSAXEventDispatch::EventListener, public srcSAXEventD
 			assert(datatotest[0].fnName == "bin"); //TODO: Fix, figure out way to test.
 		}
     protected:
-        void * DataInner() const {
+        void * DataInner() const override {
             return (void*)0; //To silence the warning
         }
     private:
-		void InitializeEventHandlers(){
-    		using namespace srcSAXEventDispatch;
-        	openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
-            	ctx.dispatcher->AddListener(&callpolicy);
-        	};
-		}
         CallPolicy callpolicy;
         CallPolicy::CallData calldata;
         std::vector<CallPolicy::CallData> datatotest;
@@ -68,7 +59,7 @@ int main(int argc, char** filename){
 	
     TestCalls calldata;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<TestCalls> handler {&calldata};
+    srcSAXEventDispatch::srcSAXEventDispatcher<CallPolicy> handler {&calldata};
     control.parse(&handler); //Start parsing
     calldata.RunTest();
 }

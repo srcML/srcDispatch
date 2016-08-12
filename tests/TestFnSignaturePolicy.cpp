@@ -31,18 +31,16 @@ std::string StringToSrcML(std::string str){
     return std::string(ch);
 }
 
-class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         ~TestFunctionSignature(){}
-        TestFunctionSignature(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
-            InitializeEventHandlers();
-            fnpolicy.AddListener(this);
-        }
+        TestFunctionSignature(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             signaturedata = *policy->Data<FunctionSignaturePolicy::SignatureData>();
             datatotest.push_back(signaturedata);
         }
         void RunTest(){
+
             assert(datatotest.size() == 5);
             assert(datatotest[0].returnType == "void");
             assert(datatotest[0].functionName == "foo");
@@ -116,17 +114,10 @@ class TestFunctionSignature : public srcSAXEventDispatch::EventListener, public 
 
         }
     protected:
-        void * DataInner() const {
+        void * DataInner() const override {
             return (void*)0; //To silence the warning
         }
     private:
-        void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
-            openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx) {
-                ctx.dispatcher->AddListener(&fnpolicy);
-            };
-        }
-        FunctionSignaturePolicy fnpolicy;
         FunctionSignaturePolicy::SignatureData signaturedata;
         std::vector<FunctionSignaturePolicy::SignatureData> datatotest;
 };
@@ -141,7 +132,7 @@ int main(int argc, char** filename){
 
     TestFunctionSignature sigData;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<TestFunctionSignature> handler {&sigData};
+    srcSAXEventDispatch::srcSAXEventDispatcher<FunctionSignaturePolicy> handler {&sigData};
     control.parse(&handler); //Start parsing
     sigData.RunTest();
 }

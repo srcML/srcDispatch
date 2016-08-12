@@ -31,13 +31,10 @@ std::string StringToSrcML(std::string str){
 	return std::string(ch);
 }
 
-class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         ~TestDeclType(){}
-        TestDeclType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
-            InitializeEventHandlers();
-            declpolicy.AddListener(this);
-        }
+        TestDeclType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             decltypedata = *policy->Data<DeclTypePolicy::DeclTypeData>();
             datatotest.push_back(decltypedata);
@@ -90,16 +87,11 @@ class TestDeclType : public srcSAXEventDispatch::EventListener, public srcSAXEve
 			assert(datatotest[4].namespaces.size() == 2);
 		}
     protected:
-        void * DataInner() const {
+        void * DataInner() const override {
             return (void*)0; //To silence the warning
         }
     private:
-		void InitializeEventHandlers(){
-    		using namespace srcSAXEventDispatch;
-        	openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-            	ctx.dispatcher->AddListener(&declpolicy);
-        	};
-		}
+
         DeclTypePolicy declpolicy;
         DeclTypePolicy::DeclTypeData decltypedata;
         std::vector<DeclTypePolicy::DeclTypeData> datatotest;
@@ -111,7 +103,7 @@ int main(int argc, char** filename){
 
     TestDeclType decltypedata;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<TestDeclType> handler {&decltypedata};
+    srcSAXEventDispatch::srcSAXEventDispatcher<DeclTypePolicy> handler {&decltypedata};
     control.parse(&handler); //Start parsing
     decltypedata.RunTest();
 }
