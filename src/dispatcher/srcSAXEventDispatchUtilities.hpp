@@ -21,7 +21,7 @@ namespace srcSAXEventDispatch{
         ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
 
         // do not put anything after these
-        tokenstring, empty, MAXENUMVALUE = empty};
+        xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
     class srcSAXEventContext {
         public:
             srcSAXEventContext() = delete;
@@ -37,7 +37,8 @@ namespace srcSAXEventDispatch{
             std::vector<int> genericDepth;
             unsigned int currentLineNumber;
             std::vector<unsigned short int> triggerField;
-            std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision, currentToken;
+            std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
+                        currentTag, currentToken, currentAttributeName, currentAttributeValue;
             std::size_t depth;
             bool isOperator;
 

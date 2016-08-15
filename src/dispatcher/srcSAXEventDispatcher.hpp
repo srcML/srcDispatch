@@ -487,14 +487,19 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::macro, ElementState::close);
                     --ctx.triggerField[ParserState::macro];
                 } },
+                { "specifier", [this](){
+                    DispatchEvent(ParserState::specifier, ElementState::close);
+                    --ctx.triggerField[ParserState::specifier];
+                } },
+                { "xmlattribute", [this](){
+                    ctx.triggerField[ParserState::xmlattribute] = 1;
+                    DispatchEvent(ParserState::xmlattribute, ElementState::close);
+                    ctx.triggerField[ParserState::xmlattribute] = 0;
+                } },
                 { "tokenstring", [this](){
                     ctx.triggerField[ParserState::tokenstring] = 1;
                     DispatchEvent(ParserState::tokenstring, ElementState::close);
                     ctx.triggerField[ParserState::tokenstring] = 0;
-                } },
-                { "specifier", [this](){
-                    DispatchEvent(ParserState::specifier, ElementState::close);
-                    --ctx.triggerField[ParserState::specifier];
                 } }
             };            
         }
@@ -575,6 +580,8 @@ namespace srcSAXEventDispatch {
             }
             localName += localname;
 
+            ctx.currentTag = localName;
+
             if(localName == "pos:position"){
                 ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
             }
@@ -595,6 +602,20 @@ namespace srcSAXEventDispatch {
                 if (process != process_map.end()) {
                     process->second();
                 }
+            }
+
+            for(int pos = 0; pos < num_attributes; ++pos) {
+
+                ctx.currentAttributeName = "";
+                if(attributes[pos].prefix) {
+                    ctx.currentAttributeName += attributes[pos].prefix;
+                    ctx.currentAttributeName += ':';
+                }
+                ctx.currentAttributeName += attributes[pos].localname;
+                ctx.currentAttributeValue = attributes[pos].value;
+                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("xmlattribute");
+                process->second();                
+
             }
 
             ctx.isOperator = false;
@@ -631,6 +652,8 @@ namespace srcSAXEventDispatch {
                 localName += ':';
             }
             localName += localname;
+
+            ctx.currentTag = localName;
 
             std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localName);
             if (process2 != process_map2.end()) {
