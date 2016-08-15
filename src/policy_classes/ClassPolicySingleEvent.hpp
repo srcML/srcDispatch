@@ -28,6 +28,7 @@ public:
     struct ClassData {
 
         ClassType type;
+        std::string stereotype;
 
         NamePolicy::NameData * name;
 
@@ -144,6 +145,7 @@ private:
 
                 data.name = nullptr;
 
+                CollectXMLAttributeHandlers();
                 CollectNameHandlers();
                 CollectSuperHanders();
                 CollectBlockHanders();
@@ -174,6 +176,21 @@ private:
         closeEventMap[ParserState::classn] = endPolicy;
         openEventMap[ParserState::structn] = startPolicy;
         closeEventMap[ParserState::structn] = endPolicy;
+
+    }
+
+    void CollectXMLAttributeHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        closeEventMap[ParserState::xmlattribute] = [this](srcSAXEventContext& ctx) {
+
+            if(classDepth == ctx.depth && ctx.currentAttributeName == "stereotype") {
+
+                data.stereotype = ctx.currentAttributeValue;
+
+            }
+
+        };
 
     }
 

@@ -19,6 +19,7 @@ public:
     struct FunctionSignatureData {
 
         FunctionSignatureType type;
+        std::string stereotype;
 
         TypePolicy::TypeData * returnType;
         NamePolicy::NameData * name;
@@ -159,6 +160,7 @@ private:
                     data.type = DESTURCTOR;
                 }
 
+                CollectXMLAttributeHandlers();
                 CollectTypeHandlers();
                 CollectNameHandlers();
                 CollectParameterHandlers();
@@ -204,6 +206,21 @@ private:
 
             }
            
+        };
+
+    }
+
+    void CollectXMLAttributeHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        closeEventMap[ParserState::xmlattribute] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth == ctx.depth && ctx.currentAttributeName == "stereotype") {
+
+                data.stereotype = ctx.currentAttributeValue;
+
+            }
+
         };
 
     }
