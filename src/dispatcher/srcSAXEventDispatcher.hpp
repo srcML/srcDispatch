@@ -34,24 +34,31 @@
 #include <memory>
 namespace srcSAXEventDispatch {
 
-    template<typename policy, typename... remaining>
-    static std::list<EventListener*> CreateListenersImpl(PolicyListener * listener);
+    template<typename... policies>
+    static std::list<EventListener*> CreateListenersImpl(PolicyListener * policyListener, std::list<EventListener*> & listeners);
 
     template<typename... policies>
-    static std::list<EventListener*> CreateListeners(PolicyListener * listener) {
-        return CreateListenersImpl<policies...>(listener);
+    static std::list<EventListener*> CreateListeners(PolicyListener * policyListener) {
+        std::list<EventListener*> listeners;
+        return CreateListenersImpl<policies...>(policyListener, listeners);
     }
 
     template<typename policy, typename... remaining>
-    static std::list<EventListener*> CreateListenersImpl(PolicyListener * listener) {
-        std::list<EventListener*> listeners{new policy({listener})};
-        std::list<EventListener*> remaining_listeners = CreateListeners<remaining...>(listener);
-        listeners.insert(listeners.end(), remaining_listeners.begin(), remaining_listeners.end());
-        return listeners;
+    static std::list<EventListener*> CreateListenersHelper(PolicyListener * policyListener, std::list<EventListener*> & listeners);
+
+    template<typename... policies>
+    static std::list<EventListener*> CreateListenersImpl(PolicyListener * policyListener, std::list<EventListener*> & listeners) {
+        return CreateListenersHelper<policies...>(policyListener, listeners);
+    }
+
+    template<typename policy, typename... remaining>
+    static std::list<EventListener*> CreateListenersHelper(PolicyListener * policyListener, std::list<EventListener*> & listeners) {
+        listeners.emplace_back(new policy({policyListener}));
+        return CreateListenersImpl<remaining...>(policyListener, listeners);
     }
     template<>
-    std::list<EventListener*> CreateListeners<>(PolicyListener * listener) {
-        return std::list<EventListener*>();
+    std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener, std::list<EventListener*> & listeners) {
+        return listeners;
     }
 
     template <typename ...policies>
