@@ -44,7 +44,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             data.parameters.push_back(*paramdata);
         }
     protected:
-        void * DataInner() const {
+        void * DataInner() const override {
             return new SignatureData(data);
         }
     private:
