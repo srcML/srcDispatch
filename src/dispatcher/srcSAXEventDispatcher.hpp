@@ -94,6 +94,45 @@ namespace srcSAXEventDispatch {
 
         }
 
+        void AddEvent(const std::string & event) {
+
+            std::pair<std::string, std::function<void()>> openEvent(event, [this, event]() {
+                    ctx.currentTag = event; 
+                    ++ctx.triggerField[ParserState::userdefined];
+                    DispatchEvent(ParserState::userdefined, ElementState::open);
+                } );
+            process_map.insert(openEvent);
+
+            std::pair<std::string, std::function<void()>> closeEvent(event, [this, event]() {
+                    ctx.currentTag = event;
+                    DispatchEvent(ParserState::userdefined, ElementState::close);
+                    --ctx.triggerField[ParserState::userdefined];
+                } );
+
+            process_map2.insert(closeEvent);
+
+        }
+
+        void AddEvents(std::initializer_list<std::string> events) {
+
+            for(const std::string & event : events)
+                AddEvent(event);
+
+        }
+
+
+        void RemoveEvent(const std::string & event) {
+            process_map.erase(event);
+            process_map2.erase(event);
+        }
+
+        void RemoveEvents(std::initializer_list<std::string> events) {
+
+            for(const std::string & event : events)
+                RemoveEvent(event);
+
+        }
+
     public:
         ~srcSAXEventDispatcher() {
             for(std::size_t count = 0; count < numberAllocatedListeners; ++count) {
