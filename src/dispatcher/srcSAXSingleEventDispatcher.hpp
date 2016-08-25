@@ -1,7 +1,7 @@
-#include <srcSAXEventDispatcher.hpp>
-
 #ifndef INCLUDED_SRCSAX_SINGLE_EVENT_DISPATCHER_HPP
 #define INCLUDED_SRCSAX_SINGLE_EVENT_DISPATCHER_HPP
+
+#include <srcSAXEventDispatcher.hpp>
 
 namespace srcSAXEventDispatch {
     template <typename ...policies>
@@ -13,26 +13,26 @@ namespace srcSAXEventDispatch {
     public:
 
        srcSAXSingleEventDispatcher(PolicyListener * listener) : srcSAXEventDispatcher<policies...>(listener), dispatched(false) {}
-        void AddListener(EventListener * listener) override {
+        virtual void AddListener(EventListener * listener) override {
             EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.push_back(listener);
         }
-        void AddListenerDispatch(EventListener * listener) override {
+        virtual void AddListenerDispatch(EventListener * listener) override {
             AddListener(listener);
             dispatched = false;
         }
-        void AddListenerNoDispatch(EventListener * listener) override {
+        virtual void AddListenerNoDispatch(EventListener * listener) override {
             AddListener(listener);
         }
-        void RemoveListener(EventListener * listener) override {
+        virtual void RemoveListener(EventListener * listener) override {
             EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.pop_back();
         }
-        void RemoveListenerDispatch(EventListener * listener) override {
+        virtual void RemoveListenerDispatch(EventListener * listener) override {
             RemoveListener(listener);
             dispatched = false;
         }
-        void RemoveListenerNoDispatch(EventListener * listener) override {
+        virtual void RemoveListenerNoDispatch(EventListener * listener) override {
             RemoveListener(listener);
         }
     protected:

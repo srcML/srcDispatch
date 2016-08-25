@@ -94,7 +94,7 @@ namespace srcSAXEventDispatch {
 
         }
 
-        void AddEvent(const std::string & event) {
+        virtual void AddEvent(const std::string & event) {
 
             std::pair<std::string, std::function<void()>> openEvent(event, [this, event]() {
                     ctx.currentTag = event; 
@@ -113,20 +113,19 @@ namespace srcSAXEventDispatch {
 
         }
 
-        void AddEvents(std::initializer_list<std::string> events) {
+        virtual void AddEvents(std::initializer_list<std::string> events) {
 
             for(const std::string & event : events)
                 AddEvent(event);
 
         }
 
-
-        void RemoveEvent(const std::string & event) {
+        virtual void RemoveEvent(const std::string & event) {
             process_map.erase(event);
             process_map2.erase(event);
         }
 
-        void RemoveEvents(std::initializer_list<std::string> events) {
+        virtual void RemoveEvents(std::initializer_list<std::string> events) {
 
             for(const std::string & event : events)
                 RemoveEvent(event);
