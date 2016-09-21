@@ -30,6 +30,7 @@ public:
         ClassType type;
         std::string stereotype;
 
+        bool isGeneric;
         NamePolicy::NameData * name;
 
         std::vector<ParentData> parents;
@@ -147,6 +148,7 @@ private:
 
                 CollectXMLAttributeHandlers();
                 CollectNameHandlers();
+                CollectGenericHandlers();
                 CollectSuperHanders();
                 CollectBlockHanders();
 
@@ -214,6 +216,21 @@ private:
 
                 NopOpenEvents({ParserState::name});
                 NopCloseEvents({ParserState::name});
+
+            }
+
+        };
+
+    }
+
+    void CollectGenericHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        closeEventMap[ParserState::templates] = [this](srcSAXEventContext& ctx) {
+
+            if((classDepth + 1) == ctx.depth) {
+
+                data.isGeneric = true;
 
             }
 
