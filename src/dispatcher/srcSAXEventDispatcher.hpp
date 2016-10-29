@@ -361,6 +361,27 @@ namespace srcSAXEventDispatch {
                 { "specifier", [this](){
                     ++ctx.triggerField[ParserState::specifier];
                     DispatchEvent(ParserState::specifier, ElementState::open);
+                } },
+                { "noun", [this](){
+                    std::cerr<<"CALLNOUN"<<std::endl;
+                    ++ctx.triggerField[ParserState::snoun];
+                    DispatchEvent(ParserState::snoun, ElementState::open);
+                } },
+                { "propernoun", [this](){
+                    ++ctx.triggerField[ParserState::spropernoun];
+                    DispatchEvent(ParserState::spropernoun, ElementState::open);
+                } },
+                { "pronoun", [this](){
+                    ++ctx.triggerField[ParserState::spronoun];
+                    DispatchEvent(ParserState::spronoun, ElementState::open);
+                } },
+                { "adjective", [this](){
+                    ++ctx.triggerField[ParserState::sadjective];
+                    DispatchEvent(ParserState::sadjective, ElementState::open);
+                } },
+                { "verb", [this](){
+                    ++ctx.triggerField[ParserState::sverb];
+                    DispatchEvent(ParserState::sverb, ElementState::open);
                 } }
             };
             process_map2 = {
@@ -536,6 +557,28 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::specifier, ElementState::close);
                     --ctx.triggerField[ParserState::specifier];
                 } },
+                { "noun", [this](){
+                    std::cerr<<"End adj"<<std::endl;
+                    --ctx.triggerField[ParserState::snoun];
+                    DispatchEvent(ParserState::snoun, ElementState::close);
+                } },
+                { "propernoun", [this](){
+                    --ctx.triggerField[ParserState::spropernoun];
+                    DispatchEvent(ParserState::spropernoun, ElementState::close);
+                } },
+                { "pronoun", [this](){
+                    --ctx.triggerField[ParserState::spronoun];
+                    DispatchEvent(ParserState::spronoun, ElementState::close);
+                } },
+                { "adjective", [this](){
+                    std::cerr<<"End adj"<<std::endl;
+                    --ctx.triggerField[ParserState::sadjective];
+                    DispatchEvent(ParserState::sadjective, ElementState::close);
+                } },
+                { "verb", [this](){
+                    --ctx.triggerField[ParserState::sverb];
+                    DispatchEvent(ParserState::sverb, ElementState::close);
+                } },
                 { "xmlattribute", [this](){
                     ctx.triggerField[ParserState::xmlattribute] = 1;
                     DispatchEvent(ParserState::xmlattribute, ElementState::close);
@@ -643,6 +686,7 @@ namespace srcSAXEventDispatch {
             }
 
             if(localName != ""){
+                std::cerr<<"local: "<<localname<<std::endl;
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();

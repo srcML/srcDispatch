@@ -19,7 +19,7 @@ namespace srcSAXEventDispatch{
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
         ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
-        userdefined,
+        userdefined, snoun, spropernoun, spronoun, sadjective, sverb,
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
