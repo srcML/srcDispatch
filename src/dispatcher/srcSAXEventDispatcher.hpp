@@ -115,8 +115,9 @@ namespace srcSAXEventDispatch {
 
         virtual void AddEvents(std::initializer_list<std::string> events) {
 
-            for(const std::string & event : events)
+            for(const std::string & event : events){
                 AddEvent(event);
+            }
 
         }
 
@@ -127,8 +128,9 @@ namespace srcSAXEventDispatch {
 
         virtual void RemoveEvents(std::initializer_list<std::string> events) {
 
-            for(const std::string & event : events)
+            for(const std::string & event : events){
                 RemoveEvent(event);
+            }
 
         }
 
@@ -152,26 +154,30 @@ namespace srcSAXEventDispatch {
             elementListeners.push_back(listener);
         }
         void AddListenerDispatch(EventListener* listener) override {
-            if(dispatching)
+            if(dispatching){
                 listener->HandleEvent(currentPState, currentEState, ctx);
+            }
             AddListener(listener);
         }
         void AddListenerNoDispatch(EventListener* listener) override {
-            if(dispatching)
+            if(dispatching){
                 listener->SetDispatched(true);
+            }
             AddListener(listener);
         }
         void RemoveListener(EventListener* listener) override {
             elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
         }
         void RemoveListenerDispatch(EventListener* listener) override {
-            if(dispatching)
+            if(dispatching){
                 listener->HandleEvent(currentPState, currentEState, ctx);
+            }
             RemoveListener(listener);
         }
         void RemoveListenerNoDispatch(EventListener* listener) override {
-            if(dispatching)
+            if(dispatching){
                 listener->SetDispatched(true);
+            }
             RemoveListener(listener);
         }
         void InitializeHandlers(){
@@ -362,14 +368,13 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::specifier];
                     DispatchEvent(ParserState::specifier, ElementState::open);
                 } },
-                { "noun", [this](){
-                    std::cerr<<"CALLNOUN"<<std::endl;
+                { "noun", [this](){                    
                     ++ctx.triggerField[ParserState::snoun];
                     DispatchEvent(ParserState::snoun, ElementState::open);
                 } },
                 { "propernoun", [this](){
-                    ++ctx.triggerField[ParserState::spropernoun];
-                    DispatchEvent(ParserState::spropernoun, ElementState::open);
+                    ++ctx.triggerField[ParserState::propersnoun];
+                    DispatchEvent(ParserState::propersnoun, ElementState::open);
                 } },
                 { "pronoun", [this](){
                     ++ctx.triggerField[ParserState::spronoun];
@@ -558,20 +563,18 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::specifier];
                 } },
                 { "noun", [this](){
-                    std::cerr<<"End adj"<<std::endl;
                     --ctx.triggerField[ParserState::snoun];
                     DispatchEvent(ParserState::snoun, ElementState::close);
                 } },
                 { "propernoun", [this](){
-                    --ctx.triggerField[ParserState::spropernoun];
-                    DispatchEvent(ParserState::spropernoun, ElementState::close);
+                    --ctx.triggerField[ParserState::propersnoun];
+                    DispatchEvent(ParserState::propersnoun, ElementState::close);
                 } },
                 { "pronoun", [this](){
                     --ctx.triggerField[ParserState::spronoun];
                     DispatchEvent(ParserState::spronoun, ElementState::close);
                 } },
                 { "adjective", [this](){
-                    std::cerr<<"End adj"<<std::endl;
                     --ctx.triggerField[ParserState::sadjective];
                     DispatchEvent(ParserState::sadjective, ElementState::close);
                 } },
@@ -686,7 +689,7 @@ namespace srcSAXEventDispatch {
             }
 
             if(localName != ""){
-                std::cerr<<"local: "<<localname<<std::endl;
+                //std::cerr<<"local: "<<localname<<std::endl;
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();
@@ -744,7 +747,7 @@ namespace srcSAXEventDispatch {
 
             ctx.currentTag = localName;
 
-            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localName);
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localname);
             if (process2 != process_map2.end()) {
                 process2->second();
             }

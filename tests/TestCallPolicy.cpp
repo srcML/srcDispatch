@@ -59,7 +59,7 @@ int main(int argc, char** filename){
 	
     TestCalls calldata;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<CallPolicy> handler {&calldata};
+    srcSAXEventDispatch::srcSAXEventDispatcher<CallPolicy> handler{&calldata};
     control.parse(&handler); //Start parsing
     calldata.RunTest();
 }
