@@ -6,6 +6,7 @@
 #include <list>
 #include <initializer_list>
 #include <algorithm>
+#include <iostream>
 
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
@@ -31,7 +32,8 @@ namespace srcSAXEventDispatch{
                   elementStack(elementStack),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
-                  isOperator(false) {}
+                  isOperator(false),
+                  currentLineNumber{0} {}
 
             EventDispatcher * dispatcher;
             const std::vector<std::string> & elementStack;
@@ -312,7 +314,9 @@ namespace srcSAXEventDispatch{
         std::list<PolicyListener*> policyListeners;
         virtual void * DataInner() const = 0;
         virtual void NotifyAll(const srcSAXEventContext & ctx) {
+            std::cerr<<"Size: "<<policyListeners.size()<<std::endl;
             for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){
+               std::cerr<<"Listen man"<<std::endl;
                 (*listener)->Notify(this, ctx);
             }
 

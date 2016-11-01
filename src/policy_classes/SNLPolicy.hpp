@@ -28,35 +28,35 @@ class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::snoun] = [this](srcSAXEventContext& ctx){
-                std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
+                //std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
                 data.category = "snoun";
                 NotifyAll(ctx);
                 data.identifiername.clear();
             };
 
             closeEventMap[ParserState::propersnoun] = [this](srcSAXEventContext& ctx){
-                std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
+                //std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
                 data.category = "propersnoun";
                 NotifyAll(ctx);
                 data.identifiername.clear();
             };
 
             closeEventMap[ParserState::spronoun] = [this](srcSAXEventContext& ctx){
-                std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
+                //std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
                 data.category = "spronoun";
                 NotifyAll(ctx);
                 data.identifiername.clear();
             };
 
             closeEventMap[ParserState::sadjective] = [this](srcSAXEventContext& ctx){
-                std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
+                //std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
                 data.category = "sadjective";
                 NotifyAll(ctx);
                 data.identifiername.clear();
             };
 
             closeEventMap[ParserState::sverb] = [this](srcSAXEventContext& ctx){
-                std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
+                //std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
                 data.category = "sverb";
                 NotifyAll(ctx);
                 data.identifiername.clear();
@@ -69,7 +69,7 @@ class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 }
             };
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
-                NotifyAll(ctx);
+                //NotifyAll(ctx);
                 data.clear();
             };
 
