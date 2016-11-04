@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <srcSAXHandler.hpp>
-#include <ExprStmtPolicy.hpp>
+#include <ExprPolicy.hpp>
 #include <cassert>
 #include <srcml.h>
 std::string StringToSrcML(std::string str){

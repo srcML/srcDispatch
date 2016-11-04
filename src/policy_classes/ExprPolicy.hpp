@@ -39,12 +39,11 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     if(it != dataset.end()){
                         it->second.use.erase(currentLine.back());
                         it->second.def.insert(currentLine.back());
-                        currentLine.pop_back();
                     }else{
                         std::cerr<<"No such thing as: "<<currentExprName<<std::endl;
                     }
                     seenAssignment = true;
-                    std::cerr<<"Back: "<<currentLine.back()<<std::endl;
+                    //std::cerr<<"Back: "<<currentLine.back()<<std::endl;
                 }
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
@@ -52,7 +51,10 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             };
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
-                if(ctx.And({ParserState::exprstmt})){
+                if(currentLine.empty() || currentLine.back() != ctx.currentLineNumber){
+                    currentLine.push_back(ctx.currentLineNumber);
+                }
+                if(ctx.IsOpen({ParserState::exprstmt})){
                     auto it = dataset.find(currentExprName);
                     if(it != dataset.end()){
                         it->second.use.insert(currentLine.back()); //assume it's a use
@@ -68,7 +70,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken == " ")){
                     if(ctx.IsOpen(ParserState::exprstmt)){
-                        currentLine.push_back(ctx.currentLineNumber);
+
                     }
                     if(ctx.And({ParserState::name, ParserState::expr, ParserState::exprstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::op})){
                         currentExprName = ctx.currentToken;
@@ -96,6 +98,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     }
                     std::cerr<<"}"<<std::endl;
                 }
+                currentLine.pop_back();
                 seenAssignment = false;
                 currentLine.clear();
                 data.clear();
