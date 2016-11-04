@@ -66,8 +66,10 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
 
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
-                if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
-                    currentLine.push_back(ctx.currentLineNumber);
+                if(!(ctx.currentToken.empty() || ctx.currentToken == " ")){
+                    if(ctx.IsOpen(ParserState::exprstmt)){
+                        currentLine.push_back(ctx.currentLineNumber);
+                    }
                     if(ctx.And({ParserState::name, ParserState::expr, ParserState::exprstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::op})){
                         currentExprName = ctx.currentToken;
                     }
