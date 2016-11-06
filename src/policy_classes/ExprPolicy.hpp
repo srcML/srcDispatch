@@ -15,6 +15,15 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             std::set<unsigned int> def;
             std::set<unsigned int> use; //could be used multiple times in same expr
         };
+        struct ExprDataSet{
+           ExprDataSet(std::map<std::string, ExprData> dat){
+            dataset = dat;
+           }
+           void clear(){
+            dataset.clear();
+           }
+           std::map<std::string, ExprData> dataset;
+        };
         std::map<std::string, ExprData> dataset;
         ~ExprPolicy(){}
         ExprPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
@@ -24,7 +33,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
-            return new ExprData(data);
+            return new ExprDataSet(dataset);
         }
     private:
         ExprData data;
@@ -43,7 +52,6 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                         std::cerr<<"No such thing as: "<<currentExprName<<std::endl;
                     }
                     seenAssignment = true;
-                    //std::cerr<<"Back: "<<currentLine.back()<<std::endl;
                 }
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
@@ -85,22 +93,10 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             };
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);
-                for(auto deal : dataset){
-                    std::cerr<<deal.second.nameofidentifier<<std::endl;
-                    std::cerr<<"def { ";
-                    for(auto num : deal.second.def){
-                        std::cerr<<num<<",";
-                    }
-                    std::cerr<<"}"<<std::endl;
-                    std::cerr<<"use { ";
-                    for(auto num : deal.second.use){
-                        std::cerr<<num<<",";
-                    }
-                    std::cerr<<"}"<<std::endl;
-                }
                 currentLine.pop_back();
                 seenAssignment = false;
                 currentLine.clear();
+                dataset.clear();
                 data.clear();
             };
 
