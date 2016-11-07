@@ -16,6 +16,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             std::set<unsigned int> use; //could be used multiple times in same expr
         };
         struct ExprDataSet{
+           ExprDataSet() = default;
            ExprDataSet(std::map<std::string, ExprData> dat){
             dataset = dat;
            }

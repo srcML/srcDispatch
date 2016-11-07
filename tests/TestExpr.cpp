@@ -36,7 +36,7 @@ class TestExpr : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEven
         ~TestExpr(){}
         TestExpr(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            exprdata = *policy->Data<ExprPolicy::ExprData>();
+            exprdata = *policy->Data<ExprPolicy::ExprDataSet>();
             datatotest.push_back(exprdata);
         }
 		void RunTest(){
@@ -47,8 +47,8 @@ class TestExpr : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEven
             return (void*)0; //To silence the warning
         }
     private:
-        ExprPolicy::ExprData exprdata;
-        std::vector<ExprPolicy::ExprData> datatotest;
+        ExprPolicy::ExprDataSet exprdata;
+        std::vector<ExprPolicy::ExprDataSet> datatotest;
 };
 
 int main(int argc, char** filename){

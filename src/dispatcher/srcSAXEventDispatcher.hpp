@@ -387,6 +387,10 @@ namespace srcSAXEventDispatch {
                 { "verb", [this](){
                     ++ctx.triggerField[ParserState::sverb];
                     DispatchEvent(ParserState::sverb, ElementState::open);
+                } },
+                { "stereotype", [this](){
+                    ++ctx.triggerField[ParserState::stereotype];
+                    DispatchEvent(ParserState::stereotype, ElementState::open);
                 } }
             };
             process_map2 = {
@@ -581,6 +585,10 @@ namespace srcSAXEventDispatch {
                 { "verb", [this](){
                     --ctx.triggerField[ParserState::sverb];
                     DispatchEvent(ParserState::sverb, ElementState::close);
+                } },
+                { "stereotype", [this](){
+                    DispatchEvent(ParserState::stereotype, ElementState::close);
+                    --ctx.triggerField[ParserState::stereotype];
                 } },
                 { "xmlattribute", [this](){
                     ctx.triggerField[ParserState::xmlattribute] = 1;
