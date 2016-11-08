@@ -52,16 +52,16 @@ class TestSNLPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
         ~TestSNLPolicy(){}
         TestSNLPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            ///sourcenlpdata = *policy->Data<NLContextPolicy::NLContextData>();
-            //std::cerr<<"Output: "<<sourcenlpdata.identifiername<<" "<<sourcenlpdata.category<<std::endl;
-            //datatotest.push_back(NLContextData);
+            sourcenlpdata = *policy->Data<NLContextPolicy::NLContextData>();
+            for(auto data : sourcenlpdata.nlsetmap){
+            	std::cerr<<data.first<<" "<<data.second.category<<" "<<data.second.context<<" "<<data.second.stereotype<<std::endl;
+            }
         }
     protected:
         void * DataInner() const override {
             return (void*)0; //To silence the warning
         }
     private:
-
         NLContextPolicy::NLContextData sourcenlpdata;
 };
 

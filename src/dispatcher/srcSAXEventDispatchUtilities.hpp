@@ -20,7 +20,7 @@ namespace srcSAXEventDispatch{
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
         ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
-        userdefined, snoun, propersnoun, spronoun, sadjective, sverb, stereotype,
+        userdefined, snoun, propersnoun, spronoun, sadjective, sverb, stereotype, archive, unit,
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
@@ -33,6 +33,7 @@ namespace srcSAXEventDispatch{
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
                   isOperator(false),
+                  endArchive(false),
                   currentLineNumber{0} {}
 
             EventDispatcher * dispatcher;
@@ -43,7 +44,7 @@ namespace srcSAXEventDispatch{
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
                         currentTag, currentToken, currentAttributeName, currentAttributeValue;
             std::size_t depth;
-            bool isOperator;
+            bool isOperator, endArchive;
 
         public:
             inline bool And(std::vector<ParserState> vec) const{
@@ -218,6 +219,7 @@ namespace srcSAXEventDispatch{
                     ParserState::spronoun,
                     ParserState::sverb,
                     ParserState::stereotype,
+                    ParserState::archive,
                 });
 
                 NopCloseEvents({
@@ -265,6 +267,7 @@ namespace srcSAXEventDispatch{
                     ParserState::spronoun,
                     ParserState::sverb,
                     ParserState::stereotype,
+                    ParserState::archive,
                 });
 
         }

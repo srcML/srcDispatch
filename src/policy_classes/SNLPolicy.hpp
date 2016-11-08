@@ -68,7 +68,7 @@ class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     data.identifiername.append(ctx.currentToken);
                 }
             };
-            closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx){
+            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
                 //NotifyAll(ctx);
                 data.clear();
             };

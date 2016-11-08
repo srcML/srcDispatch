@@ -391,7 +391,15 @@ namespace srcSAXEventDispatch {
                 { "stereotype", [this](){
                     ++ctx.triggerField[ParserState::stereotype];
                     DispatchEvent(ParserState::stereotype, ElementState::open);
-                } }
+                } },
+                { "unit", [this](){
+                    if(ctx.triggerField[ParserState::unit] == 0){
+                        ctx.triggerField[ParserState::archive] = 1;
+                        DispatchEvent(ParserState::archive, ElementState::open);
+                    }
+                    ++ctx.triggerField[ParserState::unit];
+                    DispatchEvent(ParserState::unit, ElementState::open);
+                } },
             };
             process_map2 = {
                 {"decl_stmt", [this](){
@@ -590,6 +598,14 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::stereotype, ElementState::close);
                     --ctx.triggerField[ParserState::stereotype];
                 } },
+                { "unit", [this](){
+                    --ctx.triggerField[ParserState::unit];
+                    DispatchEvent(ParserState::unit, ElementState::close);
+                    if(ctx.triggerField[ParserState::unit] == 0){
+                        ctx.triggerField[ParserState::archive] = 0;
+                        DispatchEvent(ParserState::archive, ElementState::close);
+                    }
+                } },
                 { "xmlattribute", [this](){
                     ctx.triggerField[ParserState::xmlattribute] = 1;
                     DispatchEvent(ParserState::xmlattribute, ElementState::close);
@@ -626,7 +642,10 @@ namespace srcSAXEventDispatch {
         virtual void startRoot(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
-            
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
+            if (process != process_map.end()) {
+                process->second();
+            }          
         }
         /**
         * startUnit
@@ -646,6 +665,12 @@ namespace srcSAXEventDispatch {
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
+            
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
+            if (process != process_map.end()) {
+                process->second();
+            }
+
             if(num_attributes >= 3){
                 ctx.currentFilePath = std::string(attributes[2].value);
                 ctx.currentFileLanguage = std::string(attributes[1].value);
@@ -738,10 +763,16 @@ namespace srcSAXEventDispatch {
     
         // end elements may need to be used if you want to collect only on per file basis or some other granularity.
         virtual void endRoot(const char * localname, const char * prefix, const char * URI) override {
-    
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find("unit");
+            if (process2 != process_map2.end()) {
+                process2->second();
+            }
         }
         virtual void endUnit(const char * localname, const char * prefix, const char * URI) override {
-    
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find("unit");
+            if (process2 != process_map2.end()) {
+                process2->second();
+            }
         }
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {

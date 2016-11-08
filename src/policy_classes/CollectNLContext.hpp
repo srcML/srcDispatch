@@ -7,6 +7,18 @@
 #include <stack>
 class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
+        struct NLSet{
+            NLSet(std::string idname, std::string acategory, std::string acontext, std::string astereo){
+                name = idname;
+                category = acategory;
+                context = acontext;
+                stereotype = astereo;
+            }
+            std::string category;
+            std::string name;
+            std::string context;
+            std::string stereotype;
+        };
         struct NLContextData{
             NLContextData(){}
             void clear(){
@@ -15,8 +27,9 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             }
             std::string category;
             std::string identifiername;
-            std::map<std::string, std::string> identifierposmap;
+            std::map<std::string, NLSet> nlsetmap;
         };
+        std::map<std::string, std::string> identifierposmap;
         NLContextData data;
         ~NLContextPolicy(){}
         NLContextPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
@@ -33,11 +46,13 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                 if(!context.empty()){
                     top = context.top();
                 }
-                auto it = data.identifierposmap.find(sourcenlpdata.identifiername);
-                if(it == data.identifierposmap.end()){
-                    data.identifierposmap.insert(std::make_pair(sourcenlpdata.identifiername, sourcenlpdata.category));
+                auto it = identifierposmap.find(sourcenlpdata.identifiername);
+                if(it == identifierposmap.end()){
+                    identifierposmap.insert(std::make_pair(sourcenlpdata.identifiername, sourcenlpdata.category));
                 }else{
-                    it->second = "multiple";
+                    if(it->second != sourcenlpdata.category){   
+                        it->second = "multiple";
+                    }
                 }
                 //std::cerr<<"Def: "<<sourcenlpdata.identifiername<<std::endl;
             }else if(ctx.IsOpen(ParserState::exprstmt) && ctx.IsClosed(ParserState::declstmt)){
@@ -55,31 +70,18 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                     stereo = "none";
                 }
                 for(auto deal : exprdata.dataset){
-                    auto it = data.identifierposmap.find(deal.second.nameofidentifier);
-                    if(it != data.identifierposmap.end()){
+                    auto it = identifierposmap.find(deal.second.nameofidentifier);
+                    if(it != identifierposmap.end()){
                         std::string categorystr;
                         if(it->second.empty()){
                             categorystr = "none";
                         }else{
                             categorystr = it->second;
                         }
-                        std::cerr<<deal.second.nameofidentifier<<","<<categorystr<<","<<top<<","<<stereo<<std::endl;
+                        NLSet nlset = NLSet(deal.second.nameofidentifier,categorystr,top,stereo);
+                        data.nlsetmap.insert(std::make_pair(deal.second.nameofidentifier, nlset));
                     }
-
-                }/*
-                for(auto deal : exprdata.dataset){
-                    std::cerr<<deal.second.nameofidentifier<<std::endl;
-                    std::cerr<<"def { ";
-                    for(auto num : deal.second.def){
-                        std::cerr<<num<<",";
-                    }
-                    std::cerr<<"}"<<std::endl;
-                    std::cerr<<"use { ";
-                    for(auto num : deal.second.use){
-                        std::cerr<<num<<",";
-                    }
-                    std::cerr<<"}"<<std::endl;
-                }*/
+                }
             }
             if(ctx.IsOpen(ParserState::stereotype)){
                 stereotype = *policy->Data<StereotypePolicy::StereotypeData>();
@@ -131,11 +133,11 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             };
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
                 ctx.dispatcher->RemoveListenerDispatch(&sourcenlpolicy);
-                data.clear();
+                ///data.clear();
             };
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
                 ctx.dispatcher->RemoveListenerDispatch(&exprpolicy);
-                data.clear();
+                //data.clear();
             };
             closeEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx){
                 context.pop();
@@ -145,6 +147,9 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             };
             closeEventMap[ParserState::ifstmt] = [this](srcSAXEventContext& ctx){
                 context.pop();
+            };
+            closeEventMap[ParserState::archive] = [this](srcSAXEventContext& ctx){
+                NotifyAll(ctx);
             };
 
         }
