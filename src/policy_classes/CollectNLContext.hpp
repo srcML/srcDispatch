@@ -27,7 +27,7 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             }
             std::string category;
             std::string identifiername;
-            std::map<std::string, NLSet> nlsetmap;
+            std::list<NLSet> nlsetmap;
         };
         std::map<std::string, std::string> identifierposmap;
         NLContextData data;
@@ -79,7 +79,7 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                             categorystr = it->second;
                         }
                         NLSet nlset = NLSet(deal.second.nameofidentifier,categorystr,top,stereo);
-                        data.nlsetmap.insert(std::make_pair(deal.second.nameofidentifier, nlset));
+                        data.nlsetmap.push_back(nlset);
                     }
                 }
             }

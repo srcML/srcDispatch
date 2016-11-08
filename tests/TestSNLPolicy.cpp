@@ -54,7 +54,7 @@ class TestSNLPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             sourcenlpdata = *policy->Data<NLContextPolicy::NLContextData>();
             for(auto data : sourcenlpdata.nlsetmap){
-            	std::cerr<<data.first<<" "<<data.second.category<<" "<<data.second.context<<" "<<data.second.stereotype<<std::endl;
+            	std::cerr<<data.name<<","<<data.stereotype<<","<<data.context<<","<<data.category<<std::endl;
             }
         }
     protected:
