@@ -1,3 +1,6 @@
+#ifndef DECLTYPEPOLICY
+#define DECLTYPEPOLICY
+
 #include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
@@ -104,3 +107,5 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
 
         }
 };
+
+#endif

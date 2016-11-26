@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <srcSAXHandler.hpp>
 #include <ExprPolicy.hpp>
+#include <DeclTypePolicy.hpp>
 #include <cassert>
 #include <srcml.h>
 std::string StringToSrcML(std::string str){
@@ -57,7 +58,7 @@ int main(int argc, char** filename){
 	std::cerr<<srcmlstr<<std::endl;
     TestExpr exprdata;
     srcSAXController control(srcmlstr);
-    srcSAXEventDispatch::srcSAXEventDispatcher<ExprPolicy> handler {&exprdata};
+    srcSAXEventDispatch::srcSAXEventDispatcher<ExprPolicy, DeclTypePolicy> handler {&exprdata};
     control.parse(&handler); //Start parsing
     exprdata.RunTest();
 }
