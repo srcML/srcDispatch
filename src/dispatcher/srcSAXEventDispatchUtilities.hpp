@@ -6,6 +6,7 @@
 #include <list>
 #include <initializer_list>
 #include <algorithm>
+#include <iostream>
 
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
@@ -19,7 +20,7 @@ namespace srcSAXEventDispatch{
         argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
         ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
-        userdefined,
+        userdefined, snoun, propersnoun, spronoun, sadjective, sverb, stereotype, archive, unit,
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
@@ -31,7 +32,9 @@ namespace srcSAXEventDispatch{
                   elementStack(elementStack),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
-                  isOperator(false) {}
+                  isOperator(false),
+                  endArchive(false),
+                  currentLineNumber{0} {}
 
             EventDispatcher * dispatcher;
             const std::vector<std::string> & elementStack;
@@ -41,7 +44,7 @@ namespace srcSAXEventDispatch{
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
                         currentTag, currentToken, currentAttributeName, currentAttributeValue;
             std::size_t depth;
-            bool isOperator;
+            bool isOperator, endArchive;
 
         public:
             inline bool And(std::vector<ParserState> vec) const{
@@ -210,6 +213,13 @@ namespace srcSAXEventDispatch{
                     ParserState::name,
                     ParserState::macro,
                     ParserState::specifier,
+                    ParserState::snoun,
+                    ParserState::propersnoun,
+                    ParserState::sadjective,
+                    ParserState::spronoun,
+                    ParserState::sverb,
+                    ParserState::stereotype,
+                    ParserState::archive,
                 });
 
                 NopCloseEvents({
@@ -251,6 +261,13 @@ namespace srcSAXEventDispatch{
                     ParserState::macro,
                     ParserState::tokenstring,
                     ParserState::specifier,
+                    ParserState::snoun,
+                    ParserState::propersnoun,
+                    ParserState::sadjective,
+                    ParserState::spronoun,
+                    ParserState::sverb,
+                    ParserState::stereotype,
+                    ParserState::archive,
                 });
 
         }
