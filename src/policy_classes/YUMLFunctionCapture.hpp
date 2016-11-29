@@ -1,156 +1,344 @@
-#include <srcSAXEventDispatcher.hpp>
-#include <srcSAXHandler.hpp>
-#include <exceptio\vector>
-#include <ParamTypePolicy.hpp>
-class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
-    public:
+#include <srcSAXEventDispatchUtilities.hpp>
 
+#include <TypePolicySingleEvent.hpp>
+#include <NamePolicySingleEvent.hpp>
+#include <ParamTypePolicySingleEvent.hpp>
 
-        struct SignatureData{
-            SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, hasAliasedReturn{false} {}
-            int linenumber;
-            std::string returnType;
-            std::string functionName;
-            std::string returnTypeModifier;
-            std::vector<std::string> functionNamespaces;
-            std::vector<std::string> returnTypeNamespaces;
-            std::vector<ParamTypePolicy::ParamData> parameters;
-            std::vector<DeclTypePolicy::DeclTypeData> relations;
-            bool isConst;
-            bool isMethod;
-            bool isStatic;
-            bool pointerToConstReturn;
-            bool constPointerReturn;
-            bool hasAliasedReturn;
-            void clear(){
-                returnType.clear();
-                functionName.clear();
-                parameters.clear();
-                relations.clear();
-                returnTypeModifier.clear();
-                isConst = false;
-                isMethod = false;
-                isStatic = false;
-                pointerToConstReturn = false;
-                constPointerReturn = false;
-                hasAliasedReturn = false;
+#include <string>
+#include <vector>
+
+#ifndef INCLUDED_FUNCTION_SIGNATURE_POLICY_SINGE_EVENT_HPP
+#define INCLUDED_FUNCTION_SIGNATURE_POLICY_SINGE_EVENT_HPP
+
+class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+
+public:
+
+    enum FunctionSignatureType { CONSTRUCTOR, DESTURCTOR, OPERATOR, FUNCTION };
+
+    struct FunctionSignatureData {
+
+        FunctionSignatureType type;
+        std::string stereotype;
+
+        TypePolicy::TypeData * returnType;
+        NamePolicy::NameData * name;
+
+        std::vector<ParamTypePolicy::ParamTypeData *> parameters;
+        std::vector<DeclTypePolicy::DeclTypeData *> relations;
+
+        bool isVirtual;
+        bool isPureVirtual;
+        bool isConst;
+        bool isStatic;
+        bool isInline;
+        bool isFinal;
+        bool isOverride;
+        bool isConstExpr;
+        bool isDelete;
+
+        std::string ToString() const {
+
+            std::string signature = name->ToString();
+            signature += '(';
+            for(std::size_t pos = 0; pos < parameters.size(); ++pos) {
+                if(pos > 0)
+                    signature += ", ";
+                signature += parameters[pos]->type->ToString();
             }
+            signature += ')';
+            if(isConst)
+                signature += " const";
+
+            return signature;
+
+        }
+
+        friend std::ostream & operator<<(std::ostream & out, const FunctionSignatureData & functionData) {
+
+            out << *functionData.returnType << ' ' << *functionData.name;
+
+            out << '(';
+
+            for(std::size_t pos = 0; pos < functionData.parameters.size(); ++pos) {
+
+                if(pos != 0)
+                    out << ", ";
+
+                out << *functionData.parameters[pos];
+
+            }
+
+            out << ')';
+
+            return out;
+
+        }
+
+    };
+
+private:
+
+    FunctionSignatureData data;
+    std::size_t functionDepth;
+
+    TypePolicy * typePolicy;
+    NamePolicy * namePolicy;
+    ParamTypePolicy * paramPolicy;
+    DeclTypePolicy * declPolicy;
+
+public:
+
+    FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+          data{},
+          functionDepth(0),
+          typePolicy(nullptr),
+          namePolicy(nullptr),
+          paramPolicy(nullptr),
+          declPolicy(nullptr) 
+          { 
+    
+        InitializeFunctionSignaturePolicyHandlers();
+
+    }
+
+    ~FunctionSignaturePolicy() {
+
+        if(typePolicy)  delete typePolicy;
+        if(namePolicy)  delete namePolicy;
+        if(paramPolicy) delete paramPolicy;
+
+    }
+
+protected:
+    void * DataInner() const override {
+
+        return new FunctionSignatureData(data);
+
+    }
+    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+
+        if(typeid(TypePolicy) == typeid(*policy)) {
+
+            data.returnType = policy->Data<TypePolicy::TypeData>();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        } else if(typeid(NamePolicy) == typeid(*policy)) {
+
+            data.name = policy->Data<NamePolicy::NameData>(); 
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        } else if(typeid(ParamTypePolicy) == typeid(*policy)) {
+
+            data.parameters.push_back(policy->Data<ParamTypePolicy::ParamTypeData>()); 
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        } else if(typeid(DeclTypePolicy) == typeid(*policy)) {
+
+            data.relations.push_back(policy->Data<DeclTypePolicy::DeclTypeData>());
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        }
+    }
+
+private:
+
+    void InitializeFunctionSignaturePolicyHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        // start of policy
+        std::function<void (srcSAXEventContext& ctx)> functionStart = [this](srcSAXEventContext& ctx) {
+
+            if(!functionDepth) {
+
+                functionDepth = ctx.depth;
+                data = FunctionSignatureData{};
+
+                if(ctx.elementStack.back() == "function" || ctx.elementStack.back() == "function_decl") {
+
+                    if(ctx.isOperator)
+                        data.type = OPERATOR;
+                    else
+                        data.type = FUNCTION;
+
+                } else if(ctx.elementStack.back() == "constructor" || ctx.elementStack.back() == "constructor_decl") {
+                    data.type = CONSTRUCTOR;
+                } else if(ctx.elementStack.back() == "destructor" || ctx.elementStack.back() == "destructor_decl") {
+                    data.type = DESTURCTOR;
+                }
+
+                CollectXMLAttributeHandlers();
+                CollectTypeHandlers();
+                CollectNameHandlers();
+                CollectParameterHandlers();
+                CollectOtherHandlers();
+
+            }
+
         };
 
+        // end of policy
+        std::function<void (srcSAXEventContext& ctx)> functionEnd = [this](srcSAXEventContext& ctx) {
 
-        ~FunctionSignaturePolicy(){}
+            if(functionDepth && functionDepth == ctx.depth) {
 
-
-        FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
-            currentArgPosition = 1;
-            declpolicy.AddListener(this);
-            parampolicy.AddListener(this);
-
-            InitializeEventHandlers();
-        }
-
-
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            paramdata = policy->Data<ParamTypePolicy::ParamData>();
-            data.parameters.push_back(*paramdata);
-            decldata = policy->Data<DeclTypePolicy::DeclTypeData>();
-            data.relations.push_back(*decldata);
-        }
-
-
-    protected:
-        void * DataInner() const override {
-            return new SignatureData(data);
-        }
-
-
-    private:
-        bool seenModifier;
-        ParamTypePolicy parampolicy;
-        ParamTypePolicy::ParamData* paramdata;
-        DeclTypePolicy declpolicy;
-        DeclTypePolicy::DeclTypeData* decldata;
-        SignatureData data;
-        size_t currentArgPosition;       
-        std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
-
-        void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
-
-            
-            openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-                data.linenumber = ctx.currentLineNumber;
-                ctx.dispatcher->AddListener(&parampolicy);
-            };
-
-
-            openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
-                if(ctx.And({ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
-                    data.returnTypeNamespaces.push_back(ctx.currentToken);
-                }
-                if(ctx.IsOpen(ParserState::function) && ctx.Nor({ParserState::type, ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
-                    data.functionNamespaces.push_back(ctx.currentToken);
-                }
-            };
-
-
-            openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
-                if(ctx.IsOpen(ParserState::classn)){
-                    data.isMethod = true;
-                }
+                functionDepth = 0;
+ 
                 NotifyAll(ctx);
-                seenModifier = false;
-                data.clear();
-            };
+                InitializeFunctionSignaturePolicyHandlers();
+
+            }
+           
+        };
+
+        openEventMap[ParserState::function] = functionStart;
+        openEventMap[ParserState::functiondecl] = functionStart;
+        openEventMap[ParserState::constructor] = functionStart;
+        openEventMap[ParserState::constructordecl] = functionStart;
+        openEventMap[ParserState::destructor] = functionStart;
+        openEventMap[ParserState::destructordecl] = functionStart;
+
+        closeEventMap[ParserState::functiondecl] = functionEnd;
+        closeEventMap[ParserState::constructordecl] = functionEnd;
+        closeEventMap[ParserState::destructordecl] = functionEnd;
+
+        openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                functionDepth = 0;
+ 
+                NotifyAll(ctx);
+                InitializeFunctionSignaturePolicyHandlers();
+
+            }
+           
+        };
+
+    }
+
+    void CollectXMLAttributeHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        closeEventMap[ParserState::xmlattribute] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth == ctx.depth && ctx.currentAttributeName == "stereotype") {
+
+                data.stereotype = ctx.currentAttributeValue;
+
+            }
+
+        };
+
+    }
+
+    void CollectTypeHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                if(!typePolicy) typePolicy = new TypePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(typePolicy);
+
+            }
+
+        };
+
+    }
+
+    void CollectNameHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                if(!namePolicy) namePolicy = new NamePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(namePolicy);
+
+            }
+
+        };
+
+    }
 
 
-            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
-                if(currentModifier == "*") {
-                    if(ctx.And({ParserState::type, ParserState::function}) && ctx.IsClosed(ParserState::parameterlist)){
-                        seenModifier = true;
-                        data.hasAliasedReturn = true;
+    void CollectParameterHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
+
+                    if(functionDepth && (functionDepth + 2) == ctx.depth) {
+
+                        if(!paramPolicy) paramPolicy = new ParamTypePolicy{this};
+                        ctx.dispatcher->AddListenerDispatch(paramPolicy);
+
                     }
-                }
-                else if(currentModifier == "&") {}
-            };
+
+                };
+
+            }
+
+        };
+
+        closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                NopOpenEvents({ParserState::parameter});
+
+            }
+
+        };
+
+    }
 
 
-            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
-                if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
-                    data.functionName = ctx.currentToken;
+    void CollectOtherHandlers() {
+        using namespace srcSAXEventDispatch;
+
+        closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+
+             if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                if(ctx.And({ParserState::specifier})) {
+
+                    if(ctx.currentToken == "virtual")
+                        data.isVirtual = true;
+                    else if(ctx.currentToken == "static")
+                        data.isStatic = true;
+                    else if(ctx.currentToken == "const")
+                        data.isConst = true;
+                    else if(ctx.currentToken == "final")
+                        data.isFinal = true;
+                    else if(ctx.currentToken == "override")
+                        data.isOverride = true;
+                    else if(ctx.currentToken == "delete")
+                        data.isDelete = true;
+                    else if(ctx.currentToken == "inline")
+                        data.isInline = true;
+                    else if(ctx.currentToken == "constexpr")
+                        data.isConstExpr = true;
+
+                } else if(ctx.And({ParserState::literal})) {
+
+                    data.isPureVirtual = true;
+
                 }
-                if(ctx.And({ParserState::name, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::parameterlist, ParserState::genericargumentlist})){
-                    data.returnType = ctx.currentToken;
-                }
-                if(ctx.And({ParserState::modifier, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::genericargumentlist})){
-                    data.returnTypeModifier = ctx.currentToken;
-                }
-                if(ctx.And({ParserState::specifier, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::genericargumentlist})){
-                    currentSpecifier = ctx.currentToken;
-                }
-                if(ctx.And({ParserState::modifier, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::genericargumentlist})){
-                    currentModifier = ctx.currentToken;
-                }
-            };
-            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
-                if(currentSpecifier == "const" && ctx.Nor({ParserState::parameterlist, ParserState::type})){
-                    data.isConst = true;
-                }
-                if(currentSpecifier == "const" && ctx.IsOpen(ParserState::function) && ctx.IsOpen(ParserState::type)){
-                    if(!seenModifier){
-                        data.pointerToConstReturn = true;
-                    }else{
-                        data.constPointerReturn = true;
-                    }
-                }
-                if(currentSpecifier == "static" && ctx.Nor({ParserState::parameterlist, ParserState::type})){
-                    data.isStatic = true;
-                }
-                currentSpecifier.clear();
-            };
-            closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-                ctx.dispatcher->RemoveListener(&parampolicy);
-            };
-        }
+
+             }
+
+        };
+
+    }
 
 };
+
+#endif
