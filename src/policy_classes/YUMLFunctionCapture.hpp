@@ -108,6 +108,7 @@ public:
         if(typePolicy)  delete typePolicy;
         if(namePolicy)  delete namePolicy;
         if(paramPolicy) delete paramPolicy;
+        if(declPolicy) delete declPolicy;
 
     }
 
@@ -230,6 +231,30 @@ private:
             }
 
         };
+
+    }
+    
+    /* 
+    openEventMap corrilates enums of different types 
+    of pieces of a program with a pointer to a lambda
+    function in a policy of choice. Then as tags are hit 
+    during traversal, those enums are generated and the 
+    approriate lambda is called via the map.
+    openEventMap for open <> and closeEventMap for close </> 
+    */
+
+    void CollectDeclstmtHandlers(){
+    	using namespace srcSAXEventDispatch;
+
+    	openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) { 
+
+    		if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+    			if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
+    			ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
+    		}
+
+    	};
 
     }
 
