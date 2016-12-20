@@ -1,5 +1,5 @@
-#ifndef DECLTYPEPOLICY
-#define DECLTYPEPOLICY
+#ifndef INCLUDED_DECL_TYPE_POLICY_HPP
+#define INCLUDED_DECL_TYPE_POLICY_HPP
 
 #include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>

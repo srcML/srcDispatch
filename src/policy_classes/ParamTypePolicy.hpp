@@ -1,3 +1,6 @@
+#ifndef INCLUDED_PARAM_TYPE_POLICY_HPP
+#define INCLUDED_PARAM_TYPE_POLICY_HPP
+
 #include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
@@ -111,3 +114,6 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
 
         }
 };
+
+#endif
+
