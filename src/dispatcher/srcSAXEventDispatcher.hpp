@@ -150,6 +150,13 @@ namespace srcSAXEventDispatch {
             InitializeHandlers();
         }
 
+        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners) : EventDispatcher(srcml_element_stack) {
+            elementListeners = listeners;
+            numberAllocatedListeners = elementListeners.size();
+            dispatching = false;
+            classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            InitializeHandlers();
+        }
         void AddListener(EventListener* listener) override {
             elementListeners.push_back(listener);
         }
