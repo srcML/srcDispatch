@@ -3,6 +3,9 @@
 #include <exception>
 #include <vector>
 #include <ParamTypePolicy.hpp>
+
+#ifndef FUNCTIONSIGNATUREPOLICY
+#define FUNCTIONSIGNATUREPOLICY
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         struct SignatureData{
@@ -125,3 +128,4 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         }
 
 };
+#endif

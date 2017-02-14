@@ -5,6 +5,9 @@
 #include <ExprPolicy.hpp>
 #include <StereotypePolicy.hpp>
 #include <stack>
+
+#ifndef NLCONTEXTPOLICY
+#define NLCONTEXTPOLICY
 class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct NLSet{
@@ -154,3 +157,4 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
 
         }
 };
+#endif

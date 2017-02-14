@@ -2,6 +2,8 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
+#ifndef SOURCENLPOLICY
+#define SOURCENLPOLICY
 class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct SourceNLData{
@@ -75,3 +77,4 @@ class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
 
         }
 };
+#endif

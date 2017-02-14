@@ -4,6 +4,9 @@
 #include <set>
 #include <vector>
 #include <cctype>
+
+#ifndef STEREOTYPEPOLICY
+#define STEREOTYPEPOLICY
 class StereotypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct StereotypeData{
@@ -62,3 +65,4 @@ class StereotypePolicy : public srcSAXEventDispatch::EventListener, public srcSA
             };
         }
 };
+#endif

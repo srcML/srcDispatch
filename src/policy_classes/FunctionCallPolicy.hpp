@@ -7,6 +7,8 @@
  *Record current function being called
  *Record argument names and positions
  */
+#ifndef CALLPOLICY
+#define CALLPOLICY
 class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     /*
     {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},
@@ -69,3 +71,4 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             };
         }
 };
+#endif
