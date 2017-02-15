@@ -42,8 +42,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 if(ctx.triggerField[ParserState::call] == 1){ //TODO: Fix
                     data.callargumentlist.push_back(")");
                     NotifyAll(ctx);
-                    data.callargumentlist.clear();
-                    data.fnName.clear();
+                    data.clear();
                 }else{
                     data.callargumentlist.push_back(")");
                 }

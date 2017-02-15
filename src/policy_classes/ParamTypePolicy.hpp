@@ -33,11 +33,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-    
-            //data.name = policy->Data<NamePolicy::NameData>();
-    
-        }
+        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
     protected:
         void * DataInner() const override {
             return new ParamData(data);

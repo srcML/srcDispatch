@@ -27,6 +27,8 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 returnType.clear();
                 functionName.clear();
                 parameters.clear();
+                returnTypeNamespaces.clear();
+                functionNamespaces.clear();
                 returnTypeModifier.clear();
                 isConst = false;
                 isMethod = false;
