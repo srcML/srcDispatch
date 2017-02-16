@@ -1,6 +1,5 @@
 #include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
-#include <exception>
 #include <vector>
 #include <ParamTypePolicy.hpp>
 

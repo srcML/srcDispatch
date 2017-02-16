@@ -243,15 +243,22 @@ private:
     openEventMap for open <> and closeEventMap for close </> 
     */
 
+    /*
+
+    */
+
     void CollectDeclstmtHandlers(){
     	using namespace srcSAXEventDispatch;
 
-    	openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) { 
+    	openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) { 
 
     		if(functionDepth && (functionDepth + 1) == ctx.depth) {
 
-    			if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
-    			ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
+    			openEventMap[ParserState::declstmtPolicy] = [this](srcSAXEventContext& ctx) {
+    				if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
+    				ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
+    			}
+
     		}
 
     	};
