@@ -25,6 +25,7 @@ public:
         NamePolicy::NameData * name;
 
         std::vector<ParamTypePolicy::ParamTypeData *> parameters;
+        std::vector<DeclTypePolicy::DeclTypeData *> relations;
 
         bool isVirtual;
         bool isPureVirtual;
@@ -84,6 +85,7 @@ private:
     TypePolicy * typePolicy;
     NamePolicy * namePolicy;
     ParamTypePolicy * paramPolicy;
+    DeclTypePolicy * declPolicy;
 
 public:
 
@@ -93,7 +95,9 @@ public:
           functionDepth(0),
           typePolicy(nullptr),
           namePolicy(nullptr),
-          paramPolicy(nullptr) { 
+          paramPolicy(nullptr),
+          declPolicy(nullptr) 
+          { 
     
         InitializeFunctionSignaturePolicyHandlers();
 
@@ -104,6 +108,7 @@ public:
         if(typePolicy)  delete typePolicy;
         if(namePolicy)  delete namePolicy;
         if(paramPolicy) delete paramPolicy;
+        if(declPolicy) delete declPolicy;
 
     }
 
@@ -130,8 +135,12 @@ protected:
             data.parameters.push_back(policy->Data<ParamTypePolicy::ParamTypeData>()); 
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
-        }
+        } else if(typeid(DeclTypePolicy) == typeid(*policy)) {
 
+            data.relations.push_back(policy->Data<DeclTypePolicy::DeclTypeData>());
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+
+        }
     }
 
 private:
@@ -222,6 +231,37 @@ private:
             }
 
         };
+
+    }
+
+    /* 
+    openEventMap corrilates enums of different types 
+    of pieces of a program with a pointer to a lambda
+    function in a policy of choice. Then as tags are hit 
+    during traversal, those enums are generated and the 
+    approriate lambda is called via the map.
+    openEventMap for open <> and closeEventMap for close </> 
+    */
+
+    /*
+
+    */
+
+    void CollectDeclstmtHandlers(){
+    	using namespace srcSAXEventDispatch;
+
+    	openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) { 
+
+    		if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+    			openEventMap[ParserState::declstmtPolicy] = [this](srcSAXEventContext& ctx) {
+    				if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
+    				ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
+    			}
+
+    		}
+
+    	};
 
     }
 
