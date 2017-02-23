@@ -262,6 +262,14 @@ private:
     		}
 
     	};
+    	
+    	closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                NopOpenEvents({ParserState::parameter});
+            }
+        };
 
     }
 
