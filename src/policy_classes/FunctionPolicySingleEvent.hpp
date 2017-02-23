@@ -174,6 +174,7 @@ private:
                 CollectNameHandlers();
                 CollectParameterHandlers();
                 CollectOtherHandlers();
+                CollectDeclstmtHandlers();
 
             }
 
@@ -254,7 +255,7 @@ private:
 
     		if(functionDepth && (functionDepth + 1) == ctx.depth) {
 
-    			openEventMap[ParserState::declstmtPolicy] = [this](srcSAXEventContext& ctx) {
+    			openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
     				if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
     				ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
     			}
@@ -262,11 +263,11 @@ private:
     		}
 
     	};
-    	closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+    	closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 
             if(functionDepth && (functionDepth + 1) == ctx.depth) {
 
-                NopOpenEvents({ParserState::parameter});
+                NopOpenEvents({ParserState::declstmt});
             }
         };
 
