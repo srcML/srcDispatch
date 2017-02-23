@@ -354,7 +354,9 @@ private:
         };
 
     }
-    
+
+    /** @todo Will not work with local classes. */
+    /** @todo May need to add optimization that ignores declaration statement initialization. */
     void CollectDeclstmtHandlers(){
         using namespace srcSAXEventDispatch;
 
