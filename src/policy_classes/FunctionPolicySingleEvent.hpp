@@ -10,15 +10,15 @@
 #ifndef INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
 #define INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
 
-class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class FunctionPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 
-    enum FunctionSignatureType { CONSTRUCTOR, DESTURCTOR, OPERATOR, FUNCTION };
+    enum FunctionType { CONSTRUCTOR, DESTURCTOR, OPERATOR, FUNCTION };
 
-    struct FunctionSignatureData {
+    struct FunctionData {
 
-        FunctionSignatureType type;
+        FunctionType type;
         std::string stereotype;
 
         TypePolicy::TypeData * returnType;
@@ -54,7 +54,7 @@ public:
 
         }
 
-        friend std::ostream & operator<<(std::ostream & out, const FunctionSignatureData & functionData) {
+        friend std::ostream & operator<<(std::ostream & out, const FunctionData & functionData) {
 
             out << *functionData.returnType << ' ' << *functionData.name;
 
@@ -79,7 +79,7 @@ public:
 
 private:
 
-    FunctionSignatureData data;
+    FunctionData data;
     std::size_t functionDepth;
 
     TypePolicy * typePolicy;
@@ -89,7 +89,7 @@ private:
 
 public:
 
-    FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    FunctionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           functionDepth(0),
@@ -99,11 +99,11 @@ public:
           declPolicy(nullptr) 
           { 
     
-        InitializeFunctionSignaturePolicyHandlers();
+        InitializeFunctionPolicyHandlers();
 
     }
 
-    ~FunctionSignaturePolicy() {
+    ~FunctionPolicy() {
 
         if(typePolicy)  delete typePolicy;
         if(namePolicy)  delete namePolicy;
@@ -115,7 +115,7 @@ public:
 protected:
     void * DataInner() const override {
 
-        return new FunctionSignatureData(data);
+        return new FunctionData(data);
 
     }
 
@@ -146,7 +146,7 @@ protected:
 
 private:
 
-    void InitializeFunctionSignaturePolicyHandlers() {
+    void InitializeFunctionPolicyHandlers() {
         using namespace srcSAXEventDispatch;
 
         // start of policy
@@ -155,7 +155,7 @@ private:
             if(!functionDepth) {
 
                 functionDepth = ctx.depth;
-                data = FunctionSignatureData{};
+                data = FunctionData{};
 
                 if(ctx.elementStack.back() == "function" || ctx.elementStack.back() == "function_decl") {
 
@@ -189,7 +189,7 @@ private:
                 functionDepth = 0;
  
                 NotifyAll(ctx);
-                InitializeFunctionSignaturePolicyHandlers();
+                InitializeFunctionPolicyHandlers();
 
             }
            
