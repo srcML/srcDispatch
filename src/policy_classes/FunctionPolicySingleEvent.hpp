@@ -108,7 +108,7 @@ public:
         if(typePolicy)  delete typePolicy;
         if(namePolicy)  delete namePolicy;
         if(paramPolicy) delete paramPolicy;
-        if(declPolicy) delete declPolicy;
+        if(declPolicy)  delete declPolicy;
 
     }
 
@@ -118,6 +118,7 @@ protected:
         return new FunctionSignatureData(data);
 
     }
+
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
         if(typeid(TypePolicy) == typeid(*policy)) {
@@ -248,31 +249,6 @@ private:
 
     */
 
-    void CollectDeclstmtHandlers(){
-    	using namespace srcSAXEventDispatch;
-
-    	openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) { 
-
-    		if(functionDepth && (functionDepth + 1) == ctx.depth) {
-
-    			openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-    				if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
-    				ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
-    			}
-
-    		}
-
-    	};
-    	closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-
-            if(functionDepth && (functionDepth + 1) == ctx.depth) {
-
-                NopOpenEvents({ParserState::declstmt});
-            }
-        };
-
-    }
-
     void CollectTypeHandlers() {
         using namespace srcSAXEventDispatch;
 
@@ -375,6 +351,32 @@ private:
 
              }
 
+        };
+
+    }
+    
+    void CollectDeclstmtHandlers(){
+        using namespace srcSAXEventDispatch;
+
+        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) { 
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+                    if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
+                    ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
+                }
+
+            }
+
+        };
+        
+        closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+
+            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+
+                NopOpenEvents({ParserState::declstmt});
+            }
         };
 
     }
