@@ -2,7 +2,7 @@
 
 #include <NamePolicySingleEvent.hpp>
 #include <DeclTypePolicySingleEvent.hpp>
-#include <FunctionSignaturePolicySingleEvent.hpp>
+#include <FunctionPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -36,10 +36,10 @@ public:
         std::vector<ParentData> parents;
 
         std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
-        std::vector<FunctionSignaturePolicy::FunctionSignatureData *> constructors[3];
+        std::vector<FunctionPolicy::FunctionSignatureData *> constructors[3];
         bool hasDestructor;
-        std::vector<FunctionSignaturePolicy::FunctionSignatureData *> operators[3];
-        std::vector<FunctionSignaturePolicy::FunctionSignatureData *> methods[3];
+        std::vector<FunctionPolicy::FunctionSignatureData *> operators[3];
+        std::vector<FunctionPolicy::FunctionSignatureData *> methods[3];
 
         std::vector<ClassPolicy::ClassData *> innerClasses[3];
 
@@ -55,7 +55,7 @@ private:
 
     NamePolicy * namePolicy;
     DeclTypePolicy * declPolicy;
-    FunctionSignaturePolicy * functionPolicy;
+    FunctionPolicy * functionPolicy;
     ClassPolicy * classPolicy;
 
 public:
@@ -95,16 +95,16 @@ public:
             data.fields[currentRegion].emplace_back(policy->Data<DeclTypePolicy::DeclTypeData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
-        } else if(typeid(FunctionSignaturePolicy) == typeid(*policy)) {
+        } else if(typeid(FunctionPolicy) == typeid(*policy)) {
 
-            FunctionSignaturePolicy::FunctionSignatureData * f_data = policy->Data<FunctionSignaturePolicy::FunctionSignatureData>();
+            FunctionPolicy::FunctionSignatureData * f_data = policy->Data<FunctionPolicy::FunctionSignatureData>();
 
             if(f_data->isPureVirtual)
                 data.hasPureVirtual = true;
 
-            if(f_data->type == FunctionSignaturePolicy::CONSTRUCTOR)
+            if(f_data->type == FunctionPolicy::CONSTRUCTOR)
                 data.constructors[currentRegion].emplace_back(f_data);
-            else if(f_data->type == FunctionSignaturePolicy::OPERATOR)
+            else if(f_data->type == FunctionPolicy::OPERATOR)
                 data.operators[currentRegion].emplace_back(f_data);
             else 
                 data.methods[currentRegion].emplace_back(f_data);
@@ -316,7 +316,7 @@ private:
 
                     if((classDepth + 3) == ctx.depth) {
 
-                        if(!functionPolicy) functionPolicy = new FunctionSignaturePolicy{this};
+                        if(!functionPolicy) functionPolicy = new FunctionPolicy{this};
                         ctx.dispatcher->AddListenerDispatch(functionPolicy);
 
                     }

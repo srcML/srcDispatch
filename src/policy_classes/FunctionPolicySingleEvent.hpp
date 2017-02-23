@@ -7,8 +7,8 @@
 #include <string>
 #include <vector>
 
-#ifndef INCLUDED_FUNCTION_SIGNATURE_POLICY_SINGE_EVENT_HPP
-#define INCLUDED_FUNCTION_SIGNATURE_POLICY_SINGE_EVENT_HPP
+#ifndef INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
+#define INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
 
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
@@ -213,7 +213,7 @@ private:
                 functionDepth = 0;
  
                 NotifyAll(ctx);
-                InitializeFunctionSignaturePolicyHandlers();
+                InitializeFunctionPolicyHandlers();
 
             }
            
