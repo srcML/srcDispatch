@@ -85,7 +85,7 @@ private:
     TypePolicy * typePolicy;
     NamePolicy * namePolicy;
     ParamTypePolicy * paramPolicy;
-    DeclTypePolicy * declPolicy;
+    DeclTypePolicy * declstmtPolicy;
 
 public:
 
@@ -96,7 +96,7 @@ public:
           typePolicy(nullptr),
           namePolicy(nullptr),
           paramPolicy(nullptr),
-          declPolicy(nullptr) 
+          declstmtPolicy(nullptr) 
           { 
     
         InitializeFunctionPolicyHandlers();
@@ -108,7 +108,7 @@ public:
         if(typePolicy)  delete typePolicy;
         if(namePolicy)  delete namePolicy;
         if(paramPolicy) delete paramPolicy;
-        if(declPolicy)  delete declPolicy;
+        if(declstmtPolicy)  delete declstmtPolicy;
 
     }
 
@@ -365,9 +365,9 @@ private:
             if(functionDepth && (functionDepth + 1) == ctx.depth) {
 
                 openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-                    if(!declstmtPolicy) declstmtPolicy = new DeclstmtPolicy{this};
+                    if(!declstmtPolicy) declstmtPolicy = new DeclTypePolicy{this};
                     ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
-                }
+                };
 
             }
 

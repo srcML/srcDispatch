@@ -36,10 +36,10 @@ public:
         std::vector<ParentData> parents;
 
         std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
-        std::vector<FunctionPolicy::FunctionSignatureData *> constructors[3];
+        std::vector<FunctionPolicy::FunctionData *> constructors[3];
         bool hasDestructor;
-        std::vector<FunctionPolicy::FunctionSignatureData *> operators[3];
-        std::vector<FunctionPolicy::FunctionSignatureData *> methods[3];
+        std::vector<FunctionPolicy::FunctionData *> operators[3];
+        std::vector<FunctionPolicy::FunctionData *> methods[3];
 
         std::vector<ClassPolicy::ClassData *> innerClasses[3];
 
@@ -97,7 +97,7 @@ public:
 
         } else if(typeid(FunctionPolicy) == typeid(*policy)) {
 
-            FunctionPolicy::FunctionSignatureData * f_data = policy->Data<FunctionPolicy::FunctionSignatureData>();
+            FunctionPolicy::FunctionData * f_data = policy->Data<FunctionPolicy::FunctionData>();
 
             if(f_data->isPureVirtual)
                 data.hasPureVirtual = true;
