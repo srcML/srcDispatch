@@ -3,6 +3,7 @@
 #include <TypePolicySingleEvent.hpp>
 #include <NamePolicySingleEvent.hpp>
 #include <ParamTypePolicySingleEvent.hpp>
+#include <DeclTypePolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -138,7 +139,9 @@ protected:
 
         } else if(typeid(DeclTypePolicy) == typeid(*policy)) {
 
-            data.relations.push_back(policy->Data<DeclTypePolicy::DeclTypeData>());
+            std::vector<DeclTypePolicy::DeclTypeData *> * decl_data = policy->Data<std::vector<DeclTypePolicy::DeclTypeData *>>();
+            for(DeclTypePolicy::DeclTypeData * decl : *decl_data)
+                data.relations.push_back(decl);
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         }

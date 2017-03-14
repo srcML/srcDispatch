@@ -15,7 +15,7 @@ public:
 
     struct DeclTypeData {
 
-        TypePolicy::TypeData * type;
+        std::shared_ptr<TypePolicy::TypeData> type;
         NamePolicy::NameData * name;
         bool isStatic;
 
@@ -34,11 +34,13 @@ public:
 
 private:
 
-
-    DeclTypeData data;
+    std::vector<DeclTypeData *> data;
     std::size_t declDepth;
 
     TypePolicy * typePolicy;
+    bool isStatic;
+    std::shared_ptr<TypePolicy::TypeData> type;
+ 
     NamePolicy * namePolicy;
 
 public:
@@ -48,6 +50,8 @@ public:
           data{},
           declDepth(0),
           typePolicy(nullptr),
+          isStatic(false),
+          type(),
           namePolicy(nullptr) { 
     
         InitializeDeclTypePolicyHandlers();
@@ -64,19 +68,19 @@ public:
 protected:
     void * DataInner() const override {
 
-        return new DeclTypeData(data);
+        return new std::vector<DeclTypeData *>(data);
 
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
         if(typeid(TypePolicy) == typeid(*policy)) {
 
-            data.type = policy->Data<TypePolicy::TypeData>();
+            type = std::shared_ptr<TypePolicy::TypeData>(policy->Data<TypePolicy::TypeData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         } else if(typeid(NamePolicy) == typeid(*policy)) {
 
-            data.name = policy->Data<NamePolicy::NameData>(); 
+            data.back()->name = policy->Data<NamePolicy::NameData>(); 
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         }
@@ -94,13 +98,29 @@ private:
             if(!declDepth) {
 
                 declDepth = ctx.depth;
-                data = DeclTypeData{};
 
                 CollectTypeHandlers();
                 CollectNameHandlers();
                 CollectSpecifiersHandlers();
 
             }
+
+            openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
+
+                if(declDepth && (declDepth + 1) == ctx.depth) {
+                    data.push_back(new DeclTypeData{});
+                }
+
+            };
+
+            closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
+
+                if(declDepth && (declDepth + 1) == ctx.depth) {
+                    data.back()->isStatic = isStatic;
+                    data.back()->type = type;
+                }
+
+            };
 
         };
 
@@ -164,7 +184,7 @@ void CollectSpecifiersHandlers() {
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
 
                 if(ctx.currentToken == "static")
-                    data.isStatic = true;
+                    isStatic = true;
 
             };
 

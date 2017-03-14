@@ -17,7 +17,7 @@ namespace srcSAXEventDispatch{
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, 
         argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, genericargumentlist,
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
-        argument, index, block, type, init, op, literal, modifier, memberlist, classn, structn,
+        argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
         ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
         userdefined, snoun, propersnoun, spronoun, sadjective, sverb, stereotype, archive, unit,
@@ -32,6 +32,7 @@ namespace srcSAXEventDispatch{
                   elementStack(elementStack),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
+                  isPrev(false),
                   isOperator(false),
                   endArchive(false),
                   currentLineNumber{0} {}
@@ -44,7 +45,7 @@ namespace srcSAXEventDispatch{
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
                         currentTag, currentToken, currentAttributeName, currentAttributeValue;
             std::size_t depth;
-            bool isOperator, endArchive;
+            bool isPrev, isOperator, endArchive;
 
         public:
             inline bool And(std::vector<ParserState> vec) const{

@@ -352,8 +352,13 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::decl, ElementState::open);
                 } },
                 { "type", [this](){
-                    ++ctx.triggerField[ParserState::type]; 
-                    DispatchEvent(ParserState::type, ElementState::open);
+                    if(ctx.isPrev) {
+                        ++ctx.triggerField[ParserState::typeprev]; 
+                        DispatchEvent(ParserState::typeprev, ElementState::open);
+                    } else {
+                        ++ctx.triggerField[ParserState::type]; 
+                        DispatchEvent(ParserState::type, ElementState::open);
+                    }
                 } },
                 { "typedef", [this](){
                     ++ctx.triggerField[ParserState::typedefexpr]; 
@@ -558,8 +563,13 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::decl]; 
                 } },    
                 { "type", [this](){
-                    DispatchEvent(ParserState::type, ElementState::close);
-                    --ctx.triggerField[ParserState::type];
+                    if(ctx.isPrev) {
+                        DispatchEvent(ParserState::typeprev, ElementState::close);
+                        --ctx.triggerField[ParserState::typeprev];
+                    } else {
+                        DispatchEvent(ParserState::type, ElementState::close);
+                        --ctx.triggerField[ParserState::type];
+                    }
                 } },
                 { "typedef", [this](){
                     DispatchEvent(ParserState::typedefexpr, ElementState::close);
@@ -723,7 +733,9 @@ namespace srcSAXEventDispatch {
             if(name == "generic" && localName == "argument_list"){
                 ctx.genericDepth.push_back(ctx.depth);
             }
-
+            if(name == "prev" && localName == "type"){
+                ctx.isPrev = true;
+            }
             if(name == "operator" && (localName == "function" || localName == "function_decl")) {
                 ctx.isOperator = true;
             }
@@ -750,6 +762,7 @@ namespace srcSAXEventDispatch {
 
             }
 
+            ctx.isPrev = false;
             ctx.isOperator = false;
 
         }
