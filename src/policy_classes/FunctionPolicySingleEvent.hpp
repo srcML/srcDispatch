@@ -206,22 +206,25 @@ private:
         openEventMap[ParserState::destructor] = functionStart;
         openEventMap[ParserState::destructordecl] = functionStart;
 
+        closeEventMap[ParserState::function] = functionEnd;
         closeEventMap[ParserState::functiondecl] = functionEnd;
+        closeEventMap[ParserState::constructor] = functionEnd;
         closeEventMap[ParserState::constructordecl] = functionEnd;
+        closeEventMap[ParserState::destructor] = functionEnd;
         closeEventMap[ParserState::destructordecl] = functionEnd;
 
-        openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx) {
+        // openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx) {
 
-            if(functionDepth && (functionDepth + 1) == ctx.depth) {
+        //     if(functionDepth && (functionDepth + 1) == ctx.depth) {
 
-                functionDepth = 0;
+        //         functionDepth = 0;
  
-                NotifyAll(ctx);
-                InitializeFunctionPolicyHandlers();
+        //         NotifyAll(ctx);
+        //         InitializeFunctionPolicyHandlers();
 
-            }
+        //     }
            
-        };
+        // };
 
     }
 
