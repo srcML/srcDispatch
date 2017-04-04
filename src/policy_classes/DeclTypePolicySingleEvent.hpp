@@ -68,7 +68,7 @@ public:
 protected:
     void * DataInner() const override {
 
-        return new std::vector<DeclTypeData *>(data);
+        return (void *)&data;
 
     }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {

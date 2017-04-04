@@ -95,6 +95,7 @@ public:
             std::vector<DeclTypePolicy::DeclTypeData *> * decl_data = policy->Data<std::vector<DeclTypePolicy::DeclTypeData *>>();
             for(DeclTypePolicy::DeclTypeData * decl : *decl_data)
                 data.fields[currentRegion].emplace_back(decl);
+            decl_data->clear();
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
         } else if(typeid(FunctionPolicy) == typeid(*policy)) {
