@@ -43,7 +43,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
 
             assert(datatotest.size() == 5);
             assert(datatotest[0].returnType == "void");
-            assert(datatotest[0].functionName == "foo");
+            assert(datatotest[0].name== "foo");
             assert(datatotest[0].returnTypeModifier == std::string());
             assert(datatotest[0].linenumber == 1);
             assert(datatotest[0].isConst == false);
@@ -57,7 +57,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[0].hasAliasedReturn == false);
 
             assert(datatotest[1].returnType == "void");
-            assert(datatotest[1].functionName == "bar");
+            assert(datatotest[1].name== "bar");
             assert(datatotest[1].returnTypeModifier == std::string());
             assert(datatotest[1].linenumber == 2);
             assert(datatotest[1].isConst == false);
@@ -71,7 +71,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[1].hasAliasedReturn == false);
 
             assert(datatotest[2].returnType == "int");
-            assert(datatotest[2].functionName == "bloo");
+            assert(datatotest[2].name== "bloo");
             assert(datatotest[2].returnTypeModifier == "*");
             assert(datatotest[2].linenumber == 3);
             assert(datatotest[2].isConst == false);
@@ -85,7 +85,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[2].hasAliasedReturn == true);
 
             assert(datatotest[3].returnType == "void");
-            assert(datatotest[3].functionName == "bleep");
+            assert(datatotest[3].name== "bleep");
             assert(datatotest[3].returnTypeModifier == std::string());
             assert(datatotest[3].linenumber == 4);
             assert(datatotest[3].isConst == true);
@@ -99,7 +99,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[3].hasAliasedReturn == false);
 
             assert(datatotest[4].returnType == "object");
-            assert(datatotest[4].functionName == "bloo");
+            assert(datatotest[4].name== "bloo");
             assert(datatotest[4].returnTypeModifier == "*");
             assert(datatotest[4].linenumber == 5);
             assert(datatotest[4].isConst == false);

@@ -11,7 +11,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, hasAliasedReturn{false} {}
             int linenumber;
             std::string returnType;
-            std::string functionName;
+            std::string name;
             std::string returnTypeModifier;
             std::vector<std::string> functionNamespaces;
             std::vector<std::string> returnTypeNamespaces;
@@ -24,7 +24,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             bool hasAliasedReturn;
             void clear(){
                 returnType.clear();
-                functionName.clear();
+                name.clear();
                 parameters.clear();
                 returnTypeNamespaces.clear();
                 functionNamespaces.clear();
@@ -92,7 +92,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             };
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
-                    data.functionName = ctx.currentToken;
+                    data.name = ctx.currentToken;
                 }
                 if(ctx.And({ParserState::name, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::parameterlist, ParserState::genericargumentlist})){
                     data.returnType = ctx.currentToken;
