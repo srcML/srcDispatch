@@ -10,14 +10,14 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         struct DeclTypeData{
             DeclTypeData(): linenumber{0}, isConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
             void clear(){
-                nameoftype.clear();
-                nameofidentifier.clear();
-                namespaces.clear();
                 linenumber = -1;
                 isConst = false;
                 isReference = false;
                 isPointer = false;
                 isStatic = false;
+                nameoftype.clear(); //Due to multi-decls (int a,b,c,d;), type has to be cleared only at end of decl_stmt
+                namespaces.clear();
+                nameofidentifier.clear();
             }
             std::string nameoftype;
             std::string nameofidentifier;
@@ -62,6 +62,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 if(ctx.And({ParserState::declstmt})){
                     data.linenumber = ctx.currentLineNumber;
                     data.nameofidentifier = currentDeclName;
+                    
+                    NotifyAll(ctx);
+                    
+                    currentDeclName.clear();
+                    data.clear();
                 }
             };
 
@@ -88,10 +93,6 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         currentModifier = ctx.currentToken;
                     }
                 }
-            };
-            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
-                NotifyAll(ctx);
-                data.clear();
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
