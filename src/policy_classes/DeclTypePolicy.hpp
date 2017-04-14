@@ -15,9 +15,6 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 isReference = false;
                 isPointer = false;
                 isStatic = false;
-                nameoftype.clear(); //Due to multi-decls (int a,b,c,d;), type has to be cleared only at end of decl_stmt
-                namespaces.clear();
-                nameofidentifier.clear();
             }
             std::string nameoftype;
             std::string nameofidentifier;
@@ -62,10 +59,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 if(ctx.And({ParserState::declstmt})){
                     data.linenumber = ctx.currentLineNumber;
                     data.nameofidentifier = currentDeclName;
-                    
-                    NotifyAll(ctx);
-                    
                     currentDeclName.clear();
+                    NotifyAll(ctx);
                     data.clear();
                 }
             };
@@ -82,7 +77,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                         currentTypeName = ctx.currentToken;
                     }
-                    if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) && 
+                    if(ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) &&
                        ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, ParserState::init, ParserState::specifier, ParserState::modifier})){
                         currentDeclName = ctx.currentToken;
                     }
@@ -93,6 +88,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         currentModifier = ctx.currentToken;
                     }
                 }
+            };
+            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
+                data.nameoftype.clear(); //Due to multi-decls (int a,b,c,d;), type has to be cleared only at end of decl_stmt
+                data.namespaces.clear();
+                data.nameofidentifier.clear();
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){

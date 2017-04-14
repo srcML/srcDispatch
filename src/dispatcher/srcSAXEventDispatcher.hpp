@@ -355,10 +355,9 @@ namespace srcSAXEventDispatch {
                     if(ctx.isPrev) {
                         ++ctx.triggerField[ParserState::typeprev]; 
                         DispatchEvent(ParserState::typeprev, ElementState::open);
-                    } else {
-                        ++ctx.triggerField[ParserState::type]; 
-                        DispatchEvent(ParserState::type, ElementState::open);
                     }
+                    ++ctx.triggerField[ParserState::type]; 
+                    DispatchEvent(ParserState::type, ElementState::open);
                 } },
                 { "typedef", [this](){
                     ++ctx.triggerField[ParserState::typedefexpr]; 
@@ -566,10 +565,9 @@ namespace srcSAXEventDispatch {
                     if(ctx.isPrev) {
                         DispatchEvent(ParserState::typeprev, ElementState::close);
                         --ctx.triggerField[ParserState::typeprev];
-                    } else {
-                        DispatchEvent(ParserState::type, ElementState::close);
-                        --ctx.triggerField[ParserState::type];
                     }
+                    DispatchEvent(ParserState::type, ElementState::close);
+                    --ctx.triggerField[ParserState::type];
                 } },
                 { "typedef", [this](){
                     DispatchEvent(ParserState::typedefexpr, ElementState::close);
