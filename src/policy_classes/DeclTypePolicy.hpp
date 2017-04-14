@@ -15,6 +15,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 isReference = false;
                 isPointer = false;
                 isStatic = false;
+                nameoftype.clear();
+                namespaces.clear();
+                nameofidentifier.clear();
             }
             std::string nameoftype;
             std::string nameofidentifier;
@@ -88,11 +91,6 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         currentModifier = ctx.currentToken;
                     }
                 }
-            };
-            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
-                data.nameoftype.clear(); //Due to multi-decls (int a,b,c,d;), type has to be cleared only at end of decl_stmt
-                data.namespaces.clear();
-                data.nameofidentifier.clear();
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
