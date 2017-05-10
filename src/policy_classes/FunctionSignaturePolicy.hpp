@@ -73,7 +73,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     data.functionNamespaces.push_back(ctx.currentToken);
                 }
             };
-            closeEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
+            openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
                 if(ctx.IsOpen(ParserState::classn)){
                     data.isMethod = true;
                 }
