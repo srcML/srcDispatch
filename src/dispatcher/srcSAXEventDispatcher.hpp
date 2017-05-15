@@ -148,6 +148,8 @@ namespace srcSAXEventDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
+            ctx.writer = xmlNewTextWriter (ob);
             InitializeHandlers();
         }
 
@@ -156,6 +158,8 @@ namespace srcSAXEventDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
+            ctx.writer = xmlNewTextWriter (ob);
             InitializeHandlers();
         }
         void AddListener(EventListener* listener) override {
