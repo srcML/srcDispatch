@@ -762,7 +762,7 @@ namespace srcSAXEventDispatch {
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
             // write out buffered root level characters
-            write_content(ctx.currentTag);
+            write_content(ctx.currentToken);
     
             write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
@@ -847,7 +847,7 @@ namespace srcSAXEventDispatch {
             ctx.isPrev = false;
             ctx.isOperator = false;
             
-            write_content(ctx.currentTag);
+            write_content(ctx.currentToken);
             write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
         }
         /**
@@ -863,6 +863,7 @@ namespace srcSAXEventDispatch {
             ctx.currentToken.append(ch, len);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
             process->second();
+            write_content(ctx.currentToken);
         }
     
         // end elements may need to be used if you want to collect only on per file basis or some other granularity.
@@ -872,7 +873,7 @@ namespace srcSAXEventDispatch {
                 process2->second();
             }
             if(is_archive) {
-                write_content(ctx.currentTag);
+                write_content(ctx.currentToken);
                 xmlTextWriterEndElement(ctx.writer);
             }            
         }
@@ -882,7 +883,7 @@ namespace srcSAXEventDispatch {
                 process2->second();
             }
             // write out any buffered characters
-            write_content(ctx.currentTag);
+            write_content(ctx.currentToken);
             xmlTextWriterEndElement(ctx.writer);
         }
     
@@ -903,7 +904,7 @@ namespace srcSAXEventDispatch {
             }
 
             --ctx.depth;
-            write_content(ctx.currentTag);
+            write_content(ctx.currentToken);
             xmlTextWriterEndElement(ctx.writer);
         }
     #pragma GCC diagnostic pop
