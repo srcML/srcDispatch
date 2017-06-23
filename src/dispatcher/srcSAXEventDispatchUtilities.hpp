@@ -74,56 +74,59 @@ namespace srcSAXEventDispatch{
             bool isPrev, isOperator, endArchive;
 
         public:
-            inline bool And(std::vector<ParserState> vec) const{
+            inline bool And(const std::vector<ParserState> vec) const{
                 for(auto field : vec){
                     if(triggerField[field]) continue;
                     else return false;
                 }
                 return true;
             }
-            inline bool Nand(std::vector<ParserState> vec) const{
+            inline bool Nand(const std::vector<ParserState> vec) const{
                 for(auto field : vec){
                     if(triggerField[field]) return false;
                     else continue;
                 }
                 return true;
             }
-            inline bool Or(std::vector<ParserState> vec) const{
+            inline bool Or(const std::vector<ParserState> vec) const{
                 for(auto field : vec){
                     if(triggerField[field]) return true;
                     else continue;
                 }
                 return false;
             }
-            inline bool Nor(std::vector<ParserState> vec) const{
+            inline bool Nor(const std::vector<ParserState> vec) const{
                 for(auto field : vec){
                     if(triggerField[field]) return false;
                     else continue;
                 }
                 return true;
             }
-            inline bool IsEqualTo(ParserState lhs, ParserState rhs) const{
+            inline bool IsEqualTo(const ParserState lhs, const ParserState rhs) const{
                 return triggerField[lhs] == triggerField[rhs] ? true : false;
             }
-            inline bool IsGreaterThan(ParserState lhs, ParserState rhs) const{
+            inline bool IsGreaterThan(const ParserState lhs, const ParserState rhs) const{
                 return triggerField[lhs] > triggerField[rhs] ? true : false;
             }
-            inline bool IsGreaterThanOrEqualTo(ParserState lhs, ParserState rhs) const{
+            inline bool IsGreaterThanOrEqualTo(const ParserState lhs, const ParserState rhs) const{
                 return triggerField[lhs] >= triggerField[rhs] ? true : false;   
             }
-            inline bool IsLessThan(ParserState lhs, ParserState rhs) const{
+            inline bool IsLessThan(const ParserState lhs, const ParserState rhs) const{
                 return triggerField[lhs] < triggerField[rhs] ? true : false;    
             }
-            inline bool IsLessThanOrEqualTo(ParserState lhs, ParserState rhs) const{
+            inline bool IsLessThanOrEqualTo(const ParserState lhs, const ParserState rhs) const{
                 return triggerField[lhs] <= triggerField[rhs] ? true : false;   
             }
-            inline bool IsOpen(ParserState field) const{
+            inline bool IsOpen(const ParserState field) const{
                 if(triggerField[field]) return true;
                 else return false;
             }
-            inline bool IsClosed(ParserState field) const{
+            inline bool IsClosed(const ParserState field) const{
                 if(triggerField[field]) return false;
                 else return true;
+            }
+            inline unsigned int NumCurrentlyOpen(const ParserState field){
+                return triggerField[field];
             }
     };
 
