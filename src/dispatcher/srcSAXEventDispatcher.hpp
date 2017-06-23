@@ -733,8 +733,6 @@ namespace srcSAXEventDispatch {
         virtual void startRoot(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
-            xmlTextWriterWriteAttributeNS(ctx.writer, (const xmlChar *)"nlp", (const xmlChar *)"xmlns",
-                    (const xmlChar *)"http://www.srcML.org/srcML/nlp", (const xmlChar *)"");
             if(is_archive){
                 write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             }
@@ -761,8 +759,6 @@ namespace srcSAXEventDispatch {
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
-            // write out buffered root level characters
-            write_content(ctx.currentToken);
     
             write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
@@ -793,7 +789,9 @@ namespace srcSAXEventDispatch {
         virtual void startElement(const char * localname, const char * prefix, const char * URI,
                                     int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                                     const struct srcsax_attribute * attributes) override {
-
+            
+            write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
+            
             ++ctx.depth;
 
             std::string localName;
@@ -846,9 +844,6 @@ namespace srcSAXEventDispatch {
 
             ctx.isPrev = false;
             ctx.isOperator = false;
-            
-            write_content(ctx.currentToken);
-            write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
         }
         /**
         * charactersUnit
@@ -873,7 +868,6 @@ namespace srcSAXEventDispatch {
                 process2->second();
             }
             if(is_archive) {
-                write_content(ctx.currentToken);
                 xmlTextWriterEndElement(ctx.writer);
             }            
         }
@@ -882,8 +876,7 @@ namespace srcSAXEventDispatch {
             if (process2 != process_map2.end()) {
                 process2->second();
             }
-            // write out any buffered characters
-            write_content(ctx.currentToken);
+
             xmlTextWriterEndElement(ctx.writer);
         }
     
@@ -904,7 +897,7 @@ namespace srcSAXEventDispatch {
             }
 
             --ctx.depth;
-            write_content(ctx.currentToken);
+
             xmlTextWriterEndElement(ctx.writer);
         }
     #pragma GCC diagnostic pop
