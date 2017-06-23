@@ -26,6 +26,7 @@
 #include <initializer_list>
 #include <algorithm>
 #include <iostream>
+#include <libxml/xmlwriter.h>
 
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
@@ -54,8 +55,14 @@ namespace srcSAXEventDispatch{
                   isPrev(false),
                   isOperator(false),
                   endArchive(false),
-                  currentLineNumber{0} {}
-
+                  currentLineNumber{0},
+                  writer{0} {}
+            ~srcSAXEventContext(){
+                if(writer){
+                    xmlFreeTextWriter(writer);
+                }
+            }
+            xmlTextWriterPtr writer;
             EventDispatcher * dispatcher;
             const std::vector<std::string> & elementStack;
             std::vector<int> genericDepth;

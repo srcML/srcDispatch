@@ -32,6 +32,7 @@
 #include <srcSAXEventDispatchUtilities.hpp>
 #include <vector>
 #include <memory>
+
 namespace srcSAXEventDispatch {
 
     template<typename... policies>
@@ -147,6 +148,8 @@ namespace srcSAXEventDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
+            ctx.writer = xmlNewTextWriter (ob);
             InitializeHandlers();
         }
 
@@ -155,6 +158,8 @@ namespace srcSAXEventDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
+            ctx.writer = xmlNewTextWriter (ob);
             InitializeHandlers();
         }
         void AddListener(EventListener* listener) override {
@@ -634,10 +639,81 @@ namespace srcSAXEventDispatch {
             };            
         }
 
-        /*
-        virtual void startDocument() {}
-        virtual void endDocument() {}
+      /**
+        * write_start_tag
+        * @param localname the name of the element tag
+        * @param prefix the tag prefix
+        * @param URI the namespace of tag
+        * @param num_namespaces number of namespaces definitions
+        * @param namespaces the defined namespaces
+        * @param nb_attributes the number of attributes on the tag
+        * @param attributes list of attributes
+        *
+        * SAX handler function for start of the root element.
+        * Write out a start tag.
+        *
+        * Overide for desired behaviour.
         */
+        void write_start_tag(const char* localname, const char* prefix, const char* URI,
+                            int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
+                            const struct srcsax_attribute * attributes) {
+            xmlTextWriterStartElementNS(ctx.writer, (const xmlChar *)prefix, (const xmlChar *)localname, 0);
+            bool seenpos = false;
+            for(int pos = 0; pos < num_namespaces; ++pos) {
+                std::string name = "xmlns";
+                if(namespaces[pos].prefix) {
+                    name += ":";
+                    name += (const char *)namespaces[pos].prefix;
+
+                }
+                xmlTextWriterWriteAttribute(ctx.writer, (const xmlChar *)name.c_str(), (const xmlChar *)namespaces[pos].uri);
+            }
+            for(int pos = 0; pos < num_attributes; ++pos) {
+                std::string str(attributes[pos].localname);
+                if(str == "line" || str == "filename"){
+                  xmlTextWriterWriteAttributeNS(ctx.writer, (const xmlChar *)attributes[pos].prefix, (const xmlChar *)attributes[pos].localname,
+                      (const xmlChar *)attributes[pos].uri, (const xmlChar *)attributes[pos].value);                    
+                }
+
+            }
+        }
+        /**
+        * write_content
+        * @param text_content
+        *
+        * Write out the provided text content, escaping everything but ".
+        */
+        void write_content(std::string & text_content) {        
+            if(!text_content.empty()) {        
+                /*
+                    Normal output of text is for the most part
+                    identical to what libxml2 provides.  However,
+                    srcML does not escape " while libxml2 does escape
+                    quotations.
+                */
+                int ret = 0;
+                char * text = (char *)text_content.c_str();
+                for(char * pos = text; *pos; ++pos) {       
+                    if(*pos != '"') continue;       
+                    
+                    *pos = 0;
+                    ret = xmlTextWriterWriteString(ctx.writer, (const xmlChar *)text);
+                           
+                    *pos = '\"';
+                    xmlTextWriterWriteRaw(ctx.writer, (const xmlChar *)"\"");
+                           
+                    text = pos + 1;     
+                }       
+                ret = xmlTextWriterWriteString(ctx.writer, (const xmlChar *)text);      
+                text_content.clear();
+            }  
+        }
+        virtual void startDocument() {
+            xmlTextWriterStartDocument(ctx.writer, "1.0", "UTF-8", "yes");
+        }
+        virtual void endDocument() {
+            xmlTextWriterEndDocument(ctx.writer);
+        }
     
         /**
         * startRoot
@@ -657,10 +733,15 @@ namespace srcSAXEventDispatch {
         virtual void startRoot(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
+            xmlTextWriterWriteAttributeNS(ctx.writer, (const xmlChar *)"nlp", (const xmlChar *)"xmlns",
+                    (const xmlChar *)"http://www.srcML.org/srcML/nlp", (const xmlChar *)"");
+            if(is_archive){
+                write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
+            }
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
             if (process != process_map.end()) {
                 process->second();
-            }          
+            }
         }
         /**
         * startUnit
@@ -680,7 +761,10 @@ namespace srcSAXEventDispatch {
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
-            
+            // write out buffered root level characters
+            write_content(ctx.currentToken);
+    
+            write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
             if (process != process_map.end()) {
                 process->second();
@@ -762,7 +846,9 @@ namespace srcSAXEventDispatch {
 
             ctx.isPrev = false;
             ctx.isOperator = false;
-
+            
+            write_content(ctx.currentToken);
+            write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
         }
         /**
         * charactersUnit
@@ -777,6 +863,7 @@ namespace srcSAXEventDispatch {
             ctx.currentToken.append(ch, len);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
             process->second();
+            write_content(ctx.currentToken);
         }
     
         // end elements may need to be used if you want to collect only on per file basis or some other granularity.
@@ -785,12 +872,19 @@ namespace srcSAXEventDispatch {
             if (process2 != process_map2.end()) {
                 process2->second();
             }
+            if(is_archive) {
+                write_content(ctx.currentToken);
+                xmlTextWriterEndElement(ctx.writer);
+            }            
         }
         virtual void endUnit(const char * localname, const char * prefix, const char * URI) override {
             std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find("unit");
             if (process2 != process_map2.end()) {
                 process2->second();
             }
+            // write out any buffered characters
+            write_content(ctx.currentToken);
+            xmlTextWriterEndElement(ctx.writer);
         }
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
@@ -810,7 +904,8 @@ namespace srcSAXEventDispatch {
             }
 
             --ctx.depth;
-
+            write_content(ctx.currentToken);
+            xmlTextWriterEndElement(ctx.writer);
         }
     #pragma GCC diagnostic pop
     
