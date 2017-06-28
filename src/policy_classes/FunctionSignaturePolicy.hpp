@@ -21,7 +21,7 @@
 #include <srcSAXHandler.hpp>
 #include <vector>
 #include <ParamTypePolicy.hpp>
-
+#include <DeclDS.hpp>
 #ifndef FUNCTIONSIGNATUREPOLICY
 #define FUNCTIONSIGNATUREPOLICY
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
@@ -34,7 +34,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             std::string returnTypeModifier;
             std::vector<std::string> functionNamespaces;
             std::vector<std::string> returnTypeNamespaces;
-            std::vector<ParamTypePolicy::ParamData> parameters;
+            std::vector<DeclData> parameters;
             bool isConst;
             bool isMethod;
             bool isStatic;
@@ -63,7 +63,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             InitializeEventHandlers();
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            paramdata = policy->Data<ParamTypePolicy::ParamData>();
+            paramdata = policy->Data<DeclData>();
             data.parameters.push_back(*paramdata);
         }
     protected:
@@ -73,7 +73,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
     private:
         bool seenModifier;
         ParamTypePolicy parampolicy;
-        ParamTypePolicy::ParamData* paramdata;
+        DeclData* paramdata;
         SignatureData data;
         size_t currentArgPosition;       
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
