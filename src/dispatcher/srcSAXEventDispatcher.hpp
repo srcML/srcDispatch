@@ -683,7 +683,7 @@ namespace srcSAXEventDispatch {
         *
         * Write out the provided text content, escaping everything but ".
         */
-        void write_content(std::string & text_content) {        
+        void write_content(const std::string &text_content) {        
             if(!text_content.empty()) {        
                 /*
                     Normal output of text is for the most part
