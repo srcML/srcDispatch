@@ -704,8 +704,7 @@ namespace srcSAXEventDispatch {
                            
                     text = pos + 1;     
                 }       
-                ret = xmlTextWriterWriteString(ctx.writer, (const xmlChar *)text);      
-                text_content.clear();
+                ret = xmlTextWriterWriteString(ctx.writer, (const xmlChar *)text);
             }  
         }
         virtual void startDocument() {
