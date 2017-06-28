@@ -23,42 +23,19 @@
 #include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
-
+#include <DeclDS.hpp>
 class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
-        struct ParamData{
-            ParamData(): linenumber{0}, isConst{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
-            void clear(){
-                nameoftype.clear();
-                nameofidentifier.clear();
-                namespaces.clear();
-                linenumber = -1;
-                isConst = false;
-                isReference = false;
-                isPointer = false;
-                isStatic = false;
-            }
-            std::string nameoftype;
-            std::string nameofidentifier;
-            std::vector<std::string> namespaces;
-            int linenumber;
-            bool isConst;
-            bool isConstAlias;
-            bool isAliasToConst;
-            bool isReference;
-            bool isPointer;
-            bool isStatic;
-        };
         ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
     protected:
         void * DataInner() const override {
-            return new ParamData(data);
+            return new DeclData(data);
         }
     private:
-        ParamData data;
+        DeclData data;
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
 
         void InitializeEventHandlers(){

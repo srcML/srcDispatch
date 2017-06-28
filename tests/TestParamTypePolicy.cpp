@@ -55,7 +55,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
         ~TestParamType(){}
         TestParamType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            paramdata = *policy->Data<ParamTypePolicy::ParamData>();
+            paramdata = *policy->Data<DeclData>();
             datatotest.push_back(paramdata);
         }
 		void RunTest(){
@@ -112,8 +112,8 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
     private:
 
         ParamTypePolicy parampolicy;
-        ParamTypePolicy::ParamData paramdata;
-        std::vector<ParamTypePolicy::ParamData> datatotest;
+        DeclData paramdata;
+        std::vector<DeclData> datatotest;
 };
 
 int main(int argc, char** filename){

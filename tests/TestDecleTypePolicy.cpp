@@ -36,7 +36,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
         ~TestDeclType(){}
         TestDeclType(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            decltypedata = *policy->Data<DeclTypePolicy::DeclTypeData>();
+            decltypedata = *policy->Data<DeclData>();
             datatotest.push_back(decltypedata);
         }
 		void RunTest(){
@@ -93,8 +93,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
     private:
 
         DeclTypePolicy declpolicy;
-        DeclTypePolicy::DeclTypeData decltypedata;
-        std::vector<DeclTypePolicy::DeclTypeData> datatotest;
+        DeclData decltypedata;
+        std::vector<DeclData> datatotest;
 };
 
 int main(int argc, char** filename){

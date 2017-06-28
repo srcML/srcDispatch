@@ -23,31 +23,10 @@
 #include <srcSAXEventDispatcher.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
-
+#include <DeclDS.hpp>
 class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
-        struct DeclTypeData{
-            DeclTypeData(): linenumber{0}, isConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
-            void clear(){
-                linenumber = -1;
-                isConst = false;
-                isReference = false;
-                isPointer = false;
-                isStatic = false;
-                nameoftype.clear();
-                namespaces.clear();
-                nameofidentifier.clear();
-            }
-            std::string nameoftype;
-            std::string nameofidentifier;
-            std::vector<std::string> namespaces;
-            int linenumber;
-            bool isConst;
-            bool isReference;
-            bool isPointer;
-            bool isStatic;
-        };
-        DeclTypeData data;
+        DeclData data;
         ~DeclTypePolicy(){}
         DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
@@ -55,7 +34,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
-            return new DeclTypeData(data);
+            return new DeclData(data);
         }
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
