@@ -27,7 +27,7 @@
 #include <algorithm>
 #include <iostream>
 #include <libxml/xmlwriter.h>
-
+#include <srcSAXHandler.hpp>
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 
@@ -73,7 +73,74 @@ namespace srcSAXEventDispatch{
             std::size_t depth;
             bool isPrev, isOperator, endArchive;
 
-        public:
+          /**
+            * write_start_tag
+            * @param localname the name of the element tag
+            * @param prefix the tag prefix
+            * @param URI the namespace of tag
+            * @param num_namespaces number of namespaces definitions
+            * @param namespaces the defined namespaces
+            * @param nb_attributes the number of attributes on the tag
+            * @param attributes list of attributes
+            *
+            * SAX handler function for start of the root element.
+            * Write out a start tag.
+            *
+            * Overide for desired behaviour.
+            */
+            void write_start_tag(const char* localname, const char* prefix, const char* URI,
+                                int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
+                                const struct srcsax_attribute * attributes) {
+                xmlTextWriterStartElementNS(writer, (const xmlChar *)prefix, (const xmlChar *)localname, 0);
+                bool seenpos = false;
+                for(int pos = 0; pos < num_namespaces; ++pos) {
+                    std::string name = "xmlns";
+                    if(namespaces[pos].prefix) {
+                        name += ":";
+                        name += (const char *)namespaces[pos].prefix;
+    
+                    }
+                    xmlTextWriterWriteAttribute(writer, (const xmlChar *)name.c_str(), (const xmlChar *)namespaces[pos].uri);
+                }
+                for(int pos = 0; pos < num_attributes; ++pos) {
+                    std::string str(attributes[pos].localname);
+                    if(str == "line" || str == "filename"){
+                    xmlTextWriterWriteAttributeNS(writer, (const xmlChar *)attributes[pos].prefix, (const xmlChar *)attributes[pos].localname,
+                        (const xmlChar *)attributes[pos].uri, (const xmlChar *)attributes[pos].value);                    
+                    }
+    
+                }
+            }
+          /**
+            * write_content
+            * @param text_content
+            *
+            * Write out the provided text content, escaping everything but ".
+            */
+            void write_content(const std::string &text_content) {        
+                if(!text_content.empty()) {        
+                    /*
+                        Normal output of text is for the most part
+                        identical to what libxml2 provides.  However,
+                        srcML does not escape " while libxml2 does escape
+                        quotations.
+                    */
+                    int ret = 0;
+                    char * text = (char *)text_content.c_str();
+                    for(char * pos = text; *pos; ++pos) {       
+                        if(*pos != '"') continue;       
+                        
+                        *pos = 0;
+                        ret = xmlTextWriterWriteString(writer, (const xmlChar *)text);
+                               
+                        *pos = '\"';
+                        xmlTextWriterWriteRaw(writer, (const xmlChar *)"\"");
+                               
+                        text = pos + 1;     
+                    }       
+                    ret = xmlTextWriterWriteString(writer, (const xmlChar *)text);
+                }  
+            }
             inline bool And(const std::vector<ParserState> vec) const{
                 for(auto field : vec){
                     if(triggerField[field]) continue;
