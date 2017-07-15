@@ -69,7 +69,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
 			assert(datatotest[0].isStatic == false);
 			assert(datatotest[0].namespaces.empty());
 
-			assert(datatotest[1].nameoftype == "Object<int>");
+			assert(datatotest[1].nameoftype == "Object");
 			assert(datatotest[1].nameofidentifier == "onetwothree");
 			assert(datatotest[1].linenumber == 1);
 			assert(datatotest[1].isConst == false);
@@ -96,7 +96,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
 			assert(datatotest[3].isStatic == false);
 			assert(datatotest[3].namespaces.empty());
 
-			assert(datatotest[4].nameoftype == "std::vector<std::string>");
+			assert(datatotest[4].nameoftype == "vector");
 			assert(datatotest[4].nameofidentifier == "spaces");
 			assert(datatotest[4].linenumber == 1);
 			assert(datatotest[4].isConst == false);
