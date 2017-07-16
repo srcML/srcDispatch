@@ -72,6 +72,7 @@ namespace srcSAXEventDispatch {
         bool classflagopen, functionflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
 
         bool dispatching;
+        bool generateArchive;
         ParserState currentPState;
         ElementState currentEState;
 
@@ -143,23 +144,25 @@ namespace srcSAXEventDispatch {
             }
         }
 
-        srcSAXEventDispatcher(PolicyListener * listener) : EventDispatcher(srcml_element_stack) {
+        srcSAXEventDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
+            generateArchive = genArchive;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
-            ctx.writer = xmlNewTextWriter (ob);
+            if(genArchive) { ctx.writer = xmlNewTextWriter (ob); }
             InitializeHandlers();
         }
 
-        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners) : EventDispatcher(srcml_element_stack) {
+        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
+            generateArchive = genArchive;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
-            ctx.writer = xmlNewTextWriter (ob);
+            if(genArchive) { ctx.writer = xmlNewTextWriter (ob); }
             InitializeHandlers();
         }
         void AddListener(EventListener* listener) override {
@@ -640,10 +643,10 @@ namespace srcSAXEventDispatch {
         }
 
         virtual void startDocument() {
-            xmlTextWriterStartDocument(ctx.writer, "1.0", "UTF-8", "yes");
+            if (generateArchive) { xmlTextWriterStartDocument(ctx.writer, "1.0", "UTF-8", "yes"); }
         }
         virtual void endDocument() {
-            xmlTextWriterEndDocument(ctx.writer);
+            if (generateArchive) { xmlTextWriterEndDocument(ctx.writer); }
         }
     
         /**
@@ -789,7 +792,7 @@ namespace srcSAXEventDispatch {
             ctx.currentToken.append(ch, len);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
             process->second();
-            ctx.write_content(ctx.currentToken);
+            if (generateArchive) { ctx.write_content(ctx.currentToken); }
         }
     
         // end elements may need to be used if you want to collect only on per file basis or some other granularity.
@@ -799,7 +802,7 @@ namespace srcSAXEventDispatch {
                 process2->second();
             }
             if(is_archive) {
-                xmlTextWriterEndElement(ctx.writer);
+                if (generateArchive) { xmlTextWriterEndElement(ctx.writer); }
             }            
         }
         virtual void endUnit(const char * localname, const char * prefix, const char * URI) override {
@@ -808,7 +811,7 @@ namespace srcSAXEventDispatch {
                 process2->second();
             }
 
-            xmlTextWriterEndElement(ctx.writer);
+            if (generateArchive) { xmlTextWriterEndElement(ctx.writer); }
         }
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
@@ -829,7 +832,7 @@ namespace srcSAXEventDispatch {
 
             --ctx.depth;
 
-            xmlTextWriterEndElement(ctx.writer);
+            if (generateArchive) { xmlTextWriterEndElement(ctx.writer); }
         }
     #pragma GCC diagnostic pop
     
