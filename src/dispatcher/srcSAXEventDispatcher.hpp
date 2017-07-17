@@ -150,8 +150,12 @@ namespace srcSAXEventDispatch {
             dispatching = false;
             generateArchive = genArchive;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
-            xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
-            if(genArchive) { ctx.writer = xmlNewTextWriter (ob); }
+            
+            if(genArchive) {
+                ctx.archiveBuffer = xmlBufferCreate();
+                xmlOutputBufferPtr ob = xmlOutputBufferCreateBuffer (ctx.archiveBuffer, NULL);
+                ctx.writer = xmlNewTextWriter (ob);
+            }
             InitializeHandlers();
         }
 
@@ -161,8 +165,11 @@ namespace srcSAXEventDispatch {
             dispatching = false;
             generateArchive = genArchive;
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
-            xmlOutputBufferPtr ob = xmlOutputBufferCreateFd (1, NULL);
-            if(genArchive) { ctx.writer = xmlNewTextWriter (ob); }
+            if(genArchive) {
+                ctx.archiveBuffer = xmlBufferCreate();
+                xmlOutputBufferPtr ob = xmlOutputBufferCreateBuffer (ctx.archiveBuffer, NULL);
+                ctx.writer = xmlNewTextWriter (ob);
+            }
             InitializeHandlers();
         }
         void AddListener(EventListener* listener) override {
