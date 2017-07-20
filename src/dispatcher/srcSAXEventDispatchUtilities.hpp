@@ -56,13 +56,18 @@ namespace srcSAXEventDispatch{
                   isOperator(false),
                   endArchive(false),
                   currentLineNumber{0},
+                  archiveBuffer{0},
                   writer{0} {}
             ~srcSAXEventContext(){
                 if(writer){
+                    xmlBufferFree(archiveBuffer);
                     xmlFreeTextWriter(writer);
                 }
             }
+            //Objects for writing to archive and obtaining archive post-parse
             xmlTextWriterPtr writer;
+            xmlBufferPtr archiveBuffer;
+
             EventDispatcher * dispatcher;
             const std::vector<std::string> & elementStack;
             std::vector<int> genericDepth;
