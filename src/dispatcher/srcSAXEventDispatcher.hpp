@@ -667,7 +667,7 @@ namespace srcSAXEventDispatch {
         virtual void startRoot(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
-            if(is_archive){
+            if(is_archive && generateArchive){
                 ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             }
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
@@ -694,7 +694,9 @@ namespace srcSAXEventDispatch {
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
     
-            ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
+            if (generateArchive){
+                ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
+            }
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find("unit");
             if (process != process_map.end()) {
                 process->second();
@@ -724,7 +726,9 @@ namespace srcSAXEventDispatch {
                                     int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                                     const struct srcsax_attribute * attributes) override {
             
-            ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
+            if(generateArchive){
+                ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
+            }
             
             ++ctx.depth;
 
@@ -801,8 +805,8 @@ namespace srcSAXEventDispatch {
             if (process2 != process_map2.end()) {
                 process2->second();
             }
-            if(is_archive) {
-                if (generateArchive) { xmlTextWriterEndElement(ctx.writer); }
+            if(is_archive && generateArchive) {
+                xmlTextWriterEndElement(ctx.writer);
             }            
         }
         virtual void endUnit(const char * localname, const char * prefix, const char * URI) override {
