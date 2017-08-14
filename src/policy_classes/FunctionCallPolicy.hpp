@@ -55,6 +55,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
     private:
         CallData data;
         std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
+        std::string fullFuncIdentifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
@@ -75,13 +76,23 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::name) && ctx.IsGreaterThan(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                     data.fnName = ctx.currentToken;
-                    data.callargumentlist.push_back("(");
-                    data.callargumentlist.push_back(ctx.currentToken);
+                    fullFuncIdentifier += ctx.currentToken;
                 }
-                //std::cerr<<ctx.IsOpen(ParserState::name)<<" "<<ctx.IsOpen(ParserState::argument)<<" "<<ctx.IsOpen(ParserState::argumentlist)<<" "<<ctx.IsOpen(ParserState::genericargumentlist)<<std::endl;
+                
                 if(ctx.And({ParserState::name, ParserState::argument, ParserState::argumentlist}) && ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                     data.callargumentlist.push_back(ctx.currentToken);
                 }
+
+                if(ctx.And({ParserState::literal, ParserState::argument, ParserState::argumentlist}) && ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
+                    data.callargumentlist.push_back("*LITERAL*");   //Illegal c++ identifier as marker for literals
+                }
+            };
+
+            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx) {
+                data.callargumentlist.push_back("(");
+                data.callargumentlist.push_back(fullFuncIdentifier);
+                data.fnName = fullFuncIdentifier;
+                fullFuncIdentifier = "";
             };
         }
 };
