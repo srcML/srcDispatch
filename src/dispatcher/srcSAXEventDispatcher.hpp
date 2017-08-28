@@ -649,10 +649,10 @@ namespace srcSAXEventDispatch {
             };            
         }
 
-        virtual void startDocument() {
+        virtual void startDocument() override {
             if (generateArchive) { xmlTextWriterStartDocument(ctx.writer, "1.0", "UTF-8", "yes"); }
         }
-        virtual void endDocument() {
+        virtual void endDocument() override {
             if (generateArchive) { xmlTextWriterEndDocument(ctx.writer); }
         }
     
