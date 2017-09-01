@@ -11,7 +11,7 @@ std::string StringToSrcML(std::string str){
 	struct srcml_unit* unit;
 	size_t size = 0;
 
-	char *ch = nullptr;
+	char *ch = new char[str.size()];
 
 	archive = srcml_archive_create();
 	srcml_archive_enable_option(archive, SRCML_OPTION_POSITION);
@@ -43,13 +43,13 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest.size() == 5);
 			assert(datatotest[0].nameoftype == "int");
 			assert(datatotest[0].nameofidentifier == "abc");
-			std::cerr<<datatotest[0].linenumber<<std::endl;
 			assert(datatotest[0].linenumber == 1);
 			assert(datatotest[0].isConst == false);
 			assert(datatotest[0].isReference == true);
 			assert(datatotest[0].isPointer == false);
 			assert(datatotest[0].isStatic == false);
 			assert(datatotest[0].namespaces.empty());
+			assert(datatotest[0].isClassMember == true);
 
 			assert(datatotest[1].nameoftype == "Object");
 			assert(datatotest[1].nameofidentifier == "onetwothree");
@@ -99,9 +99,9 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;\n nlp::std::vector<std::string> spaces;}";
+	std::string codestr = "class testclass {void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;\n nlp::std::vector<std::string> spaces;}};";
 	std::string srcmlstr = StringToSrcML(codestr);
-std::cerr<<srcmlstr<<std::endl;
+
     TestDeclType decltypedata;
     srcSAXController control(srcmlstr);
     srcSAXEventDispatch::srcSAXEventDispatcher<DeclTypePolicy> handler {&decltypedata};

@@ -58,6 +58,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
 
             closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::declstmt})){
+                    if(ctx.IsOpen(ParserState::classblock)){
+                        data.isClassMember = true;
+                    }
                     data.linenumber = ctx.currentLineNumber;
                     data.nameofidentifier = currentDeclName;
                     currentDeclName.clear();

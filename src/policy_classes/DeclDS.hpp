@@ -31,6 +31,7 @@ struct DeclData{
         isReference = false;
         isPointer = false;
         isStatic = false;
+        isClassMember = false;
     }
     std::string nameoftype;
     std::string nameofidentifier;
@@ -42,6 +43,7 @@ struct DeclData{
     bool isReference;
     bool isPointer;
     bool isStatic;
+    bool isClassMember;
 };
 
 #endif
