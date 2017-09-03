@@ -45,6 +45,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     data.namespaces.push_back(ctx.currentToken);
                 }
             };
+            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx){
+                data.usesSubscript = true;
+            };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentModifier == "*"){

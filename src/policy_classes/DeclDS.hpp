@@ -21,7 +21,7 @@
 #define INCLUDED_DECL_DS_HPP
 
 struct DeclData{
-    DeclData(): linenumber{0}, isConst{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}
+    DeclData(): linenumber{0}, isConst{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false} {}
     void clear(){
         nameoftype.clear();
         nameofidentifier.clear();
@@ -32,6 +32,7 @@ struct DeclData{
         isPointer = false;
         isStatic = false;
         isClassMember = false;
+        usesSubscript = false;
     }
     std::string nameoftype;
     std::string nameofidentifier;
@@ -44,6 +45,7 @@ struct DeclData{
     bool isPointer;
     bool isStatic;
     bool isClassMember;
+    bool usesSubscript;
 };
 
 #endif

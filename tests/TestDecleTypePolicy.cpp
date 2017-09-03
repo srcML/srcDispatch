@@ -40,7 +40,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
             datatotest.push_back(decltypedata);
         }
 		void RunTest(){
-			assert(datatotest.size() == 5);
+			assert(datatotest.size() == 6);
 			assert(datatotest[0].nameoftype == "int");
 			assert(datatotest[0].nameofidentifier == "abc");
 			assert(datatotest[0].linenumber == 1);
@@ -86,6 +86,17 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[4].isPointer == false);
 			assert(datatotest[4].isStatic == false);
 			assert(datatotest[4].namespaces.size() == 2);
+
+			assert(datatotest[5].nameoftype == "int");
+			assert(datatotest[5].nameofidentifier == "ab");
+			assert(datatotest[5].linenumber == 2);
+			assert(datatotest[5].isConst == false);
+			assert(datatotest[5].isReference == false);
+			assert(datatotest[5].isPointer == true);
+			assert(datatotest[5].isStatic == false);
+			assert(datatotest[5].namespaces.empty());
+			assert(datatotest[5].isClassMember == false);
+			assert(datatotest[5].usesSubscript == true);			
 		}
     protected:
         void * DataInner() const override {
@@ -99,7 +110,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "class testclass {void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;\n nlp::std::vector<std::string> spaces;}};";
+	std::string codestr = "class testclass {void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;\n nlp::std::vector<std::string> spaces;}}; int* ab[5];";
 	std::string srcmlstr = StringToSrcML(codestr);
 
     TestDeclType decltypedata;
