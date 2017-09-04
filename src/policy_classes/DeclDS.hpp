@@ -21,31 +21,39 @@
 #define INCLUDED_DECL_DS_HPP
 
 struct DeclData{
-    DeclData(): linenumber{0}, isConst{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false} {}
+    DeclData(): linenumber{0}, isConst{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
+                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}{}
     void clear(){
-        nameoftype.clear();
-        nameofidentifier.clear();
-        namespaces.clear();
         linenumber = -1;
         isConst = false;
-        isReference = false;
-        isPointer = false;
         isStatic = false;
+        isPointer = false;
+        nameOfType.clear();
+        namespaces.clear();
+        isReference = false;
         isClassMember = false;
         usesSubscript = false;
+        sLexicalCategory.clear();
+        nameOfIdentifier.clear();
     }
-    std::string nameoftype;
-    std::string nameofidentifier;
-    std::vector<std::string> namespaces;
     int linenumber;
+    
     bool isConst;
-    bool isConstAlias;
-    bool isAliasToConst;
-    bool isReference;
-    bool isPointer;
     bool isStatic;
+    bool isPointer;
+    bool isReference;
+    bool isConstAlias;
     bool isClassMember;
     bool usesSubscript;
+    bool isAliasToConst;
+    
+    std::string nameOfType;
+    std::string sLexicalCategory;
+    std::string nameOfIdentifier;
+    std::string nameOfContainingFile;
+    std::string nameOfContainingFunction;
+
+    std::vector<std::string> namespaces;
 };
 
 #endif

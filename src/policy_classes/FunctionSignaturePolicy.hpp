@@ -27,33 +27,38 @@
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
         struct SignatureData{
-            SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, hasAliasedReturn{false} {}
+            SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, 
+            hasAliasedReturn{false}{}
             int linenumber;
-            std::string returnType;
-            std::string name;
-            std::string returnTypeModifier;
-            std::vector<std::string> functionNamespaces;
-            std::vector<std::string> returnTypeNamespaces;
-            std::vector<DeclData> parameters;
             bool isConst;
             bool isMethod;
             bool isStatic;
-            bool pointerToConstReturn;
-            bool constPointerReturn;
+            std::string name;
             bool hasAliasedReturn;
+            std::string returnType;
+            bool constPointerReturn;
+            bool pointerToConstReturn;
+            std::string returnTypeModifier;
+            std::string sLexicalCategory;
+            std::string nameOfContainingFile;
+            std::vector<DeclData> parameters;
+            std::string NameOfContainingFunction;
+            std::vector<std::string> functionNamespaces;
+            std::vector<std::string> returnTypeNamespaces;
             void clear(){
-                returnType.clear();
                 name.clear();
-                parameters.clear();
-                returnTypeNamespaces.clear();
-                functionNamespaces.clear();
-                returnTypeModifier.clear();
                 isConst = false;
                 isMethod = false;
                 isStatic = false;
-                pointerToConstReturn = false;
-                constPointerReturn = false;
+                returnType.clear();
+                parameters.clear();
+                sLexicalCategory.clear();
                 hasAliasedReturn = false;
+                functionNamespaces.clear();
+                returnTypeModifier.clear();
+                constPointerReturn = false;
+                returnTypeNamespaces.clear();
+                pointerToConstReturn = false;
             }
         };
         ~FunctionSignaturePolicy(){}

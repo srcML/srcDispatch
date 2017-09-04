@@ -65,7 +65,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         data.isClassMember = true;
                     }
                     data.linenumber = ctx.currentLineNumber;
-                    data.nameofidentifier = currentDeclName;
+                    data.nameOfIdentifier = currentDeclName;
                     currentDeclName.clear();
                     NotifyAll(ctx);
                     data.clear();
@@ -74,7 +74,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
 
             closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::declstmt})){
-                    data.nameoftype = currentTypeName;
+                    data.nameOfType = currentTypeName;
                 }
             };
 

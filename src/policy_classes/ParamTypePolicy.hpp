@@ -59,13 +59,13 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::parameter})){
                     data.linenumber = ctx.currentLineNumber;
-                    data.nameofidentifier = currentDeclName;
+                    data.nameOfIdentifier = currentDeclName;
                 }
             };
 
             closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::parameter})){
-                    data.nameoftype = currentTypeName;
+                    data.nameOfType = currentTypeName;
                     currentTypeName.clear();
                 }
             };
