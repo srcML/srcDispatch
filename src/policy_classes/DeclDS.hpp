@@ -21,16 +21,17 @@
 #define INCLUDED_DECL_DS_HPP
 
 struct DeclData{
-    DeclData(): linenumber{0}, isConst{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
+    DeclData(): linenumber{0}, isConstValue{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
                 isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}{}
     void clear(){
         linenumber = -1;
-        isConst = false;
         isStatic = false;
         isPointer = false;
         nameOfType.clear();
         namespaces.clear();
         isReference = false;
+        isConstValue = false;
+        isConstAlias = false;
         isClassMember = false;
         usesSubscript = false;
         sLexicalCategory.clear();
@@ -38,7 +39,7 @@ struct DeclData{
     }
     int linenumber;
     
-    bool isConst;
+    bool isConstValue;
     bool isStatic;
     bool isPointer;
     bool isReference;

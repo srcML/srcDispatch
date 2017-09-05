@@ -45,6 +45,9 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                     data.namespaces.push_back(ctx.currentToken);
                 }
             };
+            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx){
+                data.usesSubscript = true;
+            };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
                     if(currentModifier == "*"){
@@ -99,7 +102,11 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                         data.isStatic = true;
                     }
                     if(currentSpecifier == "const"){
-                        data.isConst = true;
+                        if(data.isPointer){
+                            data.isConstAlias = true;
+                        }else{
+                            data.isConstValue = true;
+                        }
                     }
                 }
                 currentSpecifier.clear();

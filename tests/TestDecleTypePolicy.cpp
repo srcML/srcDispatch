@@ -44,7 +44,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[0].nameOfType == "int");
 			assert(datatotest[0].nameOfIdentifier == "abc");
 			assert(datatotest[0].linenumber == 1);
-			assert(datatotest[0].isConst == false);
+			assert(datatotest[0].isConstValue == false);
+			assert(datatotest[0].isConstAlias == false);
 			assert(datatotest[0].isReference == true);
 			assert(datatotest[0].isPointer == false);
 			assert(datatotest[0].isStatic == false);
@@ -54,7 +55,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[1].nameOfType == "Object");
 			assert(datatotest[1].nameOfIdentifier == "onetwothree");
 			assert(datatotest[1].linenumber == 1);
-			assert(datatotest[1].isConst == false);
+			assert(datatotest[1].isConstValue == false);
+			assert(datatotest[1].isConstAlias == false);
 			assert(datatotest[1].isReference == false);
 			assert(datatotest[1].isPointer == false);
 			assert(datatotest[1].isStatic == false);
@@ -63,7 +65,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[2].nameOfType == "Object");
 			assert(datatotest[2].nameOfIdentifier == "DoReiMe");
 			assert(datatotest[2].linenumber == 1);
-			assert(datatotest[2].isConst == false);
+			assert(datatotest[2].isConstValue == false);
+			assert(datatotest[2].isConstAlias == false);
 			assert(datatotest[2].isReference == false);
 			assert(datatotest[2].isPointer == true);
 			assert(datatotest[2].isStatic == true);
@@ -72,7 +75,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[3].nameOfType == "Object");
 			assert(datatotest[3].nameOfIdentifier == "aybeecee");
 			assert(datatotest[3].linenumber == 1);
-			assert(datatotest[3].isConst == true);
+			assert(datatotest[3].isConstAlias == true);
+			assert(datatotest[3].isConstValue == true);
 			assert(datatotest[3].isReference == false);
 			assert(datatotest[3].isPointer == true);
 			assert(datatotest[3].isStatic == false);
@@ -81,7 +85,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[4].nameOfType == "vector");
 			assert(datatotest[4].nameOfIdentifier == "spaces");
 			assert(datatotest[4].linenumber == 2);
-			assert(datatotest[4].isConst == false);
+			assert(datatotest[4].isConstValue == false);
+			assert(datatotest[4].isConstAlias == false);
 			assert(datatotest[4].isReference == false);
 			assert(datatotest[4].isPointer == false);
 			assert(datatotest[4].isStatic == false);
@@ -90,13 +95,14 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[5].nameOfType == "int");
 			assert(datatotest[5].nameOfIdentifier == "ab");
 			assert(datatotest[5].linenumber == 2);
-			assert(datatotest[5].isConst == false);
+			assert(datatotest[5].isConstValue == false);
+			assert(datatotest[5].isConstAlias == true);
 			assert(datatotest[5].isReference == false);
 			assert(datatotest[5].isPointer == true);
 			assert(datatotest[5].isStatic == false);
 			assert(datatotest[5].namespaces.empty());
 			assert(datatotest[5].isClassMember == false);
-			assert(datatotest[5].usesSubscript == true);			
+			assert(datatotest[5].usesSubscript == true);
 		}
     protected:
         void * DataInner() const override {
@@ -110,7 +116,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "class testclass {void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* aybeecee;\n nlp::std::vector<std::string> spaces;}}; int* ab[5];";
+	std::string codestr = "class testclass {void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* const aybeecee;\n nlp::std::vector<std::string> spaces;}}; int* const ab[5];";
 	std::string srcmlstr = StringToSrcML(codestr);
 
     TestDeclType decltypedata;

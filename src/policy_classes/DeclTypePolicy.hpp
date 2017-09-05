@@ -99,7 +99,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentSpecifier == "const"){
-                        data.isConst = true;
+                        if(data.isPointer){
+                            data.isConstAlias = true;
+                        }else{
+                            data.isConstValue = true;
+                        }
                     }
                     if(currentSpecifier == "static"){
                         data.isStatic = true;
