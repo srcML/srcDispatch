@@ -22,7 +22,7 @@
 
 struct DeclData{
     DeclData(): linenumber{0}, isConstValue{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
-                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}{}
+                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false}{}
     void clear(){
         linenumber = -1;
         isStatic = false;
@@ -34,6 +34,7 @@ struct DeclData{
         isConstAlias = false;
         isClassMember = false;
         usesSubscript = false;
+        hasSideEffect = false;
         sLexicalCategory.clear();
         nameOfIdentifier.clear();
     }
@@ -46,8 +47,9 @@ struct DeclData{
     bool isConstAlias;
     bool isClassMember;
     bool usesSubscript;
+    bool hasSideEffect;
     bool isAliasToConst;
-    
+
     std::string nameOfType;
     std::string sLexicalCategory;
     std::string nameOfIdentifier;
