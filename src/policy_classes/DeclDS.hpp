@@ -54,6 +54,7 @@ struct DeclData{
     std::string sLexicalCategory;
     std::string nameOfIdentifier;
     std::string nameOfContainingFile;
+    std::string nameOfContainingClass;
     std::string nameOfContainingFunction;
 
     std::vector<std::string> namespaces;

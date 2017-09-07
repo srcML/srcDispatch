@@ -37,7 +37,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             return new DeclData(data);
         }
     private:
-        std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
+        std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier, currentClassName;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
@@ -47,6 +47,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             };
             openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx){
                 data.usesSubscript = true;
+            };
+            closeEventMap[ParserState::classblock] = [this](srcSAXEventContext& ctx){
+                currentClassName.clear();
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
@@ -63,6 +66,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 if(ctx.And({ParserState::declstmt})){
                     if(ctx.IsOpen(ParserState::classblock)){
                         data.isClassMember = true;
+                        data.nameOfContainingClass = currentClassName;
+                        std::cerr<<"Class name: "<<currentClassName<<std::endl;
                     }
                     data.linenumber = ctx.currentLineNumber;
                     data.nameOfIdentifier = currentDeclName;
@@ -93,6 +98,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     }
                     if(ctx.And({ParserState::modifier, ParserState::type, ParserState::declstmt})){
                         currentModifier = ctx.currentToken;
+                    }
+                    if(ctx.Or({ParserState::classn, ParserState::structn}) && ctx.IsClosed(ParserState::classblock)){
+                        currentClassName = ctx.currentToken;
                     }
                 }
             };
