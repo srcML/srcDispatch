@@ -51,7 +51,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[0].isStatic == false);
 			assert(datatotest[0].namespaces.empty());
 			assert(datatotest[0].isClassMember == true);
-			assert(datatotest[0].nameOfContainingFunction == "foo");
+			assert(datatotest[0].nameOfContainingFunction == "");
 			assert(datatotest[0].nameOfContainingClass == "testclass");
 
 			assert(datatotest[1].nameOfType == "Object");
@@ -63,7 +63,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[1].isPointer == false);
 			assert(datatotest[1].isStatic == false);
 			assert(datatotest[1].namespaces.empty());
-			assert(datatotest[1].nameOfContainingFunction == "foo");
+			assert(datatotest[1].nameOfContainingFunction == "");
 			assert(datatotest[1].nameOfContainingClass == "testclass");
 
 			assert(datatotest[2].nameOfType == "Object");
@@ -76,7 +76,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[2].isStatic == true);
 			assert(datatotest[2].namespaces.empty());
 			assert(datatotest[2].nameOfContainingFunction == "foo");
-			assert(datatotest[2].nameOfContainingClass == "testclass");
+			assert(datatotest[2].nameOfContainingClass == "");
 
 			assert(datatotest[3].nameOfType == "Object");
 			assert(datatotest[3].nameOfIdentifier == "aybeecee");
@@ -88,7 +88,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[3].isStatic == false);
 			assert(datatotest[3].namespaces.empty());
 			assert(datatotest[3].nameOfContainingFunction == "foo");
-			assert(datatotest[3].nameOfContainingClass == "testclass");
+			assert(datatotest[3].nameOfContainingClass == "");
 
 			assert(datatotest[4].nameOfType == "vector");
 			assert(datatotest[4].nameOfIdentifier == "spaces");
@@ -100,7 +100,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[4].isStatic == false);
 			assert(datatotest[4].namespaces.size() == 2);
 			assert(datatotest[4].nameOfContainingFunction == "foo");
-			assert(datatotest[4].nameOfContainingClass == "testclass");
+			assert(datatotest[4].nameOfContainingClass == "");
 
 			assert(datatotest[5].nameOfType == "int");
 			assert(datatotest[5].nameOfIdentifier == "ab");
@@ -128,7 +128,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "class testclass {void foo(){int& abc; Object<int> onetwothree; static Object* DoReiMe; const Object* const aybeecee;\n nlp::std::vector<std::string> spaces;}}; int* const ab[5];";
+	std::string codestr = "class testclass {int& abc; Object<int> onetwothree; void foo(){static Object* DoReiMe; const Object* const aybeecee;\n nlp::std::vector<std::string> spaces;}}; int* const ab[5];";
 	std::string srcmlstr = StringToSrcML(codestr);
 
     TestDeclType decltypedata;
