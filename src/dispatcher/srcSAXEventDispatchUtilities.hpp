@@ -74,7 +74,8 @@ namespace srcSAXEventDispatch{
             unsigned int currentLineNumber;
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
-                        currentTag, currentToken, currentAttributeName, currentAttributeValue;
+                        currentTag, currentToken, currentAttributeName, currentAttributeValue, currentFunctionName,
+                        currentClassName;
             std::size_t depth;
             bool isPrev, isOperator, endArchive;
 

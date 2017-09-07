@@ -37,6 +37,9 @@ struct DeclData{
         hasSideEffect = false;
         sLexicalCategory.clear();
         nameOfIdentifier.clear();
+        nameOfContainingFile.clear();
+        nameOfContainingClass.clear();
+        nameOfContainingFunction.clear();
     }
     int linenumber;
     
