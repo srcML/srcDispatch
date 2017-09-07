@@ -38,11 +38,11 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             std::string returnType;
             bool constPointerReturn;
             bool pointerToConstReturn;
-            std::string returnTypeModifier;
             std::string sLexicalCategory;
-            std::string nameOfContainingFile;
+            std::string returnTypeModifier;
             std::vector<DeclData> parameters;
-            std::string NameOfContainingFunction;
+            std::string nameOfContainingFile;
+            std::string nameOfContainingClass;
             std::vector<std::string> functionNamespaces;
             std::vector<std::string> returnTypeNamespaces;
             void clear(){
@@ -57,8 +57,10 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 functionNamespaces.clear();
                 returnTypeModifier.clear();
                 constPointerReturn = false;
+                nameOfContainingFile.clear();
                 returnTypeNamespaces.clear();
                 pointerToConstReturn = false;
+                nameOfContainingClass.clear();
             }
         };
         ~FunctionSignaturePolicy(){}
@@ -100,7 +102,9 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){//incomplete. Blocks count too.
                 if(ctx.IsOpen(ParserState::classn)){
                     data.isMethod = true;
+                    data.nameOfContainingClass = ctx.currentClassName;
                 }
+                data.name = ctx.currentFunctionName;
                 NotifyAll(ctx);
                 seenModifier = false;
                 data.clear();
@@ -115,9 +119,6 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 else if(currentModifier == "&") {}
             };
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
-                if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
-                    data.name = ctx.currentToken;
-                }
                 if(ctx.And({ParserState::name, ParserState::type, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::parameterlist, ParserState::genericargumentlist})){
                     data.returnType = ctx.currentToken;
                 }
