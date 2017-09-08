@@ -426,6 +426,10 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::unit];
                     DispatchEvent(ParserState::unit, ElementState::open);
                 } },
+                { "return", [this](){
+                    ++ctx.triggerField[ParserState::returnstmt];
+                    DispatchEvent(ParserState::returnstmt, ElementState::open);
+                } },
             };
             process_map2 = {
                 {"decl_stmt", [this](){
@@ -639,6 +643,10 @@ namespace srcSAXEventDispatch {
                         ctx.triggerField[ParserState::archive] = 0;
                         DispatchEvent(ParserState::archive, ElementState::close);
                     }
+                } },
+                { "return", [this](){
+                    --ctx.triggerField[ParserState::returnstmt];
+                    DispatchEvent(ParserState::returnstmt, ElementState::close);
                 } },
                 { "xmlattribute", [this](){
                     ctx.triggerField[ParserState::xmlattribute] = 1;
