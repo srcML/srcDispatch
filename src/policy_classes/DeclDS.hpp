@@ -22,7 +22,8 @@
 
 struct DeclData{
     DeclData(): linenumber{0}, isConstValue{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
-                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false}{}
+                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false}, 
+                numberOfContainingFunctionParams{0} {}
     void clear(){
         linenumber = -1;
         isStatic = false;
@@ -42,9 +43,11 @@ struct DeclData{
         nameOfContainingFile.clear();
         nameOfContainingClass.clear();
         nameOfContainingFunction.clear();
+        numberOfContainingFunctionParams = 0;
     }
     int linenumber;
-    
+    int numberOfContainingFunctionParams;
+
     bool isConstValue;
     bool isStatic;
     bool isPointer;
@@ -56,7 +59,7 @@ struct DeclData{
     bool isAliasToConst;
     bool isParameter;
     bool isLocalVar;
-    
+
     std::string nameOfType;
     std::string sLexicalCategory;
     std::string nameOfIdentifier;
