@@ -70,6 +70,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
 
                     data.linenumber = ctx.currentLineNumber;
                     data.nameOfIdentifier = currentDeclName;
+                    data.isLocalVar = true;
+                    
                     currentDeclName.clear();
                     NotifyAll(ctx);
                     data.clear();

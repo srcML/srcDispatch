@@ -29,7 +29,9 @@ struct DeclData{
         isPointer = false;
         nameOfType.clear();
         namespaces.clear();
+        isLocalVar = false;
         isReference = false;
+        isParameter = false;
         isConstValue = false;
         isConstAlias = false;
         isClassMember = false;
@@ -52,7 +54,9 @@ struct DeclData{
     bool usesSubscript;
     bool hasSideEffect;
     bool isAliasToConst;
-
+    bool isParameter;
+    bool isLocalVar;
+    
     std::string nameOfType;
     std::string sLexicalCategory;
     std::string nameOfIdentifier;

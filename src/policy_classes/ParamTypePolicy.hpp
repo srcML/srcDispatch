@@ -93,6 +93,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                 }
             };
             closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
+                data.isParameter = true;
                 NotifyAll(ctx);
                 data.clear();
             };
