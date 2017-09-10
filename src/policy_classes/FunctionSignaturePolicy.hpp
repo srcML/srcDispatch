@@ -24,45 +24,45 @@
 #include <DeclDS.hpp>
 #ifndef FUNCTIONSIGNATUREPOLICY
 #define FUNCTIONSIGNATUREPOLICY
+struct SignatureData{
+    SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, 
+    hasAliasedReturn{false}{}
+    int linenumber;
+    bool isConst;
+    bool isMethod;
+    bool isStatic;
+    std::string name;
+    bool hasAliasedReturn;
+    std::string returnType;
+    bool constPointerReturn;
+    bool pointerToConstReturn;
+    std::string sLexicalCategory;
+    std::string returnTypeModifier;
+    std::vector<DeclData> parameters;
+    std::string nameOfContainingFile;
+    std::string nameOfContainingClass;
+    std::vector<std::string> functionNamespaces;
+    std::vector<std::string> returnTypeNamespaces;
+    void clear(){
+        name.clear();
+        isConst = false;
+        isMethod = false;
+        isStatic = false;
+        returnType.clear();
+        parameters.clear();
+        sLexicalCategory.clear();
+        hasAliasedReturn = false;
+        functionNamespaces.clear();
+        returnTypeModifier.clear();
+        constPointerReturn = false;
+        nameOfContainingFile.clear();
+        returnTypeNamespaces.clear();
+        pointerToConstReturn = false;
+        nameOfContainingClass.clear();
+    }
+};
 class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
     public:
-        struct SignatureData{
-            SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, 
-            hasAliasedReturn{false}{}
-            int linenumber;
-            bool isConst;
-            bool isMethod;
-            bool isStatic;
-            std::string name;
-            bool hasAliasedReturn;
-            std::string returnType;
-            bool constPointerReturn;
-            bool pointerToConstReturn;
-            std::string sLexicalCategory;
-            std::string returnTypeModifier;
-            std::vector<DeclData> parameters;
-            std::string nameOfContainingFile;
-            std::string nameOfContainingClass;
-            std::vector<std::string> functionNamespaces;
-            std::vector<std::string> returnTypeNamespaces;
-            void clear(){
-                name.clear();
-                isConst = false;
-                isMethod = false;
-                isStatic = false;
-                returnType.clear();
-                parameters.clear();
-                sLexicalCategory.clear();
-                hasAliasedReturn = false;
-                functionNamespaces.clear();
-                returnTypeModifier.clear();
-                constPointerReturn = false;
-                nameOfContainingFile.clear();
-                returnTypeNamespaces.clear();
-                pointerToConstReturn = false;
-                nameOfContainingClass.clear();
-            }
-        };
         ~FunctionSignaturePolicy(){}
         FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
             currentArgPosition = 1;

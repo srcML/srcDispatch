@@ -66,7 +66,6 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         data.nameOfContainingClass = ctx.currentClassName;
                     }
                     data.nameOfContainingFile = ctx.currentFileName;
-                    data.nameOfContainingFunction = ctx.currentFunctionName;
 
                     data.linenumber = ctx.currentLineNumber;
                     data.nameOfIdentifier = currentDeclName;

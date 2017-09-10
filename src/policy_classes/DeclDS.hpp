@@ -19,11 +19,10 @@
  */
 #ifndef INCLUDED_DECL_DS_HPP
 #define INCLUDED_DECL_DS_HPP
-
+struct SignatureData;
 struct DeclData{
     DeclData(): linenumber{0}, isConstValue{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
-                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false}, 
-                numberOfContainingFunctionParams{0} {}
+                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false}{}
     void clear(){
         linenumber = -1;
         isStatic = false;
@@ -42,11 +41,8 @@ struct DeclData{
         nameOfIdentifier.clear();
         nameOfContainingFile.clear();
         nameOfContainingClass.clear();
-        nameOfContainingFunction.clear();
-        numberOfContainingFunctionParams = 0;
     }
     int linenumber;
-    int numberOfContainingFunctionParams;
 
     bool isConstValue;
     bool isStatic;
@@ -65,7 +61,8 @@ struct DeclData{
     std::string nameOfIdentifier;
     std::string nameOfContainingFile;
     std::string nameOfContainingClass;
-    std::string nameOfContainingFunction;
+
+    SignatureData* sigdata;
 
     std::vector<std::string> namespaces;
 };
