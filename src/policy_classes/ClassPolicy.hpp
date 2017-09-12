@@ -43,7 +43,7 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
    			std::string className;
    			bool isStruct = false;  //False -> Class; True -> Struct
-   			std::vector<FunctionSignaturePolicy::SignatureData> methods;
+   			std::vector<SignatureData> methods;
    			std::vector<DeclData> members;
 		};
 
@@ -61,7 +61,7 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             if (typeid(FunctionSignaturePolicy) == typeid(*policy)) {
-                FunctionSignaturePolicy::SignatureData signatureData = *policy->Data<FunctionSignaturePolicy::SignatureData>();
+                SignatureData signatureData = *policy->Data<SignatureData>();
                 data_stack.top().methods.push_back(signatureData);
             }
 

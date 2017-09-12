@@ -36,7 +36,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
         ~TestFunctionSignature(){}
         TestFunctionSignature(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){}
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            signaturedata = *policy->Data<FunctionSignaturePolicy::SignatureData>();
+            signaturedata = *policy->Data<SignatureData>();
             datatotest.push_back(signaturedata);
         }
         void RunTest(){
@@ -119,8 +119,8 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             return (void*)0; //To silence the warning
         }
     private:
-        FunctionSignaturePolicy::SignatureData signaturedata;
-        std::vector<FunctionSignaturePolicy::SignatureData> datatotest;
+        SignatureData signaturedata;
+        std::vector<SignatureData> datatotest;
 };
 
 int main(int argc, char** filename){

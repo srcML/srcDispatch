@@ -26,12 +26,13 @@
 #define FUNCTIONSIGNATUREPOLICY
 struct SignatureData{
     SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, 
-    hasAliasedReturn{false}{}
+    hasAliasedReturn{false}, hasSideEffect{false}{}
     int linenumber;
     bool isConst;
     bool isMethod;
     bool isStatic;
     std::string name;
+    bool hasSideEffect;
     bool hasAliasedReturn;
     std::string returnType;
     bool constPointerReturn;
@@ -50,6 +51,7 @@ struct SignatureData{
         isStatic = false;
         returnType.clear();
         parameters.clear();
+        hasSideEffect = false;
         sLexicalCategory.clear();
         hasAliasedReturn = false;
         functionNamespaces.clear();
