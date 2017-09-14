@@ -52,6 +52,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[0].namespaces.empty());
 			assert(datatotest[0].isClassMember == true);
 			assert(datatotest[0].nameOfContainingClass == "testclass");
+			assert(datatotest[0].nameOfContainingFunction == "");
+			assert(datatotest[0].nameOfContainingFile == "testsrcType.cpp");
 
 			assert(datatotest[1].nameOfType == "Object");
 			assert(datatotest[1].nameOfIdentifier == "onetwothree");
@@ -63,6 +65,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[1].isStatic == false);
 			assert(datatotest[1].namespaces.empty());
 			assert(datatotest[1].nameOfContainingClass == "testclass");
+			assert(datatotest[1].nameOfContainingFunction == "");
+			assert(datatotest[1].nameOfContainingFile == "testsrcType.cpp");
 
 			assert(datatotest[2].nameOfType == "Object");
 			assert(datatotest[2].nameOfIdentifier == "DoReiMe");
@@ -74,6 +78,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[2].isStatic == true);
 			assert(datatotest[2].namespaces.empty());
 			assert(datatotest[2].nameOfContainingClass == "");
+			assert(datatotest[2].nameOfContainingFunction == "foo");
+			assert(datatotest[2].nameOfContainingFile == "testsrcType.cpp");
 
 			assert(datatotest[3].nameOfType == "Object");
 			assert(datatotest[3].nameOfIdentifier == "aybeecee");
@@ -85,6 +91,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[3].isStatic == false);
 			assert(datatotest[3].namespaces.empty());
 			assert(datatotest[3].nameOfContainingClass == "");
+			assert(datatotest[3].nameOfContainingFunction == "foo");
+			assert(datatotest[3].nameOfContainingFile == "testsrcType.cpp");
 
 			assert(datatotest[4].nameOfType == "vector");
 			assert(datatotest[4].nameOfIdentifier == "spaces");
@@ -96,6 +104,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[4].isStatic == false);
 			assert(datatotest[4].namespaces.size() == 2);
 			assert(datatotest[4].nameOfContainingClass == "");
+			assert(datatotest[4].nameOfContainingFunction == "foo");
+			assert(datatotest[4].nameOfContainingFile == "testsrcType.cpp");
 
 			assert(datatotest[5].nameOfType == "int");
 			assert(datatotest[5].nameOfIdentifier == "ab");
@@ -109,6 +119,8 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[5].isClassMember == false);
 			assert(datatotest[5].usesSubscript == true);
 			assert(datatotest[5].nameOfContainingClass == "");
+			assert(datatotest[5].nameOfContainingFunction == "");
+			assert(datatotest[5].nameOfContainingFile == "testsrcType.cpp");
 		}
     protected:
         void * DataInner() const override {

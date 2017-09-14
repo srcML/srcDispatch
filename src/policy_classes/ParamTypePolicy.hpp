@@ -94,6 +94,8 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             };
             closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx){
                 data.isParameter = true;
+                data.nameOfContainingFunction = ctx.currentFunctionName;
+                data.nameOfContainingFile = ctx.currentFilePath;
                 NotifyAll(ctx);
                 data.clear();
             };

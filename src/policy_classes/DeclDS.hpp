@@ -22,7 +22,8 @@
 struct SignatureData;
 struct DeclData{
     DeclData(): linenumber{0}, isConstValue{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
-                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false}{}
+                isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false},
+                numOfContainingFunctionParams{0}{}
     void clear(){
         linenumber = -1;
         isStatic = false;
@@ -41,8 +42,11 @@ struct DeclData{
         nameOfIdentifier.clear();
         nameOfContainingFile.clear();
         nameOfContainingClass.clear();
+        numOfContainingFunctionParams = 0;
+        nameOfContainingFunction.clear();
     }
     int linenumber;
+    int numOfContainingFunctionParams;
 
     bool isConstValue;
     bool isStatic;
@@ -61,8 +65,7 @@ struct DeclData{
     std::string nameOfIdentifier;
     std::string nameOfContainingFile;
     std::string nameOfContainingClass;
-
-    SignatureData* sigdata;
+    std::string nameOfContainingFunction;
 
     std::vector<std::string> namespaces;
 };
