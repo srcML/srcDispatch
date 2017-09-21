@@ -731,6 +731,22 @@ namespace srcSAXEventDispatch {
 
             for(int pos = 0; pos < num_attributes; ++pos) {
 
+		// temp way to determine line number
+                if(std::strcmp(attributes[pos].localname,"start")) {
+                    std::vector<std::string> v;
+
+                    char * dup = strdup(attributes[pos].value);
+                    char * token = strtok(dup, "");
+                    while(token != NULL) {
+                      v.push_back(std::string(token));
+                      token = strtok(NULL, "");
+                    }
+                    free(dup);
+
+                    ctx.currentLineNumber = strtoul(v[0].c_str(), NULL, 0);
+
+                }
+
                 ctx.currentAttributeName = "";
                 if(attributes[pos].prefix) {
                     ctx.currentAttributeName += attributes[pos].prefix;
