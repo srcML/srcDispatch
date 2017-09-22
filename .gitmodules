@@ -1,0 +1,4 @@
+[submodule "srcSAX"]
+	path = srcSAX
+	url = https://github.com/srcML/srcSAX.git
+	branch = srcSlice-EventDispatch-d4cb7e3
