@@ -28,7 +28,7 @@
 #ifndef INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
 
-class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class DeclTypePolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 

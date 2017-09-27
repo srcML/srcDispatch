@@ -26,7 +26,7 @@
 
 #ifndef STEREOTYPEPOLICY
 #define STEREOTYPEPOLICY
-class StereotypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class StereotypePolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct StereotypeData{
             StereotypeData() {}

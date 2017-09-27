@@ -25,7 +25,7 @@
 #define INCLUDED_TYPE_POLICY_SINGLE_EVENT_HPP
 
 class NamePolicy;
-class TypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class TypePolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
     enum TypeType { NAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };

@@ -30,7 +30,7 @@
 #ifndef INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
 #define INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
 
-class FunctionPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class FunctionPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 

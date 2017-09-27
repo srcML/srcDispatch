@@ -24,7 +24,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <DeclDS.hpp>
-class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class DeclTypePolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         DeclData data;
         ~DeclTypePolicy(){}

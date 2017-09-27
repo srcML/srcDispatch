@@ -27,7 +27,7 @@
 
 #ifndef NLCONTEXTPOLICY
 #define NLCONTEXTPOLICY
-class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class NLContextPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct NLSet{
             NLSet(std::string idname, std::string acategory, std::string acontext, std::string astereo){

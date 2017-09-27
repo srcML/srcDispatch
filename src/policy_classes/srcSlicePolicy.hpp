@@ -2,7 +2,7 @@
 #include <srcSAXHandler.hpp>
 #include <exception>
 
-class srcSlicePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class srcSlicePolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct DeclTypeData{
             DeclTypeData(): linenumber{0}, isConst{false}, isReference{false}, isPointer{false}, isStatic{false} {}

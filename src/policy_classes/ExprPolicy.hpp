@@ -24,7 +24,7 @@
 #include <vector>
 #ifndef EXPRPOLICY
 #define EXPRPOLICY
-class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class ExprPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct ExprData{
             ExprData() {}

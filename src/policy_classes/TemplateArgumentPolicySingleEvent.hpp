@@ -25,7 +25,7 @@
 #define INCLUDED_TEMPLATE_ARGUMENT_POLICY_SINGLE_EVENT_HPP
 
 class NamePolicy;
-class TemplateArgumentPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class TemplateArgumentPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
     enum TemplateArgumentType { NAME, LITERAL, MODIFIER, POINTER, REFERENCE, RVALUE, OPERATOR, CALL };

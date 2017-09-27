@@ -403,7 +403,7 @@ namespace srcSAXEventDispatch{
             virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventContext & ctx) = 0;
 
         };
-    class PolicyDispatcher{
+    class PolicyDispatcher : public EventListener {
     public:
         PolicyDispatcher(std::initializer_list<PolicyListener *> listeners) : policyListeners(listeners){}
         virtual void AddListener(PolicyListener* listener){

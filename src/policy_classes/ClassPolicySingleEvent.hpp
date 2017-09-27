@@ -29,7 +29,7 @@
 #ifndef INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
 
-class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class ClassPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
 
 public:
 

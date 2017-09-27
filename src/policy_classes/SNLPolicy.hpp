@@ -23,7 +23,7 @@
 
 #ifndef SOURCENLPOLICY
 #define SOURCENLPOLICY
-class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class SourceNLPolicy : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct SourceNLData{
             SourceNLData(){}
