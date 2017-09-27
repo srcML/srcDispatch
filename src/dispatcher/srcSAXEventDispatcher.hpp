@@ -54,11 +54,7 @@ namespace srcSAXEventDispatch {
 
     template<typename policy, typename... remaining>
     static std::list<EventListener*> CreateListenersHelper(std::initializer_list<PolicyListener*> policyListeners, std::list<EventListener*> & listeners) {
-        if(typeid(PolicyDispatcher) == typeid(policy)) {
-           listeners.emplace_back(new policy(policyListeners));
-        } else {
-           listeners.emplace_back(new policy());
-        }
+        listeners.emplace_back(new policy(policyListeners));
         return CreateListenersImpl<remaining...>(policyListeners, listeners);
     }
     template<>

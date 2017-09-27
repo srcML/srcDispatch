@@ -405,7 +405,7 @@ namespace srcSAXEventDispatch{
         };
     class PolicyDispatcher : public EventListener {
     public:
-        PolicyDispatcher(std::initializer_list<PolicyListener *> listeners = {}) : policyListeners(listeners){}
+        PolicyDispatcher(std::initializer_list<PolicyListener *> listeners) : policyListeners(listeners){}
         virtual void AddListener(PolicyListener* listener){
             policyListeners.push_back(listener);
         }
