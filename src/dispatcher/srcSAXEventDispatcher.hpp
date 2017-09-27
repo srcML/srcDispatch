@@ -148,7 +148,7 @@ namespace srcSAXEventDispatch {
             }
         }
 
-        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcSAXEventDispatcher(std::initializer_list<PolicyListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
             elementListeners = CreateListeners<policies...>(listeners);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
@@ -163,8 +163,21 @@ namespace srcSAXEventDispatch {
             InitializeHandlers();
         }
 
-        srcSAXEventDispatcher(EventListener* listener, bool genArchive = false) : srcSAXEventDispatcher({listener}, genArchive) {}
+        srcSAXEventDispatcher(PolicyListener* listener, bool genArchive = false) : srcSAXEventDispatcher({listener}, genArchive) {}
 
+        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+            elementListeners = listeners;
+            numberAllocatedListeners = elementListeners.size();
+            dispatching = false;
+            generateArchive = genArchive;
+            classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            if(genArchive) {
+                ctx.archiveBuffer = xmlBufferCreate();
+                xmlOutputBufferPtr ob = xmlOutputBufferCreateBuffer (ctx.archiveBuffer, NULL);
+                ctx.writer = xmlNewTextWriter (ob);
+            }
+            InitializeHandlers();
+        }
         void AddListener(EventListener* listener) override {
             elementListeners.push_back(listener);
         }
