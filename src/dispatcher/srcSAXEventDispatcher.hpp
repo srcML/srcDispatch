@@ -36,29 +36,33 @@
 namespace srcSAXEventDispatch {
 
     template<typename... policies>
-    static std::list<EventListener*> CreateListenersImpl(PolicyListener * policyListener, std::list<EventListener*> & listeners);
+    static std::list<EventListener*> CreateListenersImpl(std::initializer_list<PolicyListener*> policyListeners, std::list<EventListener*> & listeners);
 
     template<typename... policies>
-    static std::list<EventListener*> CreateListeners(PolicyListener * policyListener) {
+    static std::list<EventListener*> CreateListeners(std::initializer_list<PolicyListener*> policyListeners) {
         std::list<EventListener*> listeners;
-        return CreateListenersImpl<policies...>(policyListener, listeners);
+        return CreateListenersImpl<policies...>(policyListeners, listeners);
     }
 
     template<typename policy, typename... remaining>
-    static std::list<EventListener*> CreateListenersHelper(PolicyListener * policyListener, std::list<EventListener*> & listeners);
+    static std::list<EventListener*> CreateListenersHelper(std::initializer_list<PolicyListener*> policyListeners, std::list<EventListener*> & listeners);
 
     template<typename... policies>
-    static std::list<EventListener*> CreateListenersImpl(PolicyListener * policyListener, std::list<EventListener*> & listeners) {
-        return CreateListenersHelper<policies...>(policyListener, listeners);
+    static std::list<EventListener*> CreateListenersImpl(std::initializer_list<PolicyListener*> policyListeners, std::list<EventListener*> & listeners) {
+        return CreateListenersHelper<policies...>(policyListeners, listeners);
     }
 
     template<typename policy, typename... remaining>
-    static std::list<EventListener*> CreateListenersHelper(PolicyListener * policyListener, std::list<EventListener*> & listeners) {
-        listeners.emplace_back(new policy({policyListener}));
-        return CreateListenersImpl<remaining...>(policyListener, listeners);
+    static std::list<EventListener*> CreateListenersHelper(std::initializer_list<PolicyListener*> policyListeners, std::list<EventListener*> & listeners) {
+        if(typeid(PolicyDispatcher) == typeid(policy)) {
+           listeners.emplace_back(new policy(policyListeners));
+        } else {
+           listeners.emplace_back(new policy());
+        }
+        return CreateListenersImpl<remaining...>(policyListeners, listeners);
     }
     template<>
-    std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener, std::list<EventListener*> & listeners) {
+    std::list<EventListener*> CreateListenersImpl<>(std::initializer_list<PolicyListener*> policyListeners, std::list<EventListener*> & listeners) {
         return listeners;
     }
 
@@ -144,8 +148,8 @@ namespace srcSAXEventDispatch {
             }
         }
 
-        srcSAXEventDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
-            elementListeners = CreateListeners<policies...>(listener);
+        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+            elementListeners = CreateListeners<policies...>(listeners);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             generateArchive = genArchive;
@@ -159,19 +163,8 @@ namespace srcSAXEventDispatch {
             InitializeHandlers();
         }
 
-        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
-            elementListeners = listeners;
-            numberAllocatedListeners = elementListeners.size();
-            dispatching = false;
-            generateArchive = genArchive;
-            classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
-            if(genArchive) {
-                ctx.archiveBuffer = xmlBufferCreate();
-                xmlOutputBufferPtr ob = xmlOutputBufferCreateBuffer (ctx.archiveBuffer, NULL);
-                ctx.writer = xmlNewTextWriter (ob);
-            }
-            InitializeHandlers();
-        }
+        srcSAXEventDispatcher(EventListener* listener, bool genArchive = false) : srcSAXEventDispatcher({listener}, genArchive) {}
+
         void AddListener(EventListener* listener) override {
             elementListeners.push_back(listener);
         }
