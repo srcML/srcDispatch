@@ -62,7 +62,7 @@ namespace srcSAXEventDispatch {
         return listeners;
     }
 
-    template <typename ...policies>
+    template<typename... policies>
     class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
