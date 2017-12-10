@@ -19,7 +19,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             std::string nameoftype;
             std::string nameofidentifier;
             std::vector<std::string> namespaces;
-            std::string<std::string> exprvars;
+            std::vector<std::string> exprvars;
             int linenumber;
             bool isConst;
             bool isReference;
