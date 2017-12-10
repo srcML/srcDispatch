@@ -19,6 +19,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             std::string nameoftype;
             std::string nameofidentifier;
             std::vector<std::string> namespaces;
+            std::string<std::string> exprvars;
             int linenumber;
             bool isConst;
             bool isReference;
@@ -59,6 +60,13 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 if(ctx.And({ParserState::declstmt})){
                     data.linenumber = ctx.currentLineNumber;
                     data.nameofidentifier = currentDeclName;
+                }
+            };
+            
+            closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
+                // Variables used in a decl stmt for initilization, excluding calls
+                if(ctx.IsOpen(ParserState::expr) && ctx.IsClosed(ParserState::call)) {
+                    data.exprvars.push_back(ctx.currentToken);
                 }
             };
 
