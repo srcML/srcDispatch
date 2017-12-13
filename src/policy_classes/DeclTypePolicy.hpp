@@ -10,6 +10,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 nameoftype.clear();
                 nameofidentifier.clear();
                 namespaces.clear();
+                exprvars.clear();
+                pointers.clear();
                 linenumber = -1;
                 isConst = false;
                 isReference = false;
@@ -20,6 +22,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             std::string nameofidentifier;
             std::vector<std::string> namespaces;
             std::vector<std::string> exprvars;
+            std::vector<std::string> pointers;
             int linenumber;
             bool isConst;
             bool isReference;
@@ -45,6 +48,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     data.namespaces.push_back(ctx.currentToken);
                 }
             };
+
+
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentModifier == "*"){
@@ -61,13 +66,23 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     data.linenumber = ctx.currentLineNumber;
                     data.nameofidentifier = currentDeclName;
                 }
+
             };
             
+            // not the right place for this??
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
                 // Variables used in a decl stmt for initilization, excluding calls
                 if(ctx.IsOpen(ParserState::expr) && ctx.IsClosed(ParserState::call)) {
                     data.exprvars.push_back(ctx.currentToken);
+
+                    // not sure this is intended, not sure when modifier is cleared  
+                    if(data.isPointer) {
+                        data.pointers.push_back(ctx.currentToken);
+                    }
                 }
+
+
+
             };
 
             closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx){
@@ -79,6 +94,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
+
                     if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::declstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                         currentTypeName = ctx.currentToken;
                     }
@@ -92,6 +108,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     if(ctx.And({ParserState::modifier, ParserState::type, ParserState::declstmt})){
                         currentModifier = ctx.currentToken;
                     }
+
                 }
             };
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
