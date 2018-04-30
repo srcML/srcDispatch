@@ -153,8 +153,7 @@ namespace srcSAXEventDispatch {
             
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
-                xmlOutputBufferPtr ob = xmlOutputBufferCreateBuffer (ctx.archiveBuffer, NULL);
-                ctx.writer = xmlNewTextWriter (ob);
+                ctx.writer = xmlNewTextWriterMemory(ctx.archiveBuffer, 0);
             }
             InitializeHandlers();
         }
@@ -167,8 +166,7 @@ namespace srcSAXEventDispatch {
             classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
-                xmlOutputBufferPtr ob = xmlOutputBufferCreateBuffer (ctx.archiveBuffer, NULL);
-                ctx.writer = xmlNewTextWriter (ob);
+                ctx.writer = xmlNewTextWriterMemory(ctx.archiveBuffer, 0);
             }
             InitializeHandlers();
         }

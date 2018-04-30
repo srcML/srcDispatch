@@ -386,6 +386,7 @@ namespace srcSAXEventDispatch{
         virtual void RemoveListener(EventListener* l) = 0;
         virtual void RemoveListenerDispatch(EventListener* listener) = 0;
         virtual void RemoveListenerNoDispatch(EventListener* listener) = 0;
+        xmlBufferPtr GetXmlBuffer(){return ctx.archiveBuffer;}
     protected:
         srcSAXEventContext ctx;
         std::list<EventListener*> elementListeners;

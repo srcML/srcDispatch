@@ -46,7 +46,7 @@ std::string StringToSrcML(std::string str){
 	srcml_unit_free(unit);
 	srcml_archive_close(archive);
 	srcml_archive_free(archive);
-	//TrimFromEnd(ch, size);
+	ch[size] = 0;
 	return std::string(ch);
 }
 

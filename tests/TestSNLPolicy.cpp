@@ -27,7 +27,7 @@ std::string StringToSrcML(std::string str){
 	struct srcml_unit* unit;
 	size_t size = 0;
 
-	char *ch = new char[str.size()];
+	char *ch = 0;
 
 	archive = srcml_archive_create();
 	srcml_archive_enable_option(archive, SRCML_OPTION_POSITION);
@@ -43,7 +43,7 @@ std::string StringToSrcML(std::string str){
 	srcml_unit_free(unit);
 	srcml_archive_close(archive);
 	srcml_archive_free(archive);
-	//TrimFromEnd(ch, size);
+	ch[size] = 0;
 	return std::string(ch);
 }
 
