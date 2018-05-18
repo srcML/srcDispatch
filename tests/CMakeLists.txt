@@ -22,6 +22,8 @@
 file( GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Test* )
 include_directories(${DISPATCH_INCLUDE_DIR})
 
+add_definitions("-std=c++11")
+
 foreach( testsourcefile ${SOURCES} )
     string( REPLACE ".cpp" "" testname ${testsourcefile} )
     get_filename_component(file ${testsourcefile} NAME_WE)
