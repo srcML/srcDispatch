@@ -19,9 +19,10 @@
 #  along with the srcSAXEventDispatch; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-cmake_minimum_required(VERSION 2.8)
-project(srcSAXEventDispatch)
+# add this directory
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory(srcSAX/CMake)
-add_subdirectory(CMake)
-add_subdirectory(tests)
+include(srcsax_event_dispatch_build)
+if(CMAKE_PROJECT_NAME STREQUAL "srcSAXEventDispatch")
+    include(srcsax_event_dispatch_install)
+endif()

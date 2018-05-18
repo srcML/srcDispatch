@@ -1,5 +1,5 @@
 ##
-#  CMakeLists.txt
+#  srcsax_event_dispatch_install.cmake
 #
 #  Copyright (C) 2016-2018 srcML, LLC. (www.srcML.org)
 #
@@ -19,9 +19,11 @@
 #  along with the srcSAXEventDispatch; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-cmake_minimum_required(VERSION 2.8)
-project(srcSAXEventDispatch)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-add_subdirectory(srcSAX/CMake)
-add_subdirectory(CMake)
-add_subdirectory(tests)
+if(NOT WIN32)
+set(CMAKE_INSTALL_PREFIX "/usr/local")
+endif()
+
