@@ -22,6 +22,8 @@
 get_filename_component(DISPATCH_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 get_filename_component(DISPATCH_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR} DIRECTORY)
 
+add_subdirectory(${DISPATCH_SOURCE_DIR}/srcSAX/CMake ${DISPATCH_BINARY_DIR}/srcSAX/CMake)
+
 # Compiler options
 add_definitions("-std=c++11")
 
