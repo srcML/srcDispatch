@@ -416,6 +416,22 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::stereotype];
                     DispatchEvent(ParserState::stereotype, ElementState::open);
                 } },
+                { "diff:delete", [this](){
+                    ++ctx.triggerField[ParserState::diff_delete];
+                    DispatchEvent(ParserState::diff_delete, ElementState::open);
+                } },
+                { "diff:insert", [this](){
+                    ++ctx.triggerField[ParserState::diff_insert];
+                    DispatchEvent(ParserState::diff_insert, ElementState::open);
+                } },
+                { "diff:common", [this](){
+                    ++ctx.triggerField[ParserState::diff_common];
+                    DispatchEvent(ParserState::diff_common, ElementState::open);
+                } },
+                { "diff:ws", [this](){
+                    ++ctx.triggerField[ParserState::diff_ws];
+                    DispatchEvent(ParserState::diff_ws, ElementState::open);
+                } },
                 { "unit", [this](){
                     if(ctx.triggerField[ParserState::unit] == 0){
                         ctx.triggerField[ParserState::archive] = 1;
@@ -633,6 +649,22 @@ namespace srcSAXEventDispatch {
                 { "stereotype", [this](){
                     DispatchEvent(ParserState::stereotype, ElementState::close);
                     --ctx.triggerField[ParserState::stereotype];
+                } },
+                { "diff:delete", [this](){
+                    DispatchEvent(ParserState::diff_delete, ElementState::close);
+                    --ctx.triggerField[ParserState::diff_delete];
+                } },
+                { "diff_insert", [this](){
+                    DispatchEvent(ParserState::diff_insert, ElementState::close);
+                    --ctx.triggerField[ParserState::diff_insert];
+                } },
+                { "diff_common", [this](){
+                    DispatchEvent(ParserState::diff_common, ElementState::close);
+                    --ctx.triggerField[ParserState::diff_common];
+                } },
+                { "diff_ws", [this](){
+                    DispatchEvent(ParserState::diff_ws, ElementState::close);
+                    --ctx.triggerField[ParserState::diff_ws];
                 } },
                 { "unit", [this](){
                     --ctx.triggerField[ParserState::unit];

@@ -40,7 +40,18 @@ namespace srcSAXEventDispatch{
         argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
         ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
-        userdefined, snoun, propersnoun, spronoun, sadjective, sverb, stereotype, archive, unit, returnstmt,
+        userdefined, 
+
+        // NLP states
+        snoun, propersnoun, spronoun, sadjective, sverb,
+
+        // stereotype state
+        stereotype, 
+
+        // srcDiff states
+        diff_common, diff_insert, diff_delete, diff_ws,
+
+        archive, unit, returnstmt,
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
