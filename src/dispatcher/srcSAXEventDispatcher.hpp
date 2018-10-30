@@ -798,15 +798,15 @@ namespace srcSAXEventDispatch {
 
             ctx.currentTag = localName;
             
-            /////////DEPRECATED////////////
-            if(localName == "pos:position"){
-                ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
-            }
-            /////////DEPRECATED///////////
+            // /////////DEPRECATED////////////
+            // if(localName == "pos:position"){
+            //     ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
+            // }
+            // /////////DEPRECATED///////////
 
-            if(localName == "name"){
-                ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
-            }
+            // if(localName == "name"){
+            //     ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
+            // }
 
             std::string name;
             if(num_attributes){
