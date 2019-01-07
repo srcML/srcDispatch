@@ -75,6 +75,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             paramdata = policy->Data<DeclData>();
             data.parameters.push_back(*paramdata);
         }
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new SignatureData(data);

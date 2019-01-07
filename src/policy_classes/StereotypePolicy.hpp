@@ -38,6 +38,7 @@ class StereotypePolicy : public srcSAXEventDispatch::EventListener, public srcSA
             InitializeEventHandlers();
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new StereotypeData(data);

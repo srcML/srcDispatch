@@ -59,6 +59,7 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
             InitializeEventHandlers();
         }
 
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             if (typeid(FunctionSignaturePolicy) == typeid(*policy)) {
                 SignatureData signatureData = *policy->Data<SignatureData>();

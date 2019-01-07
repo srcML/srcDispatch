@@ -90,6 +90,7 @@ protected:
         return (void *)&data;
 
     }
+    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
         if(typeid(TypePolicy) == typeid(*policy)) {

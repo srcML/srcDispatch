@@ -27,7 +27,7 @@ std::string StringToSrcML(std::string str){
 	srcml_unit_free(unit);
 	srcml_archive_close(archive);
 	srcml_archive_free(archive);
-	ch[size] = 0;
+
 	return std::string(ch);
 }
 
@@ -39,6 +39,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
             decltypedata = *policy->Data<DeclData>();
             datatotest.push_back(decltypedata);
         }
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
 		void RunTest(){
 			assert(datatotest.size() == 6);
 			assert(datatotest[0].nameOfType == "int");

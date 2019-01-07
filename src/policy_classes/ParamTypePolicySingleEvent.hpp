@@ -100,6 +100,7 @@ protected:
         }
 
     }
+    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
 private:
 

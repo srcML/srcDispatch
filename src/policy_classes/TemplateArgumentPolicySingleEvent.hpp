@@ -45,6 +45,7 @@ public:
         TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
         ~TemplateArgumentPolicy();
         virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
+        virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override;
     protected:
         virtual void * DataInner() const override;
     private:

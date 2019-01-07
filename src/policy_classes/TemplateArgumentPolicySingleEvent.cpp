@@ -68,6 +68,7 @@ void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSA
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
 }
+void TemplateArgumentPolicy::NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx){}
 
 void * TemplateArgumentPolicy::DataInner() const {
     return new TemplateArgumentPolicy::TemplateArgumentData(data);
