@@ -97,6 +97,7 @@ void TypePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispat
 
 }
 void TypePolicy::NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx){}
+
 void * TypePolicy::DataInner() const {
     return new TypePolicy::TypeData(data);
 }

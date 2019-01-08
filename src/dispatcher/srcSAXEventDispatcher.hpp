@@ -159,6 +159,7 @@ namespace srcSAXEventDispatch {
         }
 
         srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+            std::cerr<<"Genarchive: "<<genArchive<<std::endl;
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
@@ -186,6 +187,7 @@ namespace srcSAXEventDispatch {
             AddListener(listener);
         }
         void RemoveListener(EventListener* listener) override {
+            //std::cerr<<(std::find(elementListeners.begin(), elementListeners.end(), listener) == elementListeners.end())<<std::endl;
             elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
         }
         void RemoveListenerDispatch(EventListener* listener) override {
@@ -193,6 +195,7 @@ namespace srcSAXEventDispatch {
                 listener->HandleEvent(currentPState, currentEState, ctx);
             }
             RemoveListener(listener);
+            //std::cerr<<"out"<<std::endl;
         }
         void RemoveListenerNoDispatch(EventListener* listener) override {
             if(dispatching){
@@ -252,7 +255,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::function, ElementState::open);
                 } },
                 { "constructor", [this](){
-                    functionflagopen = true;
+                    //functionflagopen = true;
                     ++ctx.triggerField[ParserState::constructor];
                     DispatchEvent(ParserState::constructor, ElementState::open);
                 } },
@@ -299,7 +302,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::privateaccess, ElementState::open);
                 } },
                 { "destructor", [this](){
-                    functionflagopen = true;
+                    //functionflagopen = true;
                     ++ctx.triggerField[ParserState::destructor];
                     DispatchEvent(ParserState::destructor, ElementState::open);
                 } },
@@ -703,7 +706,11 @@ namespace srcSAXEventDispatch {
             if (generateArchive) { xmlTextWriterStartDocument(ctx.writer, "1.0", "UTF-8", "yes"); }
         }
         virtual void endDocument() override {
-            if (generateArchive) { xmlTextWriterEndDocument(ctx.writer); }
+            if (generateArchive) {
+                xmlTextWriterEndDocument(ctx.writer);
+                auto buf = GetXmlBuffer();
+                fprintf(stdout, "%s", buf->content);
+            }
         }
     
         /**
@@ -823,7 +830,7 @@ namespace srcSAXEventDispatch {
             }
 
             if(localName != ""){
-                //std::cerr<<"local: "<<localname<<std::endl;
+                ////std::cerr<<"local: "<<localname<<std::endl;
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();
