@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 #include <initializer_list>
 #include <algorithm>
 #include <iostream>
@@ -88,6 +89,7 @@ namespace srcSAXEventDispatch{
                         currentTag, currentToken, currentAttributeName, currentAttributeValue, currentFunctionName,
                         currentClassName;
             std::size_t depth;
+            std::map<std::string, std::string> attributes;
             bool isPrev, isOperator, endArchive;
 
           /**

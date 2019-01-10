@@ -829,12 +829,29 @@ namespace srcSAXEventDispatch {
                 ctx.isOperator = true;
             }
 
+
             if(localName != ""){
+                // form attribute map
+                for(int pos = 0; pos < num_attributes; ++pos) {
+                    std::string attributeName;
+                    if(attributes[pos].prefix) {
+                        attributeName += attributes[pos].prefix;
+                        attributeName += ':';
+                    }
+                    attributeName += attributes[pos].localname;
+                    std::string attributeValue = attributes[pos].value;
+
+                    ctx.attributes.emplace(attributeName, attributeValue);         
+
+                }
+
                 ////std::cerr<<"local: "<<localname<<std::endl;
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();
                 }
+                // erase attribute now that call is over
+                ctx.attributes.clear();
             }
 
             for(int pos = 0; pos < num_attributes; ++pos) {
@@ -846,6 +863,7 @@ namespace srcSAXEventDispatch {
                 }
                 ctx.currentAttributeName += attributes[pos].localname;
                 ctx.currentAttributeValue = attributes[pos].value;
+
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("xmlattribute");
                 process->second();                
 
