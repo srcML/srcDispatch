@@ -32,6 +32,7 @@
 #include <srcSAXEventDispatchUtilities.hpp>
 #include <vector>
 #include <memory>
+#include <string.h>
 
 namespace srcSAXEventDispatch {
 
@@ -159,7 +160,6 @@ namespace srcSAXEventDispatch {
         }
 
         srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
-            std::cerr<<"Genarchive: "<<genArchive<<std::endl;
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
@@ -187,7 +187,6 @@ namespace srcSAXEventDispatch {
             AddListener(listener);
         }
         void RemoveListener(EventListener* listener) override {
-            //std::cerr<<(std::find(elementListeners.begin(), elementListeners.end(), listener) == elementListeners.end())<<std::endl;
             elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
         }
         void RemoveListenerDispatch(EventListener* listener) override {
@@ -195,7 +194,6 @@ namespace srcSAXEventDispatch {
                 listener->HandleEvent(currentPState, currentEState, ctx);
             }
             RemoveListener(listener);
-            //std::cerr<<"out"<<std::endl;
         }
         void RemoveListenerNoDispatch(EventListener* listener) override {
             if(dispatching){
@@ -839,13 +837,19 @@ namespace srcSAXEventDispatch {
                         attributeName += ':';
                     }
                     attributeName += attributes[pos].localname;
+                    if(strcmp(attributes[pos].localname, "start") == 0){
+                        std::string posString;
+                        for(int i = 0; attributes[pos].value[i] != ':'; ++i){
+                            posString+=attributes[pos].value[i];
+                        }
+                        ctx.currentLineNumber = std::stoi(posString);
+                    }
                     std::string attributeValue = attributes[pos].value;
 
                     ctx.attributes.emplace(attributeName, attributeValue);         
 
                 }
 
-                ////std::cerr<<"local: "<<localname<<std::endl;
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
                 if (process != process_map.end()) {
                     process->second();

@@ -27,7 +27,7 @@ std::string StringToSrcML(std::string str){
 	srcml_unit_free(unit);
 	srcml_archive_close(archive);
 	srcml_archive_free(archive);
-	ch[size] = 0;
+	ch[size-1] = 0;
 	return std::string(ch);
 }
 
@@ -38,6 +38,8 @@ class TestExpr : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEven
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             exprdata = *policy->Data<ExprPolicy::ExprDataSet>();
             datatotest.push_back(exprdata);
+        }
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {
         }
 		void RunTest(){
 			
