@@ -38,7 +38,11 @@ class TestCalls : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEve
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             calldata = *policy->Data<CallPolicy::CallData>();
             datatotest.push_back(calldata);
+            for(auto it : calldata.callargumentlist){
+                std::cerr<<it<<std::endl;
+            }
         }
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
         void RunTest(){
             assert(datatotest[0].fnName == "bin"); //TODO: Fix, figure out way to test.
         }
@@ -54,7 +58,7 @@ class TestCalls : public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEve
 };
 
 int main(int argc, char** filename){
-    std::string codestr = "void foo(){foo(bar, baz, bin(), beep);}";
+    std::string codestr = "void foo(){foo(bar, baz, 2 + bin(dep, pep(1+blep)), beep);}";
     std::string srcmlstr = StringToSrcML(codestr);
     
     TestCalls calldata;

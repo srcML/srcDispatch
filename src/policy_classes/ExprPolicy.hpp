@@ -27,11 +27,13 @@
 class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
         struct ExprData{
-            ExprData() {}
+            ExprData() {lhs = false;}
             void clear(){
                def.clear();
                use.clear();
+               lhs = false;
             }
+            bool lhs;
             std::string nameofidentifier;
             std::set<unsigned int> def;
             std::set<unsigned int> use; //could be used multiple times in same expr
@@ -69,6 +71,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 if(ctx.currentToken == "="){
                     auto it = dataset.find(currentExprName);
                     if(it != dataset.end()){
+                        it->second.lhs = true;
                         it->second.use.erase(currentLine.back());
                         it->second.def.insert(currentLine.back());
                     }else{
