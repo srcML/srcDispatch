@@ -46,9 +46,9 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
            void clear(){
             dataset.clear();
            }
+           std::string lhsName;
            std::map<std::string, ExprData> dataset;
         };
-        std::map<std::string, ExprData> dataset;
         ~ExprPolicy(){}
         ExprPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             seenAssignment = false;
@@ -58,10 +58,11 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
-            return new ExprDataSet(dataset);
+            return new ExprDataSet(exprdataset);
         }
     private:
         ExprData data;
+        ExprDataSet exprdataset;
         std::string currentTypeName, currentExprName, currentModifier, currentSpecifier;
         std::vector<unsigned int> currentLine;
         bool seenAssignment;
@@ -69,8 +70,9 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.currentToken == "="){
-                    auto it = dataset.find(currentExprName);
-                    if(it != dataset.end()){
+                    auto it = exprdataset.dataset.find(currentExprName);
+                    if(it != exprdataset.dataset.end()){
+                        exprdataset.lhsName = currentExprName;
                         it->second.lhs = true;
                         it->second.use.erase(currentLine.back());
                         it->second.def.insert(currentLine.back());
@@ -89,13 +91,13 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     currentLine.push_back(ctx.currentLineNumber);
                 }
                 if(ctx.IsOpen({ParserState::exprstmt})){
-                    auto it = dataset.find(currentExprName);
-                    if(it != dataset.end()){
+                    auto it = exprdataset.dataset.find(currentExprName);
+                    if(it != exprdataset.dataset.end()){
                         it->second.use.insert(currentLine.back()); //assume it's a use
                     }else{
                         data.nameofidentifier = currentExprName;
                         data.use.insert(currentLine.back());
-                        dataset.insert(std::make_pair(currentExprName, data));
+                        exprdataset.dataset.insert(std::make_pair(currentExprName, data));
                     }
                 }
             };
@@ -122,7 +124,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 currentLine.pop_back();
                 seenAssignment = false;
                 currentLine.clear();
-                dataset.clear();
+                exprdataset.dataset.clear();
                 data.clear();
             };
 
