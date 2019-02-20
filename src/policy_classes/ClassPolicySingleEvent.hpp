@@ -162,6 +162,10 @@ private:
                 classDepth = ctx.depth;
 
                 data = ClassData{};
+                std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
+                if(stereotype_attr_itr != ctx.attributes.end())
+                    data.stereotype = stereotype_attr_itr->second
+
                 if(ctx.elementStack.back() == "class")
                     data.type = CLASS;
                 else if(ctx.elementStack.back() == "struct")
@@ -169,7 +173,6 @@ private:
 
                 data.name = nullptr;
 
-                CollectXMLAttributeHandlers();
                 CollectNameHandlers();
                 CollectGenericHandlers();
                 CollectSuperHanders();
@@ -201,21 +204,6 @@ private:
         closeEventMap[ParserState::classn] = endPolicy;
         openEventMap[ParserState::structn] = startPolicy;
         closeEventMap[ParserState::structn] = endPolicy;
-
-    }
-
-    void CollectXMLAttributeHandlers() {
-        using namespace srcSAXEventDispatch;
-
-        closeEventMap[ParserState::xmlattribute] = [this](srcSAXEventContext& ctx) {
-
-            if(classDepth == ctx.depth && ctx.currentAttributeName == "stereotype") {
-
-                data.stereotype = ctx.currentAttributeValue;
-
-            }
-
-        };
 
     }
 
