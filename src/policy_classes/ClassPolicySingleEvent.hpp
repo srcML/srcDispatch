@@ -164,7 +164,7 @@ private:
                 data = ClassData{};
                 std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
                 if(stereotype_attr_itr != ctx.attributes.end())
-                    data.stereotype = stereotype_attr_itr->second
+                    data.stereotype = stereotype_attr_itr->second;
 
                 if(ctx.elementStack.back() == "class")
                     data.type = CLASS;
