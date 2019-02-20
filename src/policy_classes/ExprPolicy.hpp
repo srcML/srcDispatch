@@ -29,57 +29,54 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         struct ExprData{
             ExprData() {lhs = false;}
             void clear(){
-               def.clear();
-               use.clear();
+               definitions.clear();
+               uses.clear();
                lhs = false;
             }
             bool lhs;
-            std::string nameofidentifier;
-            std::set<unsigned int> def;
-            std::set<unsigned int> use; //could be used multiple times in same expr
+            std::string nameOfIdentifier;
+            std::set<unsigned int> definitions;
+            std::set<unsigned int> uses; //could be used multiple times in same expr
         };
         struct ExprDataSet{
            ExprDataSet() = default;
            ExprDataSet(std::map<std::string, ExprData> dat){
-            dataset = dat;
+            dataSet = dat;
            }
            void clear(){
-            dataset.clear();
+            dataSet.clear();
            }
            std::string lhsName;
-           std::map<std::string, ExprData> dataset;
+           std::map<std::string, ExprData> dataSet;
         };
         ~ExprPolicy(){}
         ExprPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
-            seenAssignment = false;
             InitializeEventHandlers();
         }
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
         void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
-            return new ExprDataSet(exprdataset);
+            return new ExprDataSet(exprDataSet);
         }
     private:
         ExprData data;
-        ExprDataSet exprdataset;
+        ExprDataSet exprDataSet;
         std::string currentTypeName, currentExprName, currentModifier, currentSpecifier;
         std::vector<unsigned int> currentLine;
-        bool seenAssignment;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.currentToken == "="){
-                    auto it = exprdataset.dataset.find(currentExprName);
-                    if(it != exprdataset.dataset.end()){
-                        exprdataset.lhsName = currentExprName;
+                    auto it = exprDataSet.dataSet.find(currentExprName);
+                    if(it != exprDataSet.dataSet.end()){
+                        exprDataSet.lhsName = currentExprName;
                         it->second.lhs = true;
-                        it->second.use.erase(currentLine.back());
-                        it->second.def.insert(currentLine.back());
+                        it->second.uses.erase(currentLine.back());
+                        it->second.definitions.insert(currentLine.back());
                     }else{
                         std::cerr<<"No such thing as: "<<currentExprName<<std::endl;
                     }
-                    seenAssignment = true;
                 }
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
@@ -91,13 +88,13 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     currentLine.push_back(ctx.currentLineNumber);
                 }
                 if(ctx.IsOpen({ParserState::exprstmt})){
-                    auto it = exprdataset.dataset.find(currentExprName);
-                    if(it != exprdataset.dataset.end()){
-                        it->second.use.insert(currentLine.back()); //assume it's a use
+                    auto it = exprDataSet.dataSet.find(currentExprName);
+                    if(it != exprDataSet.dataSet.end()){
+                        it->second.uses.insert(currentLine.back()); //assume it's a use
                     }else{
-                        data.nameofidentifier = currentExprName;
-                        data.use.insert(currentLine.back());
-                        exprdataset.dataset.insert(std::make_pair(currentExprName, data));
+                        data.nameOfIdentifier = currentExprName;
+                        data.uses.insert(currentLine.back());
+                        exprDataSet.dataSet.insert(std::make_pair(currentExprName, data));
                     }
                 }
             };
@@ -122,9 +119,8 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);
                 currentLine.pop_back();
-                seenAssignment = false;
                 currentLine.clear();
-                exprdataset.dataset.clear();
+                exprDataSet.dataSet.clear();
                 data.clear();
             };
 

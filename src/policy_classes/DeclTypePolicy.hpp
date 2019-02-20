@@ -72,7 +72,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     }
                     data.nameOfContainingFunction = ctx.currentFunctionName;
 
-                    data.linenumber = ctx.currentLineNumber;
+                    data.lineNumber = ctx.currentLineNumber;
                     data.nameOfIdentifier = currentDeclName;
                     data.isLocalVar = true;
                     

@@ -21,11 +21,11 @@
 #define INCLUDED_DECL_DS_HPP
 struct SignatureData;
 struct DeclData{
-    DeclData(): linenumber{0}, isConstValue{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
+    DeclData(): lineNumber{0}, isConstValue{false}, isConstAlias{false}, isAliasToConst{false}, isReference{false}, 
                 isPointer{false}, isStatic{false}, isClassMember{false}, usesSubscript{false}, hasSideEffect{false},
                 numOfContainingFunctionParams{0}{}
     void clear(){
-        linenumber = -1;
+        lineNumber = -1;
         isStatic = false;
         isPointer = false;
         nameOfType.clear();
@@ -45,7 +45,7 @@ struct DeclData{
         numOfContainingFunctionParams = 0;
         nameOfContainingFunction.clear();
     }
-    int linenumber;
+    int lineNumber;
     int numOfContainingFunctionParams;
 
     bool isConstValue;
