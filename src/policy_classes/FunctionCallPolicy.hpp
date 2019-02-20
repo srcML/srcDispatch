@@ -59,7 +59,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         std::string fullFuncIdentifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
-            closeEventMap[ParserState::call] = [this](srcSAXEventContext& ctx){
+            closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx){
                 if(ctx.triggerField[ParserState::call] == 1){ //TODO: Fix
                     data.callargumentlist.push_back(")");
                     NotifyAll(ctx);
