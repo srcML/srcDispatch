@@ -33,375 +33,377 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
 public:
 
-    enum ClassType : std::size_t { CLASS, STRUCT/*, UNION, ENUM*/ };
-    enum AccessSpecifier { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
-    struct ParentData {
+	enum ClassType : std::size_t { CLASS, STRUCT/*, UNION, ENUM*/ };
+	enum AccessSpecifier { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
+	struct ParentData {
 
-        // should this be a NamePolicy::NameData?
-        std::string name;
-        bool isVirtual;
-        AccessSpecifier accessSpecifier;
+		// should this be a NamePolicy::NameData?
+		std::string name;
+		bool isVirtual;
+		AccessSpecifier accessSpecifier;
 
-    };
+	};
 
-    struct ClassData {
+	struct ClassData {
 
-        ClassType type;
-        std::string stereotype;
+		ClassType type;
+		std::vector<std::string> stereotype;
 
-        bool isGeneric;
-        NamePolicy::NameData * name;
+		bool isGeneric;
+		NamePolicy::NameData * name;
 
-        std::vector<ParentData> parents;
+		std::vector<ParentData> parents;
 
-        std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
-        std::vector<FunctionPolicy::FunctionData *> constructors[3];
-        bool hasDestructor;
-        std::vector<FunctionPolicy::FunctionData *> operators[3];
-        std::vector<FunctionPolicy::FunctionData *> methods[3];
+		std::vector<DeclTypePolicy::DeclTypeData *> fields[3];
+		std::vector<FunctionPolicy::FunctionData *> constructors[3];
+		bool hasDestructor;
+		std::vector<FunctionPolicy::FunctionData *> operators[3];
+		std::vector<FunctionPolicy::FunctionData *> methods[3];
 
-        std::vector<ClassPolicy::ClassData *> innerClasses[3];
+		std::vector<ClassPolicy::ClassData *> innerClasses[3];
 
-        bool hasPureVirtual;
+		bool hasPureVirtual;
 
-    };
+	};
 
 private:
 
-    ClassData data;
-    std::size_t classDepth;
-    AccessSpecifier currentRegion;
+	ClassData data;
+	std::size_t classDepth;
+	AccessSpecifier currentRegion;
 
-    NamePolicy * namePolicy;
-    DeclTypePolicy * declPolicy;
-    FunctionPolicy * functionPolicy;
-    ClassPolicy * classPolicy;
+	NamePolicy * namePolicy;
+	DeclTypePolicy * declPolicy;
+	FunctionPolicy * functionPolicy;
+	ClassPolicy * classPolicy;
 
 public:
 
-    ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-        : srcSAXEventDispatch::PolicyDispatcher(listeners),
-          data{},
-          classDepth(0),
-          currentRegion(PUBLIC),
-          namePolicy(nullptr),
-          declPolicy(nullptr),
-          functionPolicy(nullptr),
-          classPolicy(nullptr) { 
-    
-        InitializeClassPolicyHandlers();
+	ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+		: srcSAXEventDispatch::PolicyDispatcher(listeners),
+		  data{},
+		  classDepth(0),
+		  currentRegion(PUBLIC),
+		  namePolicy(nullptr),
+		  declPolicy(nullptr),
+		  functionPolicy(nullptr),
+		  classPolicy(nullptr) { 
+	
+		InitializeClassPolicyHandlers();
 
-    }
+	}
 
-    ~ClassPolicy() {
+	~ClassPolicy() {
 
-        if(namePolicy)     delete namePolicy;
-        if(declPolicy)     delete declPolicy;
-        if(functionPolicy) delete functionPolicy;
-        if(classPolicy)    delete classPolicy;
+		if(namePolicy)     delete namePolicy;
+		if(declPolicy)     delete declPolicy;
+		if(functionPolicy) delete functionPolicy;
+		if(classPolicy)    delete classPolicy;
 
-    }
+	}
 
-    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
-    void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+	void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+	void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
-        if(typeid(NamePolicy) == typeid(*policy)) {
+		if(typeid(NamePolicy) == typeid(*policy)) {
 
-            data.name = policy->Data<NamePolicy::NameData>();
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+			data.name = policy->Data<NamePolicy::NameData>();
+			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
-        } else if(typeid(DeclTypePolicy) == typeid(*policy)) {
-    
-            std::vector<DeclTypePolicy::DeclTypeData *> * decl_data = policy->Data<std::vector<DeclTypePolicy::DeclTypeData *>>();
-            for(DeclTypePolicy::DeclTypeData * decl : *decl_data)
-                data.fields[currentRegion].emplace_back(decl);
-            decl_data->clear();
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+		} else if(typeid(DeclTypePolicy) == typeid(*policy)) {
+	
+			std::vector<DeclTypePolicy::DeclTypeData *> * decl_data = policy->Data<std::vector<DeclTypePolicy::DeclTypeData *>>();
+			for(DeclTypePolicy::DeclTypeData * decl : *decl_data)
+				data.fields[currentRegion].emplace_back(decl);
+			decl_data->clear();
+			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
-        } else if(typeid(FunctionPolicy) == typeid(*policy)) {
+		} else if(typeid(FunctionPolicy) == typeid(*policy)) {
 
-            FunctionPolicy::FunctionData * f_data = policy->Data<FunctionPolicy::FunctionData>();
+			FunctionPolicy::FunctionData * f_data = policy->Data<FunctionPolicy::FunctionData>();
 
-            if(f_data->isPureVirtual)
-                data.hasPureVirtual = true;
+			if(f_data->isPureVirtual)
+				data.hasPureVirtual = true;
 
-            if(f_data->type == FunctionPolicy::CONSTRUCTOR)
-                data.constructors[currentRegion].emplace_back(f_data);
-            else if(f_data->type == FunctionPolicy::OPERATOR)
-                data.operators[currentRegion].emplace_back(f_data);
-            else 
-                data.methods[currentRegion].emplace_back(f_data);
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+			if(f_data->type == FunctionPolicy::CONSTRUCTOR)
+				data.constructors[currentRegion].emplace_back(f_data);
+			else if(f_data->type == FunctionPolicy::OPERATOR)
+				data.operators[currentRegion].emplace_back(f_data);
+			else 
+				data.methods[currentRegion].emplace_back(f_data);
+			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
-        } else if(typeid(ClassPolicy) == typeid(*policy)) {
+		} else if(typeid(ClassPolicy) == typeid(*policy)) {
 
-            data.innerClasses[currentRegion].emplace_back(policy->Data<ClassPolicy::ClassData>());
-            ctx.dispatcher->RemoveListener(nullptr);
+			data.innerClasses[currentRegion].emplace_back(policy->Data<ClassPolicy::ClassData>());
+			ctx.dispatcher->RemoveListener(nullptr);
 
-        }
+		}
 
-    }
+	}
 
 protected:
-    void * DataInner() const override {
+	void * DataInner() const override {
 
-        return new ClassData(data);
+		return new ClassData(data);
 
-    }
+	}
 
 private:
 
-    void InitializeClassPolicyHandlers() {
-        using namespace srcSAXEventDispatch;
+	void InitializeClassPolicyHandlers() {
+		using namespace srcSAXEventDispatch;
 
-        // start of policy
-        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> startPolicy = [this](srcSAXEventContext& ctx) {
+		// start of policy
+		std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> startPolicy = [this](srcSAXEventContext& ctx) {
 
-            if(!classDepth) {
+			if(!classDepth) {
 
-                classDepth = ctx.depth;
+				classDepth = ctx.depth;
 
-                data = ClassData{};
-                std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
-                if(stereotype_attr_itr != ctx.attributes.end())
-                    data.stereotype = stereotype_attr_itr->second;
+				data = ClassData{};
+				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
 
-                if(ctx.elementStack.back() == "class")
-                    data.type = CLASS;
-                else if(ctx.elementStack.back() == "struct")
-                    data.type = STRUCT;
+				if(stereotype_attr_itr != ctx.attributes.end())
+					std::istringstream stereostring(stereotype_attr_itr->second);
+					data.stereotype = std::vector<std::string>(std::istringstream::iterator(stereostring), std::istringstream::iterator());
 
-                data.name = nullptr;
+				if(ctx.elementStack.back() == "class")
+					data.type = CLASS;
+				else if(ctx.elementStack.back() == "struct")
+					data.type = STRUCT;
 
-                CollectNameHandlers();
-                CollectGenericHandlers();
-                CollectSuperHanders();
-                CollectBlockHanders();
+				data.name = nullptr;
 
-            } else if((classDepth + 3) == ctx.depth) {
+				CollectNameHandlers();
+				CollectGenericHandlers();
+				CollectSuperHanders();
+				CollectBlockHanders();
 
-                if(!classPolicy) classPolicy = new ClassPolicy{this};
-                ctx.dispatcher->AddListenerDispatch(classPolicy); 
+			} else if((classDepth + 3) == ctx.depth) {
 
-            }
+				if(!classPolicy) classPolicy = new ClassPolicy{this};
+				ctx.dispatcher->AddListenerDispatch(classPolicy);
 
-        };
+			}
 
-        // end of policy
-        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> endPolicy = [this](srcSAXEventContext& ctx) {
+		};
 
-            if(classDepth && classDepth == ctx.depth) {
+		// end of policy
+		std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> endPolicy = [this](srcSAXEventContext& ctx) {
 
-                classDepth = 0;
-                NotifyAll(ctx);
-                InitializeClassPolicyHandlers();
+			if(classDepth && classDepth == ctx.depth) {
 
-            }
-           
-        };
+				classDepth = 0;
+				NotifyAll(ctx);
+				InitializeClassPolicyHandlers();
 
-        openEventMap[ParserState::classn] = startPolicy;
-        closeEventMap[ParserState::classn] = endPolicy;
-        openEventMap[ParserState::structn] = startPolicy;
-        closeEventMap[ParserState::structn] = endPolicy;
+			}
+		   
+		};
 
-    }
+		openEventMap[ParserState::classn] = startPolicy;
+		closeEventMap[ParserState::classn] = endPolicy;
+		openEventMap[ParserState::structn] = startPolicy;
+		closeEventMap[ParserState::structn] = endPolicy;
 
-    void CollectNameHandlers() {
-        using namespace srcSAXEventDispatch;
+	}
 
-        openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
+	void CollectNameHandlers() {
+		using namespace srcSAXEventDispatch;
 
-            if((classDepth + 1) == ctx.depth) {
+		openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
-                if(!namePolicy) namePolicy = new NamePolicy{this};
-                ctx.dispatcher->AddListenerDispatch(namePolicy);
+			if((classDepth + 1) == ctx.depth) {
 
-            }
+				if(!namePolicy) namePolicy = new NamePolicy{this};
+				ctx.dispatcher->AddListenerDispatch(namePolicy);
 
-        };
+			}
 
-        closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
+		};
 
-            if((classDepth + 1) == ctx.depth) {
+		closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
-                NopOpenEvents({ParserState::name});
-                NopCloseEvents({ParserState::name});
+			if((classDepth + 1) == ctx.depth) {
 
-            }
+				NopOpenEvents({ParserState::name});
+				NopCloseEvents({ParserState::name});
 
-        };
+			}
 
-    }
+		};
 
-    void CollectGenericHandlers() {
-        using namespace srcSAXEventDispatch;
+	}
 
-        closeEventMap[ParserState::templates] = [this](srcSAXEventContext& ctx) {
+	void CollectGenericHandlers() {
+		using namespace srcSAXEventDispatch;
 
-            if((classDepth + 1) == ctx.depth) {
+		closeEventMap[ParserState::templates] = [this](srcSAXEventContext& ctx) {
 
-                data.isGeneric = true;
+			if((classDepth + 1) == ctx.depth) {
 
-            }
+				data.isGeneric = true;
 
-        };
+			}
 
-    }
+		};
 
-    void CollectSuperHanders() {
-        using namespace srcSAXEventDispatch;
+	}
 
-        openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
+	void CollectSuperHanders() {
+		using namespace srcSAXEventDispatch;
 
-            if((classDepth + 1) == ctx.depth) {
+		openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 
-                openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
+			if((classDepth + 1) == ctx.depth) {
 
-                    data.parents.emplace_back(ParentData{ "", false, PUBLIC });
+				openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
 
-                };
+					data.parents.emplace_back(ParentData{ "", false, PUBLIC });
 
-                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+				};
 
-                    if(ctx.And({ ParserState::specifier })) {
+				closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
 
-                        if(ctx.currentToken == "virtual") {
-                            data.parents.back().isVirtual = true;
-                        } else if(ctx.currentToken == "public") {
-                            data.parents.back().accessSpecifier = PUBLIC;
-                        } else if(ctx.currentToken == "private") {
-                            data.parents.back().accessSpecifier = PRIVATE;
-                        } else if(ctx.currentToken == "protected") {
-                            data.parents.back().accessSpecifier = PROTECTED;
-                        }
+					if(ctx.And({ ParserState::specifier })) {
 
-                    } else if(ctx.And({ ParserState::name })) {
+						if(ctx.currentToken == "virtual") {
+							data.parents.back().isVirtual = true;
+						} else if(ctx.currentToken == "public") {
+							data.parents.back().accessSpecifier = PUBLIC;
+						} else if(ctx.currentToken == "private") {
+							data.parents.back().accessSpecifier = PRIVATE;
+						} else if(ctx.currentToken == "protected") {
+							data.parents.back().accessSpecifier = PROTECTED;
+						}
 
-                        data.parents.back().name += ctx.currentToken;
+					} else if(ctx.And({ ParserState::name })) {
 
-                    }
+						data.parents.back().name += ctx.currentToken;
 
+					}
 
-                };              
 
-            }
+				};              
 
-        };
+			}
 
-        closeEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
+		};
 
-            if((classDepth + 1) == ctx.depth) {
+		closeEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 
-                NopOpenEvents({ParserState::super_list, ParserState::super});
-                NopCloseEvents({ParserState::super_list, ParserState::tokenstring});
+			if((classDepth + 1) == ctx.depth) {
 
-            }
+				NopOpenEvents({ParserState::super_list, ParserState::super});
+				NopCloseEvents({ParserState::super_list, ParserState::tokenstring});
 
-        };
+			}
 
-    }
+		};
 
-    void CollectBlockHanders() {
-        using namespace srcSAXEventDispatch;
+	}
 
-       openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+	void CollectBlockHanders() {
+		using namespace srcSAXEventDispatch;
 
-            if((classDepth + 1) == ctx.depth) {
+	   openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 
-                NopOpenEvents({ParserState::name, ParserState::super_list, ParserState::super});
-                NopCloseEvents({ParserState::name, ParserState::super_list, ParserState::tokenstring});
+			if((classDepth + 1) == ctx.depth) {
 
-                // set up to listen to decl_stmt, member, and class policies
-                openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+				NopOpenEvents({ParserState::name, ParserState::super_list, ParserState::super});
+				NopCloseEvents({ParserState::name, ParserState::super_list, ParserState::tokenstring});
 
-                    if((classDepth + 3) == ctx.depth) {
+				// set up to listen to decl_stmt, member, and class policies
+				openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
 
-                        if(!declPolicy) declPolicy = new DeclTypePolicy{this};
-                        ctx.dispatcher->AddListenerDispatch(declPolicy);
+					if((classDepth + 3) == ctx.depth) {
 
-                    }
+						if(!declPolicy) declPolicy = new DeclTypePolicy{this};
+						ctx.dispatcher->AddListenerDispatch(declPolicy);
 
-                };
-                std::function<void (srcSAXEventContext& ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
+					}
 
-                    if((classDepth + 3) == ctx.depth) {
+				};
+				std::function<void (srcSAXEventContext& ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
 
-                        if(!functionPolicy) functionPolicy = new FunctionPolicy{this};
-                        ctx.dispatcher->AddListenerDispatch(functionPolicy);
+					if((classDepth + 3) == ctx.depth) {
 
-                    }
+						if(!functionPolicy) functionPolicy = new FunctionPolicy{this};
+						ctx.dispatcher->AddListenerDispatch(functionPolicy);
 
-                };
-                openEventMap[ParserState::function] = functionEvent;
-                openEventMap[ParserState::functiondecl] = functionEvent;
-                openEventMap[ParserState::constructor] = functionEvent;
-                openEventMap[ParserState::constructordecl] = functionEvent;
+					}
 
-                std::function<void (srcSAXEventContext& ctx)> destructorEvent = [this](srcSAXEventContext& ctx) {
+				};
+				openEventMap[ParserState::function] = functionEvent;
+				openEventMap[ParserState::functiondecl] = functionEvent;
+				openEventMap[ParserState::constructor] = functionEvent;
+				openEventMap[ParserState::constructordecl] = functionEvent;
 
-                    if((classDepth + 3) == ctx.depth) {
+				std::function<void (srcSAXEventContext& ctx)> destructorEvent = [this](srcSAXEventContext& ctx) {
 
-                        data.hasDestructor = true;
+					if((classDepth + 3) == ctx.depth) {
 
-                    }
+						data.hasDestructor = true;
 
-                };
+					}
 
-                openEventMap[ParserState::destructor] = destructorEvent;
-                openEventMap[ParserState::destructordecl] = destructorEvent;
+				};
 
-            }
+				openEventMap[ParserState::destructor] = destructorEvent;
+				openEventMap[ParserState::destructordecl] = destructorEvent;
 
-        };
+			}
 
+		};
 
-        // should always be in a region once block starts, so should not have to close
-        openEventMap[ParserState::publicaccess] = [this](srcSAXEventContext& ctx) {
 
-            if((classDepth + 2) == ctx.depth) {
+		// should always be in a region once block starts, so should not have to close
+		openEventMap[ParserState::publicaccess] = [this](srcSAXEventContext& ctx) {
 
-                currentRegion = PUBLIC;
+			if((classDepth + 2) == ctx.depth) {
 
-            }
+				currentRegion = PUBLIC;
 
-        };
+			}
 
-        openEventMap[ParserState::protectedaccess] = [this](srcSAXEventContext& ctx) {
+		};
 
-            if((classDepth + 2) == ctx.depth) {
+		openEventMap[ParserState::protectedaccess] = [this](srcSAXEventContext& ctx) {
 
-                currentRegion = PROTECTED;
+			if((classDepth + 2) == ctx.depth) {
 
-            }
+				currentRegion = PROTECTED;
 
-        };
+			}
 
-        openEventMap[ParserState::privateaccess] = [this](srcSAXEventContext& ctx) {
+		};
 
-            if((classDepth + 2) == ctx.depth) {
+		openEventMap[ParserState::privateaccess] = [this](srcSAXEventContext& ctx) {
 
-                currentRegion = PRIVATE;
+			if((classDepth + 2) == ctx.depth) {
 
-            }
+				currentRegion = PRIVATE;
 
-        };
+			}
 
-        closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+		};
 
-            if((classDepth + 1) == ctx.depth) {
+		closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 
-                NopOpenEvents({ParserState::block, ParserState::function, ParserState::functiondecl, 
-                               ParserState::constructor, ParserState::constructordecl, ParserState::destructor, ParserState::destructordecl,
-                               ParserState::declstmt,
-                               ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
-                NopCloseEvents({ParserState::block});
+			if((classDepth + 1) == ctx.depth) {
 
-            }
+				NopOpenEvents({ParserState::block, ParserState::function, ParserState::functiondecl, 
+							   ParserState::constructor, ParserState::constructordecl, ParserState::destructor, ParserState::destructordecl,
+							   ParserState::declstmt,
+							   ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
+				NopCloseEvents({ParserState::block});
 
-        };
+			}
 
-    }
+		};
+
+	}
 
 };
 
