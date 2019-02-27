@@ -889,7 +889,7 @@ namespace srcSAXEventDispatch {
             ctx.currentToken.append(ch, len);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
             
-            if(ctx.Or({ParserState::classn, ParserState::structn}) && ctx.IsOpen(ParserState::name) && ctx.IsClosed(ParserState::classblock)){
+            if(ctx.Or({ParserState::classn, ParserState::structn}) && ctx.IsOpen(ParserState::name) && ctx.Nor({ParserState::classblock, ParserState::super_list})){
                 ctx.currentClassName = ctx.currentToken;
             }
             
