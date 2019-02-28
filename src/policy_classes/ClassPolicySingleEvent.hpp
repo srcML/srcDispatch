@@ -327,7 +327,7 @@ private:
 				};
 				std::function<void (srcSAXEventContext& ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
 
-					if((classDepth + 3) == ctx.depth) {
+					if((classDepth + 2) == ctx.depth) {
 
 						if(!functionPolicy) functionPolicy = new FunctionPolicy{this};
 						ctx.dispatcher->AddListenerDispatch(functionPolicy);
@@ -342,7 +342,7 @@ private:
 
 				std::function<void (srcSAXEventContext& ctx)> destructorEvent = [this](srcSAXEventContext& ctx) {
 
-					if((classDepth + 3) == ctx.depth) {
+					if((classDepth + 2) == ctx.depth) {
 
 						data.hasDestructor = true;
 

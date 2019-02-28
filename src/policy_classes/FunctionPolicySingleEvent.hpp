@@ -183,6 +183,7 @@ private:
 				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
 
 				if(stereotype_attr_itr != ctx.attributes.end())
+					//why? compilation error
 					std::istringstream stereostring(stereotype_attr_itr->second);
 					data.stereotype = std::vector<std::string>(std::istringstream::iterator(stereostring), std::istringstream::iterator());
 				
