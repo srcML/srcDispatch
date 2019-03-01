@@ -164,9 +164,10 @@ private:
 				data = ClassData{};
 				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
 
-				if(stereotype_attr_itr != ctx.attributes.end())
+				if(stereotype_attr_itr != ctx.attributes.end()){
 					std::istringstream stereostring(stereotype_attr_itr->second);
-					data.stereotype = std::vector<std::string>(std::istringstream::iterator(stereostring), std::istringstream::iterator());
+					data.stereotype = std::vector<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
+				}
 
 				if(ctx.elementStack.back() == "class")
 					data.type = CLASS;
