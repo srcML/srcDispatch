@@ -25,6 +25,7 @@
 
 #include <string>
 #include <vector>
+#include <set>
 #include <sstream>
 #include <iterator>
 
@@ -49,7 +50,7 @@ public:
 	struct ClassData {
 
 		ClassType type;
-		std::vector<std::string> stereotype;
+		std::set<std::string> stereotypes;
 
 		bool isGeneric;
 		NamePolicy::NameData * name;
@@ -168,7 +169,7 @@ private:
 
 				if(stereotype_attr_itr != ctx.attributes.end()){
 					std::istringstream stereostring(stereotype_attr_itr->second);
-					data.stereotype = std::vector<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
+					data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
 				}
 
 				if(ctx.elementStack.back() == "class")
