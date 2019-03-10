@@ -24,6 +24,10 @@
 #include <FunctionPolicySingleEvent.hpp>
 
 #include <string>
+<<<<<<< HEAD
+=======
+#include <vector>
+>>>>>>> 9ab6b986694a64f08a228803cb5b1158e921283f
 #include <set>
 #include <sstream>
 #include <iterator>

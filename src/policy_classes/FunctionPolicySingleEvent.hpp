@@ -25,6 +25,7 @@
 #include <DeclTypePolicySingleEvent.hpp>
 
 #include <string>
+#include <vector>
 #include <set>
 #include <sstream>
 #include <iterator>
