@@ -26,6 +26,7 @@ struct DeclData{
                 numOfContainingFunctionParams{0}{}
     void clear(){
         lineNumber = -1;
+        isFinal = false;
         isStatic = false;
         isPointer = false;
         nameOfType.clear();
@@ -47,7 +48,7 @@ struct DeclData{
     }
     int lineNumber;
     int numOfContainingFunctionParams;
-
+    bool isFinal;
     bool isConstValue;
     bool isStatic;
     bool isPointer;

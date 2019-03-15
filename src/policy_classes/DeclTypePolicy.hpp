@@ -75,7 +75,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     data.lineNumber = ctx.currentLineNumber;
                     data.nameOfIdentifier = currentDeclName;
                     data.isLocalVar = true;
-                    
+                    if(ctx.currentFileLanguage == "Java" && !data.isFinal){
+                        data.isReference = true;
+                    }
                     currentDeclName.clear();
                     NotifyAll(ctx);
                     data.clear();
@@ -114,6 +116,9 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         }else{
                             data.isConstValue = true;
                         }
+                    }
+                    if(currentSpecifier == "final"){
+                        data.isFinal = true;
                     }
                     if(currentSpecifier == "static"){
                         data.isStatic = true;
