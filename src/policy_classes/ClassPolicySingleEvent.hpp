@@ -25,6 +25,9 @@
 
 #include <string>
 #include <vector>
+#include <set>
+#include <sstream>
+#include <iterator>
 
 #ifndef INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
@@ -47,7 +50,7 @@ public:
 	struct ClassData {
 
 		ClassType type;
-		std::vector<std::string> stereotype;
+		std::set<std::string> stereotypes;
 
 		bool isGeneric;
 		NamePolicy::NameData * name;
@@ -164,9 +167,10 @@ private:
 				data = ClassData{};
 				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
 
-				if(stereotype_attr_itr != ctx.attributes.end())
+				if(stereotype_attr_itr != ctx.attributes.end()){
 					std::istringstream stereostring(stereotype_attr_itr->second);
-					data.stereotype = std::vector<std::string>(std::istringstream::iterator(stereostring), std::istringstream::iterator());
+					data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
+				}
 
 				if(ctx.elementStack.back() == "class")
 					data.type = CLASS;
