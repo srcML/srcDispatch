@@ -51,7 +51,13 @@ std::string TypePolicy::TypeData::ToString() const {
 
 std::ostream & operator<<(std::ostream & out, const TypePolicy::TypeData & typeData) {
 
+    std::cerr << "TPSE\n";
+    std::cerr << "TPSE Size: " << typeData.types.empty() << '\n';
+    std::cerr << "TACO\n";
+
     for(std::size_t pos = 0; pos < typeData.types.size(); ++pos) {
+
+        std::cerr << "TPSE2\n";
 
         if(pos != 0) out << ' ';
 
@@ -91,6 +97,8 @@ TypePolicy::~TypePolicy(){
 }
 
 void TypePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+
+    //this causes undefined behavior if types is empty
 
     data.types.back().first = policy->Data<NamePolicy::NameData>();
     ctx.dispatcher->RemoveListenerDispatch(nullptr);

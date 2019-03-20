@@ -79,6 +79,13 @@ public:
 
 		friend std::ostream & operator<<(std::ostream & out, const FunctionData & functionData) {
 
+			std::cerr << "FPSE\n";
+
+			//ok returnType is null
+			if(functionData.returnType == nullptr){
+				std::cerr << "FUUUUUUUUUUUUUUUUUUUUUUU\n";
+			}
+
 			out << *functionData.returnType << ' ' << *functionData.name;
 
 			out << '(';
@@ -144,12 +151,17 @@ protected:
 	void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 	virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
+		std::cerr << "FPSE Notify - Policy: " << typeid(*policy).name() << '\n';
+
 		if(typeid(TypePolicy) == typeid(*policy)) {
 
+			//HERE
 			data.returnType = policy->Data<TypePolicy::TypeData>();
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
 		} else if(typeid(NamePolicy) == typeid(*policy)) {
+
+			std::cerr << "I think?\n";
 
 			data.name = policy->Data<NamePolicy::NameData>(); 
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
