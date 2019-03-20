@@ -82,11 +82,9 @@ public:
 			std::cerr << "FPSE\n";
 
 			//ok returnType is null
-			if(functionData.returnType == nullptr){
-				std::cerr << "FUUUUUUUUUUUUUUUUUUUUUUU\n";
+			if(functionData.returnType){
+				out << *functionData.returnType << ' ' << *functionData.name;
 			}
-
-			out << *functionData.returnType << ' ' << *functionData.name;
 
 			out << '(';
 
@@ -151,8 +149,6 @@ protected:
 	void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 	virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 
-		std::cerr << "FPSE Notify - Policy: " << typeid(*policy).name() << '\n';
-
 		if(typeid(TypePolicy) == typeid(*policy)) {
 
 			//HERE
@@ -160,8 +156,6 @@ protected:
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
 		} else if(typeid(NamePolicy) == typeid(*policy)) {
-
-			std::cerr << "I think?\n";
 
 			data.name = policy->Data<NamePolicy::NameData>(); 
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -201,17 +195,17 @@ private:
 					std::istringstream stereostring(stereotype_attr_itr->second);
 					data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
 				}
-				
-				if(ctx.elementStack.back() == "function" || ctx.elementStack.back() == "function_decl") {
+
+				if(ctx.currentTag == "function" || ctx.currentTag == "function_decl") {
 
 					if(ctx.isOperator)
 						data.type = OPERATOR;
 					else
 						data.type = FUNCTION;
 
-				} else if(ctx.elementStack.back() == "constructor" || ctx.elementStack.back() == "constructor_decl") {
+				} else if(ctx.currentTag == "constructor" || ctx.currentTag == "constructor_decl") {
 					data.type = CONSTRUCTOR;
-				} else if(ctx.elementStack.back() == "destructor" || ctx.elementStack.back() == "destructor_decl") {
+				} else if(ctx.currentTag == "destructor" || ctx.currentTag == "destructor_decl") {
 					data.type = DESTURCTOR;
 				}
 

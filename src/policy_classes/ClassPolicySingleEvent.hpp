@@ -125,9 +125,6 @@ public:
 
 			FunctionPolicy::FunctionData * f_data = policy->Data<FunctionPolicy::FunctionData>();
 
-			//testing function info
-			std::cerr << "FunctionData CPSE: " << *f_data << '\n'; 
-
 			if(f_data->isPureVirtual)
 				data.hasPureVirtual = true;
 
