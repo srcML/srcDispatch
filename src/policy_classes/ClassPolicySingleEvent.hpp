@@ -172,9 +172,9 @@ private:
 					data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
 				}
 
-				if(ctx.elementStack.back() == "class")
+				if(ctx.currentTag == "class")
 					data.type = CLASS;
-				else if(ctx.elementStack.back() == "struct")
+				else if(ctx.currentTag == "struct")
 					data.type = STRUCT;
 
 				data.name = nullptr;

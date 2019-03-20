@@ -79,7 +79,12 @@ public:
 
 		friend std::ostream & operator<<(std::ostream & out, const FunctionData & functionData) {
 
-			out << *functionData.returnType << ' ' << *functionData.name;
+			std::cerr << "FPSE\n";
+
+			//ok returnType is null
+			if(functionData.returnType){
+				out << *functionData.returnType << ' ' << *functionData.name;
+			}
 
 			out << '(';
 
@@ -146,6 +151,7 @@ protected:
 
 		if(typeid(TypePolicy) == typeid(*policy)) {
 
+			//HERE
 			data.returnType = policy->Data<TypePolicy::TypeData>();
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 
@@ -189,17 +195,17 @@ private:
 					std::istringstream stereostring(stereotype_attr_itr->second);
 					data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
 				}
-				
-				if(ctx.elementStack.back() == "function" || ctx.elementStack.back() == "function_decl") {
+
+				if(ctx.currentTag == "function" || ctx.currentTag == "function_decl") {
 
 					if(ctx.isOperator)
 						data.type = OPERATOR;
 					else
 						data.type = FUNCTION;
 
-				} else if(ctx.elementStack.back() == "constructor" || ctx.elementStack.back() == "constructor_decl") {
+				} else if(ctx.currentTag == "constructor" || ctx.currentTag == "constructor_decl") {
 					data.type = CONSTRUCTOR;
-				} else if(ctx.elementStack.back() == "destructor" || ctx.elementStack.back() == "destructor_decl") {
+				} else if(ctx.currentTag == "destructor" || ctx.currentTag == "destructor_decl") {
 					data.type = DESTURCTOR;
 				}
 
