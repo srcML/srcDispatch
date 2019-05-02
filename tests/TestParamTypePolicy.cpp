@@ -58,11 +58,14 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
             paramdata = *policy->Data<DeclData>();
             datatotest.push_back(paramdata);
         }
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override{
+
+        }
 		void RunTest(){
 			assert(datatotest.size() == 6);
 			assert(datatotest[0].nameOfType == "int");
 			assert(datatotest[0].nameOfIdentifier == "abc");
-			assert(datatotest[0].linenumber == 1);
+			assert(datatotest[0].lineNumber == 1);
 			assert(datatotest[0].isConstValue == false);
 			assert(datatotest[0].isConstAlias == false);
 			assert(datatotest[0].isReference == true);
@@ -72,7 +75,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
 
 			assert(datatotest[1].nameOfType == "Object");
 			assert(datatotest[1].nameOfIdentifier == "onetwothree");
-			assert(datatotest[1].linenumber == 1);
+			assert(datatotest[1].lineNumber == 1);
 			assert(datatotest[1].isConstValue == false);
 			assert(datatotest[1].isConstAlias == false);
 			assert(datatotest[1].isReference == false);
@@ -82,7 +85,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
 
 			assert(datatotest[2].nameOfType == "Object");
 			assert(datatotest[2].nameOfIdentifier == "DoReiMe");
-			assert(datatotest[2].linenumber == 1);
+			assert(datatotest[2].lineNumber == 1);
 			assert(datatotest[2].isConstValue == false);
 			assert(datatotest[2].isConstAlias == false);
 			assert(datatotest[2].isReference == false);
@@ -92,7 +95,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
 
 			assert(datatotest[3].nameOfType == "Object");
 			assert(datatotest[3].nameOfIdentifier == "aybeecee");
-			assert(datatotest[3].linenumber == 1);
+			assert(datatotest[3].lineNumber == 1);
 			assert(datatotest[3].isConstValue == true);
 			assert(datatotest[3].isConstAlias == true);
 			assert(datatotest[3].isReference == false);
@@ -102,7 +105,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
 
 			assert(datatotest[4].nameOfType == "vector");
 			assert(datatotest[4].nameOfIdentifier == "spaces");
-			assert(datatotest[4].linenumber == 1);
+			assert(datatotest[4].lineNumber == 1);
 			assert(datatotest[4].isConstValue == false);
 			assert(datatotest[4].isConstAlias == false);
 			assert(datatotest[4].isReference == false);
@@ -112,7 +115,7 @@ class TestParamType : public srcSAXEventDispatch::PolicyDispatcher, public srcSA
 
 			assert(datatotest[5].nameOfType == "int");
 			assert(datatotest[5].nameOfIdentifier == "ab");
-			assert(datatotest[5].linenumber == 1);
+			assert(datatotest[5].lineNumber == 1);
 			assert(datatotest[5].isConstValue == false);
 			assert(datatotest[5].isConstAlias == true);
 			assert(datatotest[5].isReference == false);

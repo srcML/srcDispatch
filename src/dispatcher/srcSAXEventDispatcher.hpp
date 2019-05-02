@@ -506,15 +506,17 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::function];
                 } },
                 { "constructor", [this](){
-                    DispatchEvent(ParserState::functionblock, ElementState::close);
+                      //This code causes problems for some reason. FIX.
+/*                    DispatchEvent(ParserState::functionblock, ElementState::close);
                     --ctx.triggerField[ParserState::functionblock];
-
+*/
                     DispatchEvent(ParserState::constructor, ElementState::close);
                     --ctx.triggerField[ParserState::constructor];
                 } },
                 { "destructor", [this](){
-                    DispatchEvent(ParserState::functionblock, ElementState::close);
-                    --ctx.triggerField[ParserState::functionblock];
+                      //This code causes problems for some reason. FIX.
+/*                    DispatchEvent(ParserState::functionblock, ElementState::close);
+                    --ctx.triggerField[ParserState::functionblock];*/
                     
                     DispatchEvent(ParserState::destructor, ElementState::close);
                     --ctx.triggerField[ParserState::destructor];
