@@ -70,7 +70,7 @@ namespace srcSAXEventDispatch {
 
     private:
         std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
-        bool classflagopen, functionflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
+        bool classflagopen, functionflagopen, constructorflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
 
         bool dispatching;
         bool generateArchive;
@@ -150,7 +150,7 @@ namespace srcSAXEventDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             generateArchive = genArchive;
-            classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
@@ -164,7 +164,7 @@ namespace srcSAXEventDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             generateArchive = genArchive;
-            classflagopen = functionflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+            classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
                 ctx.writer = xmlNewTextWriterMemory(ctx.archiveBuffer, 0);
@@ -253,7 +253,7 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::function, ElementState::open);
                 } },
                 { "constructor", [this](){
-                    //functionflagopen = true;
+                    constructorflagopen = true;
                     ++ctx.triggerField[ParserState::constructor];
                     DispatchEvent(ParserState::constructor, ElementState::open);
                 } },
@@ -322,6 +322,11 @@ namespace srcSAXEventDispatch {
                 } },
                 { "block", [this](){ 
                     ++ctx.triggerField[ParserState::block];
+                    if(constructorflagopen){
+                        constructorflagopen = false;
+                        ++ctx.triggerField[ParserState::constructorblock];
+                        DispatchEvent(ParserState::constructorblock, ElementState::open);
+                    }
                     if(functionflagopen){
                         functionflagopen = false;
                         ++ctx.triggerField[ParserState::functionblock];
@@ -507,9 +512,10 @@ namespace srcSAXEventDispatch {
                 } },
                 { "constructor", [this](){
                       //This code causes problems for some reason. FIX.
-/*                    DispatchEvent(ParserState::functionblock, ElementState::close);
-                    --ctx.triggerField[ParserState::functionblock];
-*/
+                    DispatchEvent(ParserState::constructorblock, ElementState::close);
+                    ctx.currentFunctionName.clear();
+                    --ctx.triggerField[ParserState::constructorblock];
+
                     DispatchEvent(ParserState::constructor, ElementState::close);
                     --ctx.triggerField[ParserState::constructor];
                 } },
@@ -895,7 +901,7 @@ namespace srcSAXEventDispatch {
                 ctx.currentClassName = ctx.currentToken;
             }
             
-            if(ctx.And({ParserState::name, ParserState::function}) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+            if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::constructorblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
                 ctx.currentFunctionName = ctx.currentToken;
             }
             process->second();

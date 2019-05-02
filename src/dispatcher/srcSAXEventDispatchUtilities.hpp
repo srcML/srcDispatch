@@ -40,8 +40,8 @@ namespace srcSAXEventDispatch{
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
-        ifstmt, nonterminal, macro, classblock, functionblock, ifblock, whileblock, forblock, specifier, typedefexpr,
-        userdefined, comment,
+        ifstmt, nonterminal, macro, classblock, functionblock, constructorblock, ifblock, whileblock, forblock, 
+        specifier, typedefexpr, userdefined, comment,
 
         // NLP states
         snoun, propersnoun, spronoun, sadjective, sverb,

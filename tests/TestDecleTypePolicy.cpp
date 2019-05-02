@@ -122,6 +122,10 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 			assert(datatotest[5].nameOfContainingClass == "");
 			assert(datatotest[5].nameOfContainingFunction == "");
 			assert(datatotest[5].nameOfContainingFile == "testsrcType.cpp");
+
+			//assert(datatotest[5].nameOfType == "");
+			//std::cerr<<"Msg: "<<datatotest[6].nameOfIdentifier<<std::endl;
+			//assert(datatotest[5].nameOfIdentifier == "testclass");
 		}
     protected:
         void * DataInner() const override {
@@ -135,7 +139,7 @@ class TestDeclType : public srcSAXEventDispatch::PolicyDispatcher, public srcSAX
 };
 
 int main(int argc, char** filename){
-	std::string codestr = "class testclass {int& abc; Object<int> onetwothree; void foo(){static Object* DoReiMe; const Object* const aybeecee;\n nlp::std::vector<std::string> spaces;}}; int* const ab[5];";
+	std::string codestr = "class testclass {int& abc; Object<int> onetwothree; void foo(){static Object* DoReiMe; const Object* const aybeecee;\n nlp::std::vector<std::string> spaces;} testclass(int i){}}; int* const ab[5];";
 	std::string srcmlstr = StringToSrcML(codestr);
 
     TestDeclType decltypedata;
