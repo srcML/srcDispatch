@@ -39,6 +39,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             signaturedata = *policy->Data<SignatureData>();
             datatotest.push_back(signaturedata);
         }
+        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
         void RunTest(){
 
             assert(datatotest.size() == 5);

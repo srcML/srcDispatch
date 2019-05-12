@@ -446,6 +446,10 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::unit];
                     DispatchEvent(ParserState::unit, ElementState::open);
                 } },
+                { "throws", [this](){
+                    ++ctx.triggerField[ParserState::throws];
+                    DispatchEvent(ParserState::throws, ElementState::open);
+                } },
                 { "return", [this](){
                     ++ctx.triggerField[ParserState::returnstmt];
                     DispatchEvent(ParserState::returnstmt, ElementState::open);
@@ -691,6 +695,10 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::returnstmt];
                     DispatchEvent(ParserState::returnstmt, ElementState::close);
                 } },
+                { "throws", [this](){
+                    --ctx.triggerField[ParserState::throws];
+                    DispatchEvent(ParserState::throws, ElementState::close);
+                } },
                 { "comment", [this](){
                     --ctx.triggerField[ParserState::comment];
                     DispatchEvent(ParserState::comment, ElementState::close);
@@ -901,7 +909,7 @@ namespace srcSAXEventDispatch {
                 ctx.currentClassName = ctx.currentToken;
             }
             
-            if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::constructorblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist})){
+            if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::constructorblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::throws})){
                 ctx.currentFunctionName = ctx.currentToken;
             }
             process->second();
