@@ -41,7 +41,7 @@ namespace srcSAXEventDispatch{
         argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
         ifstmt, nonterminal, macro, classblock, functionblock, constructorblock, ifblock, whileblock, forblock, 
-        specifier, throws, typedefexpr, userdefined, comment,
+        specifier, throws, typedefexpr, userdefined, comment, annotation,
 
         // NLP states
         snoun, propersnoun, spronoun, sadjective, sverb,
@@ -327,6 +327,7 @@ namespace srcSAXEventDispatch{
                     ParserState::throws,
                     ParserState::comment,
                     ParserState::stereotype,
+                    ParserState::annotation,
                     ParserState::archive,
                 });
 
@@ -380,6 +381,7 @@ namespace srcSAXEventDispatch{
                     ParserState::returnstmt,
                     ParserState::throws,
                     ParserState::comment,
+                    ParserState::annotation,
                     ParserState::archive,
                 });
 
