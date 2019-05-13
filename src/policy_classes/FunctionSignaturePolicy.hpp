@@ -27,12 +27,13 @@
 struct SignatureData{
     SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, 
     hasAliasedReturn{false}, hasSideEffect{false}{}
-    int linenumber;
+    int lineNumber;
     bool isConst;
     bool isMethod;
     bool isStatic;
     std::string name;
     bool hasSideEffect;
+    bool isConstructor;
     bool hasAliasedReturn;
     std::string returnType;
     bool constPointerReturn;
@@ -52,6 +53,7 @@ struct SignatureData{
         returnType.clear();
         parameters.clear();
         hasSideEffect = false;
+        isConstructor = false;
         sLexicalCategory.clear();
         hasAliasedReturn = false;
         functionNamespaces.clear();
@@ -91,8 +93,10 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-                data.linenumber = ctx.currentLineNumber;
                 ctx.dispatcher->AddListener(&parampolicy);
+            };
+            openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx) {
+                data.lineNumber = ctx.currentLineNumber;
             };
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
@@ -114,7 +118,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             };
             openEventMap[ParserState::constructorblock] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::classn)){
-                    data.isMethod = true;
+                    data.isConstructor = true;
                     data.nameOfContainingClass = ctx.currentClassName;
                 }
                 data.name = ctx.currentFunctionName;
