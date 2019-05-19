@@ -27,12 +27,13 @@
 struct SignatureData{
     SignatureData():isConst{false}, constPointerReturn{false}, isMethod{false}, isStatic{false}, pointerToConstReturn{false}, 
     hasAliasedReturn{false}, hasSideEffect{false}{}
-    int linenumber;
+    int lineNumber;
     bool isConst;
     bool isMethod;
     bool isStatic;
     std::string name;
     bool hasSideEffect;
+    bool isConstructor;
     bool hasAliasedReturn;
     std::string returnType;
     bool constPointerReturn;
@@ -52,6 +53,7 @@ struct SignatureData{
         returnType.clear();
         parameters.clear();
         hasSideEffect = false;
+        isConstructor = false;
         sLexicalCategory.clear();
         hasAliasedReturn = false;
         functionNamespaces.clear();
@@ -91,8 +93,8 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-                data.linenumber = ctx.currentLineNumber;
                 ctx.dispatcher->AddListener(&parampolicy);
+                data.lineNumber = ctx.currentLineNumber;
             };
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
@@ -102,7 +104,8 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     data.functionNamespaces.push_back(ctx.currentToken);
                 }
             };
-            openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx){
+            closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx){
+                ctx.dispatcher->RemoveListener(&parampolicy);
                 if(ctx.IsOpen(ParserState::classn)){
                     data.isMethod = true;
                     data.nameOfContainingClass = ctx.currentClassName;
@@ -112,16 +115,16 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 seenModifier = false;
                 data.clear();
             };
-            openEventMap[ParserState::constructorblock] = [this](srcSAXEventContext& ctx){
+/*            openEventMap[ParserState::constructorblock] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::classn)){
-                    data.isMethod = true;
+                    data.isConstructor = true;
                     data.nameOfContainingClass = ctx.currentClassName;
                 }
                 data.name = ctx.currentFunctionName;
                 NotifyAll(ctx);
                 seenModifier = false;
                 data.clear();
-            };
+            };*/
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
                 if(currentModifier == "*") {
                     if(ctx.And({ParserState::type, ParserState::function}) && ctx.IsClosed(ParserState::parameterlist)){
@@ -160,9 +163,6 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     data.isStatic = true;
                 }
                 currentSpecifier.clear();
-            };
-            closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-                ctx.dispatcher->RemoveListener(&parampolicy);
             };
         }
 
