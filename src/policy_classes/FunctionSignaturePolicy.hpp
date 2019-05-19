@@ -96,6 +96,9 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                 ctx.dispatcher->AddListener(&parampolicy);
                 data.lineNumber = ctx.currentLineNumber;
             };
+            openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx) {
+                data.lineNumber = ctx.currentLineNumber;
+            };
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::type, ParserState::function}) && ctx.Nor({ParserState::parameterlist, ParserState::functionblock, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                     data.returnTypeNamespaces.push_back(ctx.currentToken);
