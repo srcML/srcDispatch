@@ -41,7 +41,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 callargumentlist.clear();
             }
             std::string fnName;
-            std::list<std::string> callargumentlist;
+            std::vector<std::string> callargumentlist;
         };
         ~CallPolicy(){}
         CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
