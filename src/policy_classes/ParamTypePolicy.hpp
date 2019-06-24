@@ -77,7 +77,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
-                    if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
+                    if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist, ParserState::index})){
                         currentTypeName = ctx.currentToken;
                     }
                     if(ctx.And({ParserState::name, ParserState::decl, ParserState::parameter}) && 
