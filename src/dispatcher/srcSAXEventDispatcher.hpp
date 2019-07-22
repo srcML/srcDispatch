@@ -225,6 +225,10 @@ namespace srcSAXEventDispatch {
                         DispatchEvent(ParserState::elseif, ElementState::open);
                     }
                 } },
+                { "else", [this](){
+                    ++ctx.triggerField[ParserState::elsestmt];
+                    DispatchEvent(ParserState::elsestmt, ElementState::open);
+                } },
                 { "for", [this](){
                     ++ctx.triggerField[ParserState::forstmt];
                     DispatchEvent(ParserState::forstmt, ElementState::open);
@@ -491,7 +495,11 @@ namespace srcSAXEventDispatch {
                         DispatchEvent(ParserState::elseif, ElementState::close);
                         ifelseflagopen = false;
                     }
-                } },            
+                } },  
+                { "else", [this](){
+                    --ctx.triggerField[ParserState::elsestmt];
+                    DispatchEvent(ParserState::elsestmt, ElementState::close);
+                } },
                 { "for", [this](){
                     --ctx.triggerField[ParserState::forblock];
                     DispatchEvent(ParserState::forstmt, ElementState::close);
