@@ -216,9 +216,14 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::parameterlist, ElementState::open);
                 } },
                 { "if", [this](){
-                    ifflagopen = true;
-                    ++ctx.triggerField[ParserState::ifstmt];
-                    DispatchEvent(ParserState::ifstmt, ElementState::open);
+                    if(!ifelseflagopen){
+                        ifflagopen = true;
+                        ++ctx.triggerField[ParserState::ifstmt];
+                        DispatchEvent(ParserState::ifstmt, ElementState::open);
+                    }else{
+                        ++ctx.triggerField[ParserState::elseif];
+                        DispatchEvent(ParserState::elseif, ElementState::open);
+                    }
                 } },
                 { "for", [this](){
                     ++ctx.triggerField[ParserState::forstmt];
@@ -477,9 +482,15 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::parameterlist];
                 } },            
                 { "if", [this](){
-                    --ctx.triggerField[ParserState::ifblock];
-                    DispatchEvent(ParserState::ifstmt, ElementState::close);
-                    --ctx.triggerField[ParserState::ifstmt];
+                    if(!ifelseflagopen){
+                        --ctx.triggerField[ParserState::ifblock];
+                        DispatchEvent(ParserState::ifstmt, ElementState::close);
+                        --ctx.triggerField[ParserState::ifstmt];
+                    }else{
+                        --ctx.triggerField[ParserState::elseif];
+                        DispatchEvent(ParserState::elseif, ElementState::close);
+                        ifelseflagopen = false;
+                    }
                 } },            
                 { "for", [this](){
                     --ctx.triggerField[ParserState::forblock];
@@ -849,6 +860,9 @@ namespace srcSAXEventDispatch {
             }
             if(name == "operator" && (localName == "function" || localName == "function_decl")) {
                 ctx.isOperator = true;
+            }
+            if(name == "elseif" && localName == "if"){
+                ifelseflagopen = true;
             }
 
 

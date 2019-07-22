@@ -35,7 +35,7 @@
 namespace srcSAXEventDispatch{
     class EventDispatcher;            
     enum ElementState {open, close};
-    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, 
+    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif,
         argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, genericargumentlist,
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn,
