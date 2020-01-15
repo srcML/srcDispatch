@@ -46,7 +46,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[0].returnType == "void");
             assert(datatotest[0].name== "foo");
             assert(datatotest[0].returnTypeModifier == std::string());
-            assert(datatotest[0].linenumber == 1);
+            assert(datatotest[0].lineNumber == 1);
             assert(datatotest[0].isConst == false);
             assert(datatotest[0].isMethod == false);
             assert(datatotest[0].isStatic == false);
@@ -60,7 +60,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[1].returnType == "void");
             assert(datatotest[1].name== "bar");
             assert(datatotest[1].returnTypeModifier == std::string());
-            assert(datatotest[1].linenumber == 2);
+            assert(datatotest[1].lineNumber == 2);
             assert(datatotest[1].isConst == false);
             assert(datatotest[1].isMethod == false);
             assert(datatotest[1].isStatic == true);
@@ -74,7 +74,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[2].returnType == "int");
             assert(datatotest[2].name== "bloo");
             assert(datatotest[2].returnTypeModifier == "*");
-            assert(datatotest[2].linenumber == 3);
+            assert(datatotest[2].lineNumber == 3);
             assert(datatotest[2].isConst == false);
             assert(datatotest[2].isMethod == false);
             assert(datatotest[2].isStatic == false);
@@ -88,7 +88,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[3].returnType == "void");
             assert(datatotest[3].name== "bleep");
             assert(datatotest[3].returnTypeModifier == std::string());
-            assert(datatotest[3].linenumber == 4);
+            assert(datatotest[3].lineNumber == 4);
             assert(datatotest[3].isConst == true);
             assert(datatotest[3].isMethod == true);
             assert(datatotest[3].isStatic == false);
@@ -103,7 +103,7 @@ class TestFunctionSignature : public srcSAXEventDispatch::PolicyDispatcher, publ
             assert(datatotest[4].returnType == "object");
             assert(datatotest[4].name== "bloo");
             assert(datatotest[4].returnTypeModifier == "*");
-            assert(datatotest[4].linenumber == 5);
+            assert(datatotest[4].lineNumber == 5);
             assert(datatotest[4].isConst == false);
             assert(datatotest[4].isMethod == false);
             assert(datatotest[4].isStatic == true);

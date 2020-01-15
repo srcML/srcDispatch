@@ -114,6 +114,11 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     data.functionNamespaces.push_back(ctx.currentToken);
                 }
             };
+            openEventMap[ParserState::functionblock] = [this](srcSAXEventContext& ctx) {
+                NotifyAll(ctx);
+                seenModifier = false;
+                data.clear();    
+            };
             closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx){
                 ctx.dispatcher->RemoveListener(&parampolicy);
                 if(ctx.IsOpen(ParserState::classn)){
@@ -121,9 +126,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
                     data.nameOfContainingClass = ctx.currentClassName;
                 }
                 data.name = ctx.currentFunctionName;
-                NotifyAll(ctx);
-                seenModifier = false;
-                data.clear();
+
             };
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
                 if(currentModifier == "*") {
