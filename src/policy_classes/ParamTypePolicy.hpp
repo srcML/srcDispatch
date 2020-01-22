@@ -97,20 +97,26 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                 data.isParameter = true;
                 data.nameOfContainingFunction = ctx.currentFunctionName;
                 data.nameOfContainingFile = ctx.currentFilePath;
+                if (ctx.currentFileLanguage == "Java" && !data.isFinal){
+                    data.isReference = true;
+                }
                 NotifyAll(ctx);
                 data.clear();
             };
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
-                    if(currentSpecifier == "static"){
-                        data.isStatic = true;
-                    }
                     if(currentSpecifier == "const"){
                         if(data.isPointer){
                             data.isConstAlias = true;
                         }else{
                             data.isConstValue = true;
                         }
+                    }
+                    if(currentSpecifier == "final"){
+                        data.isFinal = true;
+                    }
+                    if(currentSpecifier == "static"){
+                        data.isStatic = true;
                     }
                 }
                 currentSpecifier.clear();

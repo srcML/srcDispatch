@@ -62,7 +62,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
 
             closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::declstmt})){
-                    if(ctx.IsOpen(ParserState::classblock) && ctx.IsClosed(ParserState::function)){
+                    if(ctx.IsOpen(ParserState::classblock) && ctx.Nor({ParserState::function, ParserState::constructor, ParserState::destructor})){
                         data.isClassMember = true;
                         data.nameOfContainingClass = ctx.currentClassName;
                     }
