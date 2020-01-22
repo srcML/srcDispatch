@@ -936,11 +936,23 @@ namespace srcSAXEventDispatch {
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
             
             if(ctx.Or({ParserState::classn, ParserState::structn}) && ctx.IsOpen(ParserState::name) && ctx.Nor({ParserState::classblock, ParserState::super_list})){
-                ctx.currentClassName = ctx.currentToken;
+                ctx.currentClassName = std::all_of(
+                    std::begin(ctx.currentToken), 
+                    std::end(ctx.currentToken), 
+                        [](char c){
+                            if(std::isalnum(c) || c == '_') return true;
+                            return false;
+                        }) ? ctx.currentToken : ""; 
             }
             
             if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})){
-                ctx.currentFunctionName = ctx.currentToken;
+                ctx.currentFunctionName = std::all_of(
+                    std::begin(ctx.currentToken), 
+                    std::end(ctx.currentToken), 
+                    [](char c){
+                        if(std::isalnum(c) || c == '_') return true;
+                        return false;
+                    }) ? ctx.currentToken : "";
             }
             process->second();
             if (generateArchive) { ctx.write_content(ctx.currentToken); }
