@@ -67,7 +67,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         data.nameOfContainingClass = ctx.currentClassName;
                     }
                     data.nameOfContainingFile = ctx.currentFilePath;
-                    if(ctx.currentFunctionName.empty()){
+                    if(ctx.currentFunctionName.empty() && !ctx.currentClassName.empty()){
                         data.nameOfContainingClass = ctx.currentClassName;
                     }
                     data.nameOfContainingFunction = ctx.currentFunctionName;
