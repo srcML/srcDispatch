@@ -115,7 +115,7 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
 
         // C++ has depth of 2 others 1
         std::size_t elementStackSize = ctx.elementStack.size();
-        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
+        if(     argumentDepth && (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "argument")
             || (argumentDepth + 1) == ctx.depth)) {
 
             data.data.push_back(std::make_pair(nullptr, TemplateArgumentPolicy::NAME));
