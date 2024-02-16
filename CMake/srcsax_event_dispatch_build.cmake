@@ -27,9 +27,6 @@ add_subdirectory(${DISPATCH_SOURCE_DIR}/srcSAX/CMake ${DISPATCH_BINARY_DIR}/srcS
 # Compiler options
 add_definitions("-std=c++11")
 
-# find needed libraries
-find_package(LibXml2 REQUIRED)
-
 set(DISPATCH_INCLUDE_DIR ${SRCSAX_INCLUDE_DIR}
                          ${DISPATCH_SOURCE_DIR}/src/dispatcher
                          ${DISPATCH_SOURCE_DIR}/src/policy_classes
