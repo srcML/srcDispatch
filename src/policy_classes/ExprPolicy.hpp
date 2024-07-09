@@ -64,10 +64,22 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         ExprDataSet exprDataSet;
         std::string currentTypeName, currentExprName, currentModifier, currentSpecifier;
         std::vector<unsigned int> currentLine;
+        
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
+            
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
-                if(ctx.currentToken == "="){
+                // Long or-statement allows various declaration operators to get planted into
+                // a slices def data output
+                // if (ctx.currentToken == "=" || ctx.currentToken == "++" || ctx.currentToken == "+=" ||
+                //     ctx.currentToken == "--" || ctx.currentToken == "-=" || ctx.currentToken == "*=" ||
+                //     ctx.currentToken == "/=" || ctx.currentToken == "%=" || ctx.currentToken == "&=" ||
+                //     ctx.currentToken == "|=" || ctx.currentToken == "^=" || ctx.currentToken == "<<=" ||
+                //     ctx.currentToken == ">>=")
+
+                if (ctx.currentToken == "=" || ctx.currentToken == "+=" ||
+                    ctx.currentToken == "-=" || ctx.currentToken == "*=" ||
+                    ctx.currentToken == "/=" || ctx.currentToken == "%="){
                     auto it = exprDataSet.dataSet.find(currentExprName);
                     if(it != exprDataSet.dataSet.end()){
                         exprDataSet.lhsName = currentExprName;
@@ -79,14 +91,17 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     }
                 }
             };
+
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 
             };
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
+
                 if(currentLine.empty() || currentLine.back() != ctx.currentLineNumber){
                     currentLine.push_back(ctx.currentLineNumber);
                 }
+                
                 if(ctx.IsOpen({ParserState::exprstmt})){
                     auto it = exprDataSet.dataSet.find(currentExprName);
                     if(it != exprDataSet.dataSet.end()){
@@ -102,9 +117,6 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken == " ")){
-                    if(ctx.IsOpen(ParserState::exprstmt)){
-
-                    }
                     if(ctx.And({ParserState::name, ParserState::expr, ParserState::exprstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::op})){
                         currentExprName = ctx.currentToken;
                     }

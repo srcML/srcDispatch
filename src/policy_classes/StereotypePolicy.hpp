@@ -75,6 +75,7 @@ class StereotypePolicy : public srcSAXEventDispatch::EventListener, public srcSA
                 NotifyAll(ctx);
                 data.clear();
             };
+            
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken == " ")){

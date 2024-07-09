@@ -59,6 +59,13 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         std::string fullFuncIdentifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
+
+            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx) {
+                data.callargumentlist.push_back("(");
+                data.callargumentlist.push_back(fullFuncIdentifier);
+                data.fnName = fullFuncIdentifier;
+                fullFuncIdentifier = "";
+            };
             closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx){
                 if(ctx.triggerField[ParserState::call] == 1){ //TODO: Fix
                     data.callargumentlist.push_back(")");
@@ -87,13 +94,6 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 if(ctx.And({ParserState::literal, ParserState::argument, ParserState::argumentlist}) && ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                     data.callargumentlist.push_back("*LITERAL*");   //Illegal c++ identifier as marker for literals
                 }
-            };
-
-            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx) {
-                data.callargumentlist.push_back("(");
-                data.callargumentlist.push_back(fullFuncIdentifier);
-                data.fnName = fullFuncIdentifier;
-                fullFuncIdentifier = "";
             };
         }
 };

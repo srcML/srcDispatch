@@ -208,6 +208,7 @@ private:
 
 		openEventMap[ParserState::classn] = startPolicy;
 		closeEventMap[ParserState::classn] = endPolicy;
+		
 		openEventMap[ParserState::structn] = startPolicy;
 		closeEventMap[ParserState::structn] = endPolicy;
 
@@ -226,7 +227,6 @@ private:
 			}
 
 		};
-
 		closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 
 			if((classDepth + 1) == ctx.depth) {
@@ -294,7 +294,6 @@ private:
 			}
 
 		};
-
 		closeEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 
 			if((classDepth + 1) == ctx.depth) {

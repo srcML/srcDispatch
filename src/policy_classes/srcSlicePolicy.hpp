@@ -45,6 +45,7 @@ class srcSlicePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     data.namespaces.push_back(ctx.currentToken);
                 }
             };
+            
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentModifier == "*"){
@@ -87,10 +88,12 @@ class srcSlicePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     }
                 }
             };
+            
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);
                 data.clear();
             };
+
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentSpecifier == "const"){
