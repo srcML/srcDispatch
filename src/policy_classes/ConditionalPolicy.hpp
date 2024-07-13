@@ -38,12 +38,6 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
         void EditDepth(int d) {
 
             if (switchControlVars.size() > 0 && d < 0) {
-                // std::cout << "\033[31m" << "DELETING DEPTH " << "\033[0m" << switchDepth << " : ";
-                // for (auto varNames : switchControlVars[switchDepth]) {
-                //     std::cout << varNames << " ";
-                // }
-                // std::cout << std::endl;
-
                 switchControlVars.erase(switchDepth);
             }
             switchDepth += d;
@@ -64,6 +58,7 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
             using namespace srcSAXEventDispatch;
             
             closeEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
+                currentExprName = ctx.currentToken;
 
                 if ( ctx.IsClosed({ParserState::comment}) ) {
                     // The following is for detecting possible uses within various Conditionals
@@ -73,12 +68,14 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                         }
                     }
 
+                    // The following is for detecting possible uses within various Conditionals
                     if( ctx.IsOpen({ParserState::whilestmt}) && ctx.IsOpen({ParserState::condition}) ){
                         if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
                             conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
                         }
                     }
-
+                    
+                    // The following is for detecting possible uses within various Conditionals
                     if( ctx.IsOpen({ParserState::forstmt}) ) {
                         if ( ctx.IsOpen({ParserState::condition}) ){
                             if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
@@ -96,20 +93,18 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                             }
                         }
                     }
-
+                    
+                    // The following is for detecting possible uses within various Conditionals
                     if( ctx.IsOpen({ParserState::dostmt}) && ctx.IsOpen({ParserState::condition}) ){
                         if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
                             conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
                         }
                     }
 
-                    if( ctx.IsOpen({ParserState::switchstmt}) ){
-                        // std::cout << "[*] " << ctx.currentLineNumber << " | " << ctx.currentToken << " DEPTH -> " << switchDepth << std::endl;
-                        
-                        currentExprName = ctx.currentToken;
+                    // Get uses or use/defs within switch conditions
+                    if( ctx.IsOpen({ParserState::switchstmt}) && ctx.IsOpen({ParserState::condition}) ){
 
                         switchControlVars[switchDepth].insert(ctx.currentToken);
-                        // std::cout << std::endl;
 
                         if (switchUses[ctx.currentToken].empty() || ctx.currentLineNumber != switchUses[ctx.currentToken].back()) {
                             switchUses[ctx.currentToken].push_back(ctx.currentLineNumber);
@@ -128,12 +123,10 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                 }
             };
 
+            // Assume switch cases are a use of the condition value
             closeEventMap[ParserState::switchcase] = [this](srcSAXEventContext &ctx) {
                 if( ctx.IsOpen({ParserState::switchstmt}) ){
-                    // std::cout << ctx.currentLineNumber << " | " << ctx.currentToken << std::endl;
-
                     for (auto varName : switchControlVars[switchDepth]) {
-                        // std::cout << "USE FOR VARIABLE :: " << varName << " ON LINE " << ctx.currentLineNumber << " AT DEPTH " << switchDepth << std::endl;
                         if (switchUses[varName].empty() || ctx.currentLineNumber != switchUses[varName].back()) {
                             switchUses[varName].push_back(ctx.currentLineNumber);
                         }
@@ -154,12 +147,17 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                                     ctx.currentToken == "%=" || ctx.currentToken == "++" ||
                                     ctx.currentToken == "--");
 
+                // Within switch blocks find use/defs
                 if ( isMutatorOp && ctx.IsOpen({ParserState::switchstmt}) ) {
                     currentExprOp = ctx.currentToken;
                     if (!currentExprName.empty()) {
                         // postfix : <name>c</name><operator>++</operator>
-                        if (conditionalDefs[currentExprName].empty() || ctx.currentLineNumber != conditionalDefs[currentExprName].back()) {
-                            conditionalDefs[currentExprName].push_back(ctx.currentLineNumber);
+                        if (switchDefs[currentExprName].empty() || ctx.currentLineNumber != switchDefs[currentExprName].back()) {
+                            switchDefs[currentExprName].push_back(ctx.currentLineNumber);
+                        }
+                        
+                        if (switchUses[currentExprName].empty() || ctx.currentLineNumber != switchUses[currentExprName].back()) {
+                            switchUses[currentExprName].push_back(ctx.currentLineNumber);
                         }
 
                         currentExprName = "";
