@@ -147,17 +147,17 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                                     ctx.currentToken == "%=" || ctx.currentToken == "++" ||
                                     ctx.currentToken == "--");
 
-                // Within switch blocks find use/defs
-                if ( isMutatorOp && ctx.IsOpen({ParserState::switchstmt}) ) {
+                // Within conditional blocks find use/defs
+                if ( isMutatorOp ) {
                     currentExprOp = ctx.currentToken;
                     if (!currentExprName.empty()) {
                         // postfix : <name>c</name><operator>++</operator>
-                        if (switchDefs[currentExprName].empty() || ctx.currentLineNumber != switchDefs[currentExprName].back()) {
-                            switchDefs[currentExprName].push_back(ctx.currentLineNumber);
+                        if (conditionalDefs[currentExprName].empty() || ctx.currentLineNumber != conditionalDefs[currentExprName].back()) {
+                            conditionalDefs[currentExprName].push_back(ctx.currentLineNumber);
                         }
                         
-                        if (switchUses[currentExprName].empty() || ctx.currentLineNumber != switchUses[currentExprName].back()) {
-                            switchUses[currentExprName].push_back(ctx.currentLineNumber);
+                        if (conditionalUses[currentExprName].empty() || ctx.currentLineNumber != conditionalUses[currentExprName].back()) {
+                            conditionalUses[currentExprName].push_back(ctx.currentLineNumber);
                         }
 
                         currentExprName = "";
