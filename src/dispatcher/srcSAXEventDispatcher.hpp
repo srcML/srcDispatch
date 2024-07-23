@@ -257,6 +257,10 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::forstmt];
                     DispatchEvent(ParserState::forstmt, ElementState::open);
                 } },
+                { "control", [this](){
+                    ++ctx.triggerField[ParserState::control];
+                    DispatchEvent(ParserState::control, ElementState::open);
+                } },
                 { "while", [this](){
                     whileflagopen = true;
                     ++ctx.triggerField[ParserState::whilestmt];
@@ -552,7 +556,11 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::forblock];
                     DispatchEvent(ParserState::forstmt, ElementState::close);
                     --ctx.triggerField[ParserState::forstmt];
-                } },            
+                } },  
+                { "control", [this](){
+                    --ctx.triggerField[ParserState::control];
+                    DispatchEvent(ParserState::control, ElementState::close);
+                } },           
                 { "while", [this](){
                     --ctx.triggerField[ParserState::whileblock];
                     DispatchEvent(ParserState::whilestmt, ElementState::close);
