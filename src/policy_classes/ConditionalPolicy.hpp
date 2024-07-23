@@ -77,13 +77,19 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                     
                     // The following is for detecting possible uses within various Conditionals
                     if( ctx.IsOpen({ParserState::forstmt}) ) {
+                        if ( ctx.And({ParserState::decl, ParserState::init, ParserState::expr}) ) {
+                            if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
+                                conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            }
+                        }
+
                         if ( ctx.IsOpen({ParserState::condition}) ){
                             if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
                                 conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
                             }
                         }
 
-                        if ( ( ctx.IsOpen({ParserState::init}) || ctx.IsOpen({ParserState::incr}) || ctx.IsOpen({ParserState::decr}) ) && ctx.IsOpen({ParserState::expr}) ){
+                        if ( ctx.IsOpen({ParserState::incr}) || ctx.IsOpen({ParserState::decr}) ){
                             if (conditionalDefs[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalDefs[ctx.currentToken].back()) {
                                 conditionalDefs[ctx.currentToken].push_back(ctx.currentLineNumber);
                             }
@@ -103,22 +109,28 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
 
                     // Get uses or use/defs within switch conditions
                     if( ctx.IsOpen({ParserState::switchstmt}) && ctx.IsOpen({ParserState::condition}) ){
+                        if ( ctx.IsOpen({ParserState::init}) ) {
+                            if (switchUses[ctx.currentToken].empty() || ctx.currentLineNumber != switchUses[ctx.currentToken].back()) {
+                                switchUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            }
+                        } else {
+                            switchControlVars[switchDepth].insert(ctx.currentToken);
 
-                        switchControlVars[switchDepth].insert(ctx.currentToken);
-
-                        if (switchUses[ctx.currentToken].empty() || ctx.currentLineNumber != switchUses[ctx.currentToken].back()) {
-                            switchUses[ctx.currentToken].push_back(ctx.currentLineNumber);
-                        }
-
-                        if (!currentExprOp.empty()) {
-                            // prefix : <operator>++</operator><name>c</name>
-                            if (switchDefs[ctx.currentToken].empty() || ctx.currentLineNumber != switchDefs[ctx.currentToken].back()) {
-                                switchDefs[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (switchUses[ctx.currentToken].empty() || ctx.currentLineNumber != switchUses[ctx.currentToken].back()) {
+                                switchUses[ctx.currentToken].push_back(ctx.currentLineNumber);
                             }
                             
-                            currentExprName = "";
-                            currentExprOp = "";
+                            if (!currentExprOp.empty()) {
+                                // prefix : <operator>++</operator><name>c</name>
+                                if (switchDefs[ctx.currentToken].empty() || ctx.currentLineNumber != switchDefs[ctx.currentToken].back()) {
+                                    switchDefs[ctx.currentToken].push_back(ctx.currentLineNumber);
+                                }
+                                
+                                currentExprName = "";
+                                currentExprOp = "";
+                            }
                         }
+
                     }
                 }
             };
