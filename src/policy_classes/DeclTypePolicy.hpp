@@ -37,7 +37,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         void Finalize(srcSAXEventDispatch::srcSAXEventContext& ctx){  
             using namespace srcSAXEventDispatch;
 
-                if( ctx.And({ParserState::declstmt}) || ctx.IsOpen({ParserState::init}) ){
+                if( ctx.And({ParserState::declstmt}) || ctx.And({ParserState::forstmt, ParserState::control, ParserState::init}) || 
+                    ctx.And({ParserState::switchstmt, ParserState::condition}) ){
                     if(ctx.IsOpen(ParserState::classblock) && ctx.Nor({ParserState::function, ParserState::constructor, ParserState::destructor})){
                         data.isClassMember = true;
                         data.nameOfContainingClass = ctx.currentClassName;
@@ -59,6 +60,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     if(ctx.currentFileLanguage == "Java" && !data.isFinal){
                         data.isReference = true;
                     }
+
                     currentDeclName.clear();
                     NotifyAll(ctx);
                     data.clear();
@@ -155,6 +157,10 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         ctx.Nor({ParserState::index, ParserState::argumentlist, ParserState::specifier, ParserState::modifier}) ) {
                         currentTypeName = ctx.currentToken;
                     }
+                    if( ctx.IsOpen(ParserState::switchstmt) && ctx.And({ParserState::name, ParserState::type, ParserState::decl}) && 
+                        ctx.Nor({ParserState::index, ParserState::argumentlist, ParserState::specifier, ParserState::modifier}) ) {
+                        currentTypeName = ctx.currentToken;
+                    }
 
 
                     if( ctx.And({ParserState::name, ParserState::decl, ParserState::declstmt}) &&
@@ -162,7 +168,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                         currentDeclName = ctx.currentToken;
                     }
                     if( ctx.IsOpen(ParserState::forstmt) && ctx.And({ParserState::name, ParserState::decl}) && 
-                        ctx.Nor({ParserState::type, ParserState::index, ParserState::argumentlist, ParserState::specifier, ParserState::modifier}) ) {
+                        ctx.Nor({ParserState::type, ParserState::index, ParserState::argumentlist, ParserState::specifier, ParserState::modifier, ParserState::expr}) ) {
+                        currentDeclName = ctx.currentToken;
+                    }
+                    if( ctx.IsOpen(ParserState::switchstmt) && ctx.And({ParserState::name, ParserState::decl}) && 
+                        ctx.Nor({ParserState::type, ParserState::index, ParserState::argumentlist, ParserState::specifier, ParserState::modifier, ParserState::expr}) ) {
                         currentDeclName = ctx.currentToken;
                     }
 
