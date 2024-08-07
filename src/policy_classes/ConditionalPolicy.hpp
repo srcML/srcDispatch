@@ -44,6 +44,9 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
             if (switchDepth < 0) switchDepth = 0;
         }
 
+        void DeleteUsesCollection(std::string name) { conditionalUses.erase(name); }
+        void DeleteDefsCollection(std::string name) { conditionalDefs.erase(name); }
+
     protected:
         void * DataInner() const override {}
         
@@ -56,6 +59,10 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
+
+            closeEventMap[ParserState::function] = [this](srcSAXEventContext &ctx) {
+                NotifyAll(ctx);
+            };
             
             closeEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
                 currentExprName = ctx.currentToken;
