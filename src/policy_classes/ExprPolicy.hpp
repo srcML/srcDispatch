@@ -62,7 +62,8 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
     private:
         ExprData data;
         ExprDataSet exprDataSet;
-        std::string currentTypeName, currentExprName, currentModifier, currentSpecifier, currentExprOp;
+        std::string currentTypeName, currentExprName, currentModifier, currentSpecifier;
+        std::pair<std::string, unsigned int> currentExprOp;
         std::vector<unsigned int> currentLine;
         
         void InitializeEventHandlers(){
@@ -81,7 +82,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     ctx.currentToken == "-=" || ctx.currentToken == "*=" ||
                     ctx.currentToken == "/=" || ctx.currentToken == "%=" ||
                     ctx.currentToken == "--" || ctx.currentToken == "++"){
-                    currentExprOp = ctx.currentToken;
+                    currentExprOp = std::make_pair(ctx.currentToken, ctx.currentLineNumber);
                     auto it = exprDataSet.dataSet.find(currentExprName);
 
                     if(it != exprDataSet.dataSet.end()){
@@ -89,7 +90,6 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                         it->second.lhs = true;
                         it->second.uses.erase(currentLine.back());
                         it->second.definitions.insert(currentLine.back());
-                        std::cout << currentExprName << " | " << currentLine.back() << std::endl;
                     }else{
                         std::cerr<<"No such thing as: "<<currentExprName<<std::endl;
                     }
@@ -110,12 +110,16 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     auto it = exprDataSet.dataSet.find(currentExprName);
                     if(it != exprDataSet.dataSet.end()){
                         it->second.uses.insert(currentLine.back()); //assume it's a use
-                        if (currentExprOp == "++" || currentExprOp == "--") it->second.definitions.insert(currentLine.back());
+
+                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.currentLineNumber )
+                            it->second.definitions.insert(currentLine.back());
                     }else{
                         data.nameOfIdentifier = currentExprName;
 
                         data.uses.insert(currentLine.back());
-                        if (currentExprOp == "++" || currentExprOp == "--") data.definitions.insert(currentLine.back());
+
+                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.currentLineNumber )
+                            data.definitions.insert(currentLine.back());
 
                         exprDataSet.dataSet.insert(std::make_pair(currentExprName, data));
                     }
