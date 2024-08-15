@@ -55,7 +55,7 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
         std::unordered_map<std::string, std::vector<unsigned int>> switchUses, switchDefs;
         std::unordered_map< unsigned int, std::set<std::string> > switchControlVars;
         unsigned int switchDepth = 0;
-        std::string currentExprName, currentExprOp;
+        std::string currentExprName = "", currentExprOp = "", currentType = "";
 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
@@ -69,21 +69,33 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
 
                 if ( ctx.IsClosed({ParserState::comment}) ) {
                     // The following is for detecting possible uses within various Conditionals
-                    if( (ctx.IsOpen({ParserState::ifstmt}) || ctx.IsOpen({ParserState::elseif})) && ctx.IsOpen({ParserState::condition}) ){
-                        if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
-                            conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                    if ( (ctx.IsOpen({ParserState::ifstmt}) || ctx.IsOpen({ParserState::elseif})) && ctx.IsOpen({ParserState::condition}) ) {
+                        // switch using data-type capturing:
+                        // xml will appear as `<type>int</type><name>i</name>`
+                        // using this switch when I hit the name when I've detected
+                        // a type within an if-stmt I wont add the line as a use of
+                        // a line where it is being declared:
+                        // `4 | if (int a = i; i < 10) {...}` I want to mark:
+                        // "a" with only def on line 4, and "i" use on 4
+
+                        if (currentType.empty()) {    
+                            if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
+                                conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            }
+                        } else {
+                            currentType.clear();
                         }
                     }
 
                     // The following is for detecting possible uses within various Conditionals
-                    if( ctx.IsOpen({ParserState::whilestmt}) && ctx.IsOpen({ParserState::condition}) ){
+                    if ( ctx.IsOpen({ParserState::whilestmt}) && ctx.IsOpen({ParserState::condition}) ){
                         if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
                             conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
                         }
                     }
                     
                     // The following is for detecting possible uses within various Conditionals
-                    if( ctx.IsOpen({ParserState::forstmt}) ) {
+                    if ( ctx.IsOpen({ParserState::forstmt}) ) {
                         if ( ctx.And({ParserState::decl, ParserState::init, ParserState::expr}) ) {
                             if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
                                 conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
@@ -108,14 +120,14 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                     }
                     
                     // The following is for detecting possible uses within various Conditionals
-                    if( ctx.IsOpen({ParserState::dostmt}) && ctx.IsOpen({ParserState::condition}) ){
+                    if ( ctx.IsOpen({ParserState::dostmt}) && ctx.IsOpen({ParserState::condition}) ){
                         if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
                             conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
                         }
                     }
 
                     // Get uses or use/defs within switch conditions
-                    if( ctx.IsOpen({ParserState::switchstmt}) && ctx.IsOpen({ParserState::condition}) ){
+                    if ( ctx.IsOpen({ParserState::switchstmt}) && ctx.IsOpen({ParserState::condition}) ){
                         if ( ctx.IsOpen({ParserState::init}) ) {
                             if (switchUses[ctx.currentToken].empty() || ctx.currentLineNumber != switchUses[ctx.currentToken].back()) {
                                 switchUses[ctx.currentToken].push_back(ctx.currentLineNumber);
@@ -144,12 +156,18 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
 
             // Assume switch cases are a use of the condition value
             closeEventMap[ParserState::switchcase] = [this](srcSAXEventContext &ctx) {
-                if( ctx.IsOpen({ParserState::switchstmt}) ){
+                if ( ctx.IsOpen({ParserState::switchstmt}) ){
                     for (auto varName : switchControlVars[switchDepth]) {
                         if (switchUses[varName].empty() || ctx.currentLineNumber != switchUses[varName].back()) {
                             switchUses[varName].push_back(ctx.currentLineNumber);
                         }
                     }
+                }
+            };
+            
+            closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx){
+                if (ctx.And({ParserState::ifstmt, ParserState::condition})) {
+                    currentType = ctx.currentToken;
                 }
             };
 
