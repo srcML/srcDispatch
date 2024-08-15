@@ -155,11 +155,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist, ParserState::index})){
                         currentTypeName = ctx.currentToken; // parameter data type
                     }
-                    if( ctx.IsOpen(ParserState::forstmt) && ctx.And({ParserState::name, ParserState::type, ParserState::decl}) && 
-                        ctx.Nor({ParserState::index, ParserState::argumentlist, ParserState::specifier, ParserState::modifier}) ) {
-                        currentTypeName = ctx.currentToken;
-                    }
-                    if( ctx.IsOpen(ParserState::switchstmt) && ctx.And({ParserState::name, ParserState::type, ParserState::decl}) && 
+
+                    bool openConditional = ctx.IsOpen(ParserState::ifstmt) || ctx.IsOpen(ParserState::forstmt) ||
+                                            ctx.IsOpen(ParserState::whilestmt) || ctx.IsOpen(ParserState::switchstmt);
+                                            
+                    if( openConditional && ctx.And({ParserState::name, ParserState::type, ParserState::decl}) && 
                         ctx.Nor({ParserState::index, ParserState::argumentlist, ParserState::specifier, ParserState::modifier}) ) {
                         currentTypeName = ctx.currentToken;
                     }
