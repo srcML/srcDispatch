@@ -133,8 +133,10 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 }
             };
 
-            closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx){ 
-                if( ctx.And({ParserState::declstmt}) || ctx.IsOpen({ParserState::init}) ){
+            closeEventMap[ParserState::type] = [this](srcSAXEventContext& ctx){
+                // Capture the data-type when a condition is met
+                if( ctx.And({ParserState::declstmt}) || ctx.IsOpen({ParserState::init}) ||
+                    ctx.And({ParserState::switchstmt, ParserState::condition, ParserState::decl}) ){
                     data.nameOfType = currentTypeName;
                 }
 
