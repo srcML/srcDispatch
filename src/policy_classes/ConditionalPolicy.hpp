@@ -8,6 +8,17 @@
 #define CONDITIONALPOLICY
 class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
+        struct DvarData{
+            DvarData(std::string func, std::string name, unsigned int line) {
+                function = func;
+                lhsName = name;
+                lhsDefLine = line;
+                dvars.clear();
+            }
+            std::string function, lhsName;
+            unsigned int lhsDefLine;
+            std::set<std::pair<std::string, unsigned int>> dvars;
+        };
 
         ConditionalPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
@@ -47,6 +58,8 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
         void DeleteUsesCollection(std::string name) { conditionalUses.erase(name); }
         void DeleteDefsCollection(std::string name) { conditionalDefs.erase(name); }
 
+        std::vector<DvarData>* GetPossibleDvars() { return &dvarSet; }
+
     protected:
         void * DataInner() const override {}
         
@@ -56,6 +69,8 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
         std::unordered_map< unsigned int, std::set<std::string> > switchControlVars;
         unsigned int switchDepth = 0;
         std::string currentExprName = "", currentExprOp = "", currentType = "";
+        std::vector<DvarData> dvarSet;
+        bool insertDvar = false;
 
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
@@ -66,6 +81,10 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
             
             closeEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
                 currentExprName = ctx.currentToken;
+
+                if (ctx.IsOpen({ParserState::decl}) && ctx.IsClosed({ParserState::type}) && dvarSet.size() > 0 && insertDvar) {
+                    dvarSet.back().dvars.insert( std::make_pair(ctx.currentToken, ctx.currentLineNumber) );
+                }
 
                 if ( ctx.IsClosed({ParserState::comment}) ) {
                     // The following is for detecting possible uses within various Conditionals
@@ -171,6 +190,33 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                 }
             };
 
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
+                std::string token = ctx.currentToken;
+                std::string extractedToken = "";
+
+                // Extract white-spaces from token
+                for (int i = 0; i < token.length(); ++i) {
+                    if (std::isalnum(token[i]) || token[i] == '=' || token[i] == '-' ||
+                        token[i] == '+' || token[i] == '*' || token[i] == '/' ||
+                        token[i] == '%' || token[i] == '&') {
+                        extractedToken += token[i];
+                    }
+                }
+                
+                if (extractedToken == "+=" || extractedToken == "-=" || extractedToken == "*=" ||
+                    extractedToken == "/=" || extractedToken == "%=" || extractedToken == "=") {
+
+                    if ( (ctx.IsOpen({ParserState::decl}) && ctx.IsClosed({ParserState::name}) && ctx.IsClosed({ParserState::type})) && !currentExprName.empty()) {
+                        dvarSet.push_back(DvarData(ctx.currentFunctionName, currentExprName, ctx.currentLineNumber));
+                        insertDvar = true;
+                    }
+                }
+            };
+
+            closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx){
+                insertDvar = false;
+            };
+
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 // Long or-statement allows various declaration operators to get planted into
                 // a slices def data output
@@ -199,6 +245,14 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
 
                         currentExprName = "";
                         currentExprOp = "";
+                    }
+                }
+
+                if (ctx.currentToken == "+=" || ctx.currentToken == "-=" ||
+                    ctx.currentToken == "*=" || ctx.currentToken == "/=" ||
+                    ctx.currentToken == "%=" || ctx.currentToken == "=") {
+                    if ( ctx.IsOpen({ParserState::decl}) && !currentExprName.empty() && !currentType.empty() ) {
+                        dvarSet.push_back(DvarData(ctx.currentFunctionName, currentExprName, ctx.currentLineNumber));
                     }
                 }
             };
