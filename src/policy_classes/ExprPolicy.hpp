@@ -96,10 +96,6 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 }
             };
 
-            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
-                
-            };
-
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
 
                 if(currentLine.empty() || currentLine.back() != ctx.currentLineNumber){
