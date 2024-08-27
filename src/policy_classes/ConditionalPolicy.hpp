@@ -60,6 +60,8 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
 
         std::vector<DvarData>* GetPossibleDvars() { return &dvarSet; }
 
+        const std::string& GetLastFunction() { return recentFunction; }
+
     protected:
         void * DataInner() const override {}
         
@@ -70,6 +72,7 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
         unsigned int switchDepth = 0;
         std::string currentExprName = "", currentExprOp = "", currentType = "";
         std::vector<DvarData> dvarSet;
+        std::string recentFunction;
         bool insertDvar = false;
 
         void InitializeEventHandlers(){
@@ -80,6 +83,7 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
             };
             
             closeEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
+                recentFunction = ctx.currentFunctionName;
                 currentExprName = ctx.currentToken;
 
                 if (ctx.IsOpen({ParserState::decl}) && ctx.IsClosed({ParserState::type}) && dvarSet.size() > 0 && insertDvar) {
