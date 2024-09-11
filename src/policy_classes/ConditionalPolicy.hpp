@@ -6,27 +6,27 @@
 #include <map>
 #ifndef CONDITIONALPOLICY
 #define CONDITIONALPOLICY
+struct DvarData{
+    DvarData(std::string func, std::string name, unsigned int line) {
+        function = func;
+        lhsName = name;
+        lhsDefLine = line;
+        dvars.clear();
+    }
+    std::string function, lhsName;
+    unsigned int lhsDefLine;
+    std::set<std::pair<std::string, unsigned int>> dvars;
+};
+
 class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
-        struct DvarData{
-            DvarData(std::string func, std::string name, unsigned int line) {
-                function = func;
-                lhsName = name;
-                lhsDefLine = line;
-                dvars.clear();
-            }
-            std::string function, lhsName;
-            unsigned int lhsDefLine;
-            std::set<std::pair<std::string, unsigned int>> dvars;
-        };
-
         ConditionalPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
         ~ConditionalPolicy(){}
 
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
         std::unordered_map<std::string, std::vector<unsigned int>>* GetConditionalUses() {
             return &conditionalUses;
@@ -217,7 +217,7 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
                 }
             };
 
-            closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx){
+            closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx [[maybe_unused]]){
                 insertDvar = false;
             };
 
