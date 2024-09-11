@@ -29,8 +29,8 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new DeclData(data);
@@ -47,7 +47,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                 }
             };
             
-            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx){
+            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx [[maybe_unused]]){
                 data.usesSubscript = true;
             };
 

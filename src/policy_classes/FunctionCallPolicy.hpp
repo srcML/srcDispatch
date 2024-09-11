@@ -47,8 +47,8 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new CallData(data);
@@ -60,7 +60,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
 
-            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 data.callargumentlist.push_back("(");
                 data.callargumentlist.push_back(fullFuncIdentifier);
                 data.fnName = fullFuncIdentifier;
@@ -76,7 +76,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 }
             };
 
-            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
+            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx [[maybe_unused]]){
                 if(currentModifier == "*"){}
                 else if(currentModifier == "&"){}
             };

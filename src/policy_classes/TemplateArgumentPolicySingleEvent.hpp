@@ -42,10 +42,10 @@ public:
         NamePolicy * namePolicy;
 
     public:
-        TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
+        TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners [[maybe_unused]]);
         ~TemplateArgumentPolicy();
         virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
-        virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override;
+        virtual void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override;
     protected:
         virtual void * DataInner() const override;
     private:

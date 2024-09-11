@@ -31,8 +31,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
         void Finalize(srcSAXEventDispatch::srcSAXEventContext& ctx){  
             using namespace srcSAXEventDispatch;
@@ -118,7 +118,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                 }
             };
 
-            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx){ 
+            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx [[maybe_unused]]){ 
                 data.usesSubscript = true;
             };
 

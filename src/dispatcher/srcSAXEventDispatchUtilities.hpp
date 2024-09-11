@@ -108,8 +108,8 @@ namespace srcSAXEventDispatch{
             *
             * Overide for desired behaviour.
             */
-            void write_start_tag(const char* localname, const char* prefix, const char* URI,
-                                int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
+            void write_start_tag(const char* localname, const char* prefix, const char* URI [[maybe_unused]],
+                                int num_namespaces [[maybe_unused]], const struct srcsax_namespace * namespaces [[maybe_unused]], int num_attributes,
                                 const struct srcsax_attribute * attributes) {
                 xmlTextWriterStartElementNS(writer, (const xmlChar *)prefix, (const xmlChar *)localname, 0);
                 for(int pos = 0; pos < num_attributes; ++pos) {
@@ -259,7 +259,7 @@ namespace srcSAXEventDispatch{
 
                 for(ParserState state : states) {
 
-                    openEventMap[state] = [this](const srcSAXEventContext& ctx) {};
+                    openEventMap[state] = [this](const srcSAXEventContext& ctx [[maybe_unused]]) {};
 
                 }
 
@@ -268,7 +268,7 @@ namespace srcSAXEventDispatch{
 
                 for(ParserState state : states) {
 
-                    closeEventMap[state] = [this](const srcSAXEventContext& ctx) {};
+                    closeEventMap[state] = [this](const srcSAXEventContext& ctx [[maybe_unused]]) {};
 
                 }
 
@@ -421,7 +421,7 @@ namespace srcSAXEventDispatch{
         virtual void DispatchEvent(ParserState, ElementState) = 0;
     };
     class PolicyDispatcher;
-    class PolicyListener{
+    class PolicyListener {
 
         public:
 

@@ -60,7 +60,7 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             stereotypepolicy.AddListener(this);
             InitializeEventHandlers();
         }
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             using namespace srcSAXEventDispatch;
             if(ctx.IsOpen(ParserState::declstmt) && ctx.IsClosed(ParserState::exprstmt)){

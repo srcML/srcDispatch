@@ -75,11 +75,11 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
             parampolicy.AddListener(this);
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {
             paramdata = policy->Data<DeclData>();
             data.parameters.push_back(*paramdata);
         }
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new SignatureData(data);
