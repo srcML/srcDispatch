@@ -78,6 +78,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {
             paramdata = policy->Data<DeclData>();
             data.parameters.push_back(*paramdata);
+            delete paramdata;
         }
         void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
