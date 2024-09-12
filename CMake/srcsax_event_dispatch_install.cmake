@@ -20,6 +20,6 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 if(NOT WIN32)
-    set(CMAKE_INSTALL_PREFIX "/usr/local")
+    set(CMAKE_INSTALL_PREFIX "/usr/local/")
 endif()
 

@@ -1,69 +1,58 @@
 /**
  * @file DeclTypePolicySingleEvent.hpp
  *
- * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * MODIFIED from srcSAXEventDispatcher
+ *  This collects the initializer
  *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#ifndef INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
+
 #include <srcSAXEventDispatchUtilities.hpp>
 
 #include <TypePolicySingleEvent.hpp>
 #include <NamePolicySingleEvent.hpp>
+#include <ExpressionPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
 
-#ifndef INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
-#define INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
+struct DeclTypeData {
+    std::shared_ptr<TypeData> type;
+    NameData                  *name;
+    ExpressionData            *initializer;
+    bool                      isStatic;
 
-class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+    friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
+        out << declData.type->ToString();
+        if (declData.name)
+            out << ' ' << *declData.name;
+        if (declData.initializer)
+            out << " = " << *declData.initializer;
+        return out;
+    }
+};
 
-public:
 
-    struct DeclTypeData {
 
-        std::shared_ptr<TypePolicy::TypeData> type;
-        NamePolicy::NameData * name;
-        bool isStatic;
-
-        friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
-
-            out << *declData.type;
-
-            if(declData.name)
-                out << ' ' << *declData.name;
-
-            return out;
-
-        }
-
-    };
+class DeclTypePolicy :
+public srcSAXEventDispatch::EventListener,
+public srcSAXEventDispatch::PolicyDispatcher,
+public srcSAXEventDispatch::PolicyListener {
 
 private:
+    std::vector<DeclTypeData *>           data;
+    std::size_t                           declDepth;
+    TypePolicy                            *typePolicy;
+    NamePolicy                            *namePolicy;
+    ExpressionPolicy                      *expressionPolicy;
 
-    std::vector<DeclTypeData *> data;
-    std::size_t declDepth;
-
-    TypePolicy * typePolicy;
-    bool isStatic;
-    std::shared_ptr<TypePolicy::TypeData> type;
- 
-    NamePolicy * namePolicy;
+    bool                                  isStatic;
+    std::shared_ptr<TypeData> type;
+    ExpressionData                        *initializer;
 
 public:
-
     DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
@@ -71,158 +60,116 @@ public:
           typePolicy(nullptr),
           isStatic(false),
           type(),
-          namePolicy(nullptr) { 
-    
+          expressionPolicy(nullptr),
+          namePolicy(nullptr) {
         InitializeDeclTypePolicyHandlers();
-
     }
 
     ~DeclTypePolicy() {
-
-        if(typePolicy) delete typePolicy;
-        if(namePolicy) delete namePolicy;
-
+        if (typePolicy) delete typePolicy;
+        if (namePolicy) delete namePolicy;
+        if (expressionPolicy) delete expressionPolicy;
     }
 
 protected:
-    void * DataInner() const override {
+    void * DataInner() const override { return (void *)&data; }
 
-        return (void *)&data;
+    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
-    }
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-
-        if(typeid(TypePolicy) == typeid(*policy)) {
-
-            type = std::shared_ptr<TypePolicy::TypeData>(policy->Data<TypePolicy::TypeData>());
+        if (typeid(TypePolicy) == typeid(*policy)) {
+            type = std::shared_ptr<TypeData>(policy->Data<TypeData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
-
-        } else if(typeid(NamePolicy) == typeid(*policy)) {
-
-            data.back()->name = policy->Data<NamePolicy::NameData>(); 
+        } else if (typeid(NamePolicy) == typeid(*policy)) {
+            data.back()->name = policy->Data<NameData>(); 
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
-
+        } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
+            initializer = policy->Data<ExpressionData>();
+            ctx.dispatcher->RemoveListener(nullptr);
         }
 
     }
 
 private:
-
     void InitializeDeclTypePolicyHandlers() {
         using namespace srcSAXEventDispatch;
-
         // start of policy
         openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-
-            if(!declDepth) {
-
+            if (!declDepth) {
                 declDepth = ctx.depth;
-
                 CollectTypeHandlers();
                 CollectNameHandlers();
                 CollectSpecifiersHandlers();
-
+                CollectInitHandlers();
             }
-
             openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
-
-                if(declDepth && (declDepth + 1) == ctx.depth) {
+                if (declDepth && (declDepth + 1) == ctx.depth) {
                     data.push_back(new DeclTypeData{});
                 }
-
             };
-
             closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
-
-                if(declDepth && (declDepth + 1) == ctx.depth) {
+                if (declDepth && (declDepth + 1) == ctx.depth) {
                     data.back()->isStatic = isStatic;
                     data.back()->type = type;
+                    data.back()->initializer = initializer;
                 }
-
             };
-
         };
 
         // end of policy
         closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-
-            if(declDepth && declDepth == ctx.depth) {
-
+            if (declDepth && declDepth == ctx.depth) {
                 declDepth = 0;
- 
                 NotifyAll(ctx);
                 InitializeDeclTypePolicyHandlers();
-
             }
-           
         };
-
     }
 
     void CollectTypeHandlers() {
         using namespace srcSAXEventDispatch;
-
         openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
-
-            if(declDepth && (declDepth + 2) == ctx.depth) {
-
-                if(!typePolicy) typePolicy = new TypePolicy{this};
+            if (declDepth && (declDepth + 2) == ctx.depth) {
+                if (!typePolicy) typePolicy = new TypePolicy{this};
                 ctx.dispatcher->AddListenerDispatch(typePolicy);
-
             }
-
         };
-
     }
 
     void CollectNameHandlers() {
         using namespace srcSAXEventDispatch;
-
         openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-
-            if(declDepth && (declDepth + 2) == ctx.depth) {
-
-                if(!namePolicy) namePolicy = new NamePolicy{this};
+            if (declDepth && (declDepth + 2) == ctx.depth) {
+                if (!namePolicy) namePolicy = new NamePolicy{this};
                 ctx.dispatcher->AddListenerDispatch(namePolicy);
-
             }
-
         };
-
     }
 
+    void CollectSpecifiersHandlers() {
+        using namespace srcSAXEventDispatch;
+        openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+            if (declDepth && (declDepth + 2) == ctx.depth) {
+                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+                    if (ctx.currentToken == "static")
+                        isStatic = true;
+                };
+            }
+        };
+        closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+            if (declDepth && (declDepth + 1) == ctx.depth) {
+                NopCloseEvents({ParserState::tokenstring});
+            }
+        };
+    }
 
-
-void CollectSpecifiersHandlers() {
-    using namespace srcSAXEventDispatch;
-
-    openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
-
-        if(declDepth && (declDepth + 2) == ctx.depth) {
-
-            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-
-                if(ctx.currentToken == "static")
-                    isStatic = true;
-
-            };
-
-        }
-
-    };
-
-    closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
-
-        if(declDepth && (declDepth + 1) == ctx.depth) {
-
-            NopCloseEvents({ParserState::tokenstring});
-
-        }
-
-    };
-
-}
+    void CollectInitHandlers() {
+        using namespace srcSAXEventDispatch;
+        openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
+            if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
+            ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+        };
+    }
 
 };
 
