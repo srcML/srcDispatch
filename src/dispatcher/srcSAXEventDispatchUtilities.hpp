@@ -215,6 +215,7 @@ namespace srcSAXEventDispatch{
             EventListener() : dispatched(false) {
                 DefaultEventHandlers();
             }
+            virtual ~EventListener() {}
 
             void SetDispatched(bool isDispatched) { dispatched = isDispatched; }
 
@@ -403,6 +404,7 @@ namespace srcSAXEventDispatch{
 
         EventDispatcher(const std::vector<std::string> & elementStack)
             : elementListeners(), ctx(this, elementStack) {}
+        virtual ~EventDispatcher() {}
         virtual void DispatchEvent(ParserState, ElementState) = 0;
     };
     class PolicyDispatcher;
@@ -411,12 +413,14 @@ namespace srcSAXEventDispatch{
         public:
 
             PolicyListener() {}
+            virtual ~PolicyListener() {}
             virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventContext & ctx) = 0;
             virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventContext & ctx) = 0;
         };
     class PolicyDispatcher{
     public:
         PolicyDispatcher(std::initializer_list<PolicyListener *> listeners) : policyListeners(listeners){}
+        virtual ~PolicyDispatcher() {}
         virtual void AddListener(PolicyListener* listener){
             policyListeners.push_back(listener);
         }

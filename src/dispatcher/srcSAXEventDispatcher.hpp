@@ -138,7 +138,7 @@ namespace srcSAXEventDispatch {
         }
 
     public:
-        ~srcSAXEventDispatcher() {
+        virtual ~srcSAXEventDispatcher() {
             for(std::size_t count = 0; count < numberAllocatedListeners; ++count) {
                 delete elementListeners.front();
                 elementListeners.pop_front();
