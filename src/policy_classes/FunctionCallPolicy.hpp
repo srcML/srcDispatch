@@ -47,8 +47,8 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new CallData(data);
@@ -59,6 +59,13 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         std::string fullFuncIdentifier;
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
+
+            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
+                data.callargumentlist.push_back("(");
+                data.callargumentlist.push_back(fullFuncIdentifier);
+                data.fnName = fullFuncIdentifier;
+                fullFuncIdentifier = "";
+            };
             closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx){
                 if(ctx.triggerField[ParserState::call] == 1){ //TODO: Fix
                     data.callargumentlist.push_back(")");
@@ -69,7 +76,7 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 }
             };
 
-            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
+            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx [[maybe_unused]]){
                 if(currentModifier == "*"){}
                 else if(currentModifier == "&"){}
             };
@@ -87,13 +94,6 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                 if(ctx.And({ParserState::literal, ParserState::argument, ParserState::argumentlist}) && ctx.IsEqualTo(ParserState::call,ParserState::argumentlist) && ctx.IsClosed(ParserState::genericargumentlist)){
                     data.callargumentlist.push_back("*LITERAL*");   //Illegal c++ identifier as marker for literals
                 }
-            };
-
-            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx) {
-                data.callargumentlist.push_back("(");
-                data.callargumentlist.push_back(fullFuncIdentifier);
-                data.fnName = fullFuncIdentifier;
-                fullFuncIdentifier = "";
             };
         }
 };

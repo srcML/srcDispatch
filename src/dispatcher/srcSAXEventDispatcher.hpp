@@ -59,7 +59,7 @@ namespace srcSAXEventDispatch {
         return CreateListenersImpl<remaining...>(policyListener, listeners);
     }
     template<>
-    std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener, std::list<EventListener*> & listeners) {
+    std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener [[maybe_unused]], std::list<EventListener*> & listeners) {
         return listeners;
     }
 
@@ -215,6 +215,30 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::parameterlist];
                     DispatchEvent(ParserState::parameterlist, ElementState::open);
                 } },
+                { "condition", [this](){
+                    ++ctx.triggerField[ParserState::condition];
+                    DispatchEvent(ParserState::condition, ElementState::open);
+                } },
+                { "switch", [this](){
+                    ++ctx.triggerField[ParserState::switchstmt];
+                    DispatchEvent(ParserState::switchstmt, ElementState::open);
+                } },
+                { "case", [this](){
+                    ++ctx.triggerField[ParserState::switchcase];
+                    DispatchEvent(ParserState::switchcase, ElementState::open);
+                } },
+                { "do", [this](){
+                    ++ctx.triggerField[ParserState::dostmt];
+                    DispatchEvent(ParserState::dostmt, ElementState::open);
+                } },
+                { "incr", [this](){
+                    ++ctx.triggerField[ParserState::incr];
+                    DispatchEvent(ParserState::incr, ElementState::open);
+                } },
+                { "decr", [this](){
+                    ++ctx.triggerField[ParserState::decr];
+                    DispatchEvent(ParserState::decr, ElementState::open);
+                } },
                 { "if", [this](){
                     if(!ifelseflagopen){
                         ifflagopen = true;
@@ -232,6 +256,10 @@ namespace srcSAXEventDispatch {
                 { "for", [this](){
                     ++ctx.triggerField[ParserState::forstmt];
                     DispatchEvent(ParserState::forstmt, ElementState::open);
+                } },
+                { "control", [this](){
+                    ++ctx.triggerField[ParserState::control];
+                    DispatchEvent(ParserState::control, ElementState::open);
                 } },
                 { "while", [this](){
                     whileflagopen = true;
@@ -484,7 +512,31 @@ namespace srcSAXEventDispatch {
                 { "parameter_list", [this](){
                     DispatchEvent(ParserState::parameterlist, ElementState::close);
                     --ctx.triggerField[ParserState::parameterlist];
-                } },            
+                } },       
+                { "condition", [this](){
+                    DispatchEvent(ParserState::condition, ElementState::close);
+                    --ctx.triggerField[ParserState::condition];
+                } },
+                { "switch", [this](){
+                    DispatchEvent(ParserState::switchstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::switchstmt];
+                } },
+                { "case", [this](){
+                    DispatchEvent(ParserState::switchcase, ElementState::close);
+                    --ctx.triggerField[ParserState::switchcase];
+                } },
+                { "do", [this](){
+                    DispatchEvent(ParserState::dostmt, ElementState::close);
+                    --ctx.triggerField[ParserState::dostmt];
+                } },
+                { "incr", [this](){
+                    DispatchEvent(ParserState::incr, ElementState::close);
+                    --ctx.triggerField[ParserState::incr];
+                } },
+                { "decr", [this](){
+                    DispatchEvent(ParserState::decr, ElementState::close);
+                    --ctx.triggerField[ParserState::decr];
+                } },
                 { "if", [this](){
                     if(!ifelseflagopen){
                         --ctx.triggerField[ParserState::ifblock];
@@ -504,7 +556,11 @@ namespace srcSAXEventDispatch {
                     --ctx.triggerField[ParserState::forblock];
                     DispatchEvent(ParserState::forstmt, ElementState::close);
                     --ctx.triggerField[ParserState::forstmt];
-                } },            
+                } },  
+                { "control", [this](){
+                    --ctx.triggerField[ParserState::control];
+                    DispatchEvent(ParserState::control, ElementState::close);
+                } },           
                 { "while", [this](){
                     --ctx.triggerField[ParserState::whileblock];
                     DispatchEvent(ParserState::whilestmt, ElementState::close);

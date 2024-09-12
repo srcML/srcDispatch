@@ -84,7 +84,7 @@ public:
 		if (classPolicy)    delete classPolicy;
 	}
 
-	void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+	void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
 	void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
 		if (typeid(NamePolicy) == typeid(*policy)) {
@@ -156,6 +156,7 @@ private:
 		};
 		openEventMap[ParserState::classn] = startPolicy;
 		closeEventMap[ParserState::classn] = endPolicy;
+		
 		openEventMap[ParserState::structn] = startPolicy;
 		closeEventMap[ParserState::structn] = endPolicy;
 	}
@@ -209,7 +210,6 @@ private:
 				};
 			}
 		};
-
 		closeEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
 				NopOpenEvents({ParserState::super_list, ParserState::super});

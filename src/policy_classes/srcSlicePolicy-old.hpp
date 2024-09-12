@@ -30,8 +30,8 @@ class srcSlicePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         srcSlicePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new DeclTypeData(data);
@@ -45,6 +45,7 @@ class srcSlicePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     data.namespaces.push_back(ctx.currentToken);
                 }
             };
+            
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentModifier == "*"){
@@ -87,10 +88,12 @@ class srcSlicePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
                     }
                 }
             };
+            
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);
                 data.clear();
             };
+
             closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::declstmt)){
                     if(currentSpecifier == "const"){

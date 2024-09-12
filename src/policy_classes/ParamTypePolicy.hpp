@@ -29,8 +29,8 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {}
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new DeclData(data);
@@ -46,9 +46,11 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
                     data.namespaces.push_back(ctx.currentToken);
                 }
             };
-            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx){
+            
+            openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx [[maybe_unused]]){
                 data.usesSubscript = true;
             };
+
             closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
                 if(ctx.IsOpen(ParserState::parameter)){
                     if(currentModifier == "*"){
@@ -77,13 +79,14 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken[0] == ' ')){
+
                     if(ctx.And({ParserState::name, ParserState::type, ParserState::decl, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist, ParserState::index})){
-                        currentTypeName = ctx.currentToken;
+                        currentTypeName = ctx.currentToken; // parameter data type
                     }
                     if(ctx.And({ParserState::name, ParserState::decl, ParserState::parameter}) && 
                        ctx.Nor({ParserState::type, ParserState::index/*skip array portion*/, ParserState::argumentlist/*skip init list portion*/, 
                         ParserState::init, ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
-                        currentDeclName = ctx.currentToken;
+                        currentDeclName = ctx.currentToken; // parameter variable name
                     }
                     if(ctx.And({ParserState::specifier, ParserState::decl, ParserState::parameter})){
                         currentSpecifier = ctx.currentToken;

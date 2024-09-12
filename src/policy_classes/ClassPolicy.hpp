@@ -107,7 +107,6 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
                 gotClassName = false;
             };
-
             closeEventMap[ParserState::classn] = [this](srcSAXEventContext &ctx) {
                 data.push_back(data_stack.top());
                 data_stack.pop();
@@ -134,7 +133,6 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
 
                 gotClassName = false;
             };
-
             closeEventMap[ParserState::structn] = [this](srcSAXEventContext &ctx) {
                 data.push_back(data_stack.top());
                 data_stack.pop();
@@ -154,7 +152,6 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
                     gotClassName = true;
                 }
             };
-
 
         }
 };

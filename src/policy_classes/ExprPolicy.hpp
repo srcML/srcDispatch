@@ -53,8 +53,8 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         ExprPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new ExprDataSet(exprDataSet);
@@ -63,12 +63,28 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         ExprData data;
         ExprDataSet exprDataSet;
         std::string currentTypeName, currentExprName, currentModifier, currentSpecifier;
+        std::pair<std::string, unsigned int> currentExprOp;
         std::vector<unsigned int> currentLine;
+        
         void InitializeEventHandlers(){
             using namespace srcSAXEventDispatch;
+            
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
-                if(ctx.currentToken == "="){
+                // Long or-statement allows various declaration operators to get planted into
+                // a slices def data output
+                // if (ctx.currentToken == "=" || ctx.currentToken == "++" || ctx.currentToken == "+=" ||
+                //     ctx.currentToken == "--" || ctx.currentToken == "-=" || ctx.currentToken == "*=" ||
+                //     ctx.currentToken == "/=" || ctx.currentToken == "%=" || ctx.currentToken == "&=" ||
+                //     ctx.currentToken == "|=" || ctx.currentToken == "^=" || ctx.currentToken == "<<=" ||
+                //     ctx.currentToken == ">>=")
+
+                if (ctx.currentToken == "=" || ctx.currentToken == "+=" ||
+                    ctx.currentToken == "-=" || ctx.currentToken == "*=" ||
+                    ctx.currentToken == "/=" || ctx.currentToken == "%=" ||
+                    ctx.currentToken == "--" || ctx.currentToken == "++"){
+                    currentExprOp = std::make_pair(ctx.currentToken, ctx.currentLineNumber);
                     auto it = exprDataSet.dataSet.find(currentExprName);
+
                     if(it != exprDataSet.dataSet.end()){
                         exprDataSet.lhsName = currentExprName;
                         it->second.lhs = true;
@@ -79,21 +95,28 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
                     }
                 }
             };
-            closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx){
-                
-            };
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
+
                 if(currentLine.empty() || currentLine.back() != ctx.currentLineNumber){
                     currentLine.push_back(ctx.currentLineNumber);
                 }
+                
                 if(ctx.IsOpen({ParserState::exprstmt})){
                     auto it = exprDataSet.dataSet.find(currentExprName);
                     if(it != exprDataSet.dataSet.end()){
                         it->second.uses.insert(currentLine.back()); //assume it's a use
+
+                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.currentLineNumber )
+                            it->second.definitions.insert(currentLine.back());
                     }else{
                         data.nameOfIdentifier = currentExprName;
+
                         data.uses.insert(currentLine.back());
+
+                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.currentLineNumber )
+                            data.definitions.insert(currentLine.back());
+
                         exprDataSet.dataSet.insert(std::make_pair(currentExprName, data));
                     }
                 }
@@ -102,9 +125,6 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx){
                 //TODO: possibly, this if-statement is suppressing more than just unmarked whitespace. Investigate.
                 if(!(ctx.currentToken.empty() || ctx.currentToken == " ")){
-                    if(ctx.IsOpen(ParserState::exprstmt)){
-
-                    }
                     if(ctx.And({ParserState::name, ParserState::expr, ParserState::exprstmt}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::op})){
                         currentExprName = ctx.currentToken;
                     }

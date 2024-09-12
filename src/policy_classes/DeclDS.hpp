@@ -46,7 +46,7 @@ struct DeclData{
         numOfContainingFunctionParams = 0;
         nameOfContainingFunction.clear();
     }
-    int lineNumber;
+    unsigned int lineNumber;
     int numOfContainingFunctionParams;
     bool isFinal;
     bool isConstValue;

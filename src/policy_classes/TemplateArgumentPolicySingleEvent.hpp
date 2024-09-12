@@ -24,16 +24,11 @@ public srcSAXEventDispatch::EventListener,
 public srcSAXEventDispatch::PolicyDispatcher,
 public srcSAXEventDispatch::PolicyListener {
 
-private:
-    TemplateArgumentData data;
-    std::size_t argumentDepth;
-    NamePolicy * namePolicy;
-
 public:
     TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
     ~TemplateArgumentPolicy();
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
-    virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override;
+    virtual void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override;
 
 protected:
     virtual void * DataInner() const override;
@@ -42,6 +37,11 @@ private:
     void InitializeTemplateArgumentPolicyHandlers();
     void CollectNamesHandler();
     void CollectOthersHandler();
+
+private:
+    TemplateArgumentData data;
+    std::size_t argumentDepth;
+    NamePolicy * namePolicy;
 
 };
 

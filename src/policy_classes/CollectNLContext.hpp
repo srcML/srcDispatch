@@ -60,7 +60,7 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             stereotypepolicy.AddListener(this);
             InitializeEventHandlers();
         }
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
             using namespace srcSAXEventDispatch;
             if(ctx.IsOpen(ParserState::declstmt) && ctx.IsClosed(ParserState::exprstmt)){
@@ -129,21 +129,47 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
                 ctx.dispatcher->AddListenerDispatch(&sourcenlpolicy);
             };
+            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
+                ctx.dispatcher->RemoveListenerDispatch(&sourcenlpolicy);
+                ///data.clear();
+            };
+
             openEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx) {
                 ctx.dispatcher->AddListenerDispatch(&exprpolicy);
             };
+            closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
+                ctx.dispatcher->RemoveListenerDispatch(&exprpolicy);
+                //data.clear();
+            };
+
             openEventMap[ParserState::stereotype] = [this](srcSAXEventContext& ctx){
                 ctx.dispatcher->AddListenerDispatch(&stereotypepolicy);
             };
+            closeEventMap[ParserState::stereotype] = [this](srcSAXEventContext& ctx){
+                ctx.dispatcher->RemoveListenerDispatch(&stereotypepolicy);
+            };
+
             openEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
                 context.push("while");
             };
+            closeEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx){
+                context.pop();
+            };
+            
             openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
                 context.push("for");
             };
+            closeEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx){
+                context.pop();
+            };
+
             openEventMap[ParserState::ifstmt] = [this](srcSAXEventContext& ctx) {
                 context.push("if");
             };
+            closeEventMap[ParserState::ifstmt] = [this](srcSAXEventContext& ctx){
+                context.pop();
+            };
+            
             /*
             openEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
                 context.push("else if");
@@ -151,26 +177,7 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
             openEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
                 context.push("else");
             };*/
-            closeEventMap[ParserState::stereotype] = [this](srcSAXEventContext& ctx){
-                ctx.dispatcher->RemoveListenerDispatch(&stereotypepolicy);
-            };
-            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx){
-                ctx.dispatcher->RemoveListenerDispatch(&sourcenlpolicy);
-                ///data.clear();
-            };
-            closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx){
-                ctx.dispatcher->RemoveListenerDispatch(&exprpolicy);
-                //data.clear();
-            };
-            closeEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx){
-                context.pop();
-            };
-            closeEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx){
-                context.pop();
-            };
-            closeEventMap[ParserState::ifstmt] = [this](srcSAXEventContext& ctx){
-                context.pop();
-            };
+
             closeEventMap[ParserState::archive] = [this](srcSAXEventContext& ctx){
                 NotifyAll(ctx);
             };
