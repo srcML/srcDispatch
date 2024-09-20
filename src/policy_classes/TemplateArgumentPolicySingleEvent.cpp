@@ -8,9 +8,9 @@ std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argum
     for(std::size_t pos = 0; pos < argumentData.data.size(); ++pos) {
         if (pos != 0)
             out << ' ';
-        const std::pair<void *, TemplateArgumentData::TemplateArgumentType> & element = argumentData.data[pos];
+        const std::pair<std::any, TemplateArgumentData::TemplateArgumentType> & element = argumentData.data[pos];
         if (element.second == TemplateArgumentData::NAME)
-            out << *static_cast<NameData *>(element.first);
+            out << *std::any_cast<std::shared_ptr<NameData>>(element.first);
         else if (element.second == TemplateArgumentData::POINTER)
             out << '*';
         else if (element.second == TemplateArgumentData::REFERENCE)
@@ -18,7 +18,7 @@ std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argum
         else if (element.second == TemplateArgumentData::RVALUE)
             out << "&&";
         else
-            out << *static_cast<std::string *>(element.first);
+            out << *std::any_cast<std::shared_ptr<std::string>>(element.first);
     }
 
     return out;
@@ -43,8 +43,8 @@ void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSA
 
 void TemplateArgumentPolicy::NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]){}
 
-void * TemplateArgumentPolicy::DataInner() const {
-    return new TemplateArgumentData(data);
+std::any TemplateArgumentPolicy::DataInner() const {
+    return std::make_shared<TemplateArgumentData>(data);
 }
 
 void TemplateArgumentPolicy::InitializeTemplateArgumentPolicyHandlers() {
@@ -92,9 +92,9 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
         if (argumentDepth &&
            (((argumentDepth + 2) == ctx.depth && elementStackSize > 1 && ctx.elementStack[elementStackSize - 2] == "expr")
             || (argumentDepth + 1) == ctx.depth)) {
-            data.data.push_back(std::make_pair(new std::string(), TemplateArgumentData::LITERAL));
+            data.data.push_back(std::make_pair(std::make_shared<std::string>(), TemplateArgumentData::LITERAL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
+                (*std::any_cast<std::shared_ptr<std::string>>(data.data.back().first)) += ctx.currentToken;
             };
         }
     };
@@ -114,7 +114,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
            || (argumentDepth + 1) == ctx.depth)) {
             data.data.push_back(std::make_pair(new std::string(), TemplateArgumentData::OPERATOR));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
+                (*std::any_cast<std::shared_ptr<std::string>>(data.data.back().first)) += ctx.currentToken;
             };
         }
     };
@@ -157,7 +157,7 @@ void TemplateArgumentPolicy::CollectOthersHandler() {
             || (argumentDepth + 1) == ctx.depth)) {
             data.data.push_back(std::make_pair(new std::string(), TemplateArgumentData::CALL));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                (*static_cast<std::string *>(data.data.back().first)) += ctx.currentToken;
+                (*std::any_cast<std::shared_ptr<std::string>>(data.data.back().first)) += ctx.currentToken;
             };
         }
     };

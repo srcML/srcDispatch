@@ -30,16 +30,16 @@ struct ExpressionElement {
     enum ExprType { NAME, OP, CALL, LITERAL};
 
     ExprType type;
-    NameData *name;
+    std::shared_ptr<NameData> name;
     std::string          token;
-    CallData             *call;
-    ExpressionElement(ExprType t, NameData* item) : type(t), name(item) {};
+    std::shared_ptr<CallData>             call;
+    ExpressionElement(ExprType t, std::shared_ptr<NameData> item) : type(t), name(item) {};
     ExpressionElement(ExprType t, std::string&          item) : type(t), token(item){};
-    ExpressionElement(ExprType t, CallData* item) : type(t), call(item) {};
+    ExpressionElement(ExprType t, std::shared_ptr<CallData> item) : type(t), call(item) {};
 };
 
 struct ExpressionData {
-    std::vector<ExpressionElement *> expr;   //All items in expression
+    std::vector<std::shared_ptr<ExpressionElement>> expr;   //All items in expression
 
     friend std::ostream & operator<<(std::ostream & out, const ExpressionData & ex);
 };
@@ -69,7 +69,7 @@ public:
     ~ExpressionPolicy();
 
 protected:
-    void * DataInner() const override { return new ExpressionData(data); }
+    std::any DataInner() const override { return std::make_shared<ExpressionData>(data); }
 
     void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 

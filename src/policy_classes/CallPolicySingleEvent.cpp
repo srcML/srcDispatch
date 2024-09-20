@@ -7,7 +7,7 @@
 std::ostream & operator<<(std::ostream & out, const CallData &call) {
     out << *(call.name) << "(";
     bool printComma=false;
-    for (ExpressionData * arg : call.arguments) {
+    for (std::shared_ptr<ExpressionData> arg : call.arguments) {
         if (printComma) out << ", ";
         out << *arg;
         printComma = true;
@@ -21,7 +21,7 @@ CallPolicy::~CallPolicy() {
     if (expressionPolicy) delete expressionPolicy;
 }
 
-void * CallPolicy::DataInner() const  { return new CallData(data); }
+std::any CallPolicy::DataInner() const { return std::make_shared<CallData>(data); }
 
 void CallPolicy::Notify(const srcSAXEventDispatch::PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
     using namespace srcSAXEventDispatch;

@@ -14,7 +14,7 @@ class NamePolicy;
 struct TemplateArgumentData {
     enum TemplateArgumentType { NAME, LITERAL, MODIFIER, POINTER, REFERENCE, RVALUE, OPERATOR, CALL };
 
-    std::vector<std::pair<void *, TemplateArgumentType>> data;
+    std::vector<std::pair<std::any, TemplateArgumentType>> data;
     friend std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argumentData);
 };
 
@@ -31,7 +31,7 @@ public:
     virtual void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override;
 
 protected:
-    virtual void * DataInner() const override;
+    virtual std::any DataInner() const override;
 
 private:
     void InitializeTemplateArgumentPolicyHandlers();

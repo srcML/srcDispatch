@@ -35,7 +35,7 @@ std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
     }
     if (!nameData.templateArguments.empty()) {
         out << '<';
-        for(const TemplateArgumentData * arg : nameData.templateArguments) {
+        for(const std::shared_ptr<TemplateArgumentData> arg : nameData.templateArguments) {
             out << *arg;
         }
         out << '>';

@@ -6,7 +6,7 @@
 #include <ExpressionPolicySingleEvent.hpp>
 
 std::ostream & operator<<(std::ostream & out, const ExpressionData & ex) {
-    for (ExpressionElement * item : ex.expr) {
+    for (std::shared_ptr<ExpressionElement> item : ex.expr) {
         //out << "   Type " << item->type << " ";
         switch (item->type) {
             case ExpressionElement::NAME:    out << *(item->name);  break;
@@ -26,11 +26,11 @@ ExpressionPolicy::~ExpressionPolicy() {
 
 void ExpressionPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
     if(typeid(NamePolicy) == typeid(*policy)) {
-        data.expr.push_back(new ExpressionElement(ExpressionElement::NAME, policy->Data<NameData>()));
+        data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::NAME, policy->Data<NameData>()));
            //std::cerr << "Return Name found: " << *(data.expr.back())->name << std::endl;
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
     } else if(typeid(CallPolicy) == typeid(*policy)) {
-        data.expr.push_back(new ExpressionElement(ExpressionElement::CALL, policy->Data<CallData>()));
+        data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::CALL, policy->Data<CallData>()));
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
     }
     //Operators are added in CollectOtherHandlers()
@@ -83,10 +83,10 @@ void ExpressionPolicy::CollectOtherHandlers() {  //Get the operators
     using namespace srcSAXEventDispatch;
     closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
         if (ctx.currentTag == "operator") {
-            data.expr.push_back(new ExpressionElement(ExpressionElement::OP, ctx.currentToken));
+            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::OP, ctx.currentToken));
         }
         if (ctx.currentTag == "literal") {
-            data.expr.push_back(new ExpressionElement(ExpressionElement::LITERAL, ctx.currentToken));
+            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::LITERAL, ctx.currentToken));
         }
 
     };

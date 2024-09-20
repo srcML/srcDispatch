@@ -30,8 +30,8 @@ struct NameData;
 class NamePolicy;
 
 struct CallData {
-    NameData * name;
-    std::vector<ExpressionData *> arguments;  //expressions
+    std::shared_ptr<NameData> name;
+    std::vector<std::shared_ptr<ExpressionData>> arguments;  //expressions
 
     friend std::ostream & operator<<(std::ostream & out, const CallData &call);
 };
@@ -60,7 +60,7 @@ public:
     ~CallPolicy();
 
 protected:
-    void * DataInner() const override;
+    std::any DataInner() const override;
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
     void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 

@@ -17,7 +17,9 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
 #include <memory>
+#include <any>
 #include <unordered_map>
 #include <functional>
 #include <string>
@@ -29,6 +31,7 @@
 #include <iostream>
 #include <libxml/xmlwriter.h>
 #include <srcSAXHandler.hpp>
+
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 
@@ -444,15 +447,13 @@ namespace srcSAXEventDispatch{
         }
 
         template<typename T>
-        T * Data() const {
-
-            return static_cast<T *>(DataInner());
-
+        std::shared_ptr<T> Data() const {
+            return std::any_cast<std::shared_ptr<T>>(DataInner());
         }
 
     protected:
         std::list<PolicyListener*> policyListeners;
-        virtual void * DataInner() const = 0;
+        virtual std::any DataInner() const = 0;
         //TODO: These may not need to be synchronous or even called in the same method (i.e., notifyall)
         virtual void NotifyAll(/*const*/ srcSAXEventContext & ctx) {
             for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){

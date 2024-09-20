@@ -25,10 +25,10 @@ class  TemplateArgumentPolicy;
 
 
 struct NameData {
-    std::string                         name;
-    std::vector<NameData *>             names;
-    std::vector<TemplateArgumentData *> templateArguments;
-    ExpressionData                      *indices;
+    std::string                                        name;
+    std::vector<std::shared_ptr<NameData>>             names;
+    std::vector<std::shared_ptr<TemplateArgumentData>> templateArguments;
+    std::shared_ptr<ExpressionData>                    indices;
 
     std::string SimpleName() const;
     std::string ToString() const;
@@ -63,7 +63,7 @@ public:
 
 protected:
 
-    void * DataInner() const override { return new NameData(data); }
+    std::any DataInner() const override { return std::make_shared<NameData>(data); }
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
     void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 

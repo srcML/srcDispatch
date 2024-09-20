@@ -17,7 +17,7 @@ class NamePolicy;
 struct TypeData {
     enum TypeType { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };
 
-    std::vector<std::pair<void *, TypeType>> types;
+    std::vector<std::pair<std::any, TypeType>> types;
     std::string ToString() const;
     friend std::ostream & operator<<(std::ostream & out, const TypeData & typeData);
 };
@@ -40,7 +40,7 @@ public:
     virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override;
 
 protected:
-    virtual void * DataInner() const override;
+    virtual std::any DataInner() const override;
 
 private:
     void InitializeTypePolicyHandlers();

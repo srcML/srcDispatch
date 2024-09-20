@@ -1,7 +1,7 @@
 ##
 #  CMakeLists.txt
 #
-#  Copyright (C) 2016-2021 srcML, LLC. (www.srcML.org)
+#  Copyright (C) 2016-2024 srcML, LLC. (www.srcML.org)
 #
 #  This file is part of the srcSAXEventDispatch.
 #
@@ -21,6 +21,10 @@
 
 cmake_minimum_required(VERSION 3.14)
 project(srcSAXEventDispatch)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
