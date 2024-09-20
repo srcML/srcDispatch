@@ -316,6 +316,11 @@ namespace srcSAXEventDispatch {
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::structn, ElementState::open);
                 } },
+                { "namespace", [this](){
+                    // classflagopen = true;
+                    ++ctx.triggerField[ParserState::namespacen];
+                    DispatchEvent(ParserState::namespacen, ElementState::open);
+                } },
                 { "super_list", [this](){
                     ++ctx.triggerField[ParserState::super_list];
                     DispatchEvent(ParserState::super_list, ElementState::open);
@@ -633,6 +638,11 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::structn, ElementState::close);
                     ctx.currentClassName.clear();
                     --ctx.triggerField[ParserState::classn];
+                } },
+                { "namespace", [this](){
+                    DispatchEvent(ParserState::namespacen, ElementState::close);
+                    ctx.currentNameSpaceName.clear();
+                    --ctx.triggerField[ParserState::namespacen];
                 } },
                 { "super_list", [this](){
                     DispatchEvent(ParserState::super_list, ElementState::close);
@@ -993,6 +1003,16 @@ namespace srcSAXEventDispatch {
             
             if(ctx.Or({ParserState::classn, ParserState::structn}) && ctx.IsOpen(ParserState::name) && ctx.Nor({ParserState::classblock, ParserState::super_list})){
                 ctx.currentClassName = std::all_of(
+                    std::begin(ctx.currentToken), 
+                    std::end(ctx.currentToken), 
+                        [](char c){
+                            if(std::isalnum(c) || c == '_') return true;
+                            return false;
+                        }) ? ctx.currentToken : ""; 
+            }
+
+            if(ctx.IsOpen({ParserState::namespacen}) && ctx.IsOpen(ParserState::name) && ctx.IsClosed({ParserState::block})){
+                ctx.currentNameSpaceName = std::all_of(
                     std::begin(ctx.currentToken), 
                     std::end(ctx.currentToken), 
                         [](char c){
