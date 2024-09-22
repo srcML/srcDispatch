@@ -748,9 +748,11 @@ namespace srcSAXEventDispatch {
 
             ctx.currentTag = localName;
 
-            if(localName == "pos:position"){
-                ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
-            }
+            // Depricated
+            // if(localName == "pos:position"){
+            //     ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
+            // }
+
             std::string name;
             if(num_attributes){
                 name = attributes[0].value;
@@ -765,10 +767,31 @@ namespace srcSAXEventDispatch {
                 ctx.isOperator = true;
             }
 
-            if(localName != ""){
-                //std::cerr<<"local: "<<localname<<std::endl;
+            if (localName != "")
+            {
+                for (int pos = 0; pos < num_attributes; ++pos)
+                {
+                    std::string attributeName;
+                    if (attributes[pos].prefix)
+                    {
+                        attributeName += attributes[pos].prefix;
+                        attributeName += ':';
+                    }
+                    attributeName += attributes[pos].localname;
+                    if (std::string(attributes[pos].localname) == "start")
+                    { // avoid including cstring library this way
+                        std::string posString;
+                        for (int i = 0; attributes[pos].value[i] != ':'; ++i)
+                        {
+                            posString += attributes[pos].value[i];
+                        }
+                        ctx.currentLineNumber = std::stoi(posString);
+                    }
+                }
+
                 std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
-                if (process != process_map.end()) {
+                if (process != process_map.end())
+                {
                     process->second();
                 }
             }
