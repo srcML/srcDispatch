@@ -24,18 +24,18 @@ struct ClassData {
     enum ClassType : std::size_t { CLASS, STRUCT };  //UNION, ENUM?
     enum AccessSpecifier         { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
 
-    std::string             language;
-    std::string             filename;
-    ClassType               type;
-    std::set<std::string>   stereotypes;
-    NameData    *name;
-    std::vector<ParentData> parents;
+    std::string               language;
+    std::string               filename;
+    ClassType                 type;
+    std::set<std::string>     stereotypes;
+    std::shared_ptr<NameData> name;
+    std::vector<ParentData>   parents;
 
-    std::vector<DeclTypeData *> fields[3];
-    std::vector<FunctionData *>                 constructors[3];
-    std::vector<FunctionData *>                 operators[3];
-    std::vector<FunctionData *>                 methods[3];
-    std::vector<ClassData *>                    innerClasses[3];
+    std::vector<std::shared_ptr<DeclTypeData>> fields[3];
+    std::vector<std::shared_ptr<FunctionData>> constructors[3];
+    std::vector<std::shared_ptr<FunctionData>> operators[3];
+    std::vector<std::shared_ptr<FunctionData>> methods[3];
+    std::vector<std::shared_ptr<ClassData>>    innerClasses[3];
 
     bool hasDestructor;
     bool isGeneric;
@@ -91,13 +91,13 @@ public:
 			data.name = policy->Data<NameData>();
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 		} else if (typeid(DeclTypePolicy) == typeid(*policy)) {
-			std::vector<DeclTypeData *> * decl_data = policy->Data<std::vector<DeclTypeData *>>();
-			for (DeclTypeData * decl : *decl_data)
+			std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
+			for (std::shared_ptr<DeclTypeData> decl : *decl_data)
 				data.fields[currentRegion].emplace_back(decl);
 			decl_data->clear();
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 		} else if (typeid(FunctionPolicy) == typeid(*policy)) {
-			FunctionData * f_data = policy->Data<FunctionData>();
+			std::shared_ptr<FunctionData> f_data = policy->Data<FunctionData>();
 			if (f_data->isPureVirtual)
 				data.hasPureVirtual = true;
 			if (f_data->type == FunctionData::CONSTRUCTOR)
@@ -114,7 +114,7 @@ public:
 	}
 
 protected:
-	void * DataInner() const override { return new ClassData(data); }
+	std::any DataInner() const override { return std::make_shared<ClassData>(data); }
 
 private:
 	void InitializeClassPolicyHandlers() {

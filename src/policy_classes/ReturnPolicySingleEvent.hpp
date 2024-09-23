@@ -25,9 +25,9 @@ public srcSAXEventDispatch::PolicyDispatcher,
 public srcSAXEventDispatch::PolicyListener {
 
 private:
-    ExpressionData   data;
-    std::size_t      returnDepth;
-    ExpressionPolicy *exprPolicy;
+    std::shared_ptr<ExpressionData> data;
+    std::size_t                     returnDepth;
+    ExpressionPolicy*               exprPolicy;
 
 public:
     ReturnPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
@@ -43,11 +43,11 @@ public:
     }
 
 protected:
-    void * DataInner() const override { return new ExpressionData(data); }
+    std::any DataInner() const override { return std::make_shared<ExpressionData>(data); }
 
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
         if (typeid(ExpressionPolicy) == typeid(*policy)) {
-            data = *(policy->Data<ExpressionData>());
+            data = policy->Data<ExpressionData>();
             ctx.dispatcher->RemoveListener(nullptr);
         }
     }
@@ -61,7 +61,7 @@ private:
         openEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx) {
             if (!returnDepth) {
                 returnDepth = ctx.depth;
-                data = ExpressionData{};
+                data = std::shared_ptr<ExpressionData>();
                 CollectExpressionHandlers();
             }
         };

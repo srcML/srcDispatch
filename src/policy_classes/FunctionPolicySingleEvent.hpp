@@ -30,12 +30,12 @@ struct FunctionData {
     std::string                   language;
     std::string                   filename;
     FunctionType                  type;
-    TypeData                      *returnType;
-    NameData                      *name;
-    std::vector<ParamTypeData *>  parameters;
-    std::vector<DeclTypeData *>   locals;            //Local variables
-    std::vector<ExpressionData *> returnExpressions; //Expressions returned
-    std::vector<ExpressionData *> expressions;       //All other exprs
+    std::shared_ptr<TypeData>                    returnType;
+    std::shared_ptr<NameData>                    name;
+    std::vector<std::shared_ptr<ParamTypeData>>  parameters;
+    std::vector<std::shared_ptr<DeclTypeData>>   locals;            //Local variables
+    std::vector<std::shared_ptr<ExpressionData>> returnExpressions; //Expressions returned
+    std::vector<std::shared_ptr<ExpressionData>> expressions;       //All other exprs
     std::set<std::string>         stereotypes;
 
     bool isVirtual;
@@ -52,13 +52,15 @@ struct FunctionData {
         std::string signature = name->ToString();
         signature += '(';
         for(std::size_t pos = 0; pos < parameters.size(); ++pos) {
-            if (pos > 0)
+            if (pos > 0) {
                 signature += ", ";
+            }
             signature += parameters[pos]->type->ToString();
         }
         signature += ')';
-        if (isConst)
+        if (isConst) {
             signature += " const";
+        }
         return signature;
     }
 
@@ -118,7 +120,7 @@ public:
 	}
 
 protected:
-	void * DataInner() const override { return new FunctionData(data); }
+	std::any DataInner() const override { return std::make_shared<FunctionData>(data); }
 
 	void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
@@ -133,8 +135,8 @@ protected:
 			data.parameters.push_back(policy->Data<ParamTypeData>()); 
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 		} else if (typeid(DeclTypePolicy) == typeid(*policy)) {
-			std::vector<DeclTypeData *> * decl_data = policy->Data<std::vector<DeclTypeData *>>();
-			for(DeclTypeData * decl : *decl_data)
+			std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
+			for(std::shared_ptr<DeclTypeData> decl : *decl_data)
 				data.locals.push_back(decl);
 			decl_data->clear();
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);

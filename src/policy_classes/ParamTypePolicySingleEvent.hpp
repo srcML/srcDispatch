@@ -16,10 +16,10 @@
 #include <vector>
 
 struct ParamTypeData {
-    TypeData * type;
-    NameData * name;
+    std::shared_ptr<TypeData> type;
+    std::shared_ptr<NameData> name;
 
-    friend std::ostream & operator<<(std::ostream & out, const ParamTypeData & paramData) {
+    friend std::ostream & operator<<(std::ostream& out, const ParamTypeData& paramData) {
         out << *paramData.type;
         if (paramData.name)
             out << ' ' << *paramData.name;
@@ -36,11 +36,11 @@ public srcSAXEventDispatch::PolicyListener {
 private:
     ParamTypeData data;
     std::size_t paramDepth;
-    TypePolicy * typePolicy;
-    NamePolicy * namePolicy;
+    TypePolicy* typePolicy;
+    NamePolicy* namePolicy;
 
 public:
-    ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           paramDepth(0),
@@ -52,14 +52,14 @@ public:
 
     ~ParamTypePolicy() {
         if (typePolicy) delete typePolicy;
-    if (namePolicy) delete namePolicy;
+        if (namePolicy) delete namePolicy;
 
     }
 
 protected:
-    void * DataInner() const override { return new ParamTypeData(data); }
+    std::any DataInner() const override { return std::make_shared<ParamTypeData>(data); }
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             data.type = policy->Data<TypeData>();
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -69,7 +69,7 @@ protected:
         }
     }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
 private:
     void InitializeParamTypePolicyHandlers() {

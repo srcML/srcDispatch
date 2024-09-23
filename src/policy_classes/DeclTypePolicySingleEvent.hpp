@@ -19,10 +19,10 @@
 #include <vector>
 
 struct DeclTypeData {
-    std::shared_ptr<TypeData> type;
-    NameData                  *name;
-    ExpressionData            *initializer;
-    bool                      isStatic;
+    std::shared_ptr<TypeData>       type;
+    std::shared_ptr<NameData>       name;
+    std::shared_ptr<ExpressionData> initializer;
+    bool                            isStatic;
 
     friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
         out << declData.type->ToString();
@@ -42,15 +42,15 @@ public srcSAXEventDispatch::PolicyDispatcher,
 public srcSAXEventDispatch::PolicyListener {
 
 private:
-    std::vector<DeclTypeData *>           data;
-    std::size_t                           declDepth;
-    TypePolicy                            *typePolicy;
-    NamePolicy                            *namePolicy;
-    ExpressionPolicy                      *expressionPolicy;
+    std::vector<std::shared_ptr<DeclTypeData>> data;
+    std::size_t                                declDepth;
+    TypePolicy                                 *typePolicy;
+    NamePolicy                                 *namePolicy;
+    ExpressionPolicy                           *expressionPolicy;
 
-    bool                                  isStatic;
-    std::shared_ptr<TypeData> type;
-    ExpressionData                        *initializer;
+    bool                                       isStatic;
+    std::shared_ptr<TypeData>                  type;
+    std::shared_ptr<ExpressionData>            initializer;
 
 public:
     DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
@@ -66,13 +66,13 @@ public:
     }
 
     ~DeclTypePolicy() {
-        if (typePolicy) delete typePolicy;
-        if (namePolicy) delete namePolicy;
+        if (typePolicy)       delete typePolicy;
+        if (namePolicy)       delete namePolicy;
         if (expressionPolicy) delete expressionPolicy;
     }
 
 protected:
-    void * DataInner() const override { return (void *)&data; }
+    std::any DataInner() const override { return std::make_shared<std::vector<std::shared_ptr<DeclTypeData>>>(data); }
 
     void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
@@ -104,7 +104,7 @@ private:
             }
             openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
                 if (declDepth && (declDepth + 1) == ctx.depth) {
-                    data.push_back(new DeclTypeData{});
+                    data.push_back(std::shared_ptr<DeclTypeData>());
                 }
             };
             closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
