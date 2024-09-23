@@ -874,6 +874,8 @@ namespace srcSAXEventDispatch {
             }
 
             if(num_attributes >= 3){
+                if (num_attributes >= 5)
+                    ctx.currentFileChecksum = std::string(attributes[4].value);
                 ctx.currentFilePath = std::string(attributes[2].value); 
                 ctx.currentFileLanguage = std::string(attributes[1].value);
                 ctx.currentsrcMLRevision = std::string(attributes[0].value);
