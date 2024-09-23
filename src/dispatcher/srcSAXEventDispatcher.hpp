@@ -641,7 +641,7 @@ namespace srcSAXEventDispatch {
                 } },
                 { "namespace", [this](){
                     DispatchEvent(ParserState::namespacen, ElementState::close);
-                    ctx.currentNameSpaceName.clear();
+                    ctx.currentNamespaces.pop_back();
                     --ctx.triggerField[ParserState::namespacen];
                 } },
                 { "super_list", [this](){
@@ -1014,13 +1014,16 @@ namespace srcSAXEventDispatch {
             }
 
             if(ctx.IsOpen({ParserState::namespacen}) && ctx.IsOpen(ParserState::name) && ctx.IsClosed({ParserState::block})){
-                ctx.currentNameSpaceName = std::all_of(
+                std::string namespaceName = std::all_of(
                     std::begin(ctx.currentToken), 
                     std::end(ctx.currentToken), 
                         [](char c){
                             if(std::isalnum(c) || c == '_') return true;
                             return false;
-                        }) ? ctx.currentToken : ""; 
+                        }) ? ctx.currentToken : "";
+
+                if (namespaceName != "")
+                    ctx.currentNamespaces.push_back(namespaceName);
             }
             
             if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})){
