@@ -57,10 +57,13 @@ public:
         InitializeCallPolicyHandlers();
     }
 
-    ~CallPolicy();
+    ~CallPolicy() {
+        if (namePolicy)       delete namePolicy;
+        if (expressionPolicy) delete expressionPolicy;
+    }
 
 protected:
-    std::any DataInner() const override;
+    std::any DataInner() const override { return std::make_shared<CallData>(data); };
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
     void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
