@@ -78,17 +78,16 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {
             paramdata = policy->Data<DeclData>();
             data.parameters.push_back(*paramdata);
-            delete paramdata;
         }
         void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
-        void * DataInner() const override {
-            return new SignatureData(data);
+        std::any DataInner() const override {
+            return std::make_shared<SignatureData>(data);
         }
     private:
         bool seenModifier;
         ParamTypePolicy parampolicy;
-        DeclData* paramdata;
+        std::shared_ptr<DeclData> paramdata;
         SignatureData data;
         size_t currentArgPosition;       
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
