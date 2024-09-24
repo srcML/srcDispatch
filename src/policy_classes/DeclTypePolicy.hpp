@@ -97,8 +97,8 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
             return &paramNames;
         }
     protected:
-        void * DataInner() const override { 
-            return new DeclData(data);
+        std::any DataInner() const override { 
+            return std::make_shared<DeclData>(data);
         }
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
