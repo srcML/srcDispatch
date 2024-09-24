@@ -34,8 +34,8 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
         void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
-        void * DataInner() const override {
-            return new DeclData(data);
+        std::any DataInner() const override {
+            return std::make_shared<DeclData>(data);
         }
     private:
         DeclData data;
