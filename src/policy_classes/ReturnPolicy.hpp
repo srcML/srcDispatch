@@ -23,7 +23,7 @@ class ReturnPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEve
             return &returnUses;
         }
     protected:
-        void * DataInner() const override {}
+        std::any DataInner() const override {}
         
     private:
         std::unordered_map<std::string, std::set<unsigned int>> returnUses; // variablename | line number
