@@ -63,7 +63,7 @@ class ConditionalPolicy : public srcSAXEventDispatch::EventListener, public srcS
         const std::string& GetLastFunction() { return recentFunction; }
 
     protected:
-        void * DataInner() const override {}
+        std::any DataInner() const override {}
         
     private:
         std::unordered_map<std::string, std::vector<unsigned int>> conditionalUses, conditionalDefs;
