@@ -50,8 +50,8 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
         void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
-        void * DataInner() const override {
-            return new CallData(data);
+        std::any DataInner() const override {
+            return std::make_shared<CallPolicy::CallData>(data);
         }
     private:
         CallData data;
