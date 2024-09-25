@@ -16,12 +16,12 @@ std::ostream & operator<<(std::ostream & out, const CallData &call) {
     return out;
 }
 
-// CallPolicy::~CallPolicy() {
-//     if (namePolicy)       delete namePolicy;
-//     if (expressionPolicy) delete expressionPolicy;
-// }
+CallPolicy::~CallPolicy() {
+    if (namePolicy)       delete namePolicy;
+    if (expressionPolicy) delete expressionPolicy;
+}
 
-// std::any CallPolicy::DataInner() const { return std::make_shared<CallData>(CallPolicy::data); }
+std::any CallPolicy::DataInner() const { return std::make_shared<CallData>(data); }
 
 void CallPolicy::Notify(const srcSAXEventDispatch::PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
     using namespace srcSAXEventDispatch;
