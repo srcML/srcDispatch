@@ -28,14 +28,14 @@
  */
 #ifndef CALLPOLICY
 #define CALLPOLICY
-class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class FunctionCallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     /*
     {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},
         NestedCalledFunction1{arg1, line#},{arg2, line#}, ..., {argn, line#}
         }
     */
     public:
-        struct CallData{
+        struct FunctionCallData{
             void clear(){
                 fnName.clear();
                 callargumentlist.clear();
@@ -43,18 +43,18 @@ class CallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
             std::string fnName;
             std::vector<std::string> callargumentlist;
         };
-        ~CallPolicy(){}
-        CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        ~FunctionCallPolicy(){}
+        FunctionCallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
         void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
         void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         std::any DataInner() const override {
-            return std::make_shared<CallPolicy::CallData>(data);
+            return std::make_shared<FunctionCallPolicy::FunctionCallData>(data);
         }
     private:
-        CallData data;
+        FunctionCallData data;
         std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
         std::string fullFuncIdentifier;
         void InitializeEventHandlers(){
