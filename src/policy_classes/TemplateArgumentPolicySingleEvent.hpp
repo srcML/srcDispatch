@@ -14,6 +14,7 @@ class NamePolicy;
 struct TemplateArgumentData {
     enum TemplateArgumentType { NAME, LITERAL, MODIFIER, POINTER, REFERENCE, RVALUE, OPERATOR, CALL };
 
+    unsigned int lineNumber;
     std::vector<std::pair<std::any, TemplateArgumentType>> data;
     friend std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argumentData);
 };

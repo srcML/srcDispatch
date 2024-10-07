@@ -78,6 +78,7 @@ void TypePolicy::InitializeTypePolicyHandlers() {
         if (!typeDepth) {
             typeDepth = ctx.depth;
             data = TypeData{};
+            data.lineNumber = ctx.currentLineNumber;
             CollectNamesHandler();
             CollectModifersHandler();
             CollectSpecifiersHandler();

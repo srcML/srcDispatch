@@ -24,6 +24,7 @@ struct ClassData {
     enum ClassType : std::size_t { CLASS, STRUCT };  //UNION, ENUM?
     enum AccessSpecifier         { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
 
+    unsigned int lineNumber;
     std::string               language;
     std::string               filename;
     ClassType                 type;
@@ -124,6 +125,7 @@ private:
 			if (!classDepth) {
 				classDepth = ctx.depth;
 				data = ClassData{};
+				data.lineNumber = ctx.currentLineNumber;
 				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
 				if (stereotype_attr_itr != ctx.attributes.end()){
 					std::istringstream stereostring(stereotype_attr_itr->second);

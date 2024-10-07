@@ -22,11 +22,10 @@
 #include <sstream>
 #include <iterator>
 
-
-
 struct FunctionData {
     enum FunctionType { CONSTRUCTOR, DESTURCTOR, OPERATOR, FUNCTION };
 
+    unsigned int lineNumber;
     std::string                   language;
     std::string                   filename;
     FunctionType                  type;
@@ -157,6 +156,7 @@ private:
 			if (!functionDepth) {
 				functionDepth = ctx.depth;
 				data = FunctionData{};
+				data.lineNumber = ctx.currentLineNumber;
                 data.language = ctx.currentFileLanguage;
                 data.filename = ctx.currentFilePath;
 				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");

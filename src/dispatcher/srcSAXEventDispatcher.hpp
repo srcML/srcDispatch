@@ -913,16 +913,6 @@ namespace srcSAXEventDispatch {
             localName += localname;
 
             ctx.currentTag = localName;
-            
-            // /////////DEPRECATED////////////
-            // if(localName == "pos:position"){
-            //     ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
-            // }
-            // /////////DEPRECATED///////////
-
-            // if(localName == "name"){
-            //     ctx.currentLineNumber = strtoul(attributes[0].value, NULL, 0);
-            // }
 
             std::string name;
             if(num_attributes){

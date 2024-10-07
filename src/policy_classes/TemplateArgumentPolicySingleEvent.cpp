@@ -54,6 +54,7 @@ void TemplateArgumentPolicy::InitializeTemplateArgumentPolicyHandlers() {
         if (!argumentDepth) {
             argumentDepth = ctx.depth;
             data = TemplateArgumentData{};
+            data.lineNumber = ctx.currentLineNumber;
             CollectNamesHandler();
             CollectOthersHandler();
         }

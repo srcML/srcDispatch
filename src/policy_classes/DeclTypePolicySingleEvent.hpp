@@ -19,6 +19,12 @@
 #include <vector>
 
 struct DeclTypeData {
+
+    DeclTypeData(unsigned int lineNumber) 
+        : lineNumber(lineNumber), type(), name(), initializer(), isStatic() {
+    }
+
+    unsigned int lineNumber;
     std::shared_ptr<TypeData>       type;
     std::shared_ptr<NameData>       name;
     std::shared_ptr<ExpressionData> initializer;
@@ -104,7 +110,7 @@ private:
             }
             openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
                 if (declDepth && (declDepth + 1) == ctx.depth) {
-                    data.push_back(std::shared_ptr<DeclTypeData>());
+                    data.push_back(std::shared_ptr<DeclTypeData>(ctx.currentLineNumber));
                 }
             };
             closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {

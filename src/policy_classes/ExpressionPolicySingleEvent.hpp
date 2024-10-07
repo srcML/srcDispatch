@@ -39,6 +39,8 @@ struct ExpressionElement {
 };
 
 struct ExpressionData {
+
+    unsigned int lineNumber;
     std::vector<std::shared_ptr<ExpressionElement>> expr;   //All items in expression
 
     friend std::ostream & operator<<(std::ostream & out, const ExpressionData & ex);

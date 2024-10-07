@@ -33,7 +33,6 @@ void CallPolicy::Notify(const srcSAXEventDispatch::PolicyDispatcher * policy, co
         data.arguments.push_back(policy->Data<ExpressionData>());
         ctx.dispatcher->RemoveListener(nullptr);
     }
-
 }
 
 void CallPolicy::InitializeCallPolicyHandlers() {
@@ -43,6 +42,7 @@ void CallPolicy::InitializeCallPolicyHandlers() {
         if (!callDepth) {
             callDepth = ctx.depth;
             data = CallData{};
+            data.lineNumber = ctx.currentLineNumber;
             CollectNameHandlers();
             CollectCallArgumentHandlers();
         }

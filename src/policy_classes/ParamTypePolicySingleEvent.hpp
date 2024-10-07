@@ -16,6 +16,8 @@
 #include <vector>
 
 struct ParamTypeData {
+
+    unsigned int lineNumber;
     std::shared_ptr<TypeData> type;
     std::shared_ptr<NameData> name;
 
@@ -79,6 +81,7 @@ private:
             if (!paramDepth) {
                 paramDepth = ctx.depth;
                 data = ParamTypeData{};
+                data.lineNumber = ctx.currentLineNumber;
                 CollectTypeHandlers();
                 CollectNameHandlers();
             }

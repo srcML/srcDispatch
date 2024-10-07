@@ -30,6 +30,8 @@ struct NameData;
 class NamePolicy;
 
 struct CallData {
+
+    unsigned int lineNumber;
     std::shared_ptr<NameData> name;
     std::vector<std::shared_ptr<ExpressionData>> arguments;  //expressions
 

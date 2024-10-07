@@ -25,6 +25,8 @@ class  TemplateArgumentPolicy;
 
 
 struct NameData {
+
+    unsigned int lineNumber;
     std::string                                        name;
     std::vector<std::shared_ptr<NameData>>             names;
     std::vector<std::shared_ptr<TemplateArgumentData>> templateArguments;

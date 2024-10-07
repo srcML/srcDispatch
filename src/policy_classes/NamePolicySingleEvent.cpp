@@ -75,6 +75,7 @@ void NamePolicy::InitializeNamePolicyHandlers() {
         if (!nameDepth) {
             nameDepth = ctx.depth;
             data = NameData{};
+            data.lineNumber = ctx.currentLineNumber;
             CollectTemplateArgumentsHandlers();
             CollectArrayIndicesHandlers();
         } else if ((nameDepth + 1) == ctx.depth) {

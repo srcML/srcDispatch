@@ -17,6 +17,7 @@ class NamePolicy;
 struct TypeData {
     enum TypeType { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };
 
+    unsigned int lineNumber;
     std::vector<std::pair<std::any, TypeType>> types;
     std::string ToString() const;
     friend std::ostream & operator<<(std::ostream & out, const TypeData & typeData);
