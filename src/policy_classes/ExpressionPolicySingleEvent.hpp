@@ -26,15 +26,23 @@ class NamePolicy;
 //Names, operators, calls in the correct order.
 //Need for determining variable use, variable modification, calls
 
+struct Token {
+    Token(unsigned int lineNumber, const std::string& token) 
+        : lineNumber(lineNumber), token(token) {
+    }
+    unsigned int lineNumber;
+    std::string token;
+};
+
 struct ExpressionElement {
     enum ExprType { NAME, OP, CALL, LITERAL};
 
     ExprType type;
     std::shared_ptr<NameData> name;
-    std::string          token;
-    std::shared_ptr<CallData>             call;
+    std::shared_ptr<Token>    token;
+    std::shared_ptr<CallData> call;
     ExpressionElement(ExprType t, std::shared_ptr<NameData> item) : type(t), name(item) {};
-    ExpressionElement(ExprType t, std::string&          item) : type(t), token(item){};
+    ExpressionElement(ExprType t, std::shared_ptr<Token>    item) : type(t), token(item){};
     ExpressionElement(ExprType t, std::shared_ptr<CallData> item) : type(t), call(item) {};
 };
 

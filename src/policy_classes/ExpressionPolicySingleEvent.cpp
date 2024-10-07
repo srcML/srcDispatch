@@ -83,11 +83,12 @@ void ExpressionPolicy::CollectCallHandlers() {
 void ExpressionPolicy::CollectOtherHandlers() {  //Get the operators
     using namespace srcSAXEventDispatch;
     closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+        std::shared_ptr<Token> token = std::make_shared<Token>(ctx.currentLineNumber, ctx.currentToken);
         if (ctx.currentTag == "operator") {
-            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::OP, ctx.currentToken));
+            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::OP, token));
         }
         if (ctx.currentTag == "literal") {
-            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::LITERAL, ctx.currentToken));
+            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::LITERAL, token));
         }
 
     };
