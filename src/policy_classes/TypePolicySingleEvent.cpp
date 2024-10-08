@@ -133,7 +133,7 @@ void TypePolicy::CollectSpecifiersHandler() {
     using namespace srcSAXEventDispatch;
     openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
         if (typeDepth && (typeDepth + 1) == ctx.depth) {
-            data.types.push_back(std::make_pair(new std::string(), TypeData::SPECIFIER));
+            data.types.push_back(std::make_pair(std::make_shared<std::string>(""), TypeData::SPECIFIER));
             closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
                 (*std::any_cast<std::shared_ptr<std::string>>(data.types.back().first)) += ctx.currentToken;
             };
