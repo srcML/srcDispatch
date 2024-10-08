@@ -5,14 +5,19 @@
 
 #include <ExpressionPolicySingleEvent.hpp>
 
+
+std::ostream & operator<<(std::ostream & out, const Token & token) {
+    return out << token.token;
+}
+
 std::ostream & operator<<(std::ostream & out, const ExpressionData & ex) {
     for (std::shared_ptr<ExpressionElement> item : ex.expr) {
         //out << "   Type " << item->type << " ";
         switch (item->type) {
-            case ExpressionElement::NAME:    out << *(item->name);  break;
-            case ExpressionElement::OP:      out << item->token;    break;
-            case ExpressionElement::LITERAL: out << item->token;    break;
-            case ExpressionElement::CALL:    out << *(item->call);  break;
+            case ExpressionElement::NAME:    out << *item->name;  break;
+            case ExpressionElement::OP:      out << *item->token; break;
+            case ExpressionElement::LITERAL: out << *item->token; break;
+            case ExpressionElement::CALL:    out << *item->call;  break;
         }
         out << " ";
     }

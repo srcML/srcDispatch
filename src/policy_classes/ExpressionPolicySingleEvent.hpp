@@ -32,6 +32,7 @@ struct Token {
     }
     unsigned int lineNumber;
     std::string token;
+    friend std::ostream & operator<<(std::ostream & out, const Token & token);
 };
 
 struct ExpressionElement {
