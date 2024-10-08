@@ -192,7 +192,7 @@ private:
 		using namespace srcSAXEventDispatch;
 		openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
-				openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
+				openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
 					data.parents.emplace_back(ParentData{ "", false, ClassData::PUBLIC });
 				};
 				closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
