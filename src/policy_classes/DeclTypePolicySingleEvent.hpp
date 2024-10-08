@@ -102,6 +102,7 @@ private:
         // start of policy
         openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
             if (!declDepth) {
+                data.clear();
                 declDepth = ctx.depth;
                 CollectTypeHandlers();
                 CollectNameHandlers();

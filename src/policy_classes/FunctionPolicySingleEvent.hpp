@@ -152,7 +152,7 @@ private:
 	void InitializeFunctionPolicyHandlers() {
 		using namespace srcSAXEventDispatch;
 		// start of policy
-		std::function<void (srcSAXEventContext& ctx)> functionStart = [this](srcSAXEventContext& ctx) {
+		std::function<void (srcSAXEventContext& ctx)> startFunction = [this](srcSAXEventContext& ctx) {
 			if (!functionDepth) {
 				functionDepth = ctx.depth;
 				data = FunctionData{};
@@ -187,7 +187,7 @@ private:
 		};
 
 		// end of policy
-		std::function<void (srcSAXEventContext& ctx)> functionEnd = [this](srcSAXEventContext& ctx) {
+		std::function<void (srcSAXEventContext& ctx)> endFunction = [this](srcSAXEventContext& ctx) {
 			if (functionDepth && functionDepth == ctx.depth) {
 				functionDepth = 0;
 				NotifyAll(ctx);
@@ -195,19 +195,19 @@ private:
 			}
 		};
 
-		openEventMap[ParserState::function]        = functionStart;
-		openEventMap[ParserState::functiondecl]    = functionStart;
-		openEventMap[ParserState::constructor]     = functionStart;
-		openEventMap[ParserState::constructordecl] = functionStart;
-		openEventMap[ParserState::destructor]      = functionStart;
-		openEventMap[ParserState::destructordecl]  = functionStart;
+		openEventMap[ParserState::function]        = startFunction;
+		openEventMap[ParserState::functiondecl]    = startFunction;
+		openEventMap[ParserState::constructor]     = startFunction;
+		openEventMap[ParserState::constructordecl] = startFunction;
+		openEventMap[ParserState::destructor]      = startFunction;
+		openEventMap[ParserState::destructordecl]  = startFunction;
 
-		closeEventMap[ParserState::function]        = functionEnd;
-		closeEventMap[ParserState::functiondecl]    = functionEnd;
-		closeEventMap[ParserState::constructor]     = functionEnd;
-		closeEventMap[ParserState::constructordecl] = functionEnd;
-		closeEventMap[ParserState::destructor]      = functionEnd;
-		closeEventMap[ParserState::destructordecl]  = functionEnd;
+		closeEventMap[ParserState::function]        = endFunction;
+		closeEventMap[ParserState::functiondecl]    = endFunction;
+		closeEventMap[ParserState::constructor]     = endFunction;
+		closeEventMap[ParserState::constructordecl] = endFunction;
+		closeEventMap[ParserState::destructor]      = endFunction;
+		closeEventMap[ParserState::destructordecl]  = endFunction;
 	}
 
 	void CollectXMLAttributeHandlers() {}
