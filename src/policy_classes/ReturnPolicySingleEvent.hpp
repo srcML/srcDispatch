@@ -43,7 +43,7 @@ public:
     }
 
 protected:
-    std::any DataInner() const override { return std::make_shared<ExpressionData>(data); }
+    std::any DataInner() const override { return std::make_shared<ExpressionData>(*data); }
 
     virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
         if (typeid(ExpressionPolicy) == typeid(*policy)) {

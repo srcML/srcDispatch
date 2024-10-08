@@ -110,7 +110,7 @@ private:
             }
             openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
                 if (declDepth && (declDepth + 1) == ctx.depth) {
-                    data.push_back(std::shared_ptr<DeclTypeData>(ctx.currentLineNumber));
+                    data.push_back(std::make_shared<DeclTypeData>(ctx.currentLineNumber));
                 }
             };
             closeEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {

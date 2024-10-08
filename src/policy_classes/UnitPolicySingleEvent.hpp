@@ -51,7 +51,7 @@ public:
     }
 
 protected:
-    void * DataInner() const override { return nullptr; }
+    std::any DataInner() const override { return std::any(); }
 
 private:
     void InitializeUnitPolicyHandlers() {
