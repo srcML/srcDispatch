@@ -35,7 +35,7 @@ struct CallData {
     std::shared_ptr<NameData> name;
     std::vector<std::shared_ptr<ExpressionData>> arguments;  //expressions
 
-    friend std::ostream & operator<<(std::ostream & out, const CallData &call);
+    friend std::ostream& operator<<(std::ostream& out, const CallData& call);
 };
 
 class CallPolicy :
@@ -44,13 +44,13 @@ public srcSAXEventDispatch::PolicyDispatcher,
 public srcSAXEventDispatch::PolicyListener {
 
 private:
-    CallData            data;
-    std::size_t         callDepth;
-    NamePolicy          *namePolicy;
-    ExpressionPolicy    *expressionPolicy;
+    CallData data;
+    std::size_t callDepth;
+    NamePolicy* namePolicy;
+    ExpressionPolicy* expressionPolicy;
 
 public:
-    CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
     : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           callDepth(0),
@@ -63,8 +63,8 @@ public:
 
 protected:
     std::any DataInner() const override;
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override;
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
 private:
     void InitializeCallPolicyHandlers();

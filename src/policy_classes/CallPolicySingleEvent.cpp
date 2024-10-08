@@ -4,7 +4,7 @@
  */
 #include <CallPolicySingleEvent.hpp>
 
-std::ostream & operator<<(std::ostream & out, const CallData &call) {
+std::ostream& operator<<(std::ostream& out, const CallData& call) {
     out << *(call.name) << "(";
     bool printComma=false;
     for (std::shared_ptr<ExpressionData> arg : call.arguments) {
@@ -23,7 +23,7 @@ CallPolicy::~CallPolicy() {
 
 std::any CallPolicy::DataInner() const { return std::make_shared<CallData>(data); }
 
-void CallPolicy::Notify(const srcSAXEventDispatch::PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+void CallPolicy::Notify(const srcSAXEventDispatch::PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) {
     using namespace srcSAXEventDispatch;
     if (typeid(NamePolicy) == typeid(*policy)) {
         data.name = policy->Data<NameData>();
