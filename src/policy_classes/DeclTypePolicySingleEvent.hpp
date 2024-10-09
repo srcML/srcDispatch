@@ -30,7 +30,7 @@ struct DeclTypeData {
     std::shared_ptr<ExpressionData> initializer;
     bool                            isStatic;
 
-    friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
+    friend std::ostream& operator<<(std::ostream& out, const DeclTypeData& declData) {
         out << declData.type->ToString();
         if (declData.name)
             out << ' ' << *declData.name;
@@ -50,16 +50,16 @@ public srcSAXEventDispatch::PolicyListener {
 private:
     std::vector<std::shared_ptr<DeclTypeData>> data;
     std::size_t                                declDepth;
-    TypePolicy                                 *typePolicy;
-    NamePolicy                                 *namePolicy;
-    ExpressionPolicy                           *expressionPolicy;
+    TypePolicy*                                typePolicy;
+    NamePolicy*                                namePolicy;
+    ExpressionPolicy*                          expressionPolicy;
 
     bool                                       isStatic;
     std::shared_ptr<TypeData>                  type;
     std::shared_ptr<ExpressionData>            initializer;
 
 public:
-    DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           declDepth(0),
@@ -80,9 +80,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<std::vector<std::shared_ptr<DeclTypeData>>>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             type = std::shared_ptr<TypeData>(policy->Data<TypeData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
