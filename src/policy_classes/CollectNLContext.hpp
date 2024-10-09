@@ -54,14 +54,14 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         std::map<std::string, std::string> identifierposmap;
         NLContextData data;
         ~NLContextPolicy(){}
-        NLContextPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        NLContextPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             sourcenlpolicy.AddListener(this);
             exprpolicy.AddListener(this);
             stereotypepolicy.AddListener(this);
             InitializeEventHandlers();
         }
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+        void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override {
             using namespace srcSAXEventDispatch;
             if(ctx.IsOpen(ParserState::declstmt) && ctx.IsClosed(ParserState::exprstmt)){
                 sourcenlpdata = *policy->Data<SourceNLPolicy::SourceNLData>();
