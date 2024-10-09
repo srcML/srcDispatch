@@ -9,7 +9,7 @@ std::string TypeData::ToString() const {
     std::string type_str;
     for (std::size_t pos = 0; pos < types.size(); ++pos) {
         if (pos != 0) type_str += ' ';
-        const std::pair<std::any, TypeType> & type = types[pos];
+        const std::pair<std::any, TypeType>& type = types[pos];
         if (type.second == TypeData::POINTER)
             type_str += '*';
         else if (type.second == TypeData::REFERENCE)
@@ -24,14 +24,14 @@ std::string TypeData::ToString() const {
     return type_str;
 }
 
-std::ostream & operator<<(std::ostream & out, const TypeData & typeData) {
+std::ostream& operator<<(std::ostream& out, const TypeData& typeData) {
     //std::cerr << "TPSE\n";
     //std::cerr << "TPSE Size: " << typeData.types.empty() << '\n';
     //std::cerr << "TACO\n";
     for(std::size_t pos = 0; pos < typeData.types.size(); ++pos) {
         //std::cerr << "TPSE2\n";
         if (pos != 0) out << ' ';
-        const std::pair<std::any, TypeData::TypeType> & type = typeData.types[pos];
+        const std::pair<std::any, TypeData::TypeType>& type = typeData.types[pos];
         if (type.second == TypeData::POINTER)
             out << '*';
         else if (type.second == TypeData::REFERENCE)
@@ -46,7 +46,7 @@ std::ostream & operator<<(std::ostream & out, const TypeData & typeData) {
     return out;
 }
 
-TypePolicy::TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+TypePolicy::TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
     : srcSAXEventDispatch::PolicyDispatcher(listeners),
       data{},
       typeDepth(0),
@@ -59,13 +59,13 @@ TypePolicy::~TypePolicy(){
     if (namePolicy) delete namePolicy;
 }
 
-void TypePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+void TypePolicy::Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) {
     //this causes undefined behavior if types is empty
     data.types.back().first = policy->Data<NameData>();
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 }
 
-void TypePolicy::NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]){}
+void TypePolicy::NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]){}
 
 std::any TypePolicy::DataInner() const {
     return std::make_shared<TypeData>(data);
