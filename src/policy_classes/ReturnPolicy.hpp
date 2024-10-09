@@ -9,13 +9,13 @@
 class ReturnPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
     public:
 
-        ReturnPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        ReturnPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
         ~ReturnPolicy(){}
 
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} // doesn't use other parsers
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} // doesn't use other parsers
+        void Notify(const PolicyDispatcher* policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
         void ClearCollection() { returnUses.clear(); }
 

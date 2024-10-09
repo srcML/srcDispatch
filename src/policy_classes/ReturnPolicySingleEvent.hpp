@@ -30,7 +30,7 @@ private:
     ExpressionPolicy*               exprPolicy;
 
 public:
-    ReturnPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    ReturnPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
         : srcSAXEventDispatch::PolicyDispatcher(listeners),
           data{},
           returnDepth(0),
@@ -45,14 +45,14 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<ExpressionData>(*data); }
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override {
         if (typeid(ExpressionPolicy) == typeid(*policy)) {
             data = policy->Data<ExpressionData>();
             ctx.dispatcher->RemoveListener(nullptr);
         }
     }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
 private:
     void InitializeReturnPolicyHandlers() {
