@@ -16,7 +16,7 @@ struct TemplateArgumentData {
 
     unsigned int lineNumber;
     std::vector<std::pair<std::any, TemplateArgumentType>> data;
-    friend std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argumentData);
+    friend std::ostream& operator<<(std::ostream& out, const TemplateArgumentData& argumentData);
 };
 
 
@@ -26,10 +26,10 @@ public srcSAXEventDispatch::PolicyDispatcher,
 public srcSAXEventDispatch::PolicyListener {
 
 public:
-    TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
+    TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners);
     ~TemplateArgumentPolicy();
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
-    virtual void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override;
+    virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override;
+    virtual void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override;
 
 protected:
     virtual std::any DataInner() const override;
@@ -42,7 +42,7 @@ private:
 private:
     TemplateArgumentData data;
     std::size_t argumentDepth;
-    NamePolicy * namePolicy;
+    NamePolicy* namePolicy;
 
 };
 

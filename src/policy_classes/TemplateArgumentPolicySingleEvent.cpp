@@ -4,11 +4,11 @@
  */
 #include <TemplateArgumentPolicySingleEvent.hpp>
 
-std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argumentData) {
+std::ostream& operator<<(std::ostream& out, const TemplateArgumentData& argumentData) {
     for(std::size_t pos = 0; pos < argumentData.data.size(); ++pos) {
         if (pos != 0)
             out << ' ';
-        const std::pair<std::any, TemplateArgumentData::TemplateArgumentType> & element = argumentData.data[pos];
+        const std::pair<std::any, TemplateArgumentData::TemplateArgumentType>& element = argumentData.data[pos];
         if (element.second == TemplateArgumentData::NAME)
             out << *std::any_cast<std::shared_ptr<NameData>>(element.first);
         else if (element.second == TemplateArgumentData::POINTER)
@@ -24,7 +24,7 @@ std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argum
     return out;
 }
 
-TemplateArgumentPolicy::TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+TemplateArgumentPolicy::TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
     : srcSAXEventDispatch::PolicyDispatcher(listeners),
       data{},
       argumentDepth(0),
@@ -36,12 +36,12 @@ TemplateArgumentPolicy::~TemplateArgumentPolicy() {
     if (namePolicy) delete namePolicy;
 }
 
-void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+void TemplateArgumentPolicy::Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) {
     data.data.back().first = policy->Data<NameData>();
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 }
 
-void TemplateArgumentPolicy::NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]){}
+void TemplateArgumentPolicy::NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]){}
 
 std::any TemplateArgumentPolicy::DataInner() const {
     return std::make_shared<TemplateArgumentData>(data);
