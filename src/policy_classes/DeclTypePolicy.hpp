@@ -28,11 +28,11 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
     public:
         DeclData data;
         ~DeclTypePolicy(){}
-        DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher* policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
         void Finalize(srcSAXEventDispatch::srcSAXEventContext& ctx){  
             using namespace srcSAXEventDispatch;
