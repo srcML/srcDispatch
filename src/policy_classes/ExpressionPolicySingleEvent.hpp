@@ -5,7 +5,7 @@
 #ifndef INCLUDED_EXPRESSION_POLICY_SINGE_EVENT_HPP
 #define INCLUDED_EXPRESSION_POLICY_SINGE_EVENT_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <NamePolicySingleEvent.hpp>
 #include <CallPolicySingleEvent.hpp>
@@ -56,9 +56,9 @@ struct ExpressionData {
 };
 
 class ExpressionPolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     ExpressionData  data;
@@ -67,8 +67,8 @@ private:
     std::size_t     exprDepth;
 
 public:
-    ExpressionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-    : srcSAXEventDispatch::PolicyDispatcher(listeners),
+    ExpressionPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    : srcDispatch::PolicyDispatcher(listeners),
     data{},
     exprDepth(0),
     namePolicy(nullptr),
@@ -82,9 +82,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<ExpressionData>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
 
 private:
     void InitializeExpressionPolicyHandlers();

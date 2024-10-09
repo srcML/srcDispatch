@@ -8,7 +8,7 @@
 
 #include <srcSAXController.hpp>
 #include <srcSAXSingleEventDispatcher.hpp>
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <ExpressionPolicySingleEvent.hpp>
 
@@ -20,9 +20,9 @@
 // Collect the expression in the return
 //
 class ReturnPolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     std::shared_ptr<ExpressionData> data;
@@ -30,8 +30,8 @@ private:
     ExpressionPolicy*               exprPolicy;
 
 public:
-    ReturnPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+    ReturnPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+        : srcDispatch::PolicyDispatcher(listeners),
           data{},
           returnDepth(0),
           exprPolicy(nullptr) {
@@ -45,18 +45,18 @@ public:
 protected:
     std::any DataInner() const override { return data; }
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
         if (typeid(ExpressionPolicy) == typeid(*policy)) {
             data = policy->Data<ExpressionData>();
             ctx.dispatcher->RemoveListener(nullptr);
         }
     }
 
-    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
 private:
     void InitializeReturnPolicyHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         // start of policy
         openEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx) {
             if (!returnDepth) {
@@ -77,7 +77,7 @@ private:
     }
 
     void CollectExpressionHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
             if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
             ctx.dispatcher->AddListenerDispatch(exprPolicy);

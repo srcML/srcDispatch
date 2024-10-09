@@ -1,5 +1,5 @@
 /**
- * Policy for srcSAXEventDispatcher
+ * Policy for srcDispatch
  * Listens for both classes and functions
  * Calls the ClassPolicySingleEvent for class
  * Calls the FunctionPolicySingleEvent for function
@@ -8,11 +8,12 @@
 #ifndef INCLUDED_UNIT_POLICY_HPP
 #define INCLUDED_UNIT_POLICY_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <FunctionPolicySingleEvent.hpp>
 #include <ClassPolicySingleEvent.hpp>
 
+#include <typeinfo>
 #include <string>
 #include <vector>
 #include <set>
@@ -21,17 +22,17 @@
 
 
 class UnitPolicySingleEvent : 
-	public srcSAXEventDispatch::EventListener,
-	public srcSAXEventDispatch::PolicyDispatcher,
-    public srcSAXEventDispatch::PolicyListener   {
+	public srcDispatch::EventListener,
+	public srcDispatch::PolicyDispatcher,
+    public srcDispatch::PolicyListener   {
 
 public:
     FunctionPolicy *functionPolicy;
     ClassPolicy    *classPolicy;
 
 public:
-    UnitPolicySingleEvent(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners) :
-                srcSAXEventDispatch::PolicyDispatcher(listeners),
+    UnitPolicySingleEvent(std::initializer_list<srcDispatch::PolicyListener *> listeners) :
+                srcDispatch::PolicyDispatcher(listeners),
                 functionPolicy(nullptr),
                 classPolicy(nullptr) {
         InitializeUnitPolicyHandlers();
@@ -42,9 +43,9 @@ public:
         if(classPolicy)    delete classPolicy;
     }
 
-    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
-    void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
         // Assumes at least one lister which should always be one
         policyListeners.back()->Notify(policy, ctx);
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -55,16 +56,16 @@ protected:
 
 private:
     void InitializeUnitPolicyHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
 
         // start of policy
-        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> startClassPolicy = [this](srcSAXEventContext& ctx) {
+        std::function<void(srcDispatch::srcSAXEventContext&)> startClassPolicy = [this](srcSAXEventContext& ctx) {
             if(!classPolicy) classPolicy = new ClassPolicy{this};
             ctx.dispatcher->AddListenerDispatch(classPolicy);
         };
 
         // end of policy
-        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> endClassPolicy = [this](srcSAXEventContext& ctx) {
+        std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [this](srcSAXEventContext& ctx) {
         };
 
         openEventMap[ParserState::classn] = startClassPolicy;
@@ -73,13 +74,13 @@ private:
         closeEventMap[ParserState::structn] = endClassPolicy;
 
         // start function of policy
-        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> startFunction = [this](srcSAXEventContext& ctx) {
+        std::function<void(srcDispatch::srcSAXEventContext&)> startFunction = [this](srcSAXEventContext& ctx) {
             if(!functionPolicy) functionPolicy = new FunctionPolicy{this};
             ctx.dispatcher->AddListenerDispatch(functionPolicy);
         };
 
         // end of policy
-        std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> endFunction = [this](srcSAXEventContext& ctx) {
+        std::function<void(srcDispatch::srcSAXEventContext&)> endFunction = [this](srcSAXEventContext& ctx) {
         };
 
         openEventMap[ParserState::function]        = startFunction;

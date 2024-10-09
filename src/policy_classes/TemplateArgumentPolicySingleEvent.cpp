@@ -24,8 +24,8 @@ std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argum
     return out;
 }
 
-TemplateArgumentPolicy::TemplateArgumentPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-    : srcSAXEventDispatch::PolicyDispatcher(listeners),
+TemplateArgumentPolicy::TemplateArgumentPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    : srcDispatch::PolicyDispatcher(listeners),
       data{},
       argumentDepth(0),
       namePolicy(nullptr) {
@@ -36,19 +36,19 @@ TemplateArgumentPolicy::~TemplateArgumentPolicy() {
     if (namePolicy) delete namePolicy;
 }
 
-void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+void TemplateArgumentPolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
     data.data.back().first = policy->Data<NameData>();
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 }
 
-void TemplateArgumentPolicy::NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]){}
+void TemplateArgumentPolicy::NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]){}
 
 std::any TemplateArgumentPolicy::DataInner() const {
     return std::make_shared<TemplateArgumentData>(data);
 }
 
 void TemplateArgumentPolicy::InitializeTemplateArgumentPolicyHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     // start of policy
     openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
         if (!argumentDepth) {
@@ -71,7 +71,7 @@ void TemplateArgumentPolicy::InitializeTemplateArgumentPolicyHandlers() {
 }
 
 void TemplateArgumentPolicy::CollectNamesHandler() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
         // C++ has depth of 2 others 1
         std::size_t elementStackSize = ctx.elementStack.size();
@@ -86,7 +86,7 @@ void TemplateArgumentPolicy::CollectNamesHandler() {
 }
 
 void TemplateArgumentPolicy::CollectOthersHandler() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
         // C++ has depth of 2 others 1
         std::size_t elementStackSize = ctx.elementStack.size();

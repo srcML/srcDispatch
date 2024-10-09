@@ -27,7 +27,7 @@ ExpressionPolicy::~ExpressionPolicy() {
         if(callPolicy)  delete callPolicy;
 }
 
-void ExpressionPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+void ExpressionPolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
     if(typeid(NamePolicy) == typeid(*policy)) {
         data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::NAME, policy->Data<NameData>()));
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -39,7 +39,7 @@ void ExpressionPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEvent
 }
 
 void ExpressionPolicy::InitializeExpressionPolicyHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     // start of policy
     std::function<void (srcSAXEventContext& ctx)> expressionStart = [this](srcSAXEventContext& ctx) {
         if(!exprDepth) {
@@ -67,7 +67,7 @@ void ExpressionPolicy::InitializeExpressionPolicyHandlers() {
 
 
 void ExpressionPolicy::CollectNameHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
         if(!namePolicy) namePolicy = new NamePolicy{this};
         ctx.dispatcher->AddListenerDispatch(namePolicy);
@@ -75,7 +75,7 @@ void ExpressionPolicy::CollectNameHandlers() {
 }
 
 void ExpressionPolicy::CollectCallHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
         if(!callPolicy) callPolicy = new CallPolicy{this};
         ctx.dispatcher->AddListenerDispatch(callPolicy);
@@ -83,7 +83,7 @@ void ExpressionPolicy::CollectCallHandlers() {
 }
 
 void ExpressionPolicy::CollectOtherHandlers() {  //Get the operators
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
         std::shared_ptr<Token> token = std::make_shared<Token>(ctx.currentLineNumber, ctx.currentToken);
         if (ctx.currentTag == "operator") {

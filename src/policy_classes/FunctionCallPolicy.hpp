@@ -17,7 +17,7 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <stack>
@@ -28,7 +28,7 @@
  */
 #ifndef CALLPOLICY
 #define CALLPOLICY
-class FunctionCallPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class FunctionCallPolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener {
     /*
     {CalledFunction1{arg1, line#}, {arg2, line#}, ..., {argn, line#},
         NestedCalledFunction1{arg1, line#},{arg2, line#}, ..., {argn, line#}
@@ -44,11 +44,11 @@ class FunctionCallPolicy : public srcSAXEventDispatch::EventListener, public src
             std::vector<std::string> callargumentlist;
         };
         ~FunctionCallPolicy(){}
-        FunctionCallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        FunctionCallPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}): srcDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         std::any DataInner() const override {
             return std::make_shared<FunctionCallPolicy::FunctionCallData>(data);
@@ -58,7 +58,7 @@ class FunctionCallPolicy : public srcSAXEventDispatch::EventListener, public src
         std::string currentTypeName, currentCallName, currentModifier, currentSpecifier;
         std::string fullFuncIdentifier;
         void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
 
             openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 data.callargumentlist.push_back("(");

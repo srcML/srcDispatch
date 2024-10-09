@@ -7,7 +7,7 @@
 #define INCLUDED_PARAM_TYPE_POLICY_SINGLE_EVENT_HPP
 
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <TypePolicySingleEvent.hpp>
 #include <NamePolicySingleEvent.hpp>
@@ -31,9 +31,9 @@ struct ParamTypeData {
 
 
 class ParamTypePolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     ParamTypeData data;
@@ -42,8 +42,8 @@ private:
     NamePolicy* namePolicy;
 
 public:
-    ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
-        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+    ParamTypePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
+        : srcDispatch::PolicyDispatcher(listeners),
           data{},
           paramDepth(0),
           typePolicy(nullptr),
@@ -61,7 +61,7 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<ParamTypeData>(data); }
 
-    virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             data.type = policy->Data<TypeData>();
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -71,11 +71,11 @@ protected:
         }
     }
 
-    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
 private:
     void InitializeParamTypePolicyHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         // start of policy
         openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
             if (!paramDepth) {
@@ -98,7 +98,7 @@ private:
     }
 
     void CollectTypeHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
             if (paramDepth && (paramDepth + 2) == ctx.depth) {
                 if (!typePolicy) typePolicy = new TypePolicy{this};
@@ -108,7 +108,7 @@ private:
     }
 
     void CollectNameHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
             if (paramDepth && (paramDepth + 2) == ctx.depth) {
                 if (!namePolicy) namePolicy = new NamePolicy{this};

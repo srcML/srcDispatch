@@ -1,5 +1,5 @@
 /**
- * @file srcSAXEventDispatcher.cpp
+ * @file srcDispatch.cpp
  *
  * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
@@ -17,7 +17,7 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include <srcSAXEventDispatcher.hpp>
-namespace srcSAXEventDispatch{
+#include <srcDispatch.hpp>
+namespace srcDispatch{
         
 }

@@ -1,5 +1,5 @@
 /**
- * @file srcSAXEventDispatchUtilities.hpp
+ * @file srcDispatchUtilities.hpp
  *
  * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
@@ -35,7 +35,7 @@
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 
-namespace srcSAXEventDispatch{
+namespace srcDispatch{
     class EventDispatcher;            
     enum ElementState {open, close};
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt,
@@ -209,7 +209,7 @@ namespace srcSAXEventDispatch{
     };
 
     class EventListener {
-        typedef std::unordered_map<srcSAXEventDispatch::ParserState, std::function<void(srcSAXEventDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
+        typedef std::unordered_map<srcDispatch::ParserState, std::function<void(srcDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
         protected:
            bool dispatched;
            EventMap openEventMap, closeEventMap;
@@ -228,7 +228,7 @@ namespace srcSAXEventDispatch{
             virtual const EventMap & GetCloseEventMap() const { return closeEventMap; }
 
             virtual void HandleEvent() { dispatched = true; }
-            virtual void HandleEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate, srcSAXEventDispatch::srcSAXEventContext& ctx) {
+            virtual void HandleEvent(srcDispatch::ParserState pstate, srcDispatch::ElementState estate, srcDispatch::srcSAXEventContext& ctx) {
 
                 if(dispatched) return;
 
@@ -236,7 +236,7 @@ namespace srcSAXEventDispatch{
 
                 switch(estate){
 
-                    case srcSAXEventDispatch::ElementState::open: {
+                    case srcDispatch::ElementState::open: {
                         auto event = openEventMap.find(pstate);
                         if(event != openEventMap.end()){
                             event->second(ctx);
@@ -244,7 +244,7 @@ namespace srcSAXEventDispatch{
                         break;
                     }
 
-                    case srcSAXEventDispatch::ElementState::close: {
+                    case srcDispatch::ElementState::close: {
                         auto event = closeEventMap.find(pstate);
                         if(event != closeEventMap.end()){
                             event->second(ctx);
@@ -282,7 +282,7 @@ namespace srcSAXEventDispatch{
         private:
 
             void DefaultEventHandlers() {
-                using namespace srcSAXEventDispatch;
+                using namespace srcDispatch;
 
                 NopOpenEvents({
                     ParserState::declstmt,

@@ -17,7 +17,7 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <vector>
 #include <ParamTypePolicy.hpp>
@@ -67,19 +67,19 @@ struct SignatureData{
         nameOfContainingClass.clear();
     }
 };
-class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class FunctionSignaturePolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener{
     public:
         ~FunctionSignaturePolicy(){}
-        FunctionSignaturePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}) : srcSAXEventDispatch::PolicyDispatcher(listeners){
+        FunctionSignaturePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}) : srcDispatch::PolicyDispatcher(listeners){
             currentArgPosition = 1;
             parampolicy.AddListener(this);
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {
+        void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {
             paramdata = policy->Data<DeclData>();
             data.parameters.push_back(*paramdata);
         }
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         std::any DataInner() const override {
             return std::make_shared<SignatureData>(data);
@@ -93,7 +93,7 @@ class FunctionSignaturePolicy : public srcSAXEventDispatch::EventListener, publi
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
 
         void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
                 ctx.dispatcher->AddListener(&parampolicy);
                 data.lineNumber = ctx.currentLineNumber;

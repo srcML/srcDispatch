@@ -20,22 +20,22 @@
 #ifndef INCLUDED_DECL_TYPE_POLICY_HPP
 #define INCLUDED_DECL_TYPE_POLICY_HPP
 
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <DeclDS.hpp>
-class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class DeclTypePolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener {
     public:
         DeclData data;
         ~DeclTypePolicy(){}
-        DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        DeclTypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}): srcDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-        void Finalize(srcSAXEventDispatch::srcSAXEventContext& ctx){  
-            using namespace srcSAXEventDispatch;
+        void Finalize(srcDispatch::srcSAXEventContext& ctx){  
+            using namespace srcDispatch;
 
                 if( ctx.And({ParserState::declstmt}) || ctx.And({ParserState::forstmt, ParserState::control, ParserState::init}) || 
                     ctx.And({ParserState::switchstmt, ParserState::condition}) ){
@@ -106,7 +106,7 @@ class DeclTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         std::vector<std::string> paramNames;
 
         void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){ 
                 bool isDeclToken = ( ctx.And({ParserState::type, ParserState::declstmt}) &&
                                     ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist}) ||

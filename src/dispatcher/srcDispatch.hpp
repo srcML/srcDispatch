@@ -1,5 +1,5 @@
 /**
- * @file srcSAXEventDispatcher.hpp
+ * @file srcDispatch.hpp
  *
  * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef INCLUDED_SRCSAXEVENTDISPATCHER_HPP
-#define INCLUDED_SRCSAXEVENTDISPATCHER_HPP
+#ifndef INCLUDED_SRCDISPATCH_HPP
+#define INCLUDED_SRCDISPATCH_HPP
 
 #include <srcSAXHandler.hpp>
 #include <functional>
@@ -29,12 +29,12 @@
 #include <unordered_map>
 #include <vector>
 #include <algorithm>
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 #include <vector>
 #include <memory>
 #include <string.h>
 
-namespace srcSAXEventDispatch {
+namespace srcDispatch {
 
     template<typename... policies>
     static std::list<EventListener*> CreateListenersImpl(PolicyListener * policyListener, std::list<EventListener*> & listeners);
@@ -64,7 +64,7 @@ namespace srcSAXEventDispatch {
     }
 
     template<typename... policies>
-    class srcSAXEventDispatcher : public srcSAXHandler, public EventDispatcher {
+    class srcDispatch : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -138,14 +138,14 @@ namespace srcSAXEventDispatch {
         }
 
     public:
-        virtual ~srcSAXEventDispatcher() {
+        virtual ~srcDispatch() {
             for(std::size_t count = 0; count < numberAllocatedListeners; ++count) {
                 delete elementListeners.front();
                 elementListeners.pop_front();
             }
         }
 
-        srcSAXEventDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatch(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
@@ -159,7 +159,7 @@ namespace srcSAXEventDispatch {
             InitializeHandlers();
         }
 
-        srcSAXEventDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatch(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;

@@ -7,7 +7,7 @@
 #ifndef INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
 #define INCLUDED_FUNCTION_POLICY_SINGE_EVENT_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <NamePolicySingleEvent.hpp>
 #include <DeclTypePolicySingleEvent.hpp>
@@ -81,9 +81,9 @@ struct FunctionData {
 
 
 class FunctionPolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     FunctionData     data;
@@ -97,8 +97,8 @@ private:
     ExpressionPolicy *expressionPolicy;
 
 public:
-    FunctionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+    FunctionPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+        : srcDispatch::PolicyDispatcher(listeners),
           data{},
           functionDepth(0),
           typePolicy(nullptr),
@@ -122,9 +122,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<FunctionData>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             data.returnType = policy->Data<TypeData>();
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -151,7 +151,7 @@ protected:
 
 private:
     void InitializeFunctionPolicyHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         // start of policy
         std::function<void (srcSAXEventContext& ctx)> startFunction = [this](srcSAXEventContext& ctx) {
             if (!functionDepth) {
@@ -218,7 +218,7 @@ private:
     void CollectXMLAttributeHandlers() {}
 
     void CollectTypeHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
             if (functionDepth && (functionDepth + 1) == ctx.depth) {
                 if (!typePolicy) typePolicy = new TypePolicy{this};
@@ -228,7 +228,7 @@ private:
     }
 
     void CollectNameHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
             if (functionDepth && (functionDepth + 1) == ctx.depth) {
                 if (!namePolicy) namePolicy = new NamePolicy{this};
@@ -238,7 +238,7 @@ private:
     }
 
     void CollectParameterHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
             if (functionDepth && (functionDepth + 1) == ctx.depth) {
                 openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
@@ -258,7 +258,7 @@ private:
     }
 
     void CollectReturnHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx) {
             if (!returnPolicy) returnPolicy = new ReturnPolicy{this};
             ctx.dispatcher->AddListenerDispatch(returnPolicy);
@@ -266,7 +266,7 @@ private:
     }
 
     void CollectExpressionHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
             if (!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
             ctx.dispatcher->AddListenerDispatch(expressionPolicy);
@@ -274,7 +274,7 @@ private:
     }
 
     void CollectOtherHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
              if (functionDepth && (functionDepth + 1) == ctx.depth) {
                 if (ctx.And({ParserState::specifier})) {
@@ -304,7 +304,7 @@ private:
     /** @todo Will not work with local classes. */
     /** @todo May need to add optimization that ignores declaration statement initialization. */
     void CollectDeclstmtHandlers(){
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
             if (functionDepth && (functionDepth + 1) == ctx.depth) {
                 openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {

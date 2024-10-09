@@ -5,7 +5,7 @@
 #ifndef INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_CLASS_POLICY_SINGLE_EVENT_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <NamePolicySingleEvent.hpp>
 #include <DeclTypePolicySingleEvent.hpp>
@@ -51,9 +51,9 @@ struct ParentData {
 
 
 class ClassPolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
 	ClassData                  data;
@@ -66,8 +66,8 @@ private:
 	ClassPolicy    * classPolicy;
 
 public:
-	ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-		: srcSAXEventDispatch::PolicyDispatcher(listeners),
+	ClassPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+		: srcDispatch::PolicyDispatcher(listeners),
 		  data{},
 		  classDepth(0),
 		  currentRegion(ClassData::PUBLIC),
@@ -85,9 +85,9 @@ public:
 		if (classPolicy)    delete classPolicy;
 	}
 
-	void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+	void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-	void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+	void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
 		if (typeid(NamePolicy) == typeid(*policy)) {
 			data.name = policy->Data<NameData>();
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -120,9 +120,9 @@ protected:
 
 private:
 	void InitializeClassPolicyHandlers() {
-		using namespace srcSAXEventDispatch;
+		using namespace srcDispatch;
 		// start of policy
-		std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> startPolicy = [this](srcSAXEventContext& ctx) {
+		std::function<void(srcDispatch::srcSAXEventContext&)> startPolicy = [this](srcSAXEventContext& ctx) {
 			if (!classDepth) {
 				classDepth = ctx.depth;
 				data = ClassData{};
@@ -150,7 +150,7 @@ private:
 		};
 
 		// end of policy
-		std::function<void(srcSAXEventDispatch::srcSAXEventContext&)> endPolicy = [this](srcSAXEventContext& ctx) {
+		std::function<void(srcDispatch::srcSAXEventContext&)> endPolicy = [this](srcSAXEventContext& ctx) {
 			if (classDepth && classDepth == ctx.depth) {
 				classDepth = 0;
 				NotifyAll(ctx);
@@ -165,7 +165,7 @@ private:
 	}
 
 	void CollectNameHandlers() {
-		using namespace srcSAXEventDispatch;
+		using namespace srcDispatch;
 		openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
 				if (!namePolicy) namePolicy = new NamePolicy{this};
@@ -181,7 +181,7 @@ private:
 	}
 
 	void CollectGenericHandlers() {
-		using namespace srcSAXEventDispatch;
+		using namespace srcDispatch;
 		closeEventMap[ParserState::templates] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
 				data.isGeneric = true;
@@ -190,7 +190,7 @@ private:
 	}
 
 	void CollectSuperHanders() {
-		using namespace srcSAXEventDispatch;
+		using namespace srcDispatch;
 		openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
 				openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
@@ -222,7 +222,7 @@ private:
 	}
 
 	void CollectBlockHanders() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
 	    openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
 				NopOpenEvents({ParserState::name, ParserState::super_list, ParserState::super});

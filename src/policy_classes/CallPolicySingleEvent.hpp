@@ -5,7 +5,7 @@
 #ifndef INCLUDED_CALL_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_CALL_POLICY_SINGLE_EVENT_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <NamePolicySingleEvent.hpp>
 #include <TemplateArgumentPolicySingleEvent.hpp>
@@ -39,9 +39,9 @@ struct CallData {
 };
 
 class CallPolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     CallData            data;
@@ -50,8 +50,8 @@ private:
     ExpressionPolicy    *expressionPolicy;
 
 public:
-    CallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-    : srcSAXEventDispatch::PolicyDispatcher(listeners),
+    CallPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    : srcDispatch::PolicyDispatcher(listeners),
           data{},
           callDepth(0),
           expressionPolicy(nullptr),
@@ -63,8 +63,8 @@ public:
 
 protected:
     std::any DataInner() const override;
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
-    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
+    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
 private:
     void InitializeCallPolicyHandlers();

@@ -1,7 +1,7 @@
 /**
  * @file NamePolicySingleEvent.cpp
  *
- * MODIFIED from srcSAXEventDispatcher
+ * MODIFIED from srcDispatch
  *  This collects the expression in the index
  *
   */
@@ -53,7 +53,7 @@ NamePolicy::~NamePolicy() {
 }
 
 
-void NamePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx)  {
+void NamePolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx)  {
     if (typeid(NamePolicy) == typeid(*policy)) {
         data.names.push_back(policy->Data<NameData>());
         ctx.dispatcher->RemoveListener(nullptr);
@@ -69,7 +69,7 @@ void NamePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispat
 
 
 void NamePolicy::InitializeNamePolicyHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     // start of policy
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
         if (!nameDepth) {
@@ -101,7 +101,7 @@ void NamePolicy::InitializeNamePolicyHandlers() {
 
 
 void NamePolicy::CollectTemplateArgumentsHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext& ctx) {
         if (nameDepth && (nameDepth + 1) == ctx.depth) {
             openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
@@ -121,7 +121,7 @@ void NamePolicy::CollectTemplateArgumentsHandlers() {
 
 
 void NamePolicy::CollectArrayIndicesHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
             if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};

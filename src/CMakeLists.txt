@@ -28,8 +28,8 @@ file(GLOB POLICY_CLASSES_HEADER policy_classes/*.hpp)
 # find needed libraries
 find_package(LibXml2 REQUIRED)
 
-add_library(srcsaxeventdispatch ${DISPATCHER_SOURCE} ${DISPATCHER_HEADER} ${POLICY_CLASSES_SOURCE} ${POLICY_CLASSES_HEADER})
-target_link_libraries(srcsaxeventdispatch PRIVATE LibXml2::LibXml2)
+add_library(srcdispatch ${DISPATCHER_SOURCE} ${DISPATCHER_HEADER} ${POLICY_CLASSES_SOURCE} ${POLICY_CLASSES_HEADER})
+target_link_libraries(srcdispatch PRIVATE LibXml2::LibXml2)
 
-install(TARGETS srcsaxeventdispatch)
+install(TARGETS srcdispatch)
 install(FILES ${DISPATCHER_HEADER} ${POLICY_CLASSES_HEADER} DESTINATION include/dispatch)

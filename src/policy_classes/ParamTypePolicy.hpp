@@ -20,19 +20,19 @@
 #ifndef INCLUDED_PARAM_TYPE_POLICY_HPP
 #define INCLUDED_PARAM_TYPE_POLICY_HPP
 
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <DeclDS.hpp>
-class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener{
+class ParamTypePolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener{
     public:
-        ParamTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        ParamTypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}): srcDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
         ~ParamTypePolicy(){}
         
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         std::any DataInner() const override {
             return std::make_shared<DeclData>(data);
@@ -42,7 +42,7 @@ class ParamTypePolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
 
         void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 if(ctx.And({ParserState::type, ParserState::parameter}) && ctx.Nor({ParserState::specifier, ParserState::modifier, ParserState::genericargumentlist})){
                     data.namespaces.push_back(ctx.currentToken);

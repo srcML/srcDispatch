@@ -17,14 +17,14 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <set>
 #include <vector>
 #ifndef EXPRPOLICY
 #define EXPRPOLICY
-class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class ExprPolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener {
     public:
         struct ExprData{
             ExprData() {lhs = false;}
@@ -50,11 +50,11 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
            std::map<std::string, ExprData> dataSet;
         };
         ~ExprPolicy(){}
-        ExprPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        ExprPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}): srcDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         std::any DataInner() const override {
             return std::make_shared<ExprDataSet>(exprDataSet);
@@ -67,7 +67,7 @@ class ExprPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEvent
         std::vector<unsigned int> currentLine;
         
         void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
             
             closeEventMap[ParserState::op] = [this](srcSAXEventContext& ctx){
                 // Long or-statement allows various declaration operators to get planted into

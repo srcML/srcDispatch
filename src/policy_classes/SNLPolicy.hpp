@@ -17,13 +17,13 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
 
 #ifndef SOURCENLPOLICY
 #define SOURCENLPOLICY
-class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class SourceNLPolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener {
     public:
         struct SourceNLData{
             SourceNLData(){}
@@ -36,11 +36,11 @@ class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
         };
         SourceNLData data;
         ~SourceNLPolicy(){}
-        SourceNLPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        SourceNLPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}): srcDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         void * DataInner() const override {
             return new SourceNLData(data);
@@ -48,7 +48,7 @@ class SourceNLPolicy : public srcSAXEventDispatch::EventListener, public srcSAXE
     private:
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
             closeEventMap[ParserState::snoun] = [this](srcSAXEventContext& ctx){
                 //std::cerr<<ctx.currentTag<<" "<<data.identifiername<<std::endl;
                 data.category = "snoun";

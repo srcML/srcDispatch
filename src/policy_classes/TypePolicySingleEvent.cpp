@@ -44,8 +44,8 @@ std::ostream & operator<<(std::ostream & out, const TypeData & typeData) {
     return out;
 }
 
-TypePolicy::TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-    : srcSAXEventDispatch::PolicyDispatcher(listeners),
+TypePolicy::TypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    : srcDispatch::PolicyDispatcher(listeners),
       data{},
       typeDepth(0),
       namePolicy(nullptr) {
@@ -57,20 +57,20 @@ TypePolicy::~TypePolicy(){
     if (namePolicy) delete namePolicy;
 }
 
-void TypePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+void TypePolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
     //this causes undefined behavior if types is empty
     data.types.back().first = policy->Data<NameData>();
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 }
 
-void TypePolicy::NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]){}
+void TypePolicy::NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]){}
 
 std::any TypePolicy::DataInner() const {
     return std::make_shared<TypeData>(data);
 }
 
 void TypePolicy::InitializeTypePolicyHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     // start of policy
     openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
         if (!typeDepth) {
@@ -94,7 +94,7 @@ void TypePolicy::InitializeTypePolicyHandlers() {
 }
 
 void TypePolicy::CollectNamesHandler() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
         if (typeDepth && (typeDepth + 1) == ctx.depth) {
             data.types.push_back(std::make_pair(std::shared_ptr<NameData>(), TypeData::TYPENAME));
@@ -105,7 +105,7 @@ void TypePolicy::CollectNamesHandler() {
 }
 
 void TypePolicy::CollectModifersHandler() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
         if (typeDepth && (typeDepth + 1) == ctx.depth) {
             data.types.push_back(std::make_pair(nullptr, TypeData::NONE));
@@ -128,7 +128,7 @@ void TypePolicy::CollectModifersHandler() {
 }
 
 void TypePolicy::CollectSpecifiersHandler() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
         if (typeDepth && (typeDepth + 1) == ctx.depth) {
             data.types.push_back(std::make_pair(std::make_shared<std::string>(""), TypeData::SPECIFIER));

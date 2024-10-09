@@ -22,7 +22,7 @@
 # add this directory
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
-include(srcsax_event_dispatch_build)
+include(srcdispatch_build)
 if(CMAKE_PROJECT_NAME STREQUAL "srcSAXEventDispatch")
-    include(srcsax_event_dispatch_install)
+    include(srcdispatch_install)
 endif()

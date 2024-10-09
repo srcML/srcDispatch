@@ -5,7 +5,7 @@
 #ifndef INCLUDED_TYPE1_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_TYPE1_POLICY_SINGLE_EVENT_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <NamePolicySingleEvent.hpp>
 
@@ -25,9 +25,9 @@ struct TypeData {
 
 
 class TypePolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     TypeData data;
@@ -35,10 +35,10 @@ private:
     NamePolicy * namePolicy;
 
 public:
-    TypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners);
+    TypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
     ~TypePolicy();
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
-    virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override;
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
+    virtual void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override;
 
 protected:
     virtual std::any DataInner() const override;

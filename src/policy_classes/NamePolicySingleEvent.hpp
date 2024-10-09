@@ -1,14 +1,14 @@
 /**
  * @file NamePolicySingleEvent.hpp
  *
- * MODIFIED from srcSAXEventDispatcher
+ * MODIFIED from srcDispatch
  *  This collects the expression in the index
  *
   */
 #ifndef INCLUDED_NAME_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_NAME_POLICY_SINGLE_EVENT_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <TemplateArgumentPolicySingleEvent.hpp>
 #include <ExpressionPolicySingleEvent.hpp>
@@ -39,9 +39,9 @@ struct NameData {
  
 
 class NamePolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     NameData               data;
@@ -51,8 +51,8 @@ private:
     ExpressionPolicy       *expressionPolicy;
 
 public:
-    NamePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+    NamePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+        : srcDispatch::PolicyDispatcher(listeners),
           data{},
           nameDepth(0),
           namePolicy(nullptr),
@@ -66,8 +66,8 @@ public:
 protected:
 
     std::any DataInner() const override { return std::make_shared<NameData>(data); }
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
+    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
 private:
     void InitializeNamePolicyHandlers();

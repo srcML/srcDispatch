@@ -23,8 +23,8 @@ CallPolicy::~CallPolicy() {
 
 std::any CallPolicy::DataInner() const { return std::make_shared<CallData>(data); }
 
-void CallPolicy::Notify(const srcSAXEventDispatch::PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
-    using namespace srcSAXEventDispatch;
+void CallPolicy::Notify(const srcDispatch::PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
+    using namespace srcDispatch;
     if (typeid(NamePolicy) == typeid(*policy)) {
         data.name = policy->Data<NameData>();
         ctx.dispatcher->RemoveListener(nullptr);
@@ -36,7 +36,7 @@ void CallPolicy::Notify(const srcSAXEventDispatch::PolicyDispatcher * policy, co
 }
 
 void CallPolicy::InitializeCallPolicyHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     // start of policy
     openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
         if (!callDepth) {
@@ -60,7 +60,7 @@ void CallPolicy::InitializeCallPolicyHandlers() {
 
 
 void CallPolicy::CollectNameHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
         if(!namePolicy) namePolicy = new NamePolicy{this};
         ctx.dispatcher->AddListenerDispatch(namePolicy);
@@ -69,7 +69,7 @@ void CallPolicy::CollectNameHandlers() {
 
 
 void CallPolicy::CollectCallArgumentHandlers() {
-    using namespace srcSAXEventDispatch;
+    using namespace srcDispatch;
     openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
         if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
         ctx.dispatcher->AddListenerDispatch(expressionPolicy);

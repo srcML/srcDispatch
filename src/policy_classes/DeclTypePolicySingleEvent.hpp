@@ -2,14 +2,14 @@
  * @file DeclTypePolicySingleEvent.hpp
  *
  *
- * MODIFIED from srcSAXEventDispatcher
+ * MODIFIED from srcDispatch
  *  This collects the initializer
  *
  */
 #ifndef INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
 #define INCLUDED_DECL_TYPE_POLICY_SINGLE_EVENT_HPP
 
-#include <srcSAXEventDispatchUtilities.hpp>
+#include <srcDispatchUtilities.hpp>
 
 #include <TypePolicySingleEvent.hpp>
 #include <NamePolicySingleEvent.hpp>
@@ -47,9 +47,9 @@ struct DeclTypeData {
 
 
 class DeclTypePolicy :
-public srcSAXEventDispatch::EventListener,
-public srcSAXEventDispatch::PolicyDispatcher,
-public srcSAXEventDispatch::PolicyListener {
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
 
 private:
     std::vector<std::shared_ptr<DeclTypeData>> data;
@@ -63,8 +63,8 @@ private:
     std::shared_ptr<ExpressionData>            initializer;
 
 public:
-    DeclTypePolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+    DeclTypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+        : srcDispatch::PolicyDispatcher(listeners),
           data{},
           declDepth(0),
           typePolicy(nullptr),
@@ -84,9 +84,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<std::vector<std::shared_ptr<DeclTypeData>>>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             type = std::shared_ptr<TypeData>(policy->Data<TypeData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
@@ -102,7 +102,7 @@ protected:
 
 private:
     void InitializeDeclTypePolicyHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         // start of policy
         openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
             if (!declDepth) {
@@ -138,7 +138,7 @@ private:
     }
 
     void CollectTypeHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
             if (declDepth && (declDepth + 2) == ctx.depth) {
                 if (!typePolicy) typePolicy = new TypePolicy{this};
@@ -148,7 +148,7 @@ private:
     }
 
     void CollectNameHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
             if (declDepth && (declDepth + 2) == ctx.depth) {
                 if (!namePolicy) namePolicy = new NamePolicy{this};
@@ -158,7 +158,7 @@ private:
     }
 
     void CollectSpecifiersHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
             if (declDepth && (declDepth + 2) == ctx.depth) {
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -175,7 +175,7 @@ private:
     }
 
     void CollectInitHandlers() {
-        using namespace srcSAXEventDispatch;
+        using namespace srcDispatch;
         openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
             openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
                 if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};

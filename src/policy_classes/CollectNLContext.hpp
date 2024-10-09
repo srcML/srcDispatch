@@ -17,7 +17,7 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <srcSAXHandler.hpp>
 #include <exception>
 #include <SNLPolicy.hpp>
@@ -27,7 +27,7 @@
 
 #ifndef NLCONTEXTPOLICY
 #define NLCONTEXTPOLICY
-class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class NLContextPolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener {
     public:
         struct NLSet{
             NLSet(std::string idname, std::string acategory, std::string acontext, std::string astereo){
@@ -54,15 +54,15 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         std::map<std::string, std::string> identifierposmap;
         NLContextData data;
         ~NLContextPolicy(){}
-        NLContextPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        NLContextPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}): srcDispatch::PolicyDispatcher(listeners){
             sourcenlpolicy.AddListener(this);
             exprpolicy.AddListener(this);
             stereotypepolicy.AddListener(this);
             InitializeEventHandlers();
         }
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-            using namespace srcSAXEventDispatch;
+        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
+            using namespace srcDispatch;
             if(ctx.IsOpen(ParserState::declstmt) && ctx.IsClosed(ParserState::exprstmt)){
                 sourcenlpdata = *policy->Data<SourceNLPolicy::SourceNLData>();
                 std::string top;
@@ -125,7 +125,7 @@ class NLContextPolicy : public srcSAXEventDispatch::EventListener, public srcSAX
         std::string currentTypeName, currentDeclName, currentModifier, currentSpecifier;
         std::stack<std::string> context;
         void InitializeEventHandlers(){
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
             openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
                 ctx.dispatcher->AddListenerDispatch(&sourcenlpolicy);
             };

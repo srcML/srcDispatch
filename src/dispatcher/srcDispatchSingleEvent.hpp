@@ -1,5 +1,5 @@
 /**
- * @file srcSAXSingleEventDispatcher.hpp
+ * @file srcDispatchSingleEvent.hpp
  *
  * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
@@ -17,21 +17,21 @@
  * along with the srcML Toolkit; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef INCLUDED_SRCSAX_SINGLE_EVENT_DISPATCHER_HPP
-#define INCLUDED_SRCSAX_SINGLE_EVENT_DISPATCHER_HPP
+#ifndef INCLUDED_SRC_DISPATCH_SINGLE_EVENT_HPP
+#define INCLUDED_SRC_DISPATCH_SINGLE_EVENT_HPP
 
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 
-namespace srcSAXEventDispatch {
+namespace srcDispatch {
     template <typename ...policies>
-    class srcSAXSingleEventDispatcher : public srcSAXEventDispatcher<policies...> {
+    class srcDispatchSingleEvent : public srcDispatch<policies...> {
 
     private:
         bool dispatched;
 
     public:
 
-       srcSAXSingleEventDispatcher(PolicyListener * listener) : srcSAXEventDispatcher<policies...>(listener), dispatched(false) {}
+       srcDispatchSingleEvent(PolicyListener * listener) : srcDispatch<policies...>(listener), dispatched(false) {}
         virtual void AddListener(EventListener * listener) override {
             EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.push_back(listener);
@@ -55,7 +55,7 @@ namespace srcSAXEventDispatch {
             RemoveListener(listener);
         }
     protected:
-        virtual void DispatchEvent(srcSAXEventDispatch::ParserState pstate, srcSAXEventDispatch::ElementState estate) override {
+        virtual void DispatchEvent(srcDispatch::ParserState pstate, srcDispatch::ElementState estate) override {
 
             while(!dispatched) {
 

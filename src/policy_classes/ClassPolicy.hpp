@@ -21,7 +21,7 @@
 #ifndef INCLUDED_CLASS_POLICY_HPP
 #define INCLUDED_CLASS_POLICY_HPP
 
-#include <srcSAXEventDispatcher.hpp>
+#include <srcDispatch.hpp>
 #include <DeclTypePolicy.hpp>
 #include <DeclDS.hpp>
 #include <FunctionSignaturePolicy.hpp>
@@ -30,7 +30,7 @@
 #include <stack>
 #include <list>
 
-class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEventDispatch::PolicyDispatcher, public srcSAXEventDispatch::PolicyListener {
+class ClassPolicy : public srcDispatch::EventListener, public srcDispatch::PolicyDispatcher, public srcDispatch::PolicyListener {
     public:
 
     	struct ClassData {
@@ -52,22 +52,22 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
             delete declTypePolicy;
         }
 
-        ClassPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners) {
+        ClassPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners = {}): srcDispatch::PolicyDispatcher(listeners) {
             funcSigPolicy = new FunctionSignaturePolicy({this});
             declTypePolicy = new DeclTypePolicy({this});
 
             InitializeEventHandlers();
         }
 
-        void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
-        void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+        void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
             if (typeid(FunctionSignaturePolicy) == typeid(*policy)) {
                 SignatureData signatureData = *policy->Data<SignatureData>();
                 data_stack.top().methods.push_back(signatureData);
             }
 
             else if (typeid(DeclTypePolicy) == typeid(*policy)) {
-                if(!(ctx.IsOpen(srcSAXEventDispatch::ParserState::function))) {
+                if(!(ctx.IsOpen(srcDispatch::ParserState::function))) {
                     DeclData declarationData = *policy->Data<DeclData>();
                     data_stack.top().members.push_back(declarationData);
                 }
@@ -92,7 +92,7 @@ class ClassPolicy : public srcSAXEventDispatch::EventListener, public srcSAXEven
         bool gotClassName = true;
 
         void InitializeEventHandlers() {
-            using namespace srcSAXEventDispatch;
+            using namespace srcDispatch;
 
             //Classes
             openEventMap[ParserState::classn] = [this](srcSAXEventContext &ctx) {
