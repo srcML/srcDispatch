@@ -12,7 +12,6 @@ std::ostream & operator<<(std::ostream & out, const Token & token) {
 
 std::ostream & operator<<(std::ostream & out, const ExpressionData & ex) {
     for (std::shared_ptr<ExpressionElement> item : ex.expr) {
-        //out << "   Type " << item->type << " ";
         switch (item->type) {
             case ExpressionElement::NAME:    out << *item->name;  break;
             case ExpressionElement::OP:      out << *item->token; break;
@@ -32,7 +31,6 @@ ExpressionPolicy::~ExpressionPolicy() {
 void ExpressionPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
     if(typeid(NamePolicy) == typeid(*policy)) {
         data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::NAME, policy->Data<NameData>()));
-           //std::cerr << "Return Name found: " << *(data.expr.back())->name << std::endl;
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
     } else if(typeid(CallPolicy) == typeid(*policy)) {
         data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::CALL, policy->Data<CallData>()));
