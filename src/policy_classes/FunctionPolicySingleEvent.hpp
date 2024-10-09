@@ -29,6 +29,7 @@ struct FunctionData {
     std::string                   language;
     std::string                   filename;
     FunctionType                  type;
+    bool                          isDecl;
     std::shared_ptr<TypeData>                    returnType;
     std::shared_ptr<NameData>                    name;
     std::vector<std::shared_ptr<ParamTypeData>>  parameters;
@@ -85,173 +86,177 @@ public srcSAXEventDispatch::PolicyDispatcher,
 public srcSAXEventDispatch::PolicyListener {
 
 private:
-	FunctionData     data;
-	std::size_t      functionDepth;
+    FunctionData     data;
+    std::size_t      functionDepth;
     
-	TypePolicy       *typePolicy;
-	NamePolicy       *namePolicy;
-	ParamTypePolicy  *paramPolicy;
-	DeclTypePolicy   *declstmtPolicy;
+    TypePolicy       *typePolicy;
+    NamePolicy       *namePolicy;
+    ParamTypePolicy  *paramPolicy;
+    DeclTypePolicy   *declstmtPolicy;
     ReturnPolicy     *returnPolicy;
     ExpressionPolicy *expressionPolicy;
 
 public:
-	FunctionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
-		: srcSAXEventDispatch::PolicyDispatcher(listeners),
-		  data{},
-		  functionDepth(0),
-		  typePolicy(nullptr),
-		  namePolicy(nullptr),
-		  paramPolicy(nullptr),
-		  declstmtPolicy(nullptr),
+    FunctionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+        : srcSAXEventDispatch::PolicyDispatcher(listeners),
+          data{},
+          functionDepth(0),
+          typePolicy(nullptr),
+          namePolicy(nullptr),
+          paramPolicy(nullptr),
+          declstmtPolicy(nullptr),
           expressionPolicy(nullptr),
           returnPolicy(nullptr) {
-		InitializeFunctionPolicyHandlers();
-	}
+        InitializeFunctionPolicyHandlers();
+    }
 
-	~FunctionPolicy() {
-		if (typePolicy)       delete typePolicy;
-		if (namePolicy)       delete namePolicy;
-		if (paramPolicy)      delete paramPolicy;
-		if (declstmtPolicy)   delete declstmtPolicy;
+    ~FunctionPolicy() {
+        if (typePolicy)       delete typePolicy;
+        if (namePolicy)       delete namePolicy;
+        if (paramPolicy)      delete paramPolicy;
+        if (declstmtPolicy)   delete declstmtPolicy;
         if (returnPolicy)     delete returnPolicy;
         if (expressionPolicy) delete expressionPolicy;
-	}
+    }
 
 protected:
-	std::any DataInner() const override { return std::make_shared<FunctionData>(data); }
+    std::any DataInner() const override { return std::make_shared<FunctionData>(data); }
 
-	void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-	virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
-		if (typeid(TypePolicy) == typeid(*policy)) {
-			data.returnType = policy->Data<TypeData>();
-			ctx.dispatcher->RemoveListenerDispatch(nullptr);
-		} else if (typeid(NamePolicy) == typeid(*policy)) {
-			data.name = policy->Data<NameData>(); 
-			ctx.dispatcher->RemoveListenerDispatch(nullptr);
-		} else if (typeid(ParamTypePolicy) == typeid(*policy)) {
-			data.parameters.push_back(policy->Data<ParamTypeData>()); 
-			ctx.dispatcher->RemoveListenerDispatch(nullptr);
-		} else if (typeid(DeclTypePolicy) == typeid(*policy)) {
-			std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
-			for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
-				data.locals.push_back(decl);
-			}
-			decl_data->clear();
-			ctx.dispatcher->RemoveListenerDispatch(nullptr);
-		} else if (typeid(ReturnPolicy) == typeid(*policy)) {
+    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+        if (typeid(TypePolicy) == typeid(*policy)) {
+            data.returnType = policy->Data<TypeData>();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else if (typeid(NamePolicy) == typeid(*policy)) {
+            data.name = policy->Data<NameData>(); 
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else if (typeid(ParamTypePolicy) == typeid(*policy)) {
+            data.parameters.push_back(policy->Data<ParamTypeData>()); 
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else if (typeid(DeclTypePolicy) == typeid(*policy)) {
+            std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
+            for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
+                data.locals.push_back(decl);
+            }
+            decl_data->clear();
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else if (typeid(ReturnPolicy) == typeid(*policy)) {
             data.returnExpressions.push_back(policy->Data<ExpressionData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
             data.expressions.push_back(policy->Data<ExpressionData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
         }
-	}
+    }
 
 private:
-	void InitializeFunctionPolicyHandlers() {
-		using namespace srcSAXEventDispatch;
-		// start of policy
-		std::function<void (srcSAXEventContext& ctx)> startFunction = [this](srcSAXEventContext& ctx) {
-			if (!functionDepth) {
-				functionDepth = ctx.depth;
-				data = FunctionData{};
-				data.lineNumber = ctx.currentLineNumber;
+    void InitializeFunctionPolicyHandlers() {
+        using namespace srcSAXEventDispatch;
+        // start of policy
+        std::function<void (srcSAXEventContext& ctx)> startFunction = [this](srcSAXEventContext& ctx) {
+            if (!functionDepth) {
+                functionDepth = ctx.depth;
+                data = FunctionData{};
+                data.lineNumber = ctx.currentLineNumber;
                 data.language = ctx.currentFileLanguage;
                 data.filename = ctx.currentFilePath;
-				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
-				if (stereotype_attr_itr != ctx.attributes.end()){
-					std::istringstream stereostring(stereotype_attr_itr->second);
-					data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
-				}
-				if (ctx.currentTag == "function" || ctx.currentTag == "function_decl") {
-					if (ctx.isOperator)
-						data.type = FunctionData::OPERATOR;
-					else
-						data.type = FunctionData::FUNCTION;
-				} else if (ctx.currentTag == "constructor" || ctx.currentTag == "constructor_decl") {
-					data.type = FunctionData::CONSTRUCTOR;
-				} else if (ctx.currentTag == "destructor" || ctx.currentTag == "destructor_decl") {
-					data.type = FunctionData::DESTRUCTOR;
-				}
+                std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
+                if (stereotype_attr_itr != ctx.attributes.end()){
+                    std::istringstream stereostring(stereotype_attr_itr->second);
+                    data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
+                }
+                if (ctx.currentTag == "function" || ctx.currentTag == "function_decl") {
+                    if (ctx.isOperator)
+                        data.type = FunctionData::OPERATOR;
+                    else
+                        data.type = FunctionData::FUNCTION;
+                } else if (ctx.currentTag == "constructor" || ctx.currentTag == "constructor_decl") {
+                    data.type = FunctionData::CONSTRUCTOR;
+                } else if (ctx.currentTag == "destructor" || ctx.currentTag == "destructor_decl") {
+                    data.type = FunctionData::DESTRUCTOR;
+                }
 
-				CollectXMLAttributeHandlers();
-				CollectTypeHandlers();
-				CollectNameHandlers();
-				CollectParameterHandlers();
-				CollectOtherHandlers();
-				CollectDeclstmtHandlers();
+                data.isDecl = ctx.currentTag == "function_decl" 
+                           || ctx.currentTag == "constructor_decl"
+                           || ctx.currentTag == "destructor_decl";
+
+                CollectXMLAttributeHandlers();
+                CollectTypeHandlers();
+                CollectNameHandlers();
+                CollectParameterHandlers();
+                CollectOtherHandlers();
+                CollectDeclstmtHandlers();
                 CollectReturnHandlers();
                 CollectExpressionHandlers();
-			}
-		};
+            }
+        };
 
-		// end of policy
-		std::function<void (srcSAXEventContext& ctx)> endFunction = [this](srcSAXEventContext& ctx) {
-			if (functionDepth && functionDepth == ctx.depth) {
-				functionDepth = 0;
-				NotifyAll(ctx);
-				InitializeFunctionPolicyHandlers();
-			}
-		};
+        // end of policy
+        std::function<void (srcSAXEventContext& ctx)> endFunction = [this](srcSAXEventContext& ctx) {
+            if (functionDepth && functionDepth == ctx.depth) {
+                functionDepth = 0;
+                NotifyAll(ctx);
+                InitializeFunctionPolicyHandlers();
+            }
+        };
 
-		openEventMap[ParserState::function]        = startFunction;
-		openEventMap[ParserState::functiondecl]    = startFunction;
-		openEventMap[ParserState::constructor]     = startFunction;
-		openEventMap[ParserState::constructordecl] = startFunction;
-		openEventMap[ParserState::destructor]      = startFunction;
-		openEventMap[ParserState::destructordecl]  = startFunction;
+        openEventMap[ParserState::function]        = startFunction;
+        openEventMap[ParserState::functiondecl]    = startFunction;
+        openEventMap[ParserState::constructor]     = startFunction;
+        openEventMap[ParserState::constructordecl] = startFunction;
+        openEventMap[ParserState::destructor]      = startFunction;
+        openEventMap[ParserState::destructordecl]  = startFunction;
 
-		closeEventMap[ParserState::function]        = endFunction;
-		closeEventMap[ParserState::functiondecl]    = endFunction;
-		closeEventMap[ParserState::constructor]     = endFunction;
-		closeEventMap[ParserState::constructordecl] = endFunction;
-		closeEventMap[ParserState::destructor]      = endFunction;
-		closeEventMap[ParserState::destructordecl]  = endFunction;
-	}
+        closeEventMap[ParserState::function]        = endFunction;
+        closeEventMap[ParserState::functiondecl]    = endFunction;
+        closeEventMap[ParserState::constructor]     = endFunction;
+        closeEventMap[ParserState::constructordecl] = endFunction;
+        closeEventMap[ParserState::destructor]      = endFunction;
+        closeEventMap[ParserState::destructordecl]  = endFunction;
+    }
 
-	void CollectXMLAttributeHandlers() {}
+    void CollectXMLAttributeHandlers() {}
 
-	void CollectTypeHandlers() {
-		using namespace srcSAXEventDispatch;
-		openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
-			if (functionDepth && (functionDepth + 1) == ctx.depth) {
-				if (!typePolicy) typePolicy = new TypePolicy{this};
-				ctx.dispatcher->AddListenerDispatch(typePolicy);
-			}
-		};
-	}
+    void CollectTypeHandlers() {
+        using namespace srcSAXEventDispatch;
+        openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
+            if (functionDepth && (functionDepth + 1) == ctx.depth) {
+                if (!typePolicy) typePolicy = new TypePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(typePolicy);
+            }
+        };
+    }
 
-	void CollectNameHandlers() {
-		using namespace srcSAXEventDispatch;
-		openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-			if (functionDepth && (functionDepth + 1) == ctx.depth) {
-				if (!namePolicy) namePolicy = new NamePolicy{this};
-				ctx.dispatcher->AddListenerDispatch(namePolicy);
-			}
-		};
-	}
+    void CollectNameHandlers() {
+        using namespace srcSAXEventDispatch;
+        openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
+            if (functionDepth && (functionDepth + 1) == ctx.depth) {
+                if (!namePolicy) namePolicy = new NamePolicy{this};
+                ctx.dispatcher->AddListenerDispatch(namePolicy);
+            }
+        };
+    }
 
-	void CollectParameterHandlers() {
-		using namespace srcSAXEventDispatch;
-		openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-			if (functionDepth && (functionDepth + 1) == ctx.depth) {
-				openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
-					if (functionDepth && (functionDepth + 2) == ctx.depth) {
-						if (!paramPolicy) paramPolicy = new ParamTypePolicy{this};
-						ctx.dispatcher->AddListenerDispatch(paramPolicy);
-					}
-				};
-			}
-		};
+    void CollectParameterHandlers() {
+        using namespace srcSAXEventDispatch;
+        openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+            if (functionDepth && (functionDepth + 1) == ctx.depth) {
+                openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
+                    if (functionDepth && (functionDepth + 2) == ctx.depth) {
+                        if (!paramPolicy) paramPolicy = new ParamTypePolicy{this};
+                        ctx.dispatcher->AddListenerDispatch(paramPolicy);
+                    }
+                };
+            }
+        };
 
-		closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
-			if (functionDepth && (functionDepth + 1) == ctx.depth) {
-				NopOpenEvents({ParserState::parameter});
-			}
-		};
-	}
+        closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+            if (functionDepth && (functionDepth + 1) == ctx.depth) {
+                NopOpenEvents({ParserState::parameter});
+            }
+        };
+    }
 
     void CollectReturnHandlers() {
         using namespace srcSAXEventDispatch;
@@ -269,53 +274,53 @@ private:
         };
     }
 
-	void CollectOtherHandlers() {
-		using namespace srcSAXEventDispatch;
-		closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-			 if (functionDepth && (functionDepth + 1) == ctx.depth) {
-				if (ctx.And({ParserState::specifier})) {
-					if (ctx.currentToken == "virtual")
-						data.isVirtual = true;
-					else if (ctx.currentToken == "static")
-						data.isStatic = true;
-					else if (ctx.currentToken == "const")
-						data.isConst = true;
-					else if (ctx.currentToken == "final")
-						data.isFinal = true;
-					else if (ctx.currentToken == "override")
-						data.isOverride = true;
-					else if (ctx.currentToken == "delete")
-						data.isDelete = true;
-					else if (ctx.currentToken == "inline")
-						data.isInline = true;
-					else if (ctx.currentToken == "constexpr")
-						data.isConstExpr = true;
-				} else if (ctx.And({ParserState::literal})) {
-					data.isPureVirtual = true;
-				}
-			 }
-		};
-	}
+    void CollectOtherHandlers() {
+        using namespace srcSAXEventDispatch;
+        closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+             if (functionDepth && (functionDepth + 1) == ctx.depth) {
+                if (ctx.And({ParserState::specifier})) {
+                    if (ctx.currentToken == "virtual")
+                        data.isVirtual = true;
+                    else if (ctx.currentToken == "static")
+                        data.isStatic = true;
+                    else if (ctx.currentToken == "const")
+                        data.isConst = true;
+                    else if (ctx.currentToken == "final")
+                        data.isFinal = true;
+                    else if (ctx.currentToken == "override")
+                        data.isOverride = true;
+                    else if (ctx.currentToken == "delete")
+                        data.isDelete = true;
+                    else if (ctx.currentToken == "inline")
+                        data.isInline = true;
+                    else if (ctx.currentToken == "constexpr")
+                        data.isConstExpr = true;
+                } else if (ctx.And({ParserState::literal})) {
+                    data.isPureVirtual = true;
+                }
+             }
+        };
+    }
 
-	/** @todo Will not work with local classes. */
-	/** @todo May need to add optimization that ignores declaration statement initialization. */
-	void CollectDeclstmtHandlers(){
-		using namespace srcSAXEventDispatch;
-		openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-			if (functionDepth && (functionDepth + 1) == ctx.depth) {
-				openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-					if (!declstmtPolicy) declstmtPolicy = new DeclTypePolicy{this};
-					ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
-				};
-			}
-		};
-		
-		closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-			if (functionDepth && (functionDepth + 1) == ctx.depth) {
-				NopOpenEvents({ParserState::declstmt});
-			}
-		};
-	}
+    /** @todo Will not work with local classes. */
+    /** @todo May need to add optimization that ignores declaration statement initialization. */
+    void CollectDeclstmtHandlers(){
+        using namespace srcSAXEventDispatch;
+        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+            if (functionDepth && (functionDepth + 1) == ctx.depth) {
+                openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+                    if (!declstmtPolicy) declstmtPolicy = new DeclTypePolicy{this};
+                    ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
+                };
+            }
+        };
+        
+        closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+            if (functionDepth && (functionDepth + 1) == ctx.depth) {
+                NopOpenEvents({ParserState::declstmt});
+            }
+        };
+    }
 
 };
 
