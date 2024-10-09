@@ -10,38 +10,36 @@ std::string TypeData::ToString() const {
     for (std::size_t pos = 0; pos < types.size(); ++pos) {
         if (pos != 0) type_str += ' ';
         const std::pair<std::any, TypeType> & type = types[pos];
-        if (type.second == TypeData::POINTER)
+        if (type.second == TypeData::POINTER) {
             type_str += '*';
-        else if (type.second == TypeData::REFERENCE)
+        } else if (type.second == TypeData::REFERENCE) {
             type_str += '&';
-        else if (type.second == TypeData::RVALUE)
+        } else if (type.second == TypeData::RVALUE) {
             type_str += "&&";
-        else if (type.second == TypeData::SPECIFIER)
+        } else if (type.second == TypeData::SPECIFIER) {
             type_str += *std::any_cast<std::shared_ptr<std::string>>(type.first);
-        else if (type.second == TypeData::TYPENAME)
+        } else if (type.second == TypeData::TYPENAME) {
             type_str += std::any_cast<std::shared_ptr<NameData>>(type.first)->ToString();
+        }
     }
     return type_str;
 }
 
 std::ostream & operator<<(std::ostream & out, const TypeData & typeData) {
-    //std::cerr << "TPSE\n";
-    //std::cerr << "TPSE Size: " << typeData.types.empty() << '\n';
-    //std::cerr << "TACO\n";
     for(std::size_t pos = 0; pos < typeData.types.size(); ++pos) {
-        //std::cerr << "TPSE2\n";
         if (pos != 0) out << ' ';
         const std::pair<std::any, TypeData::TypeType> & type = typeData.types[pos];
-        if (type.second == TypeData::POINTER)
+        if (type.second == TypeData::POINTER) {
             out << '*';
-        else if (type.second == TypeData::REFERENCE)
+        } else if (type.second == TypeData::REFERENCE) {
             out << '&';
-        else if (type.second == TypeData::RVALUE)
+        } else if (type.second == TypeData::RVALUE) {
             out << "&&";
-        else if (type.second == TypeData::SPECIFIER)
+        } else if (type.second == TypeData::SPECIFIER) {
             out << *std::any_cast<std::shared_ptr<std::string>>(type.first);
-        else if (type.second == TypeData::TYPENAME)
+        } else if (type.second == TypeData::TYPENAME) {
             out << *std::any_cast<std::shared_ptr<NameData>>(type.first);
+        }
     }
     return out;
 }
@@ -99,7 +97,7 @@ void TypePolicy::CollectNamesHandler() {
     using namespace srcSAXEventDispatch;
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
         if (typeDepth && (typeDepth + 1) == ctx.depth) {
-            data.types.push_back(std::make_pair(nullptr, TypeData::TYPENAME));
+            data.types.push_back(std::make_pair(std::shared_ptr<NameData>(), TypeData::TYPENAME));
             if (!namePolicy) namePolicy = new NamePolicy{this};
             ctx.dispatcher->AddListenerDispatch(namePolicy);
         }
