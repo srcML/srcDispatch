@@ -960,6 +960,10 @@ namespace srcSAXEventDispatch {
                 ctx.attributes.clear();
             }
 
+            if(ctx.currentTag == "namespace") {
+                ctx.currentNamespaces.emplace_back();
+            }
+
             for(int pos = 0; pos < num_attributes; ++pos) {
 
                 ctx.currentAttributeName = "";
@@ -1010,7 +1014,7 @@ namespace srcSAXEventDispatch {
                             return false;
                         }) ? ctx.currentToken : "";
 
-        		ctx.currentNamespaces.push_back(namespaceName);
+        		ctx.currentNamespaces.back() += namespaceName;
             }
             
             if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})) {
