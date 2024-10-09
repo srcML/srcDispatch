@@ -23,7 +23,7 @@
 #include <iterator>
 
 struct FunctionData {
-    enum FunctionType { CONSTRUCTOR, DESTURCTOR, OPERATOR, FUNCTION };
+    enum FunctionType { CONSTRUCTOR, DESTRUCTOR, OPERATOR, FUNCTION };
 
     unsigned int lineNumber;
     std::string                   language;
@@ -173,7 +173,7 @@ private:
 				} else if (ctx.currentTag == "constructor" || ctx.currentTag == "constructor_decl") {
 					data.type = FunctionData::CONSTRUCTOR;
 				} else if (ctx.currentTag == "destructor" || ctx.currentTag == "destructor_decl") {
-					data.type = FunctionData::DESTURCTOR;
+					data.type = FunctionData::DESTRUCTOR;
 				}
 
 				CollectXMLAttributeHandlers();
