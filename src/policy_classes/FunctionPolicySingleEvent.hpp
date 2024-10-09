@@ -63,7 +63,7 @@ struct FunctionData {
         return signature;
     }
 
-    friend std::ostream & operator<<(std::ostream & out, const FunctionData & functionData) {
+    friend std::ostream& operator<<(std::ostream& out, const FunctionData& functionData) {
         if (functionData.returnType){
             out << *functionData.returnType << ' ' << *functionData.name;
         }
@@ -88,15 +88,15 @@ private:
 	FunctionData     data;
 	std::size_t      functionDepth;
     
-	TypePolicy       *typePolicy;
-	NamePolicy       *namePolicy;
-	ParamTypePolicy  *paramPolicy;
-	DeclTypePolicy   *declstmtPolicy;
-    ReturnPolicy     *returnPolicy;
-    ExpressionPolicy *expressionPolicy;
+	TypePolicy*			typePolicy;
+	NamePolicy*			namePolicy;
+	ParamTypePolicy*	paramPolicy;
+	DeclTypePolicy*		declstmtPolicy;
+    ReturnPolicy*		returnPolicy;
+    ExpressionPolicy*   expressionPolicy;
 
 public:
-	FunctionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+	FunctionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
 		: srcSAXEventDispatch::PolicyDispatcher(listeners),
 		  data{},
 		  functionDepth(0),
@@ -121,9 +121,9 @@ public:
 protected:
 	std::any DataInner() const override { return std::make_shared<FunctionData>(data); }
 
-	void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+	void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-	virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+	virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override {
 		if (typeid(TypePolicy) == typeid(*policy)) {
 			data.returnType = policy->Data<TypeData>();
 			ctx.dispatcher->RemoveListenerDispatch(nullptr);
