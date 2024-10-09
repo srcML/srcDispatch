@@ -31,11 +31,15 @@ struct DeclTypeData {
     bool                            isStatic;
 
     friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
-        out << declData.type->ToString();
-        if (declData.name)
+        if(declData.type) {
+            out << declData.type->ToString();
+        }
+        if (declData.name) {
             out << ' ' << *declData.name;
-        if (declData.initializer)
+        }
+        if (declData.initializer) {
             out << " = " << *declData.initializer;
+        }
         return out;
     }
 };
