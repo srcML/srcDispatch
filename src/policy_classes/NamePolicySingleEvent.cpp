@@ -123,8 +123,10 @@ void NamePolicy::CollectTemplateArgumentsHandlers() {
 void NamePolicy::CollectArrayIndicesHandlers() {
     using namespace srcSAXEventDispatch;
     openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {
-        if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+        openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+            if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
+            ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+        };
     };
 }
 

@@ -102,7 +102,6 @@ private:
         // start of policy
         openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
             if (!declDepth) {
-                data.clear();
                 declDepth = ctx.depth;
                 CollectTypeHandlers();
                 CollectNameHandlers();
@@ -127,7 +126,8 @@ private:
         closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
             if (declDepth && declDepth == ctx.depth) {
                 declDepth = 0;
-                NotifyAll(ctx);
+                NotifyAll(ctx);            
+                data.clear();
                 InitializeDeclTypePolicyHandlers();
             }
         };
@@ -173,8 +173,10 @@ private:
     void CollectInitHandlers() {
         using namespace srcSAXEventDispatch;
         openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
-            if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+            openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
+                ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+            };
         };
     }
 
