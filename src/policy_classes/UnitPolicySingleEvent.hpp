@@ -26,11 +26,11 @@ class UnitPolicySingleEvent :
     public srcSAXEventDispatch::PolicyListener   {
 
 public:
-    FunctionPolicy *functionPolicy;
-    ClassPolicy    *classPolicy;
+    FunctionPolicy*  functionPolicy;
+    ClassPolicy*     classPolicy;
 
 public:
-    UnitPolicySingleEvent(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners) :
+    UnitPolicySingleEvent(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners) :
                 srcSAXEventDispatch::PolicyDispatcher(listeners),
                 functionPolicy(nullptr),
                 classPolicy(nullptr) {
@@ -42,9 +42,9 @@ public:
         if(classPolicy)    delete classPolicy;
     }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-    void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override {
+    void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override {
         // Assumes at least one lister which should always be one
         policyListeners.back()->Notify(policy, ctx);
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
