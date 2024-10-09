@@ -61,7 +61,7 @@ private:
         openEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx) {
             if (!returnDepth) {
                 returnDepth = ctx.depth;
-                data = std::shared_ptr<ExpressionData>();
+                data = std::make_shared<ExpressionData>();
                 CollectExpressionHandlers();
             }
         };
