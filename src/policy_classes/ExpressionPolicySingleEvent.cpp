@@ -5,7 +5,7 @@
 
 #include <ExpressionPolicySingleEvent.hpp>
 
-std::ostream & operator<<(std::ostream & out, const ExpressionData & ex) {
+std::ostream& operator<<(std::ostream& out, const ExpressionData& ex) {
     for (std::shared_ptr<ExpressionElement> item : ex.expr) {
         //out << "   Type " << item->type << " ";
         switch (item->type) {
@@ -24,7 +24,7 @@ ExpressionPolicy::~ExpressionPolicy() {
         if(callPolicy)  delete callPolicy;
 }
 
-void ExpressionPolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) {
+void ExpressionPolicy::Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) {
     if(typeid(NamePolicy) == typeid(*policy)) {
         data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::NAME, policy->Data<NameData>()));
            //std::cerr << "Return Name found: " << *(data.expr.back())->name << std::endl;

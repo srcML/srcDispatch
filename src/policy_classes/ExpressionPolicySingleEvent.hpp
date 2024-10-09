@@ -51,7 +51,7 @@ struct ExpressionData {
     unsigned int lineNumber;
     std::vector<std::shared_ptr<ExpressionElement>> expr;   //All items in expression
 
-    friend std::ostream & operator<<(std::ostream & out, const ExpressionData & ex);
+    friend std::ostream& operator<<(std::ostream& out, const ExpressionData& ex);
 };
 
 class ExpressionPolicy :
@@ -61,12 +61,12 @@ public srcSAXEventDispatch::PolicyListener {
 
 private:
     ExpressionData  data;
-    NamePolicy      *namePolicy;
-    CallPolicy      *callPolicy;
+    NamePolicy*     namePolicy;
+    CallPolicy*     callPolicy;
     std::size_t     exprDepth;
 
 public:
-    ExpressionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners)
+    ExpressionPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners)
     : srcSAXEventDispatch::PolicyDispatcher(listeners),
     data{},
     exprDepth(0),
@@ -81,9 +81,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<ExpressionData>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx) override;
+    virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx) override;
 
 private:
     void InitializeExpressionPolicyHandlers();
