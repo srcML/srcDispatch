@@ -44,11 +44,11 @@ class FunctionCallPolicy : public srcSAXEventDispatch::EventListener, public src
             std::vector<std::string> callargumentlist;
         };
         ~FunctionCallPolicy(){}
-        FunctionCallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener *> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
+        FunctionCallPolicy(std::initializer_list<srcSAXEventDispatch::PolicyListener*> listeners = {}): srcSAXEventDispatch::PolicyDispatcher(listeners){
             InitializeEventHandlers();
         }
-        void Notify(const PolicyDispatcher * policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {}
-        void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+        void Notify(const PolicyDispatcher* policy [[maybe_unused]], const srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
+        void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcSAXEventDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
     protected:
         std::any DataInner() const override {
             return std::make_shared<FunctionCallPolicy::FunctionCallData>(data);
