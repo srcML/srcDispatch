@@ -139,7 +139,6 @@ protected:
             for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
                 data.locals.push_back(decl);
             }
-            decl_data->clear();
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(ReturnPolicy) == typeid(*policy)) {
             data.returnExpressions.push_back(policy->Data<ExpressionData>());
