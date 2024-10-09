@@ -25,7 +25,7 @@ std::string NameData::ToString() const {
 }
 
 
-std::ostream & operator<<(std::ostream & out, const NameData & nameData) {
+std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
     if (!nameData.name.empty()) {
         out << nameData.name;
     }
@@ -53,7 +53,7 @@ NamePolicy::~NamePolicy() {
 }
 
 
-void NamePolicy::Notify(const PolicyDispatcher * policy, const srcSAXEventDispatch::srcSAXEventContext & ctx)  {
+void NamePolicy::Notify(const PolicyDispatcher* policy, const srcSAXEventDispatch::srcSAXEventContext& ctx)  {
     if (typeid(NamePolicy) == typeid(*policy)) {
         data.names.push_back(policy->Data<NameData>());
         ctx.dispatcher->RemoveListener(nullptr);
