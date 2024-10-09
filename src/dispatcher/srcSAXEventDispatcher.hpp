@@ -317,7 +317,6 @@ namespace srcSAXEventDispatch {
                     DispatchEvent(ParserState::structn, ElementState::open);
                 } },
                 { "namespace", [this](){
-                    // classflagopen = true;
                     ++ctx.triggerField[ParserState::namespacen];
                     DispatchEvent(ParserState::namespacen, ElementState::open);
                 } },
@@ -641,7 +640,6 @@ namespace srcSAXEventDispatch {
                 } },
                 { "namespace", [this](){
                     DispatchEvent(ParserState::namespacen, ElementState::close);
-                    ctx.currentNamespaces.pop_back();
                     --ctx.triggerField[ParserState::namespacen];
                 } },
                 { "super_list", [this](){
@@ -1012,8 +1010,7 @@ namespace srcSAXEventDispatch {
                             return false;
                         }) ? ctx.currentToken : "";
 
-                if (namespaceName != "")
-                    ctx.currentNamespaces.push_back(namespaceName);
+        		ctx.currentNamespaces.push_back(namespaceName);
             }
             
             if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})){
@@ -1064,6 +1061,10 @@ namespace srcSAXEventDispatch {
                 process2->second();
             }
 
+    	    if(ctx.currentTag == "namespace") {
+	           ctx.currentNamespaces.pop_back();
+	        }
+	    
             --ctx.depth;
 
             if (generateArchive) { xmlTextWriterEndElement(ctx.writer); }
