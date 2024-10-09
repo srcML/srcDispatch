@@ -21,7 +21,7 @@ struct ParamTypeData {
     std::shared_ptr<TypeData> type;
     std::shared_ptr<NameData> name;
 
-    friend std::ostream & operator<<(std::ostream& out, const ParamTypeData& paramData) {
+    friend std::ostream& operator<<(std::ostream& out, const ParamTypeData& paramData) {
         out << *paramData.type;
         if (paramData.name)
             out << ' ' << *paramData.name;
