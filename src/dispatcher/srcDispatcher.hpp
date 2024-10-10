@@ -33,6 +33,7 @@
 #include <vector>
 #include <optional>
 #include <string>
+#include <unordered_set>
 #include <memory>
 #include <string.h>
 
@@ -81,7 +82,7 @@ namespace srcDispatch {
 
         std::size_t numberAllocatedListeners;
 
-        std::optional<size_t> namePos;
+        const std::unordered_set<std::string> nameCollectElements{ "class", "struct", "namespace" };
         std::optional<std::string> collectedText;
 
     protected:
@@ -154,7 +155,6 @@ namespace srcDispatch {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
-            namePos = std::optional<size_t>();
             collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
@@ -170,7 +170,6 @@ namespace srcDispatch {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
-            namePos = std::optional<size_t>();
             collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
@@ -253,7 +252,7 @@ namespace srcDispatch {
                         ifflagopen = true;
                         ++ctx.triggerField[ParserState::ifstmt];
                         DispatchEvent(ParserState::ifstmt, ElementState::open);
-                    }else{
+                    } else {
                         ++ctx.triggerField[ParserState::elseif];
                         DispatchEvent(ParserState::elseif, ElementState::open);
                     }
@@ -971,14 +970,11 @@ namespace srcDispatch {
 
             if(ctx.currentTag == "namespace") {
                 ctx.currentNamespaces.emplace_back();
-                namePos = ctx.depth;
-            } if(ctx.currentTag == "class" || ctx.currentTag == "struct") {
-                namePos = ctx.depth;
-            } else if(namePos && (*namePos + 1) == ctx.depth && ctx.currentTag == "name") {
-                namePos = std::optional<size_t>();
+            }
+
+            if(ctx.currentTag == "name" && nameCollectElements.contains(srcml_element_stack.back())) {
                 collectedText = std::string();
             } else if(collectedText && (ctx.currentTag == "block" || ctx.currentTag == "super_list")) {
-                namePos = std::optional<size_t>();
                 if(srcml_element_stack.back() == "namespace") {
                     ctx.currentNamespaces.back() = *collectedText;
                 } else {
