@@ -31,6 +31,8 @@
 #include <algorithm>
 #include <srcDispatchUtilities.hpp>
 #include <vector>
+#include <optional>
+#include <string>
 #include <memory>
 #include <string.h>
 
@@ -80,7 +82,7 @@ namespace srcDispatch {
         std::size_t numberAllocatedListeners;
 
         bool findName;
-        bool collectText;
+        std::optional<std::string> collectedText;
 
     protected:
         void DispatchEvent(ParserState pstate, ElementState estate) override {
@@ -153,7 +155,7 @@ namespace srcDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             findName = false;
-            collectText = false;
+            collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             
@@ -169,7 +171,7 @@ namespace srcDispatch {
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             findName = false;
-            collectText = false;
+            collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             if(genArchive) {
@@ -972,10 +974,11 @@ namespace srcDispatch {
                 findName = true;
             } else if(findName && ctx.currentTag == "name") {
                 findName = false;
-                collectText = true;
-            } else if(collectText && ctx.currentTag == "block") {
+                collectedText = std::string();
+            } else if(collectedText && (ctx.currentTag == "block")) {
                 findName = false;
-                collectText = false;
+                ctx.currentNamespaces.back() = *collectedText;
+                collectedText = std::optional<std::string>();
             }
 
             for(int pos = 0; pos < num_attributes; ++pos) {
@@ -1019,8 +1022,8 @@ namespace srcDispatch {
                         }) ? ctx.currentToken : ""; 
             }
 
-            if(collectText) {
-        		ctx.currentNamespaces.back().append(ch, len);
+            if(collectedText) {
+        		collectedText->append(ch, len);
             }
             
             if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})) {
@@ -1072,7 +1075,8 @@ namespace srcDispatch {
             }
 
     	    if(ctx.currentTag == "namespace") {
-	           ctx.currentNamespaces.pop_back();
+                collectedText = std::optional<std::string>();
+	            ctx.currentNamespaces.pop_back();
 	        }
 	    
             --ctx.depth;
