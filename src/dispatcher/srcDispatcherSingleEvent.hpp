@@ -1,5 +1,5 @@
 /**
- * @file srcDispatchSingleEvent.hpp
+ * @file srcDispatcherSingleEvent.hpp
  *
  * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
@@ -20,18 +20,18 @@
 #ifndef INCLUDED_SRC_DISPATCH_SINGLE_EVENT_HPP
 #define INCLUDED_SRC_DISPATCH_SINGLE_EVENT_HPP
 
-#include <srcDispatch.hpp>
+#include <srcDispatcher.hpp>
 
 namespace srcDispatch {
     template <typename ...policies>
-    class srcDispatchSingleEvent : public srcDispatch<policies...> {
+    class srcDispatcherSingleEvent : public srcDispatcher<policies...> {
 
     private:
         bool dispatched;
 
     public:
 
-       srcDispatchSingleEvent(PolicyListener * listener) : srcDispatch<policies...>(listener), dispatched(false) {}
+       srcDispatcherSingleEvent(PolicyListener * listener) : srcDispatcher<policies...>(listener), dispatched(false) {}
         virtual void AddListener(EventListener * listener) override {
             EventDispatcher::elementListeners.back()->SetDispatched(false);
             EventDispatcher::elementListeners.push_back(listener);

@@ -1,5 +1,5 @@
 /**
- * @file srcDispatch.hpp
+ * @file srcDispatcher.hpp
  *
  * @copyright Copyright (C) 2013-2014 SDML (www.srcML.org)
  *
@@ -19,8 +19,8 @@
  */
 
 
-#ifndef INCLUDED_SRCDISPATCH_HPP
-#define INCLUDED_SRCDISPATCH_HPP
+#ifndef INCLUDED_SRCDISPATCHER_HPP
+#define INCLUDED_SRCDISPATCHER_HPP
 
 #include <srcSAXHandler.hpp>
 #include <functional>
@@ -64,7 +64,7 @@ namespace srcDispatch {
     }
 
     template<typename... policies>
-    class srcDispatch : public srcSAXHandler, public EventDispatcher {
+    class srcDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -138,14 +138,14 @@ namespace srcDispatch {
         }
 
     public:
-        virtual ~srcDispatch() {
+        virtual ~srcDispatcher() {
             for(std::size_t count = 0; count < numberAllocatedListeners; ++count) {
                 delete elementListeners.front();
                 elementListeners.pop_front();
             }
         }
 
-        srcDispatch(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
@@ -159,7 +159,7 @@ namespace srcDispatch {
             InitializeHandlers();
         }
 
-        srcDispatch(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
