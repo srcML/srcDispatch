@@ -81,7 +81,7 @@ namespace srcDispatch {
 
         std::size_t numberAllocatedListeners;
 
-        bool findName;
+        std::optional<size_t> namePos;
         std::optional<std::string> collectedText;
 
     protected:
@@ -154,7 +154,7 @@ namespace srcDispatch {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
-            findName = false;
+            namePos = std::optional<size_t>();
             collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
@@ -170,7 +170,7 @@ namespace srcDispatch {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
-            findName = false;
+            namePos = std::optional<size_t>();
             collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
@@ -971,13 +971,19 @@ namespace srcDispatch {
 
             if(ctx.currentTag == "namespace") {
                 ctx.currentNamespaces.emplace_back();
-                findName = true;
-            } else if(findName && ctx.currentTag == "name") {
-                findName = false;
+                namePos = ctx.depth;
+            } if(ctx.currentTag == "class" || ctx.currentTag == "struct") {
+                namePos = ctx.depth;
+            } else if(namePos && (*namePos + 1) == ctx.depth && ctx.currentTag == "name") {
+                namePos = std::optional<size_t>();
                 collectedText = std::string();
-            } else if(collectedText && (ctx.currentTag == "block")) {
-                findName = false;
-                ctx.currentNamespaces.back() = *collectedText;
+            } else if(collectedText && (ctx.currentTag == "block" || ctx.currentTag == "super_list")) {
+                namePos = std::optional<size_t>();
+                if(srcml_element_stack.back() == "namespace") {
+                    ctx.currentNamespaces.back() = *collectedText;
+                } else {
+                    ctx.currentClassName = *collectedText;
+                }
                 collectedText = std::optional<std::string>();
             }
 
@@ -1011,16 +1017,6 @@ namespace srcDispatch {
             ctx.currentToken.clear();
             ctx.currentToken.append(ch, len);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
-            
-            if(ctx.Or({ParserState::classn, ParserState::structn}) && ctx.IsOpen(ParserState::name) && ctx.Nor({ParserState::classblock, ParserState::super_list})) {
-                ctx.currentClassName = std::all_of(
-                    std::begin(ctx.currentToken), 
-                    std::end(ctx.currentToken), 
-                        [](char c) {
-                            if(std::isalnum(c) || c == '_') return true;
-                            return false;
-                        }) ? ctx.currentToken : ""; 
-            }
 
             if(collectedText) {
         		collectedText->append(ch, len);
