@@ -79,6 +79,9 @@ namespace srcDispatch {
 
         std::size_t numberAllocatedListeners;
 
+        bool findName;
+        bool collectText;
+
     protected:
         void DispatchEvent(ParserState pstate, ElementState estate) override {
 
@@ -149,6 +152,8 @@ namespace srcDispatch {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
+            findName = false;
+            collectText = false;
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             
@@ -163,6 +168,8 @@ namespace srcDispatch {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
+            findName = false;
+            collectText = false;
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             if(genArchive) {
@@ -962,6 +969,13 @@ namespace srcDispatch {
 
             if(ctx.currentTag == "namespace") {
                 ctx.currentNamespaces.emplace_back();
+                findName = true;
+            } else if(findName && ctx.currentTag == "name") {
+                findName = false;
+                collectText = true;
+            } else if(collectText && ctx.currentTag == "block") {
+                findName = false;
+                collectText = false;
             }
 
             for(int pos = 0; pos < num_attributes; ++pos) {
@@ -1005,16 +1019,8 @@ namespace srcDispatch {
                         }) ? ctx.currentToken : ""; 
             }
 
-            if(ctx.IsOpen({ParserState::namespacen}) && ctx.IsOpen(ParserState::name) && ctx.IsClosed({ParserState::block})) {
-                std::string namespaceName = std::all_of(
-                    std::begin(ctx.currentToken), 
-                    std::end(ctx.currentToken), 
-                        [](char c) {
-                            if(std::isalnum(c) || c == '_') return true;
-                            return false;
-                        }) ? ctx.currentToken : "";
-
-        		ctx.currentNamespaces.back() += namespaceName;
+            if(collectText) {
+        		ctx.currentNamespaces.back().append(ch, len);
             }
             
             if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})) {
