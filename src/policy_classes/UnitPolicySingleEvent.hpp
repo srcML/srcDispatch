@@ -21,7 +21,7 @@
 #include <iterator>
 
 
-class UnitPolicySingleEvent : 
+class UnitPolicy : 
 	public srcDispatch::EventListener,
 	public srcDispatch::PolicyDispatcher,
     public srcDispatch::PolicyListener   {
@@ -31,14 +31,14 @@ public:
     ClassPolicy    *classPolicy;
 
 public:
-    UnitPolicySingleEvent(std::initializer_list<srcDispatch::PolicyListener *> listeners) :
+    UnitPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners) :
                 srcDispatch::PolicyDispatcher(listeners),
                 functionPolicy(nullptr),
                 classPolicy(nullptr) {
         InitializeUnitPolicyHandlers();
     }
 
-    ~UnitPolicySingleEvent() {
+    ~UnitPolicy() {
         if(functionPolicy) delete functionPolicy;
         if(classPolicy)    delete classPolicy;
     }
