@@ -64,13 +64,14 @@ private:
             ctx.dispatcher->AddListenerDispatch(classPolicy);
         };
 
+        openEventMap[ParserState::classn]   = startClassPolicy;
+        openEventMap[ParserState::structn]  = startClassPolicy;
+
         // end of policy
         std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [this](srcSAXEventContext& ctx) {
         };
 
-        openEventMap[ParserState::classn] = startClassPolicy;
-        closeEventMap[ParserState::classn] = endClassPolicy;
-        openEventMap[ParserState::structn] = startClassPolicy;
+        closeEventMap[ParserState::classn]  = endClassPolicy;
         closeEventMap[ParserState::structn] = endClassPolicy;
 
         // start function of policy
@@ -79,17 +80,19 @@ private:
             ctx.dispatcher->AddListenerDispatch(functionPolicy);
         };
 
+
+        openEventMap[ParserState::function]    = startFunction;
+        openEventMap[ParserState::constructor] = startFunction;
+        openEventMap[ParserState::destructor]  = startFunction;
+
         // end of policy
         std::function<void(srcDispatch::srcSAXEventContext&)> endFunction = [this](srcSAXEventContext& ctx) {
         };
 
-        openEventMap[ParserState::function]        = startFunction;
-        openEventMap[ParserState::constructor]     = startFunction;
-        openEventMap[ParserState::destructor]      = startFunction;
 
-        closeEventMap[ParserState::function]        = endFunction;
-        closeEventMap[ParserState::constructor]     = endFunction;
-        closeEventMap[ParserState::destructor]      = endFunction;
+        closeEventMap[ParserState::function]    = endFunction;
+        closeEventMap[ParserState::constructor] = endFunction;
+        closeEventMap[ParserState::destructor]  = endFunction;
 
     }
 };
