@@ -84,18 +84,12 @@ private:
         };
 
         openEventMap[ParserState::function]        = startFunction;
-        openEventMap[ParserState::functiondecl]    = startFunction;
         openEventMap[ParserState::constructor]     = startFunction;
-        openEventMap[ParserState::constructordecl] = startFunction;
         openEventMap[ParserState::destructor]      = startFunction;
-        openEventMap[ParserState::destructordecl]  = startFunction;
 
         closeEventMap[ParserState::function]        = endFunction;
-        closeEventMap[ParserState::functiondecl]    = endFunction;
         closeEventMap[ParserState::constructor]     = endFunction;
-        closeEventMap[ParserState::constructordecl] = endFunction;
         closeEventMap[ParserState::destructor]      = endFunction;
-        closeEventMap[ParserState::destructordecl]  = endFunction;
 
     }
 };
