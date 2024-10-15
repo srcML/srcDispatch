@@ -10,7 +10,7 @@
 #include <srcDispatchUtilities.hpp>
 
 #include <DeclTypePolicySingleEvent.hpp>
-#include <ExpressionPolicySingleEvent.hpp>
+#include <ExprStmtPolicySingleEvent.hpp>
 #include <ReturnPolicySingleEvent.hpp>
 
 #include <string>
@@ -41,10 +41,10 @@ private:
     BlockData     data;
     std::size_t   blockDepth;
     
-    DeclTypePolicy*   declstmtPolicy;
-    ReturnPolicy*     returnPolicy;
-    ExpressionPolicy* expressionPolicy;
-    BlockPolicy*      blockPolicy;
+    DeclTypePolicy* declstmtPolicy;
+    ReturnPolicy*   returnPolicy;
+    ExprStmtPolicy* exprStmtPolicy;
+    BlockPolicy*    blockPolicy;
 
 public:
     BlockPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -52,17 +52,17 @@ public:
           data{},
           blockDepth(0),
           declstmtPolicy(nullptr),
-          expressionPolicy(nullptr),
+          exprStmtPolicy(nullptr),
           returnPolicy(nullptr),
           blockPolicy(nullptr) {
         InitializeBlockPolicyHandlers();
     }
 
     ~BlockPolicy() {
-        if (declstmtPolicy)   delete declstmtPolicy;
-        if (returnPolicy)     delete returnPolicy;
-        if (expressionPolicy) delete expressionPolicy;
-        if (blockPolicy)      delete blockPolicy;
+        if (declstmtPolicy) delete declstmtPolicy;
+        if (returnPolicy)   delete returnPolicy;
+        if (exprStmtPolicy) delete exprStmtPolicy;
+        if (blockPolicy)    delete blockPolicy;
     }
 
 protected:
@@ -80,7 +80,7 @@ protected:
         } else if (typeid(ReturnPolicy) == typeid(*policy)) {
             data.returns.push_back(policy->Data<ExpressionData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
-        } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
+        } else if (typeid(ExprStmtPolicy) == typeid(*policy)) {
             data.expr_stmts.push_back(policy->Data<ExpressionData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
@@ -132,9 +132,9 @@ private:
 
     void CollectExpressionHandlers() {
         using namespace srcDispatch;
-        openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-            if (!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+        openEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx) {
+            if (!exprStmtPolicy) exprStmtPolicy = new ExprStmtPolicy{this};
+            ctx.dispatcher->AddListenerDispatch(exprStmtPolicy);
         };
     }
 
