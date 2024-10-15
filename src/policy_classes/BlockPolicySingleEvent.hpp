@@ -108,6 +108,15 @@ private:
                 ctx.dispatcher->AddListenerDispatch(blockPolicy);
             }
         };
+
+        closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+            if(blockDepth && blockDepth == ctx.depth) {
+                blockDepth = 0;
+                NotifyAll(ctx);
+                InitializeBlockPolicyHandlers();
+            }
+        };
+
     }
 
     void CollectReturnHandlers() {
