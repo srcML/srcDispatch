@@ -39,11 +39,12 @@ public srcDispatch::PolicyListener {
 
 private:
     BlockData     data;
-    std::size_t   BlockDepth;
+    std::size_t   blockDepth;
     
     DeclTypePolicy*   declstmtPolicy;
     ReturnPolicy*     returnPolicy;
     ExpressionPolicy* expressionPolicy;
+    BlockPolicy*      blockPolicy;
 
 public:
     BlockPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -65,7 +66,7 @@ public:
     }
 
 protected:
-    std::any DataInner() const override { return std::make_shared<FunctionData>(data); }
+    std::any DataInner() const override { return std::make_shared<BlockData>(data); }
 
     void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
 

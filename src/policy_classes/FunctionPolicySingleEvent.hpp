@@ -10,11 +10,9 @@
 #include <srcDispatchUtilities.hpp>
 
 #include <NamePolicySingleEvent.hpp>
-#include <DeclTypePolicySingleEvent.hpp>
 #include <TypePolicySingleEvent.hpp>
 #include <ParamTypePolicySingleEvent.hpp>
-#include <ExpressionPolicySingleEvent.hpp>
-#include <ReturnPolicySingleEvent.hpp>
+#include <BlockPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -29,15 +27,8 @@ struct FunctionData {
     std::string                   language;
     std::string                   filename;
     FunctionType                  type;
-    bool                          isDecl;
-    std::shared_ptr<TypeData>                    returnType;
-    std::shared_ptr<NameData>                    name;
-    std::vector<std::shared_ptr<ParamTypeData>>  parameters;
-    std::vector<std::shared_ptr<DeclTypeData>>   locals;            //Local variables
-    std::vector<std::shared_ptr<ExpressionData>> returnExpressions; //Expressions returned
-    std::vector<std::shared_ptr<ExpressionData>> expressions;       //All other exprs
-    std::set<std::string>         stereotypes;
 
+    bool isDecl;
     bool isVirtual;
     bool isPureVirtual;
     bool isConst;
@@ -47,6 +38,14 @@ struct FunctionData {
     bool isOverride;
     bool isConstExpr;
     bool isDelete;
+
+    std::set<std::string>         stereotypes;
+
+    std::shared_ptr<TypeData>                    returnType;
+    std::shared_ptr<NameData>                    name;
+    std::vector<std::shared_ptr<ParamTypeData>>  parameters;
+    std::shared_ptr<BlockData>                   block;
+
 
     std::string ToString() const {
         std::string signature = name->ToString();
@@ -89,12 +88,10 @@ private:
     FunctionData     data;
     std::size_t      functionDepth;
     
-    TypePolicy       *typePolicy;
-    NamePolicy       *namePolicy;
-    ParamTypePolicy  *paramPolicy;
-    DeclTypePolicy   *declstmtPolicy;
-    ReturnPolicy     *returnPolicy;
-    ExpressionPolicy *expressionPolicy;
+    TypePolicy*      typePolicy;
+    NamePolicy*      namePolicy;
+    ParamTypePolicy* paramPolicy;
+    BlockPolicy*     blockPolicy;
 
 public:
     FunctionPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -104,19 +101,15 @@ public:
           typePolicy(nullptr),
           namePolicy(nullptr),
           paramPolicy(nullptr),
-          declstmtPolicy(nullptr),
-          expressionPolicy(nullptr),
-          returnPolicy(nullptr) {
+          blockPolicy(nullptr) {
         InitializeFunctionPolicyHandlers();
     }
 
     ~FunctionPolicy() {
-        if (typePolicy)       delete typePolicy;
-        if (namePolicy)       delete namePolicy;
-        if (paramPolicy)      delete paramPolicy;
-        if (declstmtPolicy)   delete declstmtPolicy;
-        if (returnPolicy)     delete returnPolicy;
-        if (expressionPolicy) delete expressionPolicy;
+        if (typePolicy)  delete typePolicy;
+        if (namePolicy)  delete namePolicy;
+        if (paramPolicy) delete paramPolicy;
+        if (blockPolicy) delete blockPolicy;
     }
 
 protected:
@@ -134,17 +127,8 @@ protected:
         } else if (typeid(ParamTypePolicy) == typeid(*policy)) {
             data.parameters.push_back(policy->Data<ParamTypeData>()); 
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
-        } else if (typeid(DeclTypePolicy) == typeid(*policy)) {
-            std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
-            for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
-                data.locals.push_back(decl);
-            }
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
-        } else if (typeid(ReturnPolicy) == typeid(*policy)) {
-            data.returnExpressions.push_back(policy->Data<ExpressionData>());
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
-        } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
-            data.expressions.push_back(policy->Data<ExpressionData>());
+        } else if (typeid(BlockPolicy) == typeid(*policy)) {
+            data.block = policy->Data<BlockData>();
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
         }
     }
@@ -185,9 +169,7 @@ private:
                 CollectNameHandlers();
                 CollectParameterHandlers();
                 CollectOtherHandlers();
-                CollectDeclstmtHandlers();
-                CollectReturnHandlers();
-                CollectExpressionHandlers();
+                CollectBlockHandlers();
             }
         };
 
@@ -257,22 +239,6 @@ private:
         };
     }
 
-    void CollectReturnHandlers() {
-        using namespace srcDispatch;
-        openEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx) {
-            if (!returnPolicy) returnPolicy = new ReturnPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(returnPolicy);
-        };
-    }
-
-    void CollectExpressionHandlers() {
-        using namespace srcDispatch;
-        openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-            if (!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(expressionPolicy);
-        };
-    }
-
     void CollectOtherHandlers() {
         using namespace srcDispatch;
         closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -301,22 +267,12 @@ private:
         };
     }
 
-    /** @todo Will not work with local classes. */
-    /** @todo May need to add optimization that ignores declaration statement initialization. */
-    void CollectDeclstmtHandlers(){
+    void CollectBlockHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
             if (functionDepth && (functionDepth + 1) == ctx.depth) {
-                openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-                    if (!declstmtPolicy) declstmtPolicy = new DeclTypePolicy{this};
-                    ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
-                };
-            }
-        };
-        
-        closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-            if (functionDepth && (functionDepth + 1) == ctx.depth) {
-                NopOpenEvents({ParserState::declstmt});
+                if (!blockPolicy) blockPolicy = new BlockPolicy{this};
+                ctx.dispatcher->AddListenerDispatch(blockPolicy);
             }
         };
     }
