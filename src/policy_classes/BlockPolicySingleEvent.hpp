@@ -83,6 +83,9 @@ protected:
         } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
             data.expr_stmts.push_back(policy->Data<ExpressionData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else if (typeid(BlockPolicy) == typeid(*policy)) {
+            data.blocks.push_back(policy->Data<BlockData>());
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         }
     }
 
