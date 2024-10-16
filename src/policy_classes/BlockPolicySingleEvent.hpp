@@ -12,6 +12,7 @@
 #include <DeclTypePolicySingleEvent.hpp>
 #include <ExprStmtPolicySingleEvent.hpp>
 #include <ReturnPolicySingleEvent.hpp>
+#include <ConditionalPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -29,6 +30,7 @@ struct BlockData {
     std::vector<std::shared_ptr<ExpressionData>> expr_stmts;
 
     std::vector<std::shared_ptr<BlockData>> blocks;
+    std::vector<std::shared_ptr<ConditionalData>> conditionals;
 };
 
 
@@ -41,10 +43,11 @@ private:
     BlockData     data;
     std::size_t   blockDepth;
     
-    DeclTypePolicy* declstmtPolicy;
-    ReturnPolicy*   returnPolicy;
-    ExprStmtPolicy* exprStmtPolicy;
-    BlockPolicy*    blockPolicy;
+    DeclTypePolicy*    declstmtPolicy;
+    ReturnPolicy*      returnPolicy;
+    ExprStmtPolicy*    exprStmtPolicy;
+    BlockPolicy*       blockPolicy;
+    ConditionalPolicy* conditionalPolicy;
 
 public:
     BlockPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -54,15 +57,17 @@ public:
           declstmtPolicy(nullptr),
           exprStmtPolicy(nullptr),
           returnPolicy(nullptr),
-          blockPolicy(nullptr) {
+          blockPolicy(nullptr),
+          conditionalPolicy(nullptr) {
         InitializeBlockPolicyHandlers();
     }
 
     ~BlockPolicy() {
-        if (declstmtPolicy) delete declstmtPolicy;
-        if (returnPolicy)   delete returnPolicy;
-        if (exprStmtPolicy) delete exprStmtPolicy;
-        if (blockPolicy)    delete blockPolicy;
+        if (declstmtPolicy)    delete declstmtPolicy;
+        if (returnPolicy)      delete returnPolicy;
+        if (exprStmtPolicy)    delete exprStmtPolicy;
+        if (blockPolicy)       delete blockPolicy;
+        if (conditionalPolicy) delete conditionalPolicy;
     }
 
 protected:
@@ -86,6 +91,9 @@ protected:
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
             data.blocks.push_back(policy->Data<BlockData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
+            data.conditionals.push_back(policy->Data<ConditionalData>());
+            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         }
     }
 
@@ -97,6 +105,7 @@ private:
         CollectDeclstmtHandlers();
         CollectReturnHandlers();
         CollectExpressionHandlers();
+        CollectConditionalsHandlers();
 
     }
 
@@ -146,6 +155,22 @@ private:
             if (!declstmtPolicy) declstmtPolicy = new DeclTypePolicy{this};
             ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
         };
+    }
+
+    void CollectConditionalsHandlers() {
+        using namespace srcDispatch;
+        std::function<void (srcSAXEventContext& ctx)> startConditional = [this](srcSAXEventContext& ctx) {
+            if (!conditionalPolicy) conditionalPolicy = new ConditionalPolicy{this};
+            ctx.dispatcher->AddListenerDispatch(conditionalPolicy);
+        };
+
+        openEventMap[ParserState::ifstmt]     = startConditional;
+        openEventMap[ParserState::whilestmt]  = startConditional;
+        openEventMap[ParserState::forstmt]    = startConditional;
+        openEventMap[ParserState::switchstmt] = startConditional;
+        openEventMap[ParserState::dostmt]     = startConditional;
+
+
     }
 
 };
