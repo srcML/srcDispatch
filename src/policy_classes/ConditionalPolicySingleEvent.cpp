@@ -39,16 +39,17 @@ void ConditionalPolicy::NotifyWrite(const PolicyDispatcher * policy, srcDispatch
 void ConditionalPolicy::InitializeConditionalPolicyHandlers() {
     using namespace srcDispatch;
 
-    #define startConditional(TYPE)        \
-    [this](srcSAXEventContext& ctx) {     \
-        if (!conditionalDepth) {          \
-            conditionalDepth = ctx.depth; \
-            data = ConditionalData{};     \
-            data.type = TYPE;             \
-            CollectConditionHandlers();   \
-            CollectBlockHandlers();       \
-        }                                 \
-    };                                    \
+    #define startConditional(TYPE)                        \
+    [this](srcSAXEventContext& ctx) {                     \
+        if (!conditionalDepth) {                          \
+            conditionalDepth = ctx.depth;                 \
+            data = ConditionalData{};                     \
+            data.type = TYPE;                             \
+            data.startLineNumber = ctx.currentLineNumber; \
+            CollectConditionHandlers();                   \
+            CollectBlockHandlers();                       \
+        }                                                 \
+    };                                                    \
 
     openEventMap[ParserState::ifstmt]     = startConditional(ConditionalData::IF);
     openEventMap[ParserState::whilestmt]  = startConditional(ConditionalData::WHILE);
@@ -59,6 +60,7 @@ void ConditionalPolicy::InitializeConditionalPolicyHandlers() {
     std::function<void (srcSAXEventContext& ctx)> endConditional =[this](srcSAXEventContext& ctx) {
         if (conditionalDepth && conditionalDepth == ctx.depth) {
             conditionalDepth = 0;
+            data.endLineNumber = ctx.currentLineNumber;
             NotifyAll(ctx);
             InitializeConditionalPolicyHandlers();
         }
