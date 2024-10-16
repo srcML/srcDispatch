@@ -8,6 +8,13 @@
 
 #include <BlockPolicySingleEvent.hpp>
 
+std::ostream & operator<<(std::ostream& out, const ConditionalData& conditionalData) {
+    if (conditionalData.condition){
+        out << *conditionalData.condition;
+    }
+    return out;
+}
+
 ConditionalPolicy::ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
       data{},

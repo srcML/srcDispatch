@@ -30,6 +30,8 @@ struct ConditionalData {
 
     std::shared_ptr<ExpressionData> condition;
     std::shared_ptr<BlockData>      block;
+
+    friend std::ostream & operator<<(std::ostream& out, const ConditionalData& conditionalData);
 };
 
 
