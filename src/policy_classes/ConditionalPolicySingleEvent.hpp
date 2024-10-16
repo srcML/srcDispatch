@@ -10,7 +10,7 @@
 #include <srcDispatcherSingleEvent.hpp>
 #include <srcDispatchUtilities.hpp>
 
-#include <ExpressionPolicySingleEvent.hpp>
+#include <ConditionPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -39,10 +39,10 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    ConditionalData   data;
-    std::size_t       conditionalDepth;
-    ExpressionPolicy* exprPolicy;
-    BlockPolicy     * blockPolicy;
+    ConditionalData  data;
+    std::size_t      conditionalDepth;
+    ConditionPolicy* conditionPolicy;
+    BlockPolicy    * blockPolicy;
 
 public:
     ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);

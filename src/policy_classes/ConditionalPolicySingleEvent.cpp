@@ -12,18 +12,23 @@ ConditionalPolicy::ConditionalPolicy(std::initializer_list<srcDispatch::PolicyLi
     : srcDispatch::PolicyDispatcher(listeners),
       data{},
       conditionalDepth(0),
-      exprPolicy(nullptr) {
+      conditionPolicy(nullptr),
+      blockPolicy(nullptr) {
     InitializeConditionalPolicyHandlers();
 }
 
 ConditionalPolicy::~ConditionalPolicy() {
-    if (exprPolicy) delete exprPolicy;
+    if (conditionPolicy) delete conditionPolicy;
+    if (blockPolicy)     delete blockPolicy;
 }
 
 std::any ConditionalPolicy::DataInner() const { return std::make_shared<ConditionalData>(data); }
 
 void ConditionalPolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
-    if (typeid(BlockPolicy) == typeid(*policy)) {
+    if (typeid(ConditionPolicy) == typeid(*policy)) {
+        data.condition = policy->Data<ExpressionData>();
+        ctx.dispatcher->RemoveListener(nullptr);
+    } else if (typeid(BlockPolicy) == typeid(*policy)) {
         data.block = policy->Data<BlockData>();
         ctx.dispatcher->RemoveListener(nullptr);
     }
@@ -68,15 +73,23 @@ void ConditionalPolicy::InitializeConditionalPolicyHandlers() {
 }
 
 void ConditionalPolicy::CollectConditionHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
+        if(!conditionalDepth) return;
+        if(data.type == ConditionalData::FOR && (conditionalDepth + 2) != ctx.depth) return;
+        if(data.type != ConditionalData::FOR && (conditionalDepth + 1) != ctx.depth) return;
+
+        if (!conditionPolicy) conditionPolicy = new ConditionPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(conditionPolicy);  
+    };              
 }
 
 void ConditionalPolicy::CollectBlockHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-        if (conditionalDepth && (conditionalDepth + 1) == ctx.depth) {
+        if(conditionalDepth && (conditionalDepth + 1) == ctx.depth) {
             if (!blockPolicy) blockPolicy = new BlockPolicy{this};
             ctx.dispatcher->AddListenerDispatch(blockPolicy);                
         }
     };
-
 }
