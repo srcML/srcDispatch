@@ -7,15 +7,17 @@
 #define INCLUDED_CONDITIONAL_POLICY_SINGLE_EVENT_HPP
 
 #include <srcSAXController.hpp>
-#include <srcDispatchSingleEvent.hpp>
+#include <srcDispatcherSingleEvent.hpp>
 #include <srcDispatchUtilities.hpp>
 
 #include <ExpressionPolicySingleEvent.hpp>
-#include <BlockPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
 #include <iostream>
+
+class BlockPolicy;
+class BlockData;
 
 struct ConditionalData {
 
@@ -43,69 +45,18 @@ private:
     BlockPolicy     * blockPolicy;
 
 public:
-    ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-        : srcDispatch::PolicyDispatcher(listeners),
-          data{},
-          returnDepth(0),
-          exprPolicy(nullptr) {
-        InitializeConditionalPolicyHandlers();
-    }
-
-    ~ConditionalPolicy() {
-        if (exprPolicy) delete exprPolicy;
-    }
+    ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
+    ~ConditionalPolicy();
 
 protected:
-    std::any DataInner() const override { return std::make_shared<ConditionalData>(data); }
-
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
-        if (typeid(BlockPolicy) == typeid(*policy)) {
-            data = policy->Data<BlockData>();
-            ctx.dispatcher->RemoveListener(nullptr);
-        }
-    }
-
-    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    std::any DataInner() const override;
+    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
+    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override;
 
 private:
-    void InitializeConditionalPolicyHandlers() {
-        using namespace srcDispatch;
-
-        // start of policy
-        openEventMap[ParserState::ifstmt] = [this](srcSAXEventContext& ctx) {
-            if (!conditionalDepth) {
-                conditionalDepth = ctx.depth;
-                data = ConditionalData{};
-                data.type = IF;
-                CollectConditionHandlers();
-                CollectBlockHandlers();
-            }
-        };
-
-        // end of policy
-        closeEventMap[ParserState::ifstmt] = [this](srcSAXEventContext& ctx) {
-            if (conditionalDepth && conditionalDepth == ctx.depth) {
-                conditionalDepth = 0;
-                NotifyAll(ctx);
-                InitializeConditionalPolicyHandlers();
-            }
-        };
-    }
-
-    void CollectConditionHandlers() {
-    }
-
-    void CollectBlockHandlers() {
-
-        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-            if (conditionalDepth && (conditionalDepth + 1) == ctx.depth) {
-                if (!blockPolicy) blockPolicy = new BlockPolicy{this};
-                ctx.dispatcher->AddListenerDispatch(blockPolicy);                
-            }
-        };
-
-    }
-
+    void InitializeConditionalPolicyHandlers();
+    void CollectConditionHandlers();
+    void CollectBlockHandlers();
 };
 
 #endif
