@@ -106,6 +106,7 @@ private:
             if(!blockDepth) {
                 blockDepth = ctx.depth;
                 data = BlockData{};
+                data.startLineNumber = ctx.currentLineNumber;
             } else {
                 if (!blockPolicy) blockPolicy = new BlockPolicy{this};
                 ctx.dispatcher->AddListenerDispatch(blockPolicy);
@@ -115,6 +116,7 @@ private:
         closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
             if(blockDepth && blockDepth == ctx.depth) {
                 blockDepth = 0;
+                data.endLineNumber = ctx.currentLineNumber;
                 NotifyAll(ctx);
                 InitializeBlockPolicyHandlers();
             }
