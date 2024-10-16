@@ -7,7 +7,7 @@
 #define INCLUDED_RETURN_POLICY_SINGLE_EVENT_HPP
 
 #include <srcSAXController.hpp>
-#include <srcDispatchSingleEvent.hpp>
+#include <srcDispatcherSingleEvent.hpp>
 #include <srcDispatchUtilities.hpp>
 
 #include <ExpressionPolicySingleEvent.hpp>
