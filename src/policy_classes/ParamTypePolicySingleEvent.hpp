@@ -64,11 +64,13 @@ protected:
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             data.type = policy->Data<TypeData>();
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(NamePolicy) == typeid(*policy)) {
             data.name = policy->Data<NameData>(); 
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
+
+        ctx.dispatcher->RemoveListenerDispatch(nullptr);
     }
 
     void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers

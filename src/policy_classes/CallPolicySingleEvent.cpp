@@ -27,12 +27,13 @@ void CallPolicy::Notify(const srcDispatch::PolicyDispatcher * policy, const srcD
     using namespace srcDispatch;
     if (typeid(NamePolicy) == typeid(*policy)) {
         data.name = policy->Data<NameData>();
-        ctx.dispatcher->RemoveListener(nullptr);
-    }
-    if (typeid(ExpressionPolicy) == typeid(*policy)) {
+    } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
         data.arguments.push_back(policy->Data<ExpressionData>());
-        ctx.dispatcher->RemoveListener(nullptr);
+    } else {
+        throw PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
+
+    ctx.dispatcher->RemoveListener(nullptr);
 }
 
 void CallPolicy::InitializeCallPolicyHandlers() {

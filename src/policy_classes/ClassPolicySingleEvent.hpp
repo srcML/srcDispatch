@@ -90,14 +90,12 @@ public:
 	void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
 		if (typeid(NamePolicy) == typeid(*policy)) {
 			data.name = policy->Data<NameData>();
-			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 		} else if (typeid(DeclTypePolicy) == typeid(*policy)) {
 			std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
 			for (std::shared_ptr<DeclTypeData> decl : *decl_data) {
 				data.fields[currentRegion].emplace_back(decl);
 			}
 			decl_data->clear();
-			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 		} else if (typeid(FunctionPolicy) == typeid(*policy)) {
 			std::shared_ptr<FunctionData> f_data = policy->Data<FunctionData>();
 			if (f_data->isPureVirtual)
@@ -108,11 +106,13 @@ public:
 				data.operators[currentRegion].emplace_back(f_data);
 			else 
 				data.methods[currentRegion].emplace_back(f_data);
-			ctx.dispatcher->RemoveListenerDispatch(nullptr);
 		} else if (typeid(ClassPolicy) == typeid(*policy)) {
 			data.innerClasses[currentRegion].emplace_back(policy->Data<ClassData>());
-			ctx.dispatcher->RemoveListener(nullptr);
-		}
+		} else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
+        }
+
+		ctx.dispatcher->RemoveListenerDispatch(nullptr);
 	}
 
 protected:

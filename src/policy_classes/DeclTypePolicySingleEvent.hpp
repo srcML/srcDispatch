@@ -89,15 +89,15 @@ protected:
     virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             type = std::shared_ptr<TypeData>(policy->Data<TypeData>());
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(NamePolicy) == typeid(*policy)) {
             data.back()->name = policy->Data<NameData>(); 
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
             initializer = policy->Data<ExpressionData>();
-            ctx.dispatcher->RemoveListener(nullptr);
+        } else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
 
+        ctx.dispatcher->RemoveListener(nullptr);
     }
 
 private:

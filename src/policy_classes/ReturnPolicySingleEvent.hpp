@@ -49,6 +49,8 @@ protected:
         if (typeid(ExpressionPolicy) == typeid(*policy)) {
             data = policy->Data<ExpressionData>();
             ctx.dispatcher->RemoveListener(nullptr);
+        } else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
     }
 

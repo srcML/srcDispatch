@@ -120,17 +120,17 @@ protected:
     virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             data.returnType = policy->Data<TypeData>();
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(NamePolicy) == typeid(*policy)) {
             data.name = policy->Data<NameData>(); 
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(ParamTypePolicy) == typeid(*policy)) {
             data.parameters.push_back(policy->Data<ParamTypeData>()); 
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
             data.block = policy->Data<BlockData>();
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
+
+        ctx.dispatcher->RemoveListenerDispatch(nullptr);
     }
 
 private:

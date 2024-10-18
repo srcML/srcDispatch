@@ -56,15 +56,15 @@ NamePolicy::~NamePolicy() {
 void NamePolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx)  {
     if (typeid(NamePolicy) == typeid(*policy)) {
         data.names.push_back(policy->Data<NameData>());
-        ctx.dispatcher->RemoveListener(nullptr);
     } else if (typeid(TemplateArgumentPolicy) == typeid(*policy)) {
         data.templateArguments.push_back(policy->Data<TemplateArgumentData>());
-        ctx.dispatcher->RemoveListener(nullptr);
     } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
         data.indices = policy->Data<ExpressionData>();
-        ctx.dispatcher->RemoveListener(nullptr);
+    } else {
+        throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
 
+    ctx.dispatcher->RemoveListener(nullptr);
 }
 
 

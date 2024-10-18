@@ -34,11 +34,13 @@ std::any ConditionalPolicy::DataInner() const { return std::make_shared<Conditio
 void ConditionalPolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
     if (typeid(ConditionPolicy) == typeid(*policy)) {
         data.condition = policy->Data<ExpressionData>();
-        ctx.dispatcher->RemoveListener(nullptr);
     } else if (typeid(BlockPolicy) == typeid(*policy)) {
         data.block = policy->Data<BlockData>();
-        ctx.dispatcher->RemoveListener(nullptr);
+    } else {
+        throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
+
+    ctx.dispatcher->RemoveListener(nullptr);
 }
 
 void ConditionalPolicy::NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) {} //doesn't use other parsers
