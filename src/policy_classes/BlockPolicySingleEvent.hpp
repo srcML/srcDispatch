@@ -81,22 +81,19 @@ protected:
             for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
                 data.locals.push_back(decl);
             }
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(ReturnPolicy) == typeid(*policy)) {
             data.returns.push_back(policy->Data<ExpressionData>());
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(ExprStmtPolicy) == typeid(*policy)) {
             data.expr_stmts.push_back(policy->Data<ExpressionData>());
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
             data.blocks.push_back(policy->Data<BlockData>());
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
             data.conditionals.push_back(policy->Data<ConditionalData>());
-            ctx.dispatcher->RemoveListenerDispatch(nullptr);
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
+
+        ctx.dispatcher->RemoveListenerDispatch(nullptr);
     }
 
 private:
