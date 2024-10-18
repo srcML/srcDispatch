@@ -94,6 +94,8 @@ protected:
         } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
             data.conditionals.push_back(policy->Data<ConditionalData>());
             ctx.dispatcher->RemoveListenerDispatch(nullptr);
+        } else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
     }
 

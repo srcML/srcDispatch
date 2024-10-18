@@ -29,6 +29,8 @@
 #include <initializer_list>
 #include <algorithm>
 #include <iostream>
+#include <stdexcept>
+
 #include <libxml/xmlwriter.h>
 #include <srcSAXHandler.hpp>
 
@@ -208,6 +210,9 @@ namespace srcDispatch{
             }
     };
 
+    class EventError : public std::runtime_error { 
+        public: EventError(const std::string& msg) : std::runtime_error(msg) {}
+    };
     class EventListener {
         typedef std::unordered_map<srcDispatch::ParserState, std::function<void(srcDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
         protected:
@@ -425,6 +430,10 @@ namespace srcDispatch{
             : elementListeners(), ctx(this, elementStack) {}
         virtual ~EventDispatcher() {}
         virtual void DispatchEvent(ParserState, ElementState) = 0;
+    };
+
+    class PolicyError : public std::runtime_error { 
+        public: PolicyError(const std::string& msg) : std::runtime_error(msg) {}
     };
     class PolicyDispatcher;
     class PolicyListener {
