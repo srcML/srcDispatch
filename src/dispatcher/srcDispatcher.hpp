@@ -31,6 +31,9 @@
 #include <algorithm>
 #include <srcDispatchUtilities.hpp>
 #include <vector>
+#include <optional>
+#include <string>
+#include <unordered_set>
 #include <memory>
 #include <string.h>
 
@@ -78,6 +81,9 @@ namespace srcDispatch {
         ElementState currentEState;
 
         std::size_t numberAllocatedListeners;
+
+        const std::unordered_set<std::string> nameCollectElements{ "class", "struct", "namespace" };
+        std::optional<std::string> collectedText;
 
     protected:
         void DispatchEvent(ParserState pstate, ElementState estate) override {
@@ -149,6 +155,7 @@ namespace srcDispatch {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
+            collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             
@@ -163,6 +170,7 @@ namespace srcDispatch {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
+            collectedText = std::optional<std::string>();
             generateArchive = genArchive;
             classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             if(genArchive) {
@@ -244,7 +252,7 @@ namespace srcDispatch {
                         ifflagopen = true;
                         ++ctx.triggerField[ParserState::ifstmt];
                         DispatchEvent(ParserState::ifstmt, ElementState::open);
-                    }else{
+                    } else {
                         ++ctx.triggerField[ParserState::elseif];
                         DispatchEvent(ParserState::elseif, ElementState::open);
                     }
@@ -964,6 +972,17 @@ namespace srcDispatch {
                 ctx.currentNamespaces.emplace_back();
             }
 
+            if(ctx.currentTag == "name" && nameCollectElements.contains(srcml_element_stack.back())) {
+                collectedText = std::string();
+            } else if(collectedText && (ctx.currentTag == "block" || ctx.currentTag == "super_list")) {
+                if(srcml_element_stack.back() == "namespace") {
+                    ctx.currentNamespaces.back() = *collectedText;
+                } else {
+                    ctx.currentClassName = *collectedText;
+                }
+                collectedText = std::optional<std::string>();
+            }
+
             for(int pos = 0; pos < num_attributes; ++pos) {
 
                 ctx.currentAttributeName = "";
@@ -994,27 +1013,9 @@ namespace srcDispatch {
             ctx.currentToken.clear();
             ctx.currentToken.append(ch, len);
             std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map2.find("tokenstring");
-            
-            if(ctx.Or({ParserState::classn, ParserState::structn}) && ctx.IsOpen(ParserState::name) && ctx.Nor({ParserState::classblock, ParserState::super_list})) {
-                ctx.currentClassName = std::all_of(
-                    std::begin(ctx.currentToken), 
-                    std::end(ctx.currentToken), 
-                        [](char c) {
-                            if(std::isalnum(c) || c == '_') return true;
-                            return false;
-                        }) ? ctx.currentToken : ""; 
-            }
 
-            if(ctx.IsOpen({ParserState::namespacen}) && ctx.IsOpen(ParserState::name) && ctx.IsClosed({ParserState::block})) {
-                std::string namespaceName = std::all_of(
-                    std::begin(ctx.currentToken), 
-                    std::end(ctx.currentToken), 
-                        [](char c) {
-                            if(std::isalnum(c) || c == '_') return true;
-                            return false;
-                        }) ? ctx.currentToken : "";
-
-        		ctx.currentNamespaces.back() += namespaceName;
+            if(collectedText) {
+        		collectedText->append(ch, len);
             }
             
             if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})) {
@@ -1066,7 +1067,8 @@ namespace srcDispatch {
             }
 
     	    if(ctx.currentTag == "namespace") {
-	           ctx.currentNamespaces.pop_back();
+                collectedText = std::optional<std::string>();
+	            ctx.currentNamespaces.pop_back();
 	        }
 	    
             --ctx.depth;
