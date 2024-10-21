@@ -1,0 +1,162 @@
+/**
+ * @file ControlPolicySingleEvent.hpp
+ *
+ *
+ */
+#ifndef INCLUDED_CONTROL_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_CONTROL_POLICY_SINGLE_EVENT_HPP
+
+#include <srcSAXController.hpp>
+#include <srcDispatcherSingleEvent.hpp>
+#include <srcDispatchUtilities.hpp>
+
+#include <DeclTypePolicySingleEvent.hpp>
+#include <ExpressionPolicySingleEvent.hpp>
+
+#include <string>
+#include <vector>
+#include <iostream>
+
+struct ControlData {
+
+    unsigned int lineNumber;
+
+    std::shared_ptr<DeclTypeData>   init;
+    std::shared_ptr<ExpressionData> condition;
+    std::shared_ptr<ExpressionData> incr;
+
+    friend std::ostream & operator<<(std::ostream& out, const ControlData& controlData) {
+        if(init)      out << init      << "; ";
+        if(condition) out << condition << "; ";
+        if(incr)      out << incr;
+        return out;
+    }
+};
+
+// Collect the expression in the return
+//
+class ControlPolicy :
+public srcDispatch::EventListener,
+public srcDispatch::PolicyDispatcher,
+public srcDispatch::PolicyListener {
+
+private:
+    std::shared_ptr<ControlData>  data;
+    std::size_t                   controlDepth;
+    DeclTypePolicy  *             declPolicy;
+    ExpressionPolicy*             exprPolicy;
+
+public:
+    ControlPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+        : srcDispatch::PolicyDispatcher(listeners),
+          data{},
+          controlDepth(0),
+          exprPolicy(nullptr) {
+        InitializeControlPolicyHandlers();
+    }
+
+    ~ControlPolicy() {
+        if (declPolicy) delete declPolicy;
+        if (exprPolicy) delete exprPolicy;
+    }
+
+protected:
+    std::any DataInner() const override { return std::make_shared<ControlData>(data); }
+
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
+        using namespace srcDispatch;
+        if(typeid(DeclTypePolicy) == typeid(*policy)) {
+            data.init = policy->Data<DeclTypeData>();
+        } else if(typeid(ExpressionPolicy) == typeid(*policy)) {
+            if(IsOpen(ParserState::incr)) {
+                data.incr      = policy->Data<ExpressionData>();
+            } else {
+                data.condition = policy->Data<ExpressionData>();
+            }
+        } else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
+        }
+
+        ctx.dispatcher->RemoveListener(nullptr);
+    }
+
+    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
+
+private:
+    void InitializeControlPolicyHandlers() {
+        using namespace srcDispatch;
+        // start of policy
+        openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
+            if (!controlDepth) {
+                controlDepth = ctx.depth;
+                data = std::make_shared<ExpressionData>();
+                CollectInitHandlers();
+                CollectConditionHandlers();
+                CollectIncrHandlers();
+            }
+        };
+
+        // end of policy
+        closeEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
+            if (controlDepth && controlDepth == ctx.depth) {
+                controlDepth = 0;
+                NotifyAll(ctx);
+                InitializeControlPolicyHandlers();
+            }
+        };
+    }
+
+    void CollectInitHandlers() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
+            if(ctx.depth == (controlDepth + 1)) {
+                openEvent[ParserState::decl] = [this](srcSAXEventContext& ctx) {
+                    if (!declPolicy) declPolicy = new DeclTypePolicy{this};
+                    ctx.dispatcher->AddListenerDispatch(declPolicy);
+                };
+            }
+        };
+        closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
+            if(ctx.depth == (controlDepth + 1)) {
+                NopOpenEvents({ParserState::decl});
+            }
+        }
+    }
+
+    void CollectConditionHandlers() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
+            if(ctx.depth == (controlDepth + 1)) {
+                openEvent[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                    if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
+                    ctx.dispatcher->AddListenerDispatch(exprPolicy);
+                };
+            }
+        };
+        closeEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
+            if(ctx.depth == (controlDepth + 1)) {
+                NopOpenEvents({ParserState::expr});
+            }
+        }
+    }
+
+    void CollectIncrHandlers() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::incr] = [this](srcSAXEventContext& ctx) {
+            if(ctx.depth == (controlDepth + 1)) {
+                openEvent[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                    if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
+                    ctx.dispatcher->AddListenerDispatch(exprPolicy);
+                };
+            }
+        };
+        closeEventMap[ParserState::incr] = [this](srcSAXEventContext& ctx) {
+            if(ctx.depth == (controlDepth + 1)) {
+                NopOpenEvents({ParserState::expr});
+            }
+        }
+    }
+
+};
+
+#endif
