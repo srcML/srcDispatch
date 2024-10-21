@@ -11,7 +11,7 @@
 
 #include <NamePolicySingleEvent.hpp>
 #include <TypePolicySingleEvent.hpp>
-#include <ParamTypePolicySingleEvent.hpp>
+#include <DeclTypePolicySingleEvent.hpp>
 #include <BlockPolicySingleEvent.hpp>
 
 #include <string>
@@ -43,7 +43,7 @@ struct FunctionData {
 
     std::shared_ptr<TypeData>                    returnType;
     std::shared_ptr<NameData>                    name;
-    std::vector<std::shared_ptr<ParamTypeData>>  parameters;
+    std::vector<std::shared_ptr<DeclTypeData>>   parameters;
     std::shared_ptr<BlockData>                   block;
 
 
@@ -88,10 +88,10 @@ private:
     FunctionData     data;
     std::size_t      functionDepth;
     
-    TypePolicy*      typePolicy;
-    NamePolicy*      namePolicy;
-    ParamTypePolicy* paramPolicy;
-    BlockPolicy*     blockPolicy;
+    TypePolicy    * typePolicy;
+    NamePolicy    * namePolicy;
+    DeclTypePolicy* declPolicy;
+    BlockPolicy   * blockPolicy;
 
 public:
     FunctionPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -100,7 +100,7 @@ public:
           functionDepth(0),
           typePolicy(nullptr),
           namePolicy(nullptr),
-          paramPolicy(nullptr),
+          declPolicy(nullptr),
           blockPolicy(nullptr) {
         InitializeFunctionPolicyHandlers();
     }
@@ -108,7 +108,7 @@ public:
     ~FunctionPolicy() {
         if (typePolicy)  delete typePolicy;
         if (namePolicy)  delete namePolicy;
-        if (paramPolicy) delete paramPolicy;
+        if (declPolicy)  delete declPolicy;
         if (blockPolicy) delete blockPolicy;
     }
 
@@ -122,8 +122,11 @@ protected:
             data.returnType = policy->Data<TypeData>();
         } else if (typeid(NamePolicy) == typeid(*policy)) {
             data.name = policy->Data<NameData>(); 
-        } else if (typeid(ParamTypePolicy) == typeid(*policy)) {
-            data.parameters.push_back(policy->Data<ParamTypeData>()); 
+        } else if (typeid(DeclTypePolicy) == typeid(*policy)) {
+            std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
+            for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
+                data.parameters.push_back(decl);
+            }
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
             data.block = policy->Data<BlockData>();
         } else {
@@ -225,8 +228,8 @@ private:
             if (functionDepth && (functionDepth + 1) == ctx.depth) {
                 openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
                     if (functionDepth && (functionDepth + 2) == ctx.depth) {
-                        if (!paramPolicy) paramPolicy = new ParamTypePolicy{this};
-                        ctx.dispatcher->AddListenerDispatch(paramPolicy);
+                        if (!declPolicy) declPolicy = new DeclTypePolicy{this};
+                        ctx.dispatcher->AddListenerDispatch(declPolicy);
                     }
                 };
             }

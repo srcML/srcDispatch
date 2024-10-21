@@ -104,7 +104,8 @@ private:
     void InitializeDeclTypePolicyHandlers() {
         using namespace srcDispatch;
         // start of policy
-        openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+
+        std::function<void (srcSAXEventContext& ctx)> startDeclType = [this](srcSAXEventContext& ctx) {
             if (!declDepth) {
                 declDepth = ctx.depth;
                 CollectTypeHandlers();
@@ -126,15 +127,24 @@ private:
             };
         };
 
-        // end of policy
-        closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+
+        openEventMap[ParserState::declstmt]  = startDeclType;
+        openEventMap[ParserState::parameter] = startDeclType;
+        openEventMap[ParserState::init]      = startDeclType;
+
+        std::function<void (srcSAXEventContext& ctx)> endDeclType =  [this](srcSAXEventContext& ctx) {
             if (declDepth && declDepth == ctx.depth) {
                 declDepth = 0;
-                NotifyAll(ctx);            
+                NotifyAll(ctx);
                 data.clear();
                 InitializeDeclTypePolicyHandlers();
             }
         };
+
+        // end of policy
+        closeEventMap[ParserState::declstmt]  = endDeclType;
+        closeEventMap[ParserState::parameter] = endDeclType;
+        closeEventMap[ParserState::init]      = endDeclType;
     }
 
     void CollectTypeHandlers() {
