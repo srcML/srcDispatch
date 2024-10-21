@@ -130,7 +130,6 @@ private:
 
         openEventMap[ParserState::declstmt]  = startDeclType;
         openEventMap[ParserState::parameter] = startDeclType;
-        openEventMap[ParserState::init]      = startDeclType;
 
         std::function<void (srcSAXEventContext& ctx)> endDeclType =  [this](srcSAXEventContext& ctx) {
             if (declDepth && declDepth == ctx.depth) {
@@ -144,7 +143,6 @@ private:
         // end of policy
         closeEventMap[ParserState::declstmt]  = endDeclType;
         closeEventMap[ParserState::parameter] = endDeclType;
-        closeEventMap[ParserState::init]      = endDeclType;
     }
 
     void CollectTypeHandlers() {
@@ -187,10 +185,17 @@ private:
     void CollectInitHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
-            openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-                if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-                ctx.dispatcher->AddListenerDispatch(expressionPolicy);
-            };
+            if (declDepth && (declDepth + 2) == ctx.depth) {
+                openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                    if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
+                    ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+                };
+            }
+        };
+        closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
+            if (declDepth && (declDepth + 2) == ctx.depth) {
+                NopOpenEvents({ParserState::expr});
+            }
         };
     }
 
