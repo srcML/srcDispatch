@@ -9,9 +9,8 @@
 #include <BlockPolicySingleEvent.hpp>
 
 std::ostream & operator<<(std::ostream& out, const ConditionalData& conditionalData) {
-    if (conditionalData.condition){
-        out << *conditionalData.condition;
-    }
+    if(!conditionalData.control) return out;
+    out << conditionalData.control;
     return out;
 }
 
@@ -19,12 +18,14 @@ ConditionalPolicy::ConditionalPolicy(std::initializer_list<srcDispatch::PolicyLi
     : srcDispatch::PolicyDispatcher(listeners),
       data{},
       conditionalDepth(0),
+      controlPolicy(nullptr),
       conditionPolicy(nullptr),
       blockPolicy(nullptr) {
     InitializeConditionalPolicyHandlers();
 }
 
 ConditionalPolicy::~ConditionalPolicy() {
+    if (controlPolicy)   delete controlPolicy;
     if (conditionPolicy) delete conditionPolicy;
     if (blockPolicy)     delete blockPolicy;
 }
@@ -33,7 +34,11 @@ std::any ConditionalPolicy::DataInner() const { return std::make_shared<Conditio
 
 void ConditionalPolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
     if (typeid(ConditionPolicy) == typeid(*policy)) {
-        data.condition = policy->Data<ExpressionData>();
+        std::shared_ptr<ControlData> condition = std::make_shared<ControlData>();
+        condition->condition = policy->Data<ExpressionData>();
+        data.control = condition;
+    } else if (typeid(ControlPolicy) == typeid(*policy)) {
+        data.control = policy->Data<ControlData>();
     } else if (typeid(BlockPolicy) == typeid(*policy)) {
         data.block = policy->Data<BlockData>();
     } else {
@@ -55,6 +60,7 @@ void ConditionalPolicy::InitializeConditionalPolicyHandlers() {
             data = ConditionalData{};                     \
             data.type = TYPE;                             \
             data.startLineNumber = ctx.currentLineNumber; \
+            CollectControlHandlers();                     \
             CollectConditionHandlers();                   \
             CollectBlockHandlers();                       \
         }                                                 \
@@ -81,6 +87,17 @@ void ConditionalPolicy::InitializeConditionalPolicyHandlers() {
     closeEventMap[ParserState::forstmt]    = endConditional;
     closeEventMap[ParserState::switchstmt] = endConditional;
     closeEventMap[ParserState::dostmt]     = endConditional;
+}
+
+void ConditionalPolicy::CollectControlHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
+        if(!conditionalDepth) return;
+        if((conditionalDepth + 1) != ctx.depth) return;
+
+        if (!controlPolicy) controlPolicy = new ControlPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(controlPolicy);  
+    };              
 }
 
 void ConditionalPolicy::CollectConditionHandlers() {

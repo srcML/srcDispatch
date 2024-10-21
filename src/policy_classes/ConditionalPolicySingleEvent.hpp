@@ -10,6 +10,7 @@
 #include <srcDispatcherSingleEvent.hpp>
 #include <srcDispatchUtilities.hpp>
 
+#include <ControlPolicySingleEvent.hpp>
 #include <ConditionPolicySingleEvent.hpp>
 
 #include <string>
@@ -28,8 +29,8 @@ struct ConditionalData {
     unsigned int startLineNumber;
     unsigned int endLineNumber;
 
-    std::shared_ptr<ExpressionData> condition;
-    std::shared_ptr<BlockData>      block;
+    std::shared_ptr<ControlData> control;
+    std::shared_ptr<BlockData>   block;
 
     friend std::ostream & operator<<(std::ostream& out, const ConditionalData& conditionalData);
 };
@@ -43,6 +44,7 @@ public srcDispatch::PolicyListener {
 private:
     ConditionalData  data;
     std::size_t      conditionalDepth;
+    ControlPolicy  * controlPolicy;
     ConditionPolicy* conditionPolicy;
     BlockPolicy    * blockPolicy;
 
@@ -57,6 +59,7 @@ protected:
 
 private:
     void InitializeConditionalPolicyHandlers();
+    void CollectControlHandlers();
     void CollectConditionHandlers();
     void CollectBlockHandlers();
 };

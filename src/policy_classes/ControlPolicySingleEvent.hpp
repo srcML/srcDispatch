@@ -26,9 +26,9 @@ struct ControlData {
     std::shared_ptr<ExpressionData> incr;
 
     friend std::ostream & operator<<(std::ostream& out, const ControlData& controlData) {
-        if(init)      out << init      << "; ";
-        if(condition) out << condition << "; ";
-        if(incr)      out << incr;
+        if(controlData.init)      out << controlData.init      << "; ";
+        if(controlData.condition) out << controlData.condition << "; ";
+        if(controlData.incr)      out << controlData.incr;
         return out;
     }
 };
@@ -41,10 +41,10 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    std::shared_ptr<ControlData>  data;
-    std::size_t                   controlDepth;
-    DeclTypePolicy  *             declPolicy;
-    ExpressionPolicy*             exprPolicy;
+    ControlData        data;
+    std::size_t        controlDepth;
+    DeclTypePolicy  *  declPolicy;
+    ExpressionPolicy*  exprPolicy;
 
 public:
     ControlPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -68,10 +68,15 @@ protected:
         if(typeid(DeclTypePolicy) == typeid(*policy)) {
             data.init = policy->Data<DeclTypeData>();
         } else if(typeid(ExpressionPolicy) == typeid(*policy)) {
-            if(IsOpen(ParserState::incr)) {
-                data.incr      = policy->Data<ExpressionData>();
-            } else {
+            if(ctx.IsOpen(ParserState::init)) {
+                std::shared_ptr<ExpressionData> expr = policy->Data<ExpressionData>();
+                std::shared_ptr<DeclTypeData>   decl = std::make_shared<DeclTypeData>(expr->lineNumber);
+                decl->initializer = expr;
+                data.init      = decl;
+            } else if(ctx.IsOpen(ParserState::condition)) {
                 data.condition = policy->Data<ExpressionData>();
+            } else {
+                data.incr      = policy->Data<ExpressionData>();
             }
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
@@ -89,7 +94,7 @@ private:
         openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
             if (!controlDepth) {
                 controlDepth = ctx.depth;
-                data = std::make_shared<ExpressionData>();
+                data = ControlData{};
                 CollectInitHandlers();
                 CollectConditionHandlers();
                 CollectIncrHandlers();
@@ -110,24 +115,30 @@ private:
         using namespace srcDispatch;
         openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
             if(ctx.depth == (controlDepth + 1)) {
-                openEvent[ParserState::decl] = [this](srcSAXEventContext& ctx) {
-                    if (!declPolicy) declPolicy = new DeclTypePolicy{this};
-                    ctx.dispatcher->AddListenerDispatch(declPolicy);
+                openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
+                    if(ctx.depth != (controlDepth + 2)) return;
+                    //if (!declPolicy) declPolicy = new DeclTypePolicy{this};
+                    //ctx.dispatcher->AddListenerDispatch(declPolicy);
+                };
+                openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                    if(ctx.depth != (controlDepth + 2)) return;
+                    if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
+                    ctx.dispatcher->AddListenerDispatch(exprPolicy);
                 };
             }
         };
         closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
             if(ctx.depth == (controlDepth + 1)) {
-                NopOpenEvents({ParserState::decl});
+                NopOpenEvents({ParserState::decl, ParserState::expr});
             }
-        }
+        };
     }
 
     void CollectConditionHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
             if(ctx.depth == (controlDepth + 1)) {
-                openEvent[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
                     if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
                     ctx.dispatcher->AddListenerDispatch(exprPolicy);
                 };
@@ -137,14 +148,14 @@ private:
             if(ctx.depth == (controlDepth + 1)) {
                 NopOpenEvents({ParserState::expr});
             }
-        }
+        };
     }
 
     void CollectIncrHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::incr] = [this](srcSAXEventContext& ctx) {
             if(ctx.depth == (controlDepth + 1)) {
-                openEvent[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
                     if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
                     ctx.dispatcher->AddListenerDispatch(exprPolicy);
                 };
@@ -154,7 +165,7 @@ private:
             if(ctx.depth == (controlDepth + 1)) {
                 NopOpenEvents({ParserState::expr});
             }
-        }
+        };
     }
 
 };
