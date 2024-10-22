@@ -43,14 +43,14 @@ private:
     BlockData     data;
     std::size_t   blockDepth;
     
-    DeclTypePolicy*    declstmtPolicy;
-    ReturnPolicy*      returnPolicy;
-    ExprStmtPolicy*    exprStmtPolicy;
-    BlockPolicy*       blockPolicy;
+    DeclTypePolicy   * declstmtPolicy;
+    ReturnPolicy     * returnPolicy;
+    ExprStmtPolicy   * exprStmtPolicy;
+    BlockPolicy      * blockPolicy;
     ConditionalPolicy* conditionalPolicy;
 
 public:
-    BlockPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
           blockDepth(0),
@@ -73,9 +73,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<BlockData>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(DeclTypePolicy) == typeid(*policy)) {
             std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
             for(std::shared_ptr<DeclTypeData> decl : *decl_data) {

@@ -35,7 +35,7 @@ struct CallData {
     std::shared_ptr<NameData> name;
     std::vector<std::shared_ptr<ExpressionData>> arguments;  //expressions
 
-    friend std::ostream & operator<<(std::ostream & out, const CallData &call);
+    friend std::ostream& operator<<(std::ostream& out, const CallData &call);
 };
 
 class CallPolicy :
@@ -46,8 +46,8 @@ public srcDispatch::PolicyListener {
 private:
     CallData            data;
     std::size_t         callDepth;
-    NamePolicy          *namePolicy;
-    ExpressionPolicy    *expressionPolicy;
+    NamePolicy      *   namePolicy;
+    ExpressionPolicy*   expressionPolicy;
 
 public:
     CallPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -63,8 +63,8 @@ public:
 
 protected:
     std::any DataInner() const override;
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
-    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
+    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
 
 private:
     void InitializeCallPolicyHandlers();

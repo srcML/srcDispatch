@@ -34,7 +34,7 @@ struct NameData {
 
     std::string SimpleName() const;
     std::string ToString() const;
-    friend std::ostream & operator<<(std::ostream & out, const NameData & nameData);
+    friend std::ostream& operator<<(std::ostream& out, const NameData& nameData);
 };
  
 
@@ -51,7 +51,7 @@ private:
     ExpressionPolicy       *expressionPolicy;
 
 public:
-    NamePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    NamePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
           nameDepth(0),
@@ -66,8 +66,8 @@ public:
 protected:
 
     std::any DataInner() const override { return std::make_shared<NameData>(data); }
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
 private:
     void InitializeNamePolicyHandlers();

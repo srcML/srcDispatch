@@ -20,7 +20,7 @@ struct TypeData {
     unsigned int lineNumber;
     std::vector<std::pair<std::any, TypeType>> types;
     std::string ToString() const;
-    friend std::ostream & operator<<(std::ostream & out, const TypeData & typeData);
+    friend std::ostream& operator<<(std::ostream& out, const TypeData& typeData);
 };
 
 
@@ -35,10 +35,10 @@ private:
     NamePolicy * namePolicy;
 
 public:
-    TypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
+    TypePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners);
     ~TypePolicy();
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
-    virtual void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override;
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
+    virtual void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override;
 
 protected:
     virtual std::any DataInner() const override;

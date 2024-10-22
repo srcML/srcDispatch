@@ -16,7 +16,7 @@ struct TemplateArgumentData {
 
     unsigned int lineNumber;
     std::vector<std::pair<std::any, TemplateArgumentType>> data;
-    friend std::ostream & operator<<(std::ostream & out, const TemplateArgumentData & argumentData);
+    friend std::ostream& operator<<(std::ostream& out, const TemplateArgumentData& argumentData);
 };
 
 
@@ -28,8 +28,8 @@ public srcDispatch::PolicyListener {
 public:
     TemplateArgumentPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
     ~TemplateArgumentPolicy();
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
-    virtual void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override;
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
+    virtual void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override;
 
 protected:
     virtual std::any DataInner() const override;

@@ -8,13 +8,13 @@
 
 #include <BlockPolicySingleEvent.hpp>
 
-std::ostream & operator<<(std::ostream& out, const ConditionalData& conditionalData) {
+std::ostream& operator<<(std::ostream& out, const ConditionalData& conditionalData) {
     if(!conditionalData.control) return out;
     out << conditionalData.control;
     return out;
 }
 
-ConditionalPolicy::ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+ConditionalPolicy::ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
       data{},
       conditionalDepth(0),
@@ -32,7 +32,7 @@ ConditionalPolicy::~ConditionalPolicy() {
 
 std::any ConditionalPolicy::DataInner() const { return std::make_shared<ConditionalData>(data); }
 
-void ConditionalPolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
+void ConditionalPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
     if (typeid(ConditionPolicy) == typeid(*policy)) {
         std::shared_ptr<ControlData> condition = std::make_shared<ControlData>();
         condition->condition = policy->Data<ExpressionData>();
@@ -48,7 +48,7 @@ void ConditionalPolicy::Notify(const PolicyDispatcher * policy, const srcDispatc
     ctx.dispatcher->RemoveListener(nullptr);
 }
 
-void ConditionalPolicy::NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) {} //doesn't use other parsers
+void ConditionalPolicy::NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) {} //doesn't use other parsers
 
 void ConditionalPolicy::InitializeConditionalPolicyHandlers() {
     using namespace srcDispatch;

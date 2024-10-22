@@ -63,7 +63,7 @@ struct FunctionData {
         return signature;
     }
 
-    friend std::ostream & operator<<(std::ostream & out, const FunctionData & functionData) {
+    friend std::ostream& operator<<(std::ostream& out, const FunctionData& functionData) {
         if (functionData.returnType){
             out << *functionData.returnType << ' ' << *functionData.name;
         }
@@ -94,7 +94,7 @@ private:
     BlockPolicy   * blockPolicy;
 
 public:
-    FunctionPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    FunctionPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
           functionDepth(0),
@@ -115,9 +115,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<FunctionData>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             data.returnType = policy->Data<TypeData>();
         } else if (typeid(NamePolicy) == typeid(*policy)) {

@@ -30,7 +30,7 @@ private:
     ExpressionPolicy*               exprPolicy;
 
 public:
-    ConditionPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    ConditionPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
           conditionDepth(0),
@@ -45,7 +45,7 @@ public:
 protected:
     std::any DataInner() const override { return data; }
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(ExpressionPolicy) == typeid(*policy)) {
             data = policy->Data<ExpressionData>();
             ctx.dispatcher->RemoveListener(nullptr);
@@ -54,7 +54,7 @@ protected:
         }
     }
 
-    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
 
 private:
     void InitializeConditionPolicyHandlers() {

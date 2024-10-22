@@ -60,10 +60,10 @@ private:
 	std::size_t                classDepth;
     ClassData::AccessSpecifier currentRegion;
 
-	NamePolicy     * namePolicy;
-	DeclTypePolicy * declPolicy;
-	FunctionPolicy * functionPolicy;
-	ClassPolicy    * classPolicy;
+	NamePolicy    * namePolicy;
+	DeclTypePolicy* declPolicy;
+	FunctionPolicy* functionPolicy;
+	ClassPolicy   * classPolicy;
 
 public:
 	ClassPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -85,9 +85,9 @@ public:
 		if (classPolicy)    delete classPolicy;
 	}
 
-	void NotifyWrite(const PolicyDispatcher * policy [[maybe_unused]], srcDispatch::srcSAXEventContext & ctx [[maybe_unused]]) override {} //doesn't use other parsers
+	void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
 
-	void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
+	void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
 		if (typeid(NamePolicy) == typeid(*policy)) {
 			data.name = policy->Data<NameData>();
 		} else if (typeid(DeclTypePolicy) == typeid(*policy)) {

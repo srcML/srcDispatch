@@ -37,7 +37,7 @@
 #ifndef INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 
-namespace srcDispatch{
+namespace srcDispatch {
     class EventDispatcher;            
     enum ElementState {open, close};
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt,

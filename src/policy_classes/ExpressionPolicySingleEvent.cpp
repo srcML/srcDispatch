@@ -5,11 +5,11 @@
 
 #include <ExpressionPolicySingleEvent.hpp>
 
-std::ostream & operator<<(std::ostream & out, const Token & token) {
+std::ostream& operator<<(std::ostream& out, const Token& token) {
     return out << token.token;
 }
 
-std::ostream & operator<<(std::ostream & out, const ExpressionData & ex) {
+std::ostream& operator<<(std::ostream& out, const ExpressionData& ex) {
     for (std::shared_ptr<ExpressionElement> item : ex.expr) {
         switch (item->type) {
             case ExpressionElement::NAME:    out << *item->name;  break;
@@ -27,7 +27,7 @@ ExpressionPolicy::~ExpressionPolicy() {
         if(callPolicy)  delete callPolicy;
 }
 
-void ExpressionPolicy::Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) {
+void ExpressionPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
     if(typeid(NamePolicy) == typeid(*policy)) {
         data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::NAME, policy->Data<NameData>()));
     } else if(typeid(CallPolicy) == typeid(*policy)) {

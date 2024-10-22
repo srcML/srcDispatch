@@ -32,7 +32,7 @@ struct ConditionalData {
     std::shared_ptr<ControlData> control;
     std::shared_ptr<BlockData>   block;
 
-    friend std::ostream & operator<<(std::ostream& out, const ConditionalData& conditionalData);
+    friend std::ostream& operator<<(std::ostream& out, const ConditionalData& conditionalData);
 };
 
 
@@ -54,8 +54,8 @@ public:
 
 protected:
     std::any DataInner() const override;
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override;
-    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override;
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
+    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override;
 
 private:
     void InitializeConditionalPolicyHandlers();

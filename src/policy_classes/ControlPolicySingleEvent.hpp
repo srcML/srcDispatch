@@ -25,7 +25,7 @@ struct ControlData {
     std::shared_ptr<ExpressionData> condition;
     std::shared_ptr<ExpressionData> incr;
 
-    friend std::ostream & operator<<(std::ostream& out, const ControlData& controlData) {
+    friend std::ostream& operator<<(std::ostream& out, const ControlData& controlData) {
         if(controlData.init)      out << controlData.init      << "; ";
         if(controlData.condition) out << controlData.condition << "; ";
         if(controlData.incr)      out << controlData.incr;
@@ -47,7 +47,7 @@ private:
     ExpressionPolicy*  exprPolicy;
 
 public:
-    ControlPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    ControlPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
           controlDepth(0),
@@ -115,21 +115,8 @@ private:
         using namespace srcDispatch;
         openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
             if(ctx.depth == (controlDepth + 1)) {
-                openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
-                    if(ctx.depth != (controlDepth + 2)) return;
-                    //if (!declPolicy) declPolicy = new DeclTypePolicy{this};
-                    //ctx.dispatcher->AddListenerDispatch(declPolicy);
-                };
-                openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-                    if(ctx.depth != (controlDepth + 2)) return;
-                    if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
-                    ctx.dispatcher->AddListenerDispatch(exprPolicy);
-                };
-            }
-        };
-        closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
-            if(ctx.depth == (controlDepth + 1)) {
-                NopOpenEvents({ParserState::decl, ParserState::expr});
+                // if (!declPolicy) declPolicy = new DeclTypePolicy{this};
+                // ctx.dispatcher->AddListenerDispatch(declPolicy);
             }
         };
     }

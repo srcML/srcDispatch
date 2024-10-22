@@ -30,7 +30,7 @@ struct DeclTypeData {
     std::shared_ptr<ExpressionData> initializer;
     bool                            isStatic;
 
-    friend std::ostream & operator<<(std::ostream & out, const DeclTypeData & declData) {
+    friend std::ostream& operator<<(std::ostream& out, const DeclTypeData& declData) {
         if(declData.type) {
             out << declData.type->ToString();
         }
@@ -54,16 +54,16 @@ public srcDispatch::PolicyListener {
 private:
     std::vector<std::shared_ptr<DeclTypeData>> data;
     std::size_t                                declDepth;
-    TypePolicy                                 *typePolicy;
-    NamePolicy                                 *namePolicy;
-    ExpressionPolicy                           *expressionPolicy;
+    TypePolicy      *                          typePolicy;
+    NamePolicy      *                          namePolicy;
+    ExpressionPolicy*                          expressionPolicy;
 
     bool                                       isStatic;
     std::shared_ptr<TypeData>                  type;
     std::shared_ptr<ExpressionData>            initializer;
 
 public:
-    DeclTypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    DeclTypePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
           declDepth(0),
@@ -84,9 +84,9 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<std::vector<std::shared_ptr<DeclTypeData>>>(data); }
 
-    void NotifyWrite(const PolicyDispatcher * policy, srcDispatch::srcSAXEventContext & ctx) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
 
-    virtual void Notify(const PolicyDispatcher * policy, const srcDispatch::srcSAXEventContext & ctx) override {
+    virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(TypePolicy) == typeid(*policy)) {
             type = std::shared_ptr<TypeData>(policy->Data<TypeData>());
         } else if (typeid(NamePolicy) == typeid(*policy)) {
