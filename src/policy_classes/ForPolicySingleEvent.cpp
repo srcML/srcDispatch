@@ -23,8 +23,8 @@ ForPolicy::ForPolicy(std::initializer_list<srcDispatch::PolicyListener*> listene
 }
 
 ForPolicy::~ForPolicy() {
-    if (controlPolicy)   delete controlPolicy;
-    if (blockPolicy)     delete blockPolicy;
+    if (controlPolicy) delete controlPolicy;
+    if (blockPolicy)   delete blockPolicy;
 }
 
 std::any ForPolicy::DataInner() const { return std::make_shared<ForData>(data); }
