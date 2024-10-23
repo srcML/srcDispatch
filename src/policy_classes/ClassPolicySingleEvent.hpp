@@ -32,7 +32,7 @@ struct ClassData {
     std::shared_ptr<NameData> name;
     std::vector<ParentData>   parents;
 
-    std::vector<std::shared_ptr<DeclTypeData>> fields[3];
+    std::vector<std::shared_ptr<DeclData>>     fields[3];
     std::vector<std::shared_ptr<FunctionData>> constructors[3];
     std::vector<std::shared_ptr<FunctionData>> operators[3];
     std::vector<std::shared_ptr<FunctionData>> methods[3];
@@ -91,11 +91,10 @@ public:
 		if (typeid(NamePolicy) == typeid(*policy)) {
 			data.name = policy->Data<NameData>();
 		} else if (typeid(DeclTypePolicy) == typeid(*policy)) {
-			std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
-			for (std::shared_ptr<DeclTypeData> decl : *decl_data) {
+			std::shared_ptr<std::vector<std::shared_ptr<DeclData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclData>>>();
+			for (std::shared_ptr<DeclData> decl : *decl_data) {
 				data.fields[currentRegion].emplace_back(decl);
 			}
-			decl_data->clear();
 		} else if (typeid(FunctionPolicy) == typeid(*policy)) {
 			std::shared_ptr<FunctionData> f_data = policy->Data<FunctionData>();
 			if (f_data->isPureVirtual)

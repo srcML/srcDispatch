@@ -26,7 +26,7 @@ struct BlockData {
     unsigned int startLineNumber;
     unsigned int endLineNumber;
 
-    std::vector<std::shared_ptr<DeclTypeData>>    locals;
+    std::vector<std::shared_ptr<DeclData>>       locals;
     std::vector<std::shared_ptr<ExpressionData>>  returns;
     std::vector<std::shared_ptr<ExpressionData>>  expr_stmts;
 
@@ -81,8 +81,8 @@ protected:
 
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(DeclTypePolicy) == typeid(*policy)) {
-            std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
-            for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
+            std::shared_ptr<std::vector<std::shared_ptr<DeclData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclData>>>();
+            for(std::shared_ptr<DeclData> decl : *decl_data) {
                 data.locals.push_back(decl);
             }
         } else if (typeid(ReturnPolicy) == typeid(*policy)) {

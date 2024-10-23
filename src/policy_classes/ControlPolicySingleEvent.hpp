@@ -10,7 +10,7 @@
 #include <srcDispatcherSingleEvent.hpp>
 #include <srcDispatchUtilities.hpp>
 
-#include <DeclTypePolicySingleEvent.hpp>
+#include <DeclPolicySingleEvent.hpp>
 #include <ConditionPolicySingleEvent.hpp>
 #include <ExpressionPolicySingleEvent.hpp>
 
@@ -22,7 +22,7 @@ struct ControlData {
 
     unsigned int lineNumber;
 
-    std::shared_ptr<DeclTypeData>                init;
+    std::shared_ptr<DeclData>                    init;
     std::shared_ptr<ExpressionData>              condition;
     std::vector<std::shared_ptr<ExpressionData>> incr;
 
@@ -49,7 +49,7 @@ public srcDispatch::PolicyListener {
 private:
     ControlData        data;
     std::size_t        controlDepth;
-    DeclTypePolicy  *  declPolicy;
+    DeclPolicy  *  declPolicy;
     ConditionPolicy *  conditionPolicy;
     ExpressionPolicy*  exprPolicy;
 
@@ -73,16 +73,16 @@ protected:
 
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         using namespace srcDispatch;
-        if(typeid(DeclTypePolicy) == typeid(*policy)) {
-            data.init = policy->Data<DeclTypeData>();
+        if(typeid(DeclPolicy) == typeid(*policy)) {
+            data.init = policy->Data<DeclData>();
         } else if(typeid(ConditionPolicy) == typeid(*policy)) {
             data.condition = policy->Data<ExpressionData>();
         }  else if(typeid(ExpressionPolicy) == typeid(*policy)) {
             if(ctx.IsOpen(ParserState::init)) {
                 std::shared_ptr<ExpressionData> expr = policy->Data<ExpressionData>();
-                std::shared_ptr<DeclTypeData>   decl = std::make_shared<DeclTypeData>(expr->lineNumber);
-                decl->initializer = expr;
-                data.init         = decl;
+                std::shared_ptr<DeclData>       decl = std::make_shared<DeclData>(expr->lineNumber);
+                decl->init = expr;
+                data.init  = decl;
             } else {
                 data.incr.push_back(policy->Data<ExpressionData>());
             }
@@ -123,7 +123,7 @@ private:
         using namespace srcDispatch;
         openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
             if(ctx.depth != (controlDepth + 1)) return;
-            // if (!declPolicy) declPolicy = new DeclTypePolicy{this};
+            // if (!declPolicy) declPolicy = new DeclPolicy{this};
             // ctx.dispatcher->AddListenerDispatch(declPolicy);
         };
     }

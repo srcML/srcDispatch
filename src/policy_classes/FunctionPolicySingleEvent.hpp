@@ -39,12 +39,12 @@ struct FunctionData {
     bool isConstExpr;
     bool isDelete;
 
-    std::set<std::string>         stereotypes;
+    std::set<std::string> stereotypes;
 
-    std::shared_ptr<TypeData>                    returnType;
-    std::shared_ptr<NameData>                    name;
-    std::vector<std::shared_ptr<DeclTypeData>>   parameters;
-    std::shared_ptr<BlockData>                   block;
+    std::shared_ptr<TypeData>              returnType;
+    std::shared_ptr<NameData>              name;
+    std::vector<std::shared_ptr<DeclData>> parameters;
+    std::shared_ptr<BlockData>             block;
 
 
     std::string ToString() const {
@@ -64,7 +64,7 @@ struct FunctionData {
     }
 
     friend std::ostream& operator<<(std::ostream& out, const FunctionData& functionData) {
-        if (functionData.returnType){
+        if (functionData.returnType) {
             out << *functionData.returnType << ' ' << *functionData.name;
         }
         out << '(';
@@ -123,8 +123,8 @@ protected:
         } else if (typeid(NamePolicy) == typeid(*policy)) {
             data.name = policy->Data<NameData>(); 
         } else if (typeid(DeclTypePolicy) == typeid(*policy)) {
-            std::shared_ptr<std::vector<std::shared_ptr<DeclTypeData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclTypeData>>>();
-            for(std::shared_ptr<DeclTypeData> decl : *decl_data) {
+            std::shared_ptr<std::vector<std::shared_ptr<DeclData>>> decl_data = policy->Data<std::vector<std::shared_ptr<DeclData>>>();
+            for(std::shared_ptr<DeclData> decl : *decl_data) {
                 data.parameters.push_back(decl);
             }
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
