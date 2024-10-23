@@ -1,16 +1,16 @@
 /**
- * @file ConditionalPolicySingleEvent.hpp
+ * @file ForPolicySingleEvent.hpp
  *
  *
  */
-#ifndef INCLUDED_CONDITIONAL_POLICY_SINGLE_EVENT_HPP
-#define INCLUDED_CONDITIONAL_POLICY_SINGLE_EVENT_HPP
+#ifndef INCLUDED_FOR_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_FOR_POLICY_SINGLE_EVENT_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcherSingleEvent.hpp>
 #include <srcDispatchUtilities.hpp>
 
-#include <ConditionPolicySingleEvent.hpp>
+#include <ControlPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -19,36 +19,32 @@
 class BlockPolicy;
 class BlockData;
 
-struct ConditionalData {
-
-    enum ConditionalType { IF, WHILE, SWITCH, DO };
-
-    ConditionalType type;
+struct ForData {
 
     unsigned int startLineNumber;
     unsigned int endLineNumber;
 
-    std::shared_ptr<ExpressionData> condition;
-    std::shared_ptr<BlockData>      block;
+    std::shared_ptr<ControlData> control;
+    std::shared_ptr<BlockData>   block;
 
-    friend std::ostream& operator<<(std::ostream& out, const ConditionalData& conditionalData);
+    friend std::ostream& operator<<(std::ostream& out, const ForData& conditionalData);
 };
 
 
-class ConditionalPolicy :
+class ForPolicy :
 public srcDispatch::EventListener,
 public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    ConditionalData  data;
+    ForData  data;
     std::size_t      conditionalDepth;
-    ConditionPolicy* conditionPolicy;
+    ControlPolicy  * controlPolicy;
     BlockPolicy    * blockPolicy;
 
 public:
-    ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
-    ~ConditionalPolicy();
+    ForPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
+    ~ForPolicy();
 
 protected:
     std::any DataInner() const override;
@@ -56,9 +52,8 @@ protected:
     void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override;
 
 private:
-    void InitializeConditionalPolicyHandlers();
+    void InitializeForPolicyHandlers();
     void CollectControlHandlers();
-    void CollectConditionHandlers();
     void CollectBlockHandlers();
 };
 

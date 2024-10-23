@@ -13,6 +13,7 @@
 #include <ExprStmtPolicySingleEvent.hpp>
 #include <ReturnPolicySingleEvent.hpp>
 #include <ConditionalPolicySingleEvent.hpp>
+#include <ForPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -25,12 +26,13 @@ struct BlockData {
     unsigned int startLineNumber;
     unsigned int endLineNumber;
 
-    std::vector<std::shared_ptr<DeclTypeData>>   locals;
-    std::vector<std::shared_ptr<ExpressionData>> returns;
-    std::vector<std::shared_ptr<ExpressionData>> expr_stmts;
+    std::vector<std::shared_ptr<DeclTypeData>>    locals;
+    std::vector<std::shared_ptr<ExpressionData>>  returns;
+    std::vector<std::shared_ptr<ExpressionData>>  expr_stmts;
 
-    std::vector<std::shared_ptr<BlockData>> blocks;
+    std::vector<std::shared_ptr<BlockData>>       blocks;
     std::vector<std::shared_ptr<ConditionalData>> conditionals;
+    std::vector<std::shared_ptr<ForData>>         fors;
 };
 
 
@@ -48,6 +50,7 @@ private:
     ExprStmtPolicy   * exprStmtPolicy;
     BlockPolicy      * blockPolicy;
     ConditionalPolicy* conditionalPolicy;
+    ForPolicy        * forPolicy;
 
 public:
     BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -58,7 +61,8 @@ public:
           exprStmtPolicy(nullptr),
           returnPolicy(nullptr),
           blockPolicy(nullptr),
-          conditionalPolicy(nullptr) {
+          conditionalPolicy(nullptr),
+          forPolicy(nullptr) {
         InitializeBlockPolicyHandlers();
     }
 
@@ -89,6 +93,8 @@ protected:
             data.blocks.push_back(policy->Data<BlockData>());
         } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
             data.conditionals.push_back(policy->Data<ConditionalData>());
+        } else if (typeid(ForPolicy) == typeid(*policy)) {
+            data.fors.push_back(policy->Data<ForData>());
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
@@ -104,7 +110,9 @@ private:
         CollectDeclstmtHandlers();
         CollectReturnHandlers();
         CollectExpressionHandlers();
-        CollectConditionalsHandlers();
+        CollectConditionalHandlers();
+        CollectConditionalHandlers();
+        CollectForHandlers();
 
     }
 
@@ -156,7 +164,7 @@ private:
         };
     }
 
-    void CollectConditionalsHandlers() {
+    void CollectConditionalHandlers() {
         using namespace srcDispatch;
         std::function<void (srcSAXEventContext& ctx)> startConditional = [this](srcSAXEventContext& ctx) {
             if (!conditionalPolicy) conditionalPolicy = new ConditionalPolicy{this};
@@ -165,10 +173,17 @@ private:
 
         openEventMap[ParserState::ifstmt]     = startConditional;
         openEventMap[ParserState::whilestmt]  = startConditional;
-        openEventMap[ParserState::forstmt]    = startConditional;
         openEventMap[ParserState::switchstmt] = startConditional;
         openEventMap[ParserState::dostmt]     = startConditional;
 
+    }
+
+    void CollectForHandlers() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
+            if (!forPolicy) forPolicy = new ForPolicy{this};
+            ctx.dispatcher->AddListenerDispatch(forPolicy);
+        };
 
     }
 
