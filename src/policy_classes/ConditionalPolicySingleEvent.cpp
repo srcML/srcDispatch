@@ -10,7 +10,7 @@
 
 std::ostream& operator<<(std::ostream& out, const ConditionalData& conditionalData) {
     if(!conditionalData.condition) return out;
-    return out << conditionalData.condition;
+    return out << *conditionalData.condition;
 }
 
 ConditionalPolicy::ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)

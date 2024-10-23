@@ -22,18 +22,26 @@ struct ControlData {
 
     unsigned int lineNumber;
 
-    std::shared_ptr<DeclData>                    init;
+    std::vector<std::shared_ptr<DeclData>>       init;
     std::shared_ptr<ExpressionData>              condition;
     std::vector<std::shared_ptr<ExpressionData>> incr;
 
     friend std::ostream& operator<<(std::ostream& out, const ControlData& controlData) {
-        if(controlData.init)      out << controlData.init      << "; ";
-        if(controlData.condition) out << controlData.condition << "; ";
-        bool outputComma = false;
+
+        bool outputDeclComma = false;
+        for(const std::shared_ptr<DeclData> decl : controlData.init) {
+            if(outputDeclComma) out << ", ";
+            out << *decl;
+            outputDeclComma = true;
+        }
+
+        if(controlData.condition) out << *controlData.condition << "; ";
+
+        bool outputExprComma = false;
         for(const std::shared_ptr<ExpressionData> expr : controlData.incr) {
-            if(outputComma) out << ", ";
-            out << expr;
-            outputComma = true;
+            if(outputExprComma) out << ", ";
+            out << *expr;
+            outputExprComma = true;
         }
         return out;
     }
@@ -49,7 +57,7 @@ public srcDispatch::PolicyListener {
 private:
     ControlData        data;
     std::size_t        controlDepth;
-    DeclPolicy  *  declPolicy;
+    DeclPolicy      *  declPolicy;
     ConditionPolicy *  conditionPolicy;
     ExpressionPolicy*  exprPolicy;
 
@@ -74,15 +82,16 @@ protected:
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         using namespace srcDispatch;
         if(typeid(DeclPolicy) == typeid(*policy)) {
-            data.init = policy->Data<DeclData>();
+            data.init.push_back(policy->Data<DeclData>());
         } else if(typeid(ConditionPolicy) == typeid(*policy)) {
             data.condition = policy->Data<ExpressionData>();
         }  else if(typeid(ExpressionPolicy) == typeid(*policy)) {
             if(ctx.IsOpen(ParserState::init)) {
                 std::shared_ptr<ExpressionData> expr = policy->Data<ExpressionData>();
-                std::shared_ptr<DeclData>       decl = std::make_shared<DeclData>(expr->lineNumber);
+                std::shared_ptr<DeclData>       decl = std::make_shared<DeclData>();
+                decl->lineNumber = expr->lineNumber;
                 decl->init = expr;
-                data.init  = decl;
+                data.init.push_back(decl);
             } else {
                 data.incr.push_back(policy->Data<ExpressionData>());
             }
@@ -123,9 +132,25 @@ private:
         using namespace srcDispatch;
         openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
             if(ctx.depth != (controlDepth + 1)) return;
-            // if (!declPolicy) declPolicy = new DeclPolicy{this};
-            // ctx.dispatcher->AddListenerDispatch(declPolicy);
+
+            openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
+                if(ctx.depth != (controlDepth + 2)) return;
+
+                if (!declPolicy) declPolicy = new DeclPolicy{this};
+                ctx.dispatcher->AddListenerDispatch(declPolicy);
+            };
+            openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                if(ctx.depth != (controlDepth + 2)) return;
+
+                if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
+                ctx.dispatcher->AddListenerDispatch(exprPolicy);
+            };
         };
+        closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
+            if(ctx.depth != (controlDepth + 1)) return;
+            NopOpenEvents({ParserState::decl, ParserState::expr});
+        };
+
     }
 
     void CollectConditionHandlers() {

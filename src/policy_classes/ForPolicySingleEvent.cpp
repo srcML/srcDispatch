@@ -10,7 +10,7 @@
 
 std::ostream& operator<<(std::ostream& out, const ForData& conditionalData) {
     if(!conditionalData.control) return out;
-    return out << conditionalData.control;
+    return out << *conditionalData.control;
 }
 
 ForPolicy::ForPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
