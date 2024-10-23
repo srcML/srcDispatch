@@ -22,14 +22,19 @@ struct ControlData {
 
     unsigned int lineNumber;
 
-    std::shared_ptr<DeclTypeData>   init;
-    std::shared_ptr<ExpressionData> condition;
-    std::shared_ptr<ExpressionData> incr;
+    std::shared_ptr<DeclTypeData>                init;
+    std::shared_ptr<ExpressionData>              condition;
+    std::vector<std::shared_ptr<ExpressionData>> incr;
 
     friend std::ostream& operator<<(std::ostream& out, const ControlData& controlData) {
         if(controlData.init)      out << controlData.init      << "; ";
         if(controlData.condition) out << controlData.condition << "; ";
-        if(controlData.incr)      out << controlData.incr;
+        bool outputComma = false;
+        for(const std::shared_ptr<ExpressionData> expr : controlData.incr) {
+            if(outputComma) out << ", ";
+            out << expr;
+            outputComma = true;
+        }
         return out;
     }
 };
@@ -79,7 +84,7 @@ protected:
                 decl->initializer = expr;
                 data.init         = decl;
             } else {
-                data.incr      = policy->Data<ExpressionData>();
+                data.incr.push_back(policy->Data<ExpressionData>());
             }
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
