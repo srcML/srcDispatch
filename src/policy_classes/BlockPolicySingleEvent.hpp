@@ -14,6 +14,7 @@
 #include <ReturnPolicySingleEvent.hpp>
 
 class ConditionalPolicy;
+class SwitchPolicy;
 class WhilePolicy;
 class ForPolicy;
 class DoPolicy;
@@ -52,6 +53,7 @@ private:
     ExprStmtPolicy   * exprStmtPolicy;
     BlockPolicy      * blockPolicy;
     ConditionalPolicy* conditionalPolicy;
+    SwitchPolicy     * switchPolicy;
     WhilePolicy      * whilePolicy;
     ForPolicy        * forPolicy;
     DoPolicy         * doPolicy;
@@ -76,6 +78,7 @@ private:
     void CollectExpressionHandlers();
     void CollectDeclstmtHandlers();
     void CollectConditionalHandlers();
+    void CollectSwitchHandlers();
     void CollectWhileHandlers();
     void CollectForHandlers();
     void CollectDoHandlers();

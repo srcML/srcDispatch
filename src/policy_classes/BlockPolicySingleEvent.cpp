@@ -10,6 +10,7 @@
 #include <srcDispatchUtilities.hpp>
 
 #include <ConditionalPolicySingleEvent.hpp>
+#include <SwitchPolicySingleEvent.hpp>
 #include <WhilePolicySingleEvent.hpp>
 #include <ForPolicySingleEvent.hpp>
 #include <DoPolicySingleEvent.hpp>
@@ -23,6 +24,7 @@ BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> lis
       returnPolicy(nullptr),
       blockPolicy(nullptr),
       conditionalPolicy(nullptr),
+      switchPolicy(nullptr),
       whilePolicy(nullptr),
       forPolicy(nullptr),
       doPolicy(nullptr) {
@@ -35,6 +37,7 @@ BlockPolicy::~BlockPolicy() {
     if (exprStmtPolicy)    delete exprStmtPolicy;
     if (blockPolicy)       delete blockPolicy;
     if (conditionalPolicy) delete conditionalPolicy;
+    if (switchPolicy)      delete switchPolicy;
     if (whilePolicy)       delete whilePolicy;
     if (forPolicy)         delete forPolicy;
     if (doPolicy)          delete forPolicy;
@@ -56,6 +59,8 @@ void BlockPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcS
         data.blocks.push_back(policy->Data<BlockData>());
     } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
         data.conditionals.push_back(policy->Data<ConditionalData>());
+    } else if (typeid(SwitchPolicy) == typeid(*policy)) {
+        data.conditionals.push_back(policy->Data<SwitchData>());
     } else if (typeid(WhilePolicy) == typeid(*policy)) {
         data.conditionals.push_back(policy->Data<WhileData>());
     } else if (typeid(ForPolicy) == typeid(*policy)) {
@@ -77,7 +82,9 @@ void BlockPolicy::InitializeBlockPolicyHandlers() {
     CollectReturnHandlers();
     CollectExpressionHandlers();
     CollectConditionalHandlers();
+    CollectSwitchHandlers();
     CollectWhileHandlers();
+    CollectForHandlers();
     CollectDoHandlers();
 
 }
@@ -138,8 +145,15 @@ void BlockPolicy::CollectConditionalHandlers() {
     };
 
     openEventMap[ParserState::ifstmt]     = startConditional;
-    openEventMap[ParserState::switchstmt] = startConditional;
-    openEventMap[ParserState::dostmt]     = startConditional;
+
+}
+
+void BlockPolicy::CollectSwitchHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
+        if (!switchPolicy) switchPolicy = new SwitchPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(switchPolicy);
+    };
 
 }
 
