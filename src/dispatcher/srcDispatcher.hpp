@@ -247,6 +247,10 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::decr];
                     DispatchEvent(ParserState::decr, ElementState::open);
                 } },
+                { "if_stmt", [this]() {
+                    ++ctx.triggerField[ParserState::ifgroup];
+                    DispatchEvent(ParserState::ifgroup, ElementState::open);
+                } },
                 { "if", [this]() {
                     if(!ifelseflagopen) {
                         ifflagopen = true;
@@ -548,6 +552,10 @@ namespace srcDispatch {
                 { "decr", [this]() {
                     DispatchEvent(ParserState::decr, ElementState::close);
                     --ctx.triggerField[ParserState::decr];
+                } },
+                { "if_stmt", [this]() {
+                    DispatchEvent(ParserState::ifgroup, ElementState::close);
+                    --ctx.triggerField[ParserState::ifgroup];
                 } },
                 { "if", [this]() {
                     if(!ifelseflagopen) {
