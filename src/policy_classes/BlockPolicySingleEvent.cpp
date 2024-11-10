@@ -9,7 +9,7 @@
 
 #include <srcDispatchUtilities.hpp>
 
-#include <ConditionalPolicySingleEvent.hpp>
+#include <IfStmtPolicySingleEvent.hpp>
 #include <SwitchPolicySingleEvent.hpp>
 #include <WhilePolicySingleEvent.hpp>
 #include <ForPolicySingleEvent.hpp>
@@ -23,7 +23,7 @@ BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> lis
       exprStmtPolicy(nullptr),
       returnPolicy(nullptr),
       blockPolicy(nullptr),
-      conditionalPolicy(nullptr),
+      ifStmtPolicy(nullptr),
       switchPolicy(nullptr),
       whilePolicy(nullptr),
       forPolicy(nullptr),
@@ -36,11 +36,11 @@ BlockPolicy::~BlockPolicy() {
     if (returnPolicy)      delete returnPolicy;
     if (exprStmtPolicy)    delete exprStmtPolicy;
     if (blockPolicy)       delete blockPolicy;
-    if (conditionalPolicy) delete conditionalPolicy;
+    if (ifStmtPolicy)      delete ifStmtPolicy;
     if (switchPolicy)      delete switchPolicy;
     if (whilePolicy)       delete whilePolicy;
     if (forPolicy)         delete forPolicy;
-    if (doPolicy)          delete forPolicy;
+    if (doPolicy)          delete doPolicy;
 }
 
 std::any BlockPolicy::DataInner() const { return std::make_shared<BlockData>(data); }
@@ -57,8 +57,8 @@ void BlockPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcS
         data.expr_stmts.push_back(policy->Data<ExpressionData>());
     } else if (typeid(BlockPolicy) == typeid(*policy)) {
         data.blocks.push_back(policy->Data<BlockData>());
-    } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
-        data.conditionals.push_back(policy->Data<ConditionalData>());
+    } else if (typeid(IfStmtPolicy) == typeid(*policy)) {
+        data.conditionals.push_back(policy->Data<IfStmtData>());
     } else if (typeid(SwitchPolicy) == typeid(*policy)) {
         data.conditionals.push_back(policy->Data<SwitchData>());
     } else if (typeid(WhilePolicy) == typeid(*policy)) {
@@ -81,7 +81,7 @@ void BlockPolicy::InitializeBlockPolicyHandlers() {
     CollectDeclstmtHandlers();
     CollectReturnHandlers();
     CollectExpressionHandlers();
-    CollectConditionalHandlers();
+    CollectIfStmtHandlers();
     CollectSwitchHandlers();
     CollectWhileHandlers();
     CollectForHandlers();
@@ -137,14 +137,12 @@ void BlockPolicy::CollectDeclstmtHandlers() {
     };
 }
 
-void BlockPolicy::CollectConditionalHandlers() {
+void BlockPolicy::CollectIfStmtHandlers() {
     using namespace srcDispatch;
-    std::function<void (srcSAXEventContext& ctx)> startConditional = [this](srcSAXEventContext& ctx) {
-        if (!conditionalPolicy) conditionalPolicy = new ConditionalPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(conditionalPolicy);
+    openEventMap[ParserState::ifgroup] = [this](srcSAXEventContext& ctx) {
+        if (!ifStmtPolicy) ifStmtPolicy = new IfStmtPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(ifStmtPolicy);
     };
-
-    openEventMap[ParserState::ifstmt]     = startConditional;
 
 }
 

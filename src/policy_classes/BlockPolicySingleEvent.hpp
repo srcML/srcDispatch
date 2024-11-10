@@ -13,7 +13,7 @@
 #include <ExprStmtPolicySingleEvent.hpp>
 #include <ReturnPolicySingleEvent.hpp>
 
-class ConditionalPolicy;
+class IfStmtPolicy;
 class SwitchPolicy;
 class WhilePolicy;
 class ForPolicy;
@@ -30,7 +30,7 @@ struct BlockData {
     unsigned int startLineNumber;
     unsigned int endLineNumber;
 
-    std::vector<std::shared_ptr<DeclData>>       locals;
+    std::vector<std::shared_ptr<DeclData>>        locals;
     std::vector<std::shared_ptr<ExpressionData>>  returns;
     std::vector<std::shared_ptr<ExpressionData>>  expr_stmts;
 
@@ -52,7 +52,7 @@ private:
     ReturnPolicy     * returnPolicy;
     ExprStmtPolicy   * exprStmtPolicy;
     BlockPolicy      * blockPolicy;
-    ConditionalPolicy* conditionalPolicy;
+    IfStmtPolicy     * ifStmtPolicy;
     SwitchPolicy     * switchPolicy;
     WhilePolicy      * whilePolicy;
     ForPolicy        * forPolicy;
@@ -77,7 +77,7 @@ private:
     void CollectReturnHandlers();
     void CollectExpressionHandlers();
     void CollectDeclstmtHandlers();
-    void CollectConditionalHandlers();
+    void CollectIfStmtHandlers();
     void CollectSwitchHandlers();
     void CollectWhileHandlers();
     void CollectForHandlers();

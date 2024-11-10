@@ -1,10 +1,10 @@
 /**
- * @file SwitchPolicySingleEvent.hpp
+ * @file ElsePolicySingleEvent.hpp
  *
  *
  */
-#ifndef INCLUDED_SWITCH_POLICY_SINGLE_EVENT_HPP
-#define INCLUDED_SWITCH_POLICY_SINGLE_EVENT_HPP
+#ifndef INCLUDED_ELSE_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_ELSE_POLICY_SINGLE_EVENT_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcherSingleEvent.hpp>
@@ -17,7 +17,7 @@
 #include <vector>
 #include <iostream>
 
-struct SwitchData {
+struct ElseData {
 
     unsigned int startLineNumber;
     unsigned int endLineNumber;
@@ -25,40 +25,40 @@ struct SwitchData {
     std::shared_ptr<ExpressionData> condition;
     std::shared_ptr<BlockData>      block;
 
-    friend std::ostream& operator<<(std::ostream& out, const SwitchData& switchData) {
-        if(!switchData.condition) return out;
-        return out << *switchData.condition;
+    friend std::ostream& operator<<(std::ostream& out, const ElseData& elseData) {
+        if(!elseData.condition) return out;
+        return out << *elseData.condition;
     }
 };
 
-class SwitchPolicy :
+class ElsePolicy :
 public srcDispatch::EventListener,
 public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    SwitchData  data;
-    std::size_t      switchDepth;
+    ElseData  data;
+    std::size_t      elseDepth;
     ConditionPolicy* conditionPolicy;
     BlockPolicy    * blockPolicy;
 
 public:
-    SwitchPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
+    ElsePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          switchDepth(0),
+          elseDepth(0),
           conditionPolicy(nullptr),
           blockPolicy(nullptr) {
-        InitializeSwitchPolicyHandlers();
+        InitializeElsePolicyHandlers();
     }
 
-    ~SwitchPolicy() {
+    ~ElsePolicy() {
         if (conditionPolicy) delete conditionPolicy;
         if (blockPolicy)     delete blockPolicy;
     }
 
 protected:
-    std::any DataInner() const { return std::make_shared<SwitchData>(data); }
+    std::any DataInner() const { return std::make_shared<ElseData>(data); }
 
     void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
         if (typeid(ConditionPolicy) == typeid(*policy)) {
@@ -75,46 +75,34 @@ protected:
     void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) {} //doesn't use other parsers
 
 private:
-    void InitializeSwitchPolicyHandlers() {
+    void InitializeElsePolicyHandlers() {
         using namespace srcDispatch;
 
-        openEventMap[ParserState::switchstmt] = [this](srcSAXEventContext& ctx) {                     
-            if (!switchDepth) {                          
-                switchDepth = ctx.depth;                 
-                data = SwitchData{};                     
+        openEventMap[ParserState::elsestmt] = [this](srcSAXEventContext& ctx) {                     
+            if (!elseDepth) {                          
+                elseDepth = ctx.depth;                 
+                data = ElseData{};                     
                 data.startLineNumber = ctx.currentLineNumber; 
-                CollectConditionHandlers();                   
                 CollectBlockHandlers();                       
             }                                                 
         }; 
 
         // end of policy
-        closeEventMap[ParserState::switchstmt] =[this](srcSAXEventContext& ctx) {
-            if (switchDepth && switchDepth == ctx.depth) {
-                switchDepth = 0;
+        closeEventMap[ParserState::elsestmt] =[this](srcSAXEventContext& ctx) {
+            if (elseDepth && elseDepth == ctx.depth) {
+                elseDepth = 0;
                 data.endLineNumber = ctx.currentLineNumber;
                 NotifyAll(ctx);
-                InitializeSwitchPolicyHandlers();
+                InitializeElsePolicyHandlers();
             }
         };
-    }
-
-    void CollectConditionHandlers() {
-        using namespace srcDispatch;
-        openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
-            if(!switchDepth) return;
-            if((switchDepth + 1) != ctx.depth) return;
-
-            if (!conditionPolicy) conditionPolicy = new ConditionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(conditionPolicy);  
-        };              
     }
 
     void CollectBlockHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-            if(!switchDepth) return;
-            if((switchDepth + 1) != ctx.depth) return;
+            if(!elseDepth) return;
+            if((elseDepth + 1) != ctx.depth) return;
 
             if (!blockPolicy) blockPolicy = new BlockPolicy{this};
             ctx.dispatcher->AddListenerDispatch(blockPolicy);                

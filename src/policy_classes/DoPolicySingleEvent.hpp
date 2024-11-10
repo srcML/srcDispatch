@@ -88,15 +88,6 @@ private:
             }                                                 
         };   
 
-        std::function<void (srcSAXEventContext& ctx)> endConditional =[this](srcSAXEventContext& ctx) {
-            if (doDepth && doDepth == ctx.depth) {
-                doDepth = 0;
-                data.endLineNumber = ctx.currentLineNumber;
-                NotifyAll(ctx);
-                InitializeDoPolicyHandlers();
-            }
-        };
-
         // end of policy
         closeEventMap[ParserState::dostmt] =[this](srcSAXEventContext& ctx) {
             if (doDepth && doDepth == ctx.depth) {
