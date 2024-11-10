@@ -16,6 +16,7 @@
 class ConditionalPolicy;
 class WhilePolicy;
 class ForPolicy;
+class DoPolicy;
 
 #include <string>
 #include <vector>
@@ -53,6 +54,7 @@ private:
     ConditionalPolicy* conditionalPolicy;
     WhilePolicy      * whilePolicy;
     ForPolicy        * forPolicy;
+    DoPolicy         * doPolicy;
 
 public:
     BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners);
@@ -76,6 +78,7 @@ private:
     void CollectConditionalHandlers();
     void CollectWhileHandlers();
     void CollectForHandlers();
+    void CollectDoHandlers();
 
 };
 

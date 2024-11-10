@@ -12,6 +12,7 @@
 #include <ConditionalPolicySingleEvent.hpp>
 #include <WhilePolicySingleEvent.hpp>
 #include <ForPolicySingleEvent.hpp>
+#include <DoPolicySingleEvent.hpp>
 
 BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
@@ -22,7 +23,9 @@ BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> lis
       returnPolicy(nullptr),
       blockPolicy(nullptr),
       conditionalPolicy(nullptr),
-      forPolicy(nullptr) {
+      whilePolicy(nullptr),
+      forPolicy(nullptr),
+      doPolicy(nullptr) {
     InitializeBlockPolicyHandlers();
 }
 
@@ -34,6 +37,7 @@ BlockPolicy::~BlockPolicy() {
     if (conditionalPolicy) delete conditionalPolicy;
     if (whilePolicy)       delete whilePolicy;
     if (forPolicy)         delete forPolicy;
+    if (doPolicy)          delete forPolicy;
 }
 
 std::any BlockPolicy::DataInner() const { return std::make_shared<BlockData>(data); }
@@ -56,6 +60,8 @@ void BlockPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcS
         data.conditionals.push_back(policy->Data<WhileData>());
     } else if (typeid(ForPolicy) == typeid(*policy)) {
         data.conditionals.push_back(policy->Data<ForData>());
+    } else if (typeid(DoPolicy) == typeid(*policy)) {
+        data.conditionals.push_back(policy->Data<DoData>());
     }  else {
         throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
@@ -72,7 +78,7 @@ void BlockPolicy::InitializeBlockPolicyHandlers() {
     CollectExpressionHandlers();
     CollectConditionalHandlers();
     CollectWhileHandlers();
-    CollectForHandlers();
+    CollectDoHandlers();
 
 }
 
@@ -147,6 +153,15 @@ void BlockPolicy::CollectWhileHandlers() {
 }
 
 void BlockPolicy::CollectForHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
+        if (!forPolicy) forPolicy = new ForPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(forPolicy);
+    };
+
+}
+
+void BlockPolicy::CollectDoHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
         if (!forPolicy) forPolicy = new ForPolicy{this};
