@@ -150,7 +150,7 @@ void BlockPolicy::CollectConditionalHandlers() {
 
 void BlockPolicy::CollectSwitchHandlers() {
     using namespace srcDispatch;
-    openEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
+    openEventMap[ParserState::switchstmt] = [this](srcSAXEventContext& ctx) {
         if (!switchPolicy) switchPolicy = new SwitchPolicy{this};
         ctx.dispatcher->AddListenerDispatch(switchPolicy);
     };
@@ -177,9 +177,9 @@ void BlockPolicy::CollectForHandlers() {
 
 void BlockPolicy::CollectDoHandlers() {
     using namespace srcDispatch;
-    openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
-        if (!forPolicy) forPolicy = new ForPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(forPolicy);
+    openEventMap[ParserState::dostmt] = [this](srcSAXEventContext& ctx) {
+        if (!doPolicy) doPolicy = new DoPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(doPolicy);
     };
 
 }
