@@ -14,9 +14,8 @@
 #include <ReturnPolicySingleEvent.hpp>
 
 class ConditionalPolicy;
-class ClassData;
+class WhilePolicy;
 class ForPolicy;
-class ForData;
 
 #include <string>
 #include <vector>
@@ -35,7 +34,6 @@ struct BlockData {
 
     std::vector<std::shared_ptr<BlockData>>       blocks;
     std::vector<std::any>                         conditionals;
-    std::vector<std::shared_ptr<ForData>>         fors;
 };
 
 
@@ -53,6 +51,7 @@ private:
     ExprStmtPolicy   * exprStmtPolicy;
     BlockPolicy      * blockPolicy;
     ConditionalPolicy* conditionalPolicy;
+    WhilePolicy      * whilePolicy;
     ForPolicy        * forPolicy;
 
 public:
@@ -75,6 +74,7 @@ private:
     void CollectExpressionHandlers();
     void CollectDeclstmtHandlers();
     void CollectConditionalHandlers();
+    void CollectWhileHandlers();
     void CollectForHandlers();
 
 };

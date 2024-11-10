@@ -10,6 +10,7 @@
 #include <srcDispatchUtilities.hpp>
 
 #include <ConditionalPolicySingleEvent.hpp>
+#include <WhilePolicySingleEvent.hpp>
 #include <ForPolicySingleEvent.hpp>
 
 BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -31,6 +32,8 @@ BlockPolicy::~BlockPolicy() {
     if (exprStmtPolicy)    delete exprStmtPolicy;
     if (blockPolicy)       delete blockPolicy;
     if (conditionalPolicy) delete conditionalPolicy;
+    if (whilePolicy)       delete whilePolicy;
+    if (forPolicy)         delete forPolicy;
 }
 
 std::any BlockPolicy::DataInner() const { return std::make_shared<BlockData>(data); }
@@ -49,9 +52,11 @@ void BlockPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcS
         data.blocks.push_back(policy->Data<BlockData>());
     } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
         data.conditionals.push_back(policy->Data<ConditionalData>());
+    } else if (typeid(WhilePolicy) == typeid(*policy)) {
+        data.conditionals.push_back(policy->Data<WhileData>());
     } else if (typeid(ForPolicy) == typeid(*policy)) {
         data.conditionals.push_back(policy->Data<ForData>());
-    } else {
+    }  else {
         throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
 
@@ -66,7 +71,7 @@ void BlockPolicy::InitializeBlockPolicyHandlers() {
     CollectReturnHandlers();
     CollectExpressionHandlers();
     CollectConditionalHandlers();
-    CollectConditionalHandlers();
+    CollectWhileHandlers();
     CollectForHandlers();
 
 }
@@ -127,9 +132,17 @@ void BlockPolicy::CollectConditionalHandlers() {
     };
 
     openEventMap[ParserState::ifstmt]     = startConditional;
-    openEventMap[ParserState::whilestmt]  = startConditional;
     openEventMap[ParserState::switchstmt] = startConditional;
     openEventMap[ParserState::dostmt]     = startConditional;
+
+}
+
+void BlockPolicy::CollectWhileHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
+        if (!whilePolicy) whilePolicy = new WhilePolicy{this};
+        ctx.dispatcher->AddListenerDispatch(whilePolicy);
+    };
 
 }
 
