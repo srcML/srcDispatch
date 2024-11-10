@@ -31,7 +31,7 @@ struct BlockData {
     std::vector<std::shared_ptr<ExpressionData>>  expr_stmts;
 
     std::vector<std::shared_ptr<BlockData>>       blocks;
-    std::vector<std::shared_ptr<ConditionalData>> conditionals;
+    std::vector<std::any>                         conditionals;
     std::vector<std::shared_ptr<ForData>>         fors;
 };
 
@@ -94,7 +94,7 @@ protected:
         } else if (typeid(ConditionalPolicy) == typeid(*policy)) {
             data.conditionals.push_back(policy->Data<ConditionalData>());
         } else if (typeid(ForPolicy) == typeid(*policy)) {
-            data.fors.push_back(policy->Data<ForData>());
+            data.conditionals.push_back(policy->Data<ForData>());
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
