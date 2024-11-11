@@ -127,7 +127,7 @@ private:
 			if (!classDepth) {
 				classDepth = ctx.depth;
 				data = ClassData{};
-				data.namespace = ctx.currentNamespaces;
+				data.namespaces = ctx.currentNamespaces;
 				data.lineNumber = ctx.currentLineNumber;
 				std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
 				if (stereotype_attr_itr != ctx.attributes.end()){
