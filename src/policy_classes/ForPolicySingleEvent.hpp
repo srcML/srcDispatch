@@ -28,9 +28,9 @@ struct ForData {
     std::shared_ptr<ControlData> control;
     std::shared_ptr<BlockData>   block;
 
-    friend std::ostream& operator<<(std::ostream& out, const ForData& conditionalData) {
-        if(!conditionalData.control) return out;
-        return out << *conditionalData.control;
+    friend std::ostream& operator<<(std::ostream& out, const ForData& forData) {
+        if(!forData.control) return out;
+        return out << *forData.control;
     }
 };
 
@@ -42,7 +42,7 @@ public srcDispatch::PolicyListener {
 
 private:
     ForData         data;
-    std::size_t     conditionalDepth;
+    std::size_t     forDepth;
     ControlPolicy * controlPolicy;
     BlockPolicy   * blockPolicy;
 
@@ -51,7 +51,7 @@ public:
     ForPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          conditionalDepth(0),
+          forDepth(0),
           controlPolicy(nullptr),
           blockPolicy(nullptr) {
         InitializeForPolicyHandlers();
@@ -85,8 +85,8 @@ private:
         using namespace srcDispatch;
 
         openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {                     \
-            if (!conditionalDepth) {
-                conditionalDepth = ctx.depth;
+            if (!forDepth) {
+                forDepth = ctx.depth;
                 data = ForData{};
                 data.startLineNumber = ctx.currentLineNumber;
                 CollectControlHandlers();
@@ -96,8 +96,8 @@ private:
 
         // end of policy
         closeEventMap[ParserState::forstmt] =[this](srcSAXEventContext& ctx) {
-            if (conditionalDepth && conditionalDepth == ctx.depth) {
-                conditionalDepth = 0;
+            if (forDepth && forDepth == ctx.depth) {
+                forDepth = 0;
                 data.endLineNumber = ctx.currentLineNumber;
                 NotifyAll(ctx);
                 InitializeForPolicyHandlers();
@@ -109,8 +109,8 @@ private:
     void CollectControlHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
-            if(!conditionalDepth) return;
-            if((conditionalDepth + 1) != ctx.depth) return;
+            if(!forDepth) return;
+            if((forDepth + 1) != ctx.depth) return;
 
             if (!controlPolicy) controlPolicy = new ControlPolicy{this};
             ctx.dispatcher->AddListenerDispatch(controlPolicy);  
@@ -120,7 +120,7 @@ private:
     void CollectBlockHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-            if(conditionalDepth && (conditionalDepth + 1) == ctx.depth) {
+            if(forDepth && (forDepth + 1) == ctx.depth) {
                 if (!blockPolicy) blockPolicy = new BlockPolicy{this};
                 ctx.dispatcher->AddListenerDispatch(blockPolicy);                
             }
