@@ -11,8 +11,9 @@
 #include <srcDispatchUtilities.hpp>
 
 #include <DeclPolicySingleEvent.hpp>
-#include <ConditionPolicySingleEvent.hpp>
 #include <ExpressionPolicySingleEvent.hpp>
+#include <ConditionPolicySingleEvent.hpp>
+#include <IncrPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
@@ -22,16 +23,20 @@ struct ControlData {
 
     unsigned int lineNumber;
 
-    std::vector<std::shared_ptr<DeclData>>       init;
+    std::vector<std::any>                        init;
     std::shared_ptr<ExpressionData>              condition;
     std::vector<std::shared_ptr<ExpressionData>> incr;
 
     friend std::ostream& operator<<(std::ostream& out, const ControlData& controlData) {
 
         bool outputDeclComma = false;
-        for(const std::shared_ptr<DeclData> decl : controlData.init) {
+        for(const std::any item : controlData.init) {
             if(outputDeclComma) out << ", ";
-            out << *decl;
+            if(item.type() == typeid(std::shared_ptr<DeclData>))
+                out << *std::any_cast<std::shared_ptr<DeclData>>(item);
+            else {
+                out << *std::any_cast<std::shared_ptr<ExpressionData>>(item);
+            }
             outputDeclComma = true;
         }
 
@@ -58,22 +63,27 @@ private:
     ControlData        data;
     std::size_t        controlDepth;
     DeclPolicy      *  declPolicy;
-    ConditionPolicy *  conditionPolicy;
     ExpressionPolicy*  exprPolicy;
+    ConditionPolicy *  conditionPolicy;
+    IncrPolicy      *  incrPolicy;
 
 public:
     ControlPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
           controlDepth(0),
-          exprPolicy(nullptr) {
+          declPolicy(nullptr),
+          exprPolicy(nullptr),
+          conditionPolicy(nullptr),
+          incrPolicy(nullptr) {
         InitializeControlPolicyHandlers();
     }
 
     ~ControlPolicy() {
         if (declPolicy)      delete declPolicy;
-        if (conditionPolicy) delete conditionPolicy;
         if (exprPolicy)      delete exprPolicy;
+        if (conditionPolicy) delete conditionPolicy;
+        if (incrPolicy)      delete incrPolicy;
     }
 
 protected:
@@ -83,18 +93,12 @@ protected:
         using namespace srcDispatch;
         if(typeid(DeclPolicy) == typeid(*policy)) {
             data.init.push_back(policy->Data<DeclData>());
+        } else if(typeid(ExpressionPolicy) == typeid(*policy)) {
+            data.init.push_back(policy->Data<ExpressionData>());
         } else if(typeid(ConditionPolicy) == typeid(*policy)) {
             data.condition = policy->Data<ExpressionData>();
-        }  else if(typeid(ExpressionPolicy) == typeid(*policy)) {
-            if(ctx.IsOpen(ParserState::init)) {
-                std::shared_ptr<ExpressionData> expr = policy->Data<ExpressionData>();
-                std::shared_ptr<DeclData>       decl = std::make_shared<DeclData>();
-                decl->lineNumber = expr->lineNumber;
-                decl->init = expr;
-                data.init.push_back(decl);
-            } else {
-                data.incr.push_back(policy->Data<ExpressionData>());
-            }
+        } else if(typeid(IncrPolicy) == typeid(*policy)) {
+            data.incr.push_back(policy->Data<ExpressionData>());
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
