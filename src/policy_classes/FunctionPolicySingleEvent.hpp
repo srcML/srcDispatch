@@ -23,6 +23,8 @@
 struct FunctionData {
     enum FunctionType { CONSTRUCTOR, DESTRUCTOR, OPERATOR, FUNCTION };
 
+    std::vector<std::string> namespaces;
+
     unsigned int lineNumber;
     std::string                   language;
     std::string                   filename;
@@ -144,6 +146,7 @@ private:
             if (!functionDepth) {
                 functionDepth = ctx.depth;
                 data = FunctionData{};
+                data.namespaces = ctx.currentNamespaces;
                 data.lineNumber = ctx.currentLineNumber;
                 data.language = ctx.currentFileLanguage;
                 data.filename = ctx.currentFilePath;
