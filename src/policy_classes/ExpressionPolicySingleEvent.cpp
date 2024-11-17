@@ -5,17 +5,16 @@
 
 #include <ExpressionPolicySingleEvent.hpp>
 
-std::ostream& operator<<(std::ostream& out, const Token& token) {
-    return out << token.token;
-}
-
 std::ostream& operator<<(std::ostream& out, const ExpressionData& ex) {
-    for (std::shared_ptr<ExpressionElement> item : ex.expr) {
-        switch (item->type) {
-            case ExpressionElement::NAME:    out << *item->name;  break;
-            case ExpressionElement::OP:      out << *item->token; break;
-            case ExpressionElement::LITERAL: out << *item->token; break;
-            case ExpressionElement::CALL:    out << *item->call;  break;
+    for (std::any item : ex.expr) {
+        if(item.type() == typeid(std::shared_ptr<NameData>)) {
+            out << *std::any_cast<std::shared_ptr<NameData>>(item);
+        } else if(item.type() == typeid(std::shared_ptr<OperatorData>)) {
+            out << *std::any_cast<std::shared_ptr<OperatorData>>(item);
+        } else if(item.type() == typeid(std::shared_ptr<LiteralData>)) {
+            out << *std::any_cast<std::shared_ptr<LiteralData>>(item);
+        } else if(item.type() == typeid(std::shared_ptr<CallData>)) {
+            out << *std::any_cast<std::shared_ptr<CallData>>(item);
         }
         out << " ";
     }
@@ -23,15 +22,21 @@ std::ostream& operator<<(std::ostream& out, const ExpressionData& ex) {
 }
 
 ExpressionPolicy::~ExpressionPolicy() {
-        if(namePolicy)  delete namePolicy;
-        if(callPolicy)  delete callPolicy;
+        if(namePolicy)     delete namePolicy;
+        if(operatorPolicy) delete operatorPolicy;
+        if(literalPolicy)  delete literalPolicy;
+        if(callPolicy)     delete callPolicy;
 }
 
 void ExpressionPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
     if(typeid(NamePolicy) == typeid(*policy)) {
-        data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::NAME, policy->Data<NameData>()));
-    } else if(typeid(CallPolicy) == typeid(*policy)) {
-        data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::CALL, policy->Data<CallData>()));
+        data.expr.push_back(policy->Data<NameData>());
+    } else if(typeid(OperatorPolicy) == typeid(*policy)) {
+        data.expr.push_back(policy->Data<OperatorData>());
+    }  else if(typeid(LiteralPolicy) == typeid(*policy)) {
+        data.expr.push_back(policy->Data<LiteralData>());
+    }  else if(typeid(CallPolicy) == typeid(*policy)) {
+        data.expr.push_back(policy->Data<CallData>());
     } else {
         throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
@@ -50,7 +55,8 @@ void ExpressionPolicy::InitializeExpressionPolicyHandlers() {
             data.lineNumber = ctx.currentLineNumber;
             CollectNameHandlers();
             CollectCallHandlers();
-            CollectOtherHandlers();
+            CollectOperatorHandlers();
+            CollectLiteralHandlers();
         }
     };
 
@@ -84,17 +90,18 @@ void ExpressionPolicy::CollectCallHandlers() {
     };
 }
 
-void ExpressionPolicy::CollectOtherHandlers() {  //Get the operators
+void ExpressionPolicy::CollectOperatorHandlers() {
     using namespace srcDispatch;
-    closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-        std::shared_ptr<Token> token = std::make_shared<Token>(ctx.currentLineNumber, ctx.currentToken);
-        if (ctx.currentTag == "operator") {
-            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::OP, token));
-        }
-        if (ctx.currentTag == "literal") {
-            data.expr.push_back(std::make_shared<ExpressionElement>(ExpressionElement::LITERAL, token));
-        }
-
+    openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
+        if(!operatorPolicy) operatorPolicy = new OperatorPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(operatorPolicy);
     };
 }
 
+void ExpressionPolicy::CollectLiteralHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
+        if(!literalPolicy) literalPolicy = new LiteralPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(literalPolicy);
+    };
+}
