@@ -18,7 +18,7 @@
 #include <iostream>
 
 class BlockPolicy;
-class BlockData;
+struct BlockData;
 
 struct ForData {
 

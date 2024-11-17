@@ -62,9 +62,9 @@ public srcDispatch::PolicyListener {
 
 private:
     ExpressionData  data;
+    std::size_t     exprDepth;
     NamePolicy*     namePolicy;
     CallPolicy*     callPolicy;
-    std::size_t     exprDepth;
 
 public:
     ExpressionPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)

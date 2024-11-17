@@ -54,8 +54,8 @@ public:
     : srcDispatch::PolicyDispatcher(listeners),
           data{},
           callDepth(0),
-          expressionPolicy(nullptr),
-          namePolicy(nullptr) {
+          namePolicy(nullptr),
+          expressionPolicy(nullptr) {
         InitializeCallPolicyHandlers();
     }
 

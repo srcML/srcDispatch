@@ -30,7 +30,7 @@ struct ControlData {
     friend std::ostream& operator<<(std::ostream& out, const ControlData& controlData) {
 
         bool outputDeclComma = false;
-        for(const std::any item : controlData.init) {
+        for(const std::any& item : controlData.init) {
             if(outputDeclComma) out << ", ";
             if(item.type() == typeid(std::shared_ptr<DeclData>))
                 out << *std::any_cast<std::shared_ptr<DeclData>>(item);
@@ -43,7 +43,7 @@ struct ControlData {
         if(controlData.condition) out << *controlData.condition << "; ";
 
         bool outputExprComma = false;
-        for(const std::shared_ptr<ExpressionData> expr : controlData.incr) {
+        for(const std::shared_ptr<ExpressionData>& expr : controlData.incr) {
             if(outputExprComma) out << ", ";
             out << *expr;
             outputExprComma = true;

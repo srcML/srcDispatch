@@ -58,8 +58,8 @@ std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
 NamePolicy::~NamePolicy() {
     if (namePolicy)             delete namePolicy;
     if (operatorPolicy)         delete operatorPolicy;
-    if (expressionPolicy)       delete expressionPolicy;
     if (templateArgumentPolicy) delete templateArgumentPolicy;
+    if (expressionPolicy)       delete expressionPolicy;
 }
 
 

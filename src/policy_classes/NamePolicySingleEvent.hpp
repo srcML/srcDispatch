@@ -58,8 +58,8 @@ public:
           nameDepth(0),
           namePolicy(nullptr),
           operatorPolicy(nullptr),
-          expressionPolicy(nullptr),
-          templateArgumentPolicy(nullptr) {
+          templateArgumentPolicy(nullptr),
+          expressionPolicy(nullptr) {
         InitializeNamePolicyHandlers();
     }
 
