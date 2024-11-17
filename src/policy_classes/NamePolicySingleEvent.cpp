@@ -7,31 +7,40 @@
   */
 #include <NamePolicySingleEvent.hpp>
 
+#include <cassert>
+
 std::string NameData::SimpleName() const {
-    if (!name.empty())
+    if (!name.empty()) {
         return name;
-    return names.back()->SimpleName();
+    }
+
+    assert(names.back().type() == typeid(std::shared_ptr<NameData>));
+    return std::any_cast<std::shared_ptr<NameData>>(names.back())->SimpleName();
 }
 
-
 std::string NameData::ToString() const {
+
     std::string str = name;
-    for(std::size_t pos = 0; pos < names.size(); ++pos) {
-        if (pos != 0)
-            str += ' ';
-        str += names[pos]->ToString();
+    for(const std::any& name_element : names) {
+        if(name_element.type() == typeid(std::shared_ptr<NameData>)) {
+            str += std::any_cast<std::shared_ptr<NameData>>(name_element)->ToString();
+        } else {
+            str += std::any_cast<std::shared_ptr<OperatorData>>(name_element)->op;
+        }
     }
     return str;
 }
 
 
 std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
-    if (!nameData.name.empty()) {
-        out << nameData.name;
-    }
-    for (size_t pos = 0; pos < nameData.names.size(); ++pos) {
-        if (pos != 0) out << "::";
-        out << (*nameData.names[pos]);
+    out << nameData.name;
+
+    for(const std::any& name_element : nameData.names) {
+        if(name_element.type() == typeid(std::shared_ptr<NameData>)) {
+            out << *std::any_cast<std::shared_ptr<NameData>>(name_element);
+        } else {
+            out << std::any_cast<std::shared_ptr<OperatorData>>(name_element)->op;
+        }
     }
     if (!nameData.templateArguments.empty()) {
         out << '<';
@@ -48,14 +57,18 @@ std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
 
 NamePolicy::~NamePolicy() {
     if (namePolicy)             delete namePolicy;
+    if (operatorPolicy)         delete operatorPolicy;
     if (expressionPolicy)       delete expressionPolicy;
     if (templateArgumentPolicy) delete templateArgumentPolicy;
 }
 
 
 void NamePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx)  {
+
     if (typeid(NamePolicy) == typeid(*policy)) {
         data.names.push_back(policy->Data<NameData>());
+    } else if (typeid(OperatorPolicy) == typeid(*policy)) {
+        data.names.push_back(policy->Data<OperatorData>());
     } else if (typeid(TemplateArgumentPolicy) == typeid(*policy)) {
         data.templateArguments.push_back(policy->Data<TemplateArgumentData>());
     } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
@@ -76,6 +89,7 @@ void NamePolicy::InitializeNamePolicyHandlers() {
             nameDepth = ctx.depth;
             data = NameData{};
             data.lineNumber = ctx.currentLineNumber;
+            CollectOperatorsHandlers();
             CollectTemplateArgumentsHandlers();
             CollectArrayIndicesHandlers();
         } else if ((nameDepth + 1) == ctx.depth) {
@@ -96,6 +110,17 @@ void NamePolicy::InitializeNamePolicyHandlers() {
         if (nameDepth && nameDepth == ctx.depth) {
             data.name += ctx.currentToken;
         }
+    };
+}
+
+void NamePolicy::CollectOperatorsHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
+        if(!nameDepth) return;
+        if((nameDepth + 1) != ctx.depth) return;
+
+        if(!operatorPolicy) operatorPolicy = new OperatorPolicy{this};
+        ctx.dispatcher->AddListenerDispatch(operatorPolicy);
     };
 }
 

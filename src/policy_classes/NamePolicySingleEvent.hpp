@@ -11,6 +11,7 @@
 #include <srcDispatchUtilities.hpp>
 
 #include <TemplateArgumentPolicySingleEvent.hpp>
+#include <OperatorPolicySingleEvent.hpp>
 #include <ExpressionPolicySingleEvent.hpp>
 
 #include <string>
@@ -23,12 +24,11 @@ class  ExpressionPolicy;
 struct TemplateArgumentData;
 class  TemplateArgumentPolicy;
 
-
 struct NameData {
 
     unsigned int lineNumber;
     std::string                                        name;
-    std::vector<std::shared_ptr<NameData>>             names;
+    std::vector<std::any>                              names;
     std::vector<std::shared_ptr<TemplateArgumentData>> templateArguments;
     std::shared_ptr<ExpressionData>                    indices;
 
@@ -44,11 +44,12 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    NameData               data;
-    std::size_t            nameDepth;
-    NamePolicy             *namePolicy;
-    TemplateArgumentPolicy *templateArgumentPolicy;
-    ExpressionPolicy       *expressionPolicy;
+    NameData                data;
+    std::size_t             nameDepth;
+    NamePolicy            * namePolicy;
+    OperatorPolicy        * operatorPolicy;
+    TemplateArgumentPolicy* templateArgumentPolicy;
+    ExpressionPolicy      * expressionPolicy;
 
 public:
     NamePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -56,6 +57,7 @@ public:
           data{},
           nameDepth(0),
           namePolicy(nullptr),
+          operatorPolicy(nullptr),
           expressionPolicy(nullptr),
           templateArgumentPolicy(nullptr) {
         InitializeNamePolicyHandlers();
@@ -71,6 +73,7 @@ protected:
 
 private:
     void InitializeNamePolicyHandlers();
+    void CollectOperatorsHandlers();
     void CollectTemplateArgumentsHandlers();
     void CollectArrayIndicesHandlers();
 };
