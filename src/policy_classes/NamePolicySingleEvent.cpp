@@ -11,7 +11,7 @@
 
 std::string NameData::SimpleName() const {
     if (!name.empty()) {
-        return name;
+        return ToString();
     }
 
     assert(names.back().type() == typeid(std::shared_ptr<NameData>));
