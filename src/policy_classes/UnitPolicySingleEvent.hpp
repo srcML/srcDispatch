@@ -68,7 +68,7 @@ private:
         openEventMap[ParserState::structn]  = startClassPolicy;
 
         // end of policy
-        std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [this](srcSAXEventContext& ctx) {
+        std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [](srcSAXEventContext& ctx) {
         };
 
         closeEventMap[ParserState::classn]  = endClassPolicy;
@@ -86,7 +86,7 @@ private:
         openEventMap[ParserState::destructor]  = startFunction;
 
         // end of policy
-        std::function<void(srcDispatch::srcSAXEventContext&)> endFunction = [this](srcSAXEventContext& ctx) {
+        std::function<void(srcDispatch::srcSAXEventContext&)> endFunction = [](srcSAXEventContext& ctx) {
         };
 
 

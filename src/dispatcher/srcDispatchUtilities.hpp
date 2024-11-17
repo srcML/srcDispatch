@@ -66,16 +66,16 @@ namespace srcDispatch {
         public:
             srcSAXEventContext() = delete;
             srcSAXEventContext(EventDispatcher * dispatcher, const std::vector<std::string> & elementStack)
-                : dispatcher(dispatcher),
+                : writer{0},
+                  archiveBuffer{0},
+                  dispatcher(dispatcher),
                   elementStack(elementStack),
+                  currentLineNumber{0},
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
                   isPrev(false),
                   isOperator(false),
-                  endArchive(false),
-                  currentLineNumber{0},
-                  archiveBuffer{0},
-                  writer{0} {}
+                  endArchive(false) {}
             ~srcSAXEventContext(){
                 if(writer){
                     xmlBufferFree(archiveBuffer);
@@ -138,20 +138,19 @@ namespace srcDispatch {
                         srcML does not escape " while libxml2 does escape
                         quotations.
                     */
-                    int ret = 0;
                     char * text = (char *)text_content.c_str();
                     for(char * pos = text; *pos; ++pos) {       
                         if(*pos != '"') continue;       
                         
                         *pos = 0;
-                        ret = xmlTextWriterWriteString(writer, (const xmlChar *)text);
+                        xmlTextWriterWriteString(writer, (const xmlChar *)text);
                                
                         *pos = '\"';
                         xmlTextWriterWriteRaw(writer, (const xmlChar *)"\"");
                                
                         text = pos + 1;     
                     }       
-                    ret = xmlTextWriterWriteString(writer, (const xmlChar *)text);
+                    xmlTextWriterWriteString(writer, (const xmlChar *)text);
                 }  
             }
             inline bool And(const std::vector<ParserState> vec) const{
@@ -268,18 +267,14 @@ namespace srcDispatch {
             void NopOpenEvents(std::initializer_list<ParserState> states) {
 
                 for(ParserState state : states) {
-
-                    openEventMap[state] = [this](const srcSAXEventContext& ctx [[maybe_unused]]) {};
-
+                    openEventMap[state] = [](const srcSAXEventContext& ctx [[maybe_unused]]) {};
                 }
 
             }            
             void NopCloseEvents(std::initializer_list<ParserState> states) {
 
                 for(ParserState state : states) {
-
-                    closeEventMap[state] = [this](const srcSAXEventContext& ctx [[maybe_unused]]) {};
-
+                    closeEventMap[state] = [](const srcSAXEventContext& ctx [[maybe_unused]]) {};
                 }
 
             } 
@@ -427,7 +422,7 @@ namespace srcDispatch {
         std::list<EventListener*> elementListeners;
 
         EventDispatcher(const std::vector<std::string> & elementStack)
-            : elementListeners(), ctx(this, elementStack) {}
+            : ctx(this, elementStack), elementListeners() {}
         virtual ~EventDispatcher() {}
         virtual void DispatchEvent(ParserState, ElementState) = 0;
     };
