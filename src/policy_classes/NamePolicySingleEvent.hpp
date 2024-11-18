@@ -12,7 +12,6 @@
 
 #include <TemplateArgumentPolicySingleEvent.hpp>
 #include <OperatorPolicySingleEvent.hpp>
-#include <ExpressionPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>

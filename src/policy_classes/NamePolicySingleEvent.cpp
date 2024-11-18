@@ -7,6 +7,8 @@
   */
 #include <NamePolicySingleEvent.hpp>
 
+
+#include <ExpressionPolicySingleEvent.hpp>
 #include <cassert>
 
 std::string NameData::SimpleName() const {
@@ -28,6 +30,15 @@ std::string NameData::ToString() const {
             str += std::any_cast<std::shared_ptr<OperatorData>>(name_element)->op;
         }
     }
+
+    if (!templateArguments.empty()) {
+        str += '<';
+        for(const std::shared_ptr<TemplateArgumentData>& arg : templateArguments) {
+            str += arg->ToString();
+        }
+        str += '>';
+    }
+
     return str;
 }
 
@@ -44,7 +55,7 @@ std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
     }
     if (!nameData.templateArguments.empty()) {
         out << '<';
-        for(const std::shared_ptr<TemplateArgumentData> arg : nameData.templateArguments) {
+        for(const std::shared_ptr<TemplateArgumentData>& arg : nameData.templateArguments) {
             out << *arg;
         }
         out << '>';

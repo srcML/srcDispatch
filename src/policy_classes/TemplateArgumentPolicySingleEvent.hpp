@@ -10,12 +10,16 @@
 
 class NamePolicy;
 
+class ExpressionPolicy;
+struct ExpressionData;
+
 
 struct TemplateArgumentData {
-    enum TemplateArgumentType { NAME, LITERAL, MODIFIER, POINTER, REFERENCE, RVALUE, OPERATOR, CALL };
 
     unsigned int lineNumber;
-    std::vector<std::pair<std::any, TemplateArgumentType>> data;
+    std::vector<std::shared_ptr<ExpressionData>> arguments;
+
+    std::string ToString() const;
     friend std::ostream& operator<<(std::ostream& out, const TemplateArgumentData& argumentData);
 };
 
@@ -36,13 +40,13 @@ protected:
 
 private:
     void InitializeTemplateArgumentPolicyHandlers();
-    void CollectNamesHandler();
-    void CollectOthersHandler();
+    void CollectExpressionHandler();
 
 private:
     TemplateArgumentData data;
-    std::size_t argumentDepth;
-    NamePolicy * namePolicy;
+    std::size_t          argumentDepth;
+    NamePolicy      *    namePolicy;
+    ExpressionPolicy*    expressionPolicy;
 
 };
 
