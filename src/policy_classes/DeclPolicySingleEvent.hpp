@@ -24,6 +24,7 @@ struct DeclData {
     std::shared_ptr<TypeData>       type;
     std::shared_ptr<NameData>       name;
     std::shared_ptr<ExpressionData> init;
+    std::shared_ptr<ExpressionData> range;
     bool                            isStatic;
 
     friend std::ostream& operator<<(std::ostream& out, const DeclData& declData) {
@@ -35,6 +36,9 @@ struct DeclData {
         }
         if (declData.init) {
             out << " = " << *declData.init;
+        }
+        if (declData.range) {
+            out << " : " << *declData.range;
         }
         return out;
     }
@@ -77,12 +81,17 @@ protected:
     void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
 
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
+        using namespace srcDispatch;
         if (typeid(TypePolicy) == typeid(*policy)) {
             data.type = std::shared_ptr<TypeData>(policy->Data<TypeData>());
         } else if (typeid(NamePolicy) == typeid(*policy)) {
             data.name = policy->Data<NameData>(); 
         } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
-            data.init = policy->Data<ExpressionData>();
+            if(ctx.IsOpen(ParserState::range)) {
+                data.range = policy->Data<ExpressionData>();
+            } else {
+                data.init = policy->Data<ExpressionData>();
+            }
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
         }
@@ -106,6 +115,7 @@ private:
             CollectTypeHandlers();
             CollectNameHandlers();
             CollectInitHandlers();
+            CollectRangeHandlers();
         };
 
         // close policy
@@ -173,6 +183,24 @@ private:
             NopOpenEvents({ParserState::expr});
         };
     }
+
+    void CollectRangeHandlers() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::range] = [this](srcSAXEventContext& ctx) {
+            if(!declDepth || (declDepth + 1) != ctx.depth) return;
+
+            openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
+                if(!exprPolicy) exprPolicy = new ExpressionPolicy{this};
+                ctx.dispatcher->AddListenerDispatch(exprPolicy);
+            };
+        };
+        closeEventMap[ParserState::range] = [this](srcSAXEventContext& ctx) {
+            if(!declDepth || (declDepth + 1) != ctx.depth) return;
+
+            NopOpenEvents({ParserState::expr});
+        };
+    }
+
 
 };
 

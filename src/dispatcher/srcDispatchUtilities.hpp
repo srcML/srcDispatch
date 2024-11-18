@@ -47,7 +47,7 @@ namespace srcDispatch {
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
         ifstmt, nonterminal, macro, classblock, functionblock, constructorblock, ifblock, whileblock, forblock,
         switchstmt, switchcase, specifier, throws, typedefexpr, userdefined, comment, annotation, condition,
-        dostmt, incr, decr, control, ifgroup,
+        dostmt, incr, decr, control, ifgroup, range,
 
         // NLP states
         snoun, propersnoun, spronoun, sadjective, sverb,
