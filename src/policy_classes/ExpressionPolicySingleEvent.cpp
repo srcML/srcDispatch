@@ -6,7 +6,11 @@
 #include <ExpressionPolicySingleEvent.hpp>
 
 std::ostream& operator<<(std::ostream& out, const ExpressionData& ex) {
+    bool outputSpace = false;
     for (std::any item : ex.expr) {
+        if(outputSpace) {
+            out << ' ';
+        }
         if(item.type() == typeid(std::shared_ptr<NameData>)) {
             out << *std::any_cast<std::shared_ptr<NameData>>(item);
         } else if(item.type() == typeid(std::shared_ptr<OperatorData>)) {
@@ -16,7 +20,7 @@ std::ostream& operator<<(std::ostream& out, const ExpressionData& ex) {
         } else if(item.type() == typeid(std::shared_ptr<CallData>)) {
             out << *std::any_cast<std::shared_ptr<CallData>>(item);
         }
-        out << " ";
+        outputSpace = false;
     }
     return out;
 }

@@ -10,26 +10,26 @@
 
 #include <srcDispatchUtilities.hpp>
 
-#include <TemplateArgumentPolicySingleEvent.hpp>
+#include <TemplateArgumentListPolicySingleEvent.hpp>
 #include <OperatorPolicySingleEvent.hpp>
 
 #include <string>
 #include <vector>
 #include <iostream>
 
-struct ExpressionData;
 class  ExpressionPolicy;
+struct ExpressionData;
 
-struct TemplateArgumentData;
-class  TemplateArgumentPolicy;
+class TemplateArgumentListPolicy;
+struct TemplateArgumentListData;
 
 struct NameData {
 
     unsigned int lineNumber;
-    std::string                                        name;
-    std::vector<std::any>                              names;
-    std::vector<std::shared_ptr<TemplateArgumentData>> templateArguments;
-    std::shared_ptr<ExpressionData>                    indices;
+    std::string                               name;
+    std::vector<std::any>                     names;
+    std::shared_ptr<TemplateArgumentListData> templateArgumentList;
+    std::shared_ptr<ExpressionData>           indices;
 
     std::string SimpleName() const;
     std::string ToString() const;
@@ -43,12 +43,12 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    NameData                data;
-    std::size_t             nameDepth;
-    NamePolicy            * namePolicy;
-    OperatorPolicy        * operatorPolicy;
-    TemplateArgumentPolicy* templateArgumentPolicy;
-    ExpressionPolicy      * expressionPolicy;
+    NameData                    data;
+    std::size_t                 nameDepth;
+    NamePolicy                * namePolicy;
+    OperatorPolicy            * operatorPolicy;
+    TemplateArgumentListPolicy* templateArgumentListPolicy;
+    ExpressionPolicy          * expressionPolicy;
 
 public:
     NamePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -57,7 +57,7 @@ public:
           nameDepth(0),
           namePolicy(nullptr),
           operatorPolicy(nullptr),
-          templateArgumentPolicy(nullptr),
+          templateArgumentListPolicy(nullptr),
           expressionPolicy(nullptr) {
         InitializeNamePolicyHandlers();
     }
@@ -73,7 +73,7 @@ protected:
 private:
     void InitializeNamePolicyHandlers();
     void CollectOperatorsHandlers();
-    void CollectTemplateArgumentsHandlers();
+    void CollectTemplateArgumentListHandlers();
     void CollectArrayIndicesHandlers();
 };
 

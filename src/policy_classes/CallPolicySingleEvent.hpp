@@ -8,7 +8,6 @@
 #include <srcDispatchUtilities.hpp>
 
 #include <NamePolicySingleEvent.hpp>
-#include <TemplateArgumentPolicySingleEvent.hpp>
 #include <ExpressionPolicySingleEvent.hpp>
 
 #include <string>
