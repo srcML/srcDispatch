@@ -52,9 +52,9 @@ public:
     }
 
 protected:
-    std::any DataInner() const { return std::make_shared<IncrData>(data); }
+    std::any DataInner() const override { return std::make_shared<IncrData>(data); }
 
-    void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
+    void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(ExpressionPolicy) == typeid(*policy)) {
             data.expr = policy->Data<ExpressionData>();
         } else {

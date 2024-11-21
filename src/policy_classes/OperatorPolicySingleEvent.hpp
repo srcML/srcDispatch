@@ -44,8 +44,8 @@ public:
     }
 
 protected:
-    std::any DataInner() const { return std::make_shared<OperatorData>(data); }
-    void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {}
+    std::any DataInner() const override { return std::make_shared<OperatorData>(data); }
+    void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {}
     void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 private:

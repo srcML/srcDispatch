@@ -45,9 +45,9 @@ public:
     }
 
 protected:
-    std::any DataInner() const { return std::make_shared<ConditionalData>(data); }
+    std::any DataInner() const override { return std::make_shared<ConditionalData>(data); }
 
-    void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
+    void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(ConditionPolicy) == typeid(*policy)) {
             data.condition = policy->Data<ExpressionData>();
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
