@@ -42,8 +42,6 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<std::vector<std::shared_ptr<DeclData>>>(decls); }
 
-    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
-
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(DeclPolicy) == typeid(*policy)) {
             std::shared_ptr<DeclData> decl = policy->Data<DeclData>();
@@ -58,6 +56,8 @@ protected:
 
         ctx.dispatcher->RemoveListener(nullptr);
     }
+
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 private:
     void InitializeDeclTypePolicyHandlers() {

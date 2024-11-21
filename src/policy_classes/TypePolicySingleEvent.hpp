@@ -38,7 +38,7 @@ public:
     TypePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners);
     ~TypePolicy();
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
-    virtual void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override;
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 protected:
     virtual std::any DataInner() const override;

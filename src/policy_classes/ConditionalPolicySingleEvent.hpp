@@ -59,7 +59,7 @@ protected:
         ctx.dispatcher->RemoveListener(nullptr);
     }
 
-    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
     void InitializeConditionalPolicyHandlers() {
         using namespace srcDispatch;

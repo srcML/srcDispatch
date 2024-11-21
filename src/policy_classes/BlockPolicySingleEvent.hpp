@@ -65,10 +65,8 @@ public:
 
 protected:
     std::any DataInner() const override;
-
-    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
-
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 private:
     void InitializeBlockPolicyHandlers();

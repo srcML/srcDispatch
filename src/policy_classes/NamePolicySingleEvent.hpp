@@ -68,7 +68,7 @@ protected:
 
     std::any DataInner() const override { return std::make_shared<NameData>(data); }
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
-    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 private:
     void InitializeNamePolicyHandlers();

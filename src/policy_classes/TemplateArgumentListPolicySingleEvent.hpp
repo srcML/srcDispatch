@@ -33,7 +33,7 @@ public:
     TemplateArgumentListPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
     ~TemplateArgumentListPolicy();
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
-    virtual void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override;
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 protected:
     virtual std::any DataInner() const override;

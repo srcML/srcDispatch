@@ -54,8 +54,6 @@ void TemplateArgumentListPolicy::Notify(const PolicyDispatcher* policy, const sr
     ctx.dispatcher->RemoveListener(nullptr);
 }
 
-void TemplateArgumentListPolicy::NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]){}
-
 std::any TemplateArgumentListPolicy::DataInner() const {
     return std::make_shared<TemplateArgumentListData>(data);
 }

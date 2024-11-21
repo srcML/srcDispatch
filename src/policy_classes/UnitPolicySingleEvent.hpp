@@ -43,13 +43,13 @@ public:
         if(classPolicy)    delete classPolicy;
     }
 
-    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
-
     void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         // Assumes at least one lister which should always be one
         policyListeners.back()->Notify(policy, ctx);
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
     }
+
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 protected:
     std::any DataInner() const override { return std::any(); }

@@ -78,8 +78,6 @@ public:
 protected:
     std::any DataInner() const override { return std::make_shared<DeclData>(data); }
 
-    void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) override {} //doesn't use other parsers
-
     virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         using namespace srcDispatch;
         if (typeid(TypePolicy) == typeid(*policy)) {
@@ -98,6 +96,8 @@ protected:
 
         ctx.dispatcher->RemoveListener(nullptr);
     }
+
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 private:
     void InitializeDeclPolicyHandlers() {

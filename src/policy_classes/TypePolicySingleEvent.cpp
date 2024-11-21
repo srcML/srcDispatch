@@ -63,8 +63,6 @@ void TypePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSA
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 }
 
-void TypePolicy::NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]){}
-
 std::any TypePolicy::DataInner() const {
     return std::make_shared<TypeData>(data);
 }

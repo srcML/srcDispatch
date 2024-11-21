@@ -87,8 +87,6 @@ public:
 		if (classPolicy)    delete classPolicy;
 	}
 
-	void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} //doesn't use other parsers
-
 	void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
 		if (typeid(NamePolicy) == typeid(*policy)) {
 			data.name = policy->Data<NameData>();
@@ -115,6 +113,8 @@ public:
 
 		ctx.dispatcher->RemoveListenerDispatch(nullptr);
 	}
+
+    void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
 protected:
 	std::any DataInner() const override { return std::make_shared<ClassData>(data); }
