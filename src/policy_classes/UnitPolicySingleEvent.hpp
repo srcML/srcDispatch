@@ -10,6 +10,7 @@
 
 #include <srcDispatchUtilities.hpp>
 
+#include <DeclTypePolicySingleEvent.hpp>
 #include <FunctionPolicySingleEvent.hpp>
 #include <ClassPolicySingleEvent.hpp>
 
@@ -27,6 +28,7 @@ class UnitPolicy :
     public srcDispatch::PolicyListener   {
 
 public:
+    DeclTypePolicy* declPolicy;
     FunctionPolicy* functionPolicy;
     ClassPolicy   * classPolicy;
 
@@ -39,6 +41,7 @@ public:
     }
 
     ~UnitPolicy() {
+        if(declPolicy)     delete declPolicy;
         if(functionPolicy) delete functionPolicy;
         if(classPolicy)    delete classPolicy;
     }
@@ -93,6 +96,14 @@ private:
         closeEventMap[ParserState::function]    = endFunction;
         closeEventMap[ParserState::constructor] = endFunction;
         closeEventMap[ParserState::destructor]  = endFunction;
+
+        openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+            if(!declPolicy) declPolicy = new DeclTypePolicy{this};
+            ctx.dispatcher->AddListenerDispatch(declPolicy);
+        };
+
+        closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {
+        };
 
     }
 };
