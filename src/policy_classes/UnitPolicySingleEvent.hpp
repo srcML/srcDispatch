@@ -14,6 +14,7 @@
 #include <FunctionPolicySingleEvent.hpp>
 #include <ClassPolicySingleEvent.hpp>
 
+#include <memory>
 #include <typeinfo>
 #include <string>
 #include <vector>
@@ -28,24 +29,17 @@ class UnitPolicy :
     public srcDispatch::PolicyListener   {
 
 public:
-    DeclTypePolicy* declPolicy;
-    FunctionPolicy* functionPolicy;
-    ClassPolicy   * classPolicy;
+    std::unique_ptr<DeclTypePolicy> declPolicy;
+    std::unique_ptr<FunctionPolicy> functionPolicy;
+    std::unique_ptr<ClassPolicy>    classPolicy;
 
 public:
     UnitPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners) :
-                srcDispatch::PolicyDispatcher(listeners),
-                declPolicy(nullptr), 
-                functionPolicy(nullptr),
-                classPolicy(nullptr) {
+                srcDispatch::PolicyDispatcher(listeners) {
         InitializeUnitPolicyHandlers();
     }
 
-    ~UnitPolicy() {
-        if(declPolicy)     delete declPolicy;
-        if(functionPolicy) delete functionPolicy;
-        if(classPolicy)    delete classPolicy;
-    }
+    ~UnitPolicy() {}
 
     void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         // Assumes at least one lister which should always be one
@@ -64,8 +58,8 @@ private:
 
         // start of policy
         std::function<void(srcDispatch::srcSAXEventContext&)> startClassPolicy = [this](srcSAXEventContext& ctx) {
-            if(!classPolicy) classPolicy = new ClassPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(classPolicy);
+            if(!classPolicy) classPolicy = make_unique_policy<ClassPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(classPolicy.get());
         };
 
         openEventMap[ParserState::classn]   = startClassPolicy;
@@ -80,8 +74,8 @@ private:
 
         // start function of policy
         std::function<void(srcDispatch::srcSAXEventContext&)> startFunction = [this](srcSAXEventContext& ctx) {
-            if(!functionPolicy) functionPolicy = new FunctionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(functionPolicy);
+            if(!functionPolicy) functionPolicy = make_unique_policy<FunctionPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(functionPolicy.get());
         };
 
 
@@ -99,8 +93,8 @@ private:
         closeEventMap[ParserState::destructor]  = endFunction;
 
         openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-            if(!declPolicy) declPolicy = new DeclTypePolicy{this};
-            ctx.dispatcher->AddListenerDispatch(declPolicy);
+            if(!declPolicy) declPolicy = make_unique_policy<DeclTypePolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(declPolicy.get());
         };
 
         closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {

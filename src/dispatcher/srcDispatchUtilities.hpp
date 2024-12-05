@@ -38,6 +38,7 @@
 #define INCLUDED_SRCSAX_EVENT_DISPATCH_UTILITIES_HPP
 
 namespace srcDispatch {
+
     class EventDispatcher;            
     enum ElementState {open, close};
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt,
@@ -471,6 +472,12 @@ namespace srcDispatch {
         }
 
     };
+
+    template<class Policy>
+    constexpr std::unique_ptr<Policy> make_unique_policy(std::initializer_list<PolicyListener*>&& args) {
+        return std::make_unique<Policy>(args);
+    }
+
 }
 
 #endif
