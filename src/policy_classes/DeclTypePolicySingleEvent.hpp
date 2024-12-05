@@ -24,7 +24,7 @@ public srcDispatch::PolicyListener {
 private:
     std::vector<std::shared_ptr<DeclData>> decls;
     std::size_t                            declDepth;
-    DeclPolicy*                            declPolicy;
+    std::unique_ptr<DeclPolicy>            declPolicy;
 
 public:
     DeclTypePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -35,9 +35,7 @@ public:
         InitializeDeclTypePolicyHandlers();
     }
 
-    ~DeclTypePolicy() {
-        if (declPolicy) delete declPolicy;
-    }
+    ~DeclTypePolicy() {}
 
 protected:
     std::any DataInner() const override { return std::make_shared<std::vector<std::shared_ptr<DeclData>>>(decls); }
@@ -94,8 +92,8 @@ private:
         openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
             if(!declDepth || (declDepth + 1) != ctx.depth) return;
 
-            if (!declPolicy) declPolicy = new DeclPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(declPolicy);
+            if (!declPolicy) declPolicy = make_unique_policy<DeclPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(declPolicy.get());
         };
     }
 

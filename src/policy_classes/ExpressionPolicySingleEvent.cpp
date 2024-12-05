@@ -25,12 +25,7 @@ std::ostream& operator<<(std::ostream& out, const ExpressionData& ex) {
     return out;
 }
 
-ExpressionPolicy::~ExpressionPolicy() {
-        if(namePolicy)     delete namePolicy;
-        if(operatorPolicy) delete operatorPolicy;
-        if(literalPolicy)  delete literalPolicy;
-        if(callPolicy)     delete callPolicy;
-}
+ExpressionPolicy::~ExpressionPolicy() {}
 
 void ExpressionPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
     if(typeid(NamePolicy) == typeid(*policy)) {
@@ -81,31 +76,31 @@ void ExpressionPolicy::InitializeExpressionPolicyHandlers() {
 void ExpressionPolicy::CollectNameHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-        if(!namePolicy) namePolicy = new NamePolicy{this};
-        ctx.dispatcher->AddListenerDispatch(namePolicy);
+        if(!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(namePolicy.get());
     };
 }
 
 void ExpressionPolicy::CollectCallHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
-        if(!callPolicy) callPolicy = new CallPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(callPolicy);
+        if(!callPolicy) callPolicy = make_unique_policy<CallPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(callPolicy.get());
     };
 }
 
 void ExpressionPolicy::CollectOperatorHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
-        if(!operatorPolicy) operatorPolicy = new OperatorPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(operatorPolicy);
+        if(!operatorPolicy) operatorPolicy = make_unique_policy<OperatorPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(operatorPolicy.get());
     };
 }
 
 void ExpressionPolicy::CollectLiteralHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
-        if(!literalPolicy) literalPolicy = new LiteralPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(literalPolicy);
+        if(!literalPolicy) literalPolicy = make_unique_policy<LiteralPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(literalPolicy.get());
     };
 }

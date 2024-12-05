@@ -26,23 +26,18 @@ public srcDispatch::PolicyListener {
 protected:
     ConditionalData  data;
     std::size_t      conditionalDepth;
-    ConditionPolicy* conditionPolicy;
-    BlockPolicy    * blockPolicy;
+    std::unique_ptr<ConditionPolicy> conditionPolicy;
+    std::unique_ptr<BlockPolicy>     blockPolicy;
 
 public:
     ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          conditionalDepth(0),
-          conditionPolicy(nullptr),
-          blockPolicy(nullptr) {
+          conditionalDepth(0) {
         InitializeConditionalPolicyHandlers();
     }
 
-    ~ConditionalPolicy() {
-        if (conditionPolicy) delete conditionPolicy;
-        if (blockPolicy)     delete blockPolicy;
-    }
+    ~ConditionalPolicy() {}
 
 protected:
     std::any DataInner() const override { return std::make_shared<ConditionalData>(data); }
@@ -91,8 +86,8 @@ protected:
             if(!conditionalDepth) return;
             if((conditionalDepth + 1) != ctx.depth) return;
 
-            if (!conditionPolicy) conditionPolicy = new ConditionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(conditionPolicy);  
+            if (!conditionPolicy) conditionPolicy = make_unique_policy<ConditionPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(conditionPolicy.get());
         };              
     }
 
@@ -102,8 +97,8 @@ protected:
             if(!conditionalDepth) return;
             if((conditionalDepth + 1) != ctx.depth) return;
 
-            if (!blockPolicy) blockPolicy = new BlockPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(blockPolicy);                
+            if (!blockPolicy) blockPolicy = make_unique_policy<BlockPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
         };
     }
 };

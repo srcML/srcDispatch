@@ -62,30 +62,21 @@ private:
 	std::size_t                classDepth;
     ClassData::AccessSpecifier currentRegion;
 
-	NamePolicy    * namePolicy;
-	DeclTypePolicy* declPolicy;
-	FunctionPolicy* functionPolicy;
-	ClassPolicy   * classPolicy;
+	std::unique_ptr<NamePolicy>     namePolicy;
+	std::unique_ptr<DeclTypePolicy> declPolicy;
+	std::unique_ptr<FunctionPolicy> functionPolicy;
+	std::unique_ptr<ClassPolicy>    classPolicy;
 
 public:
 	ClassPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
 		: srcDispatch::PolicyDispatcher(listeners),
 		  data{},
 		  classDepth(0),
-		  currentRegion(ClassData::PUBLIC),
-		  namePolicy(nullptr),
-		  declPolicy(nullptr),
-		  functionPolicy(nullptr),
-		  classPolicy(nullptr) {
+		  currentRegion(ClassData::PUBLIC) {
 		InitializeClassPolicyHandlers();
 	}
 
-	~ClassPolicy() {
-		if (namePolicy)     delete namePolicy;
-		if (declPolicy)     delete declPolicy;
-		if (functionPolicy) delete functionPolicy;
-		if (classPolicy)    delete classPolicy;
-	}
+	~ClassPolicy() {}
 
 	void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
 		if (typeid(NamePolicy) == typeid(*policy)) {
@@ -146,8 +137,8 @@ private:
 				CollectSuperHanders();
 				CollectBlockHanders();
 			} else if ((classDepth + 3) == ctx.depth) {
-				if (!classPolicy) classPolicy = new ClassPolicy{this};
-				ctx.dispatcher->AddListenerDispatch(classPolicy);
+				if (!classPolicy) classPolicy = make_unique_policy<ClassPolicy>({this});
+				ctx.dispatcher->AddListenerDispatch(classPolicy.get());
 			}
 		};
 
@@ -170,8 +161,8 @@ private:
 		using namespace srcDispatch;
 		openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
-				if (!namePolicy) namePolicy = new NamePolicy{this};
-				ctx.dispatcher->AddListenerDispatch(namePolicy);
+				if (!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
+				ctx.dispatcher->AddListenerDispatch(namePolicy.get());
 			}
 		};
 		closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
@@ -232,14 +223,14 @@ private:
 				// set up to listen to decl_stmt, member, and class policies
 				openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
 					if ((classDepth + 3) == ctx.depth) {
-						if (!declPolicy) declPolicy = new DeclTypePolicy{this};
-						ctx.dispatcher->AddListenerDispatch(declPolicy);
+						if (!declPolicy) declPolicy = make_unique_policy<DeclTypePolicy>({this});
+						ctx.dispatcher->AddListenerDispatch(declPolicy.get());
 					}
 				};
 				std::function<void (srcSAXEventContext& ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
 					if ((classDepth + 3) == ctx.depth) {
-						if (!functionPolicy) functionPolicy = new FunctionPolicy{this};
-						ctx.dispatcher->AddListenerDispatch(functionPolicy);
+						if (!functionPolicy) functionPolicy = make_unique_policy<FunctionPolicy>({this});
+						ctx.dispatcher->AddListenerDispatch(functionPolicy.get());
 					}
 				};
 				openEventMap[ParserState::function] = functionEvent;

@@ -25,9 +25,9 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    std::shared_ptr<ExpressionData> data;
-    std::size_t                     conditionDepth;
-    ExpressionPolicy*               exprPolicy;
+    std::shared_ptr<ExpressionData>   data;
+    std::size_t                       conditionDepth;
+    std::unique_ptr<ExpressionPolicy> exprPolicy;
 
 public:
     ConditionPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -38,9 +38,7 @@ public:
         InitializeConditionPolicyHandlers();
     }
 
-    ~ConditionPolicy() {
-        if (exprPolicy) delete exprPolicy;
-    }
+    ~ConditionPolicy() {}
 
 protected:
     std::any DataInner() const override { return data; }
@@ -81,8 +79,8 @@ private:
     void CollectExpressionHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-            if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(exprPolicy);
+            if (!exprPolicy) exprPolicy = make_unique_policy<ExpressionPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
         };
     }
 

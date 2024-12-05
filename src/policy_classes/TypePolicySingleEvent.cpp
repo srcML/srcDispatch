@@ -5,6 +5,8 @@
 
 #include <TypePolicySingleEvent.hpp>
 
+#include <ExpressionPolicySingleEvent.hpp>
+
 std::string TypeData::ToString() const {
     std::string type_str;
     for (std::size_t pos = 0; pos < types.size(); ++pos) {
@@ -47,15 +49,12 @@ std::ostream& operator<<(std::ostream& out, const TypeData& typeData) {
 TypePolicy::TypePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
       data{},
-      typeDepth(0),
-      namePolicy(nullptr) {
+      typeDepth(0) {
 
     InitializeTypePolicyHandlers();
 }
 
-TypePolicy::~TypePolicy(){
-    if (namePolicy) delete namePolicy;
-}
+TypePolicy::~TypePolicy() {}
 
 void TypePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
     //this causes undefined behavior if types is empty
@@ -96,8 +95,8 @@ void TypePolicy::CollectNamesHandler() {
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
         if (typeDepth && (typeDepth + 1) == ctx.depth) {
             data.types.push_back(std::make_pair(std::shared_ptr<NameData>(), TypeData::TYPENAME));
-            if (!namePolicy) namePolicy = new NamePolicy{this};
-            ctx.dispatcher->AddListenerDispatch(namePolicy);
+            if (!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(namePolicy.get());
         }
     };
 }

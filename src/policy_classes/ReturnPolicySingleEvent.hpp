@@ -25,22 +25,19 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    std::shared_ptr<ExpressionData> data;
-    std::size_t                     returnDepth;
-    ExpressionPolicy*               exprPolicy;
+    std::shared_ptr<ExpressionData>   data;
+    std::size_t                       returnDepth;
+    std::unique_ptr<ExpressionPolicy> exprPolicy;
 
 public:
     ReturnPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          returnDepth(0),
-          exprPolicy(nullptr) {
+          returnDepth(0) {
         InitializeReturnPolicyHandlers();
     }
 
-    ~ReturnPolicy() {
-        if (exprPolicy) delete exprPolicy;
-    }
+    ~ReturnPolicy() {}
 
 protected:
     std::any DataInner() const override { return data; }
@@ -81,8 +78,8 @@ private:
     void CollectExpressionHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-            if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(exprPolicy);
+            if (!exprPolicy) exprPolicy = make_unique_policy<ExpressionPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
         };
     }
 

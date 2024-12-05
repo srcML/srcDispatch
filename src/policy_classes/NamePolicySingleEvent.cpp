@@ -58,12 +58,7 @@ std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
     return out;
 }
 
-NamePolicy::~NamePolicy() {
-    if (namePolicy)                 delete namePolicy;
-    if (operatorPolicy)             delete operatorPolicy;
-    if (templateArgumentListPolicy) delete templateArgumentListPolicy;
-    if (expressionPolicy)           delete expressionPolicy;
-}
+NamePolicy::~NamePolicy() {}
 
 
 void NamePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx)  {
@@ -97,8 +92,8 @@ void NamePolicy::InitializeNamePolicyHandlers() {
             CollectArrayIndicesHandlers();
         } else if ((nameDepth + 1) == ctx.depth) {
             NopCloseEvents({ParserState::tokenstring});
-            if (!namePolicy) namePolicy = new NamePolicy{this};
-            ctx.dispatcher->AddListenerDispatch(namePolicy);
+            if (!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(namePolicy.get());
         }
     };
     // end of policy
@@ -122,8 +117,8 @@ void NamePolicy::CollectOperatorsHandlers() {
         if(!nameDepth) return;
         if((nameDepth + 1) != ctx.depth) return;
 
-        if(!operatorPolicy) operatorPolicy = new OperatorPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(operatorPolicy);
+        if(!operatorPolicy) operatorPolicy = make_unique_policy<OperatorPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(operatorPolicy.get());
     };
 }
 
@@ -134,8 +129,8 @@ void NamePolicy::CollectTemplateArgumentListHandlers() {
         if (!nameDepth) return;
         if((nameDepth + 1) != ctx.depth) return;
 
-        if (!templateArgumentListPolicy) templateArgumentListPolicy = new TemplateArgumentListPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(templateArgumentListPolicy);
+        if (!templateArgumentListPolicy) templateArgumentListPolicy = make_unique_policy<TemplateArgumentListPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(templateArgumentListPolicy.get());
     };
 }
 
@@ -144,8 +139,8 @@ void NamePolicy::CollectArrayIndicesHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-            if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+            if(!expressionPolicy) expressionPolicy = make_unique_policy<ExpressionPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(expressionPolicy.get());
         };
     };
 }

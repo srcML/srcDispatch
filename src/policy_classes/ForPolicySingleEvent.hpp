@@ -43,24 +43,19 @@ public srcDispatch::PolicyListener {
 private:
     ForData         data;
     std::size_t     forDepth;
-    ControlPolicy * controlPolicy;
-    BlockPolicy   * blockPolicy;
+    std::unique_ptr<ControlPolicy> controlPolicy;
+    std::unique_ptr<BlockPolicy>   blockPolicy;
 
 public:
 
     ForPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          forDepth(0),
-          controlPolicy(nullptr),
-          blockPolicy(nullptr) {
+          forDepth(0) {
         InitializeForPolicyHandlers();
     }
 
-    ~ForPolicy() {
-        if (controlPolicy) delete controlPolicy;
-        if (blockPolicy)   delete blockPolicy;
-    }
+    ~ForPolicy() {}
 
 protected:
     std::any DataInner() const { return std::make_shared<ForData>(data); }
@@ -112,8 +107,8 @@ private:
             if(!forDepth) return;
             if((forDepth + 1) != ctx.depth) return;
 
-            if (!controlPolicy) controlPolicy = new ControlPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(controlPolicy);  
+            if (!controlPolicy) controlPolicy = make_unique_policy<ControlPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(controlPolicy.get());  
         };              
     }
 
@@ -121,8 +116,8 @@ private:
         using namespace srcDispatch;
         openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
             if(forDepth && (forDepth + 1) == ctx.depth) {
-                if (!blockPolicy) blockPolicy = new BlockPolicy{this};
-                ctx.dispatcher->AddListenerDispatch(blockPolicy);                
+                if (!blockPolicy) blockPolicy = make_unique_policy<BlockPolicy>({this});
+                ctx.dispatcher->AddListenerDispatch(blockPolicy.get());                
             }
         };
     }

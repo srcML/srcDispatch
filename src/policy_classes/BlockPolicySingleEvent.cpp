@@ -18,30 +18,11 @@
 BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
       data{},
-      blockDepth(0),
-      declstmtPolicy(nullptr),
-      returnPolicy(nullptr),
-      exprStmtPolicy(nullptr),
-      blockPolicy(nullptr),
-      ifStmtPolicy(nullptr),
-      switchPolicy(nullptr),
-      whilePolicy(nullptr),
-      forPolicy(nullptr),
-      doPolicy(nullptr) {
+      blockDepth(0) {
     InitializeBlockPolicyHandlers();
 }
 
-BlockPolicy::~BlockPolicy() {
-    if (declstmtPolicy)    delete declstmtPolicy;
-    if (returnPolicy)      delete returnPolicy;
-    if (exprStmtPolicy)    delete exprStmtPolicy;
-    if (blockPolicy)       delete blockPolicy;
-    if (ifStmtPolicy)      delete ifStmtPolicy;
-    if (switchPolicy)      delete switchPolicy;
-    if (whilePolicy)       delete whilePolicy;
-    if (forPolicy)         delete forPolicy;
-    if (doPolicy)          delete doPolicy;
-}
+BlockPolicy::~BlockPolicy() {}
 
 std::any BlockPolicy::DataInner() const { return std::make_shared<BlockData>(data); }
 
@@ -97,8 +78,8 @@ void BlockPolicy::CollectBlockHandlers() {
             data = BlockData{};
             data.startLineNumber = ctx.currentLineNumber;
         } else {
-            if (!blockPolicy) blockPolicy = new BlockPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(blockPolicy);
+            if (!blockPolicy) blockPolicy = make_unique_policy<BlockPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
         }
     };
 
@@ -116,32 +97,32 @@ void BlockPolicy::CollectBlockHandlers() {
 void BlockPolicy::CollectReturnHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx) {
-        if (!returnPolicy) returnPolicy = new ReturnPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(returnPolicy);
+        if (!returnPolicy) returnPolicy = make_unique_policy<ReturnPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(returnPolicy.get());
     };
 }
 
 void BlockPolicy::CollectExpressionHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx) {
-        if (!exprStmtPolicy) exprStmtPolicy = new ExprStmtPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(exprStmtPolicy);
+        if (!exprStmtPolicy) exprStmtPolicy = make_unique_policy<ExprStmtPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(exprStmtPolicy.get());
     };
 }
 
 void BlockPolicy::CollectDeclstmtHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-        if (!declstmtPolicy) declstmtPolicy = new DeclTypePolicy{this};
-        ctx.dispatcher->AddListenerDispatch(declstmtPolicy);
+        if (!declstmtPolicy) declstmtPolicy = make_unique_policy<DeclTypePolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(declstmtPolicy.get());
     };
 }
 
 void BlockPolicy::CollectIfStmtHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::ifgroup] = [this](srcSAXEventContext& ctx) {
-        if (!ifStmtPolicy) ifStmtPolicy = new IfStmtPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(ifStmtPolicy);
+        if (!ifStmtPolicy) ifStmtPolicy = make_unique_policy<IfStmtPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(ifStmtPolicy.get());
     };
 
 }
@@ -149,8 +130,8 @@ void BlockPolicy::CollectIfStmtHandlers() {
 void BlockPolicy::CollectSwitchHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::switchstmt] = [this](srcSAXEventContext& ctx) {
-        if (!switchPolicy) switchPolicy = new SwitchPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(switchPolicy);
+        if (!switchPolicy) switchPolicy = make_unique_policy<SwitchPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(switchPolicy.get());
     };
 
 }
@@ -158,8 +139,8 @@ void BlockPolicy::CollectSwitchHandlers() {
 void BlockPolicy::CollectWhileHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
-        if (!whilePolicy) whilePolicy = new WhilePolicy{this};
-        ctx.dispatcher->AddListenerDispatch(whilePolicy);
+        if (!whilePolicy) whilePolicy = make_unique_policy<WhilePolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(whilePolicy.get());
     };
 
 }
@@ -167,8 +148,8 @@ void BlockPolicy::CollectWhileHandlers() {
 void BlockPolicy::CollectForHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
-        if (!forPolicy) forPolicy = new ForPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(forPolicy);
+        if (!forPolicy) forPolicy = make_unique_policy<ForPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(forPolicy.get());
     };
 
 }
@@ -176,8 +157,8 @@ void BlockPolicy::CollectForHandlers() {
 void BlockPolicy::CollectDoHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::dostmt] = [this](srcSAXEventContext& ctx) {
-        if (!doPolicy) doPolicy = new DoPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(doPolicy);
+        if (!doPolicy) doPolicy = make_unique_policy<DoPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(doPolicy.get());
     };
 
 }

@@ -40,26 +40,19 @@ public srcDispatch::PolicyListener {
 private:
     IfStmtData     data;
     std::size_t    ifStmtDepth;
-    IfPolicy     * ifPolicy;
-    ElseIfPolicy * elseIfPolicy;
-    ElsePolicy   * elsePolicy;
+    std::unique_ptr<IfPolicy>     ifPolicy;
+    std::unique_ptr<ElseIfPolicy> elseIfPolicy;
+    std::unique_ptr<ElsePolicy>   elsePolicy;
 
 public:
     IfStmtPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          ifStmtDepth(0),
-          ifPolicy(nullptr),
-          elseIfPolicy(nullptr),
-          elsePolicy(nullptr) {
+          ifStmtDepth(0) {
         InitializeIfStmtPolicyHandlers();
     }
 
-    ~IfStmtPolicy() {
-        if (ifPolicy)     delete ifPolicy;
-        if (elseIfPolicy) delete elseIfPolicy;
-        if (elsePolicy)   delete elsePolicy;
-    }
+    ~IfStmtPolicy() {}
 
 protected:
     std::any DataInner() const { return std::make_shared<IfStmtData>(data); }
@@ -112,8 +105,8 @@ private:
             if(!ifStmtDepth) return;
             if((ifStmtDepth + 1) != ctx.depth) return;
 
-            if (!ifPolicy) ifPolicy = new IfPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(ifPolicy);  
+            if (!ifPolicy) ifPolicy = make_unique_policy<IfPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(ifPolicy.get());
         };              
     }
 
@@ -123,8 +116,8 @@ private:
             if(!ifStmtDepth) return;
             if((ifStmtDepth + 1) != ctx.depth) return;
 
-            if (!elseIfPolicy) elseIfPolicy = new ElseIfPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(elseIfPolicy);                
+            if (!elseIfPolicy) elseIfPolicy = make_unique_policy<ElseIfPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(elseIfPolicy.get());
         };
     }
 
@@ -134,8 +127,8 @@ private:
             if(!ifStmtDepth) return;
             if((ifStmtDepth + 1) != ctx.depth) return;
 
-            if (!elsePolicy) elsePolicy = new ElsePolicy{this};
-            ctx.dispatcher->AddListenerDispatch(elsePolicy);                
+            if (!elsePolicy) elsePolicy = make_unique_policy<ElsePolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(elsePolicy.get());
         };
     }
 };

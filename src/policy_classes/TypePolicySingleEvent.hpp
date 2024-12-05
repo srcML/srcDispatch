@@ -32,7 +32,7 @@ public srcDispatch::PolicyListener {
 private:
     TypeData data;
     std::size_t typeDepth;
-    NamePolicy * namePolicy;
+    std::unique_ptr<NamePolicy> namePolicy;
 
 public:
     TypePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners);

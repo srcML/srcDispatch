@@ -48,15 +48,15 @@ private:
     BlockData     data;
     std::size_t   blockDepth;
     
-    DeclTypePolicy   * declstmtPolicy;
-    ReturnPolicy     * returnPolicy;
-    ExprStmtPolicy   * exprStmtPolicy;
-    BlockPolicy      * blockPolicy;
-    IfStmtPolicy     * ifStmtPolicy;
-    SwitchPolicy     * switchPolicy;
-    WhilePolicy      * whilePolicy;
-    ForPolicy        * forPolicy;
-    DoPolicy         * doPolicy;
+    std::unique_ptr<DeclTypePolicy> declstmtPolicy;
+    std::unique_ptr<ReturnPolicy>   returnPolicy;
+    std::unique_ptr<ExprStmtPolicy> exprStmtPolicy;
+    std::unique_ptr<BlockPolicy>    blockPolicy;
+    std::unique_ptr<IfStmtPolicy>   ifStmtPolicy;
+    std::unique_ptr<SwitchPolicy>   switchPolicy;
+    std::unique_ptr<WhilePolicy>    whilePolicy;
+    std::unique_ptr<ForPolicy>      forPolicy;
+    std::unique_ptr<DoPolicy>       doPolicy;
 
 public:
     BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners);

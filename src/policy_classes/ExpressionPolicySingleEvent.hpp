@@ -44,20 +44,16 @@ public srcDispatch::PolicyListener {
 private:
     ExpressionData  data;
     std::size_t     exprDepth;
-    NamePolicy    * namePolicy;
-    OperatorPolicy* operatorPolicy;
-    LiteralPolicy * literalPolicy;
-    CallPolicy    * callPolicy;
+    std::unique_ptr<NamePolicy>     namePolicy;
+    std::unique_ptr<OperatorPolicy> operatorPolicy;
+    std::unique_ptr<LiteralPolicy>  literalPolicy;
+    std::unique_ptr<CallPolicy>     callPolicy;
 
 public:
     ExpressionPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
     data{},
-    exprDepth(0),
-    namePolicy(nullptr),
-    operatorPolicy(nullptr),
-    literalPolicy(nullptr),
-    callPolicy(nullptr) {
+    exprDepth(0) {
         InitializeExpressionPolicyHandlers();
     }
 

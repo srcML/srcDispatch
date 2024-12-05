@@ -43,22 +43,18 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    NameData                    data;
-    std::size_t                 nameDepth;
-    NamePolicy                * namePolicy;
-    OperatorPolicy            * operatorPolicy;
-    TemplateArgumentListPolicy* templateArgumentListPolicy;
-    ExpressionPolicy          * expressionPolicy;
+    NameData                                    data;
+    std::size_t                                 nameDepth;
+    std::unique_ptr<NamePolicy>                 namePolicy;
+    std::unique_ptr<OperatorPolicy>             operatorPolicy;
+    std::unique_ptr<TemplateArgumentListPolicy> templateArgumentListPolicy;
+    std::unique_ptr<ExpressionPolicy>           expressionPolicy;
 
 public:
     NamePolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          nameDepth(0),
-          namePolicy(nullptr),
-          operatorPolicy(nullptr),
-          templateArgumentListPolicy(nullptr),
-          expressionPolicy(nullptr) {
+          nameDepth(0) {
         InitializeNamePolicyHandlers();
     }
 

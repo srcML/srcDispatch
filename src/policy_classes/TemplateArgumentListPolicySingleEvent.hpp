@@ -43,10 +43,9 @@ private:
     void CollectArgumentHandler();
 
 private:
-    TemplateArgumentListData data;
-    std::size_t          argumentListDepth;
-    NamePolicy      *    namePolicy;
-    ExpressionPolicy*    expressionPolicy;
+    TemplateArgumentListData          data;
+    std::size_t                       argumentListDepth;
+    std::unique_ptr<ExpressionPolicy> expressionPolicy;
 
 };
 

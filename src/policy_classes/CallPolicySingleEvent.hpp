@@ -45,16 +45,14 @@ public srcDispatch::PolicyListener {
 private:
     CallData            data;
     std::size_t         callDepth;
-    NamePolicy      *   namePolicy;
-    ExpressionPolicy*   expressionPolicy;
+    std::unique_ptr<NamePolicy>       namePolicy;
+    std::unique_ptr<ExpressionPolicy> expressionPolicy;
 
 public:
     CallPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          callDepth(0),
-          namePolicy(nullptr),
-          expressionPolicy(nullptr) {
+          callDepth(0) {
         InitializeCallPolicyHandlers();
     }
 

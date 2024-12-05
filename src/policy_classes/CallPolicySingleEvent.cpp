@@ -16,10 +16,7 @@ std::ostream& operator<<(std::ostream& out, const CallData &call) {
     return out;
 }
 
-CallPolicy::~CallPolicy() {
-    if (namePolicy)       delete namePolicy;
-    if (expressionPolicy) delete expressionPolicy;
-}
+CallPolicy::~CallPolicy() {}
 
 std::any CallPolicy::DataInner() const { return std::make_shared<CallData>(data); }
 
@@ -63,8 +60,8 @@ void CallPolicy::InitializeCallPolicyHandlers() {
 void CallPolicy::CollectNameHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-        if(!namePolicy) namePolicy = new NamePolicy{this};
-        ctx.dispatcher->AddListenerDispatch(namePolicy);
+        if(!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(namePolicy.get());
     };
 }
 
@@ -72,8 +69,8 @@ void CallPolicy::CollectNameHandlers() {
 void CallPolicy::CollectCallArgumentHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx) {
-        if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-        ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+        if(!expressionPolicy) expressionPolicy = make_unique_policy<ExpressionPolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(expressionPolicy.get());
     };
 }
 

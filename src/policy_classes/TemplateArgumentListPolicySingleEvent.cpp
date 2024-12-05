@@ -32,15 +32,11 @@ std::ostream& operator<<(std::ostream& out, const TemplateArgumentListData& argu
 TemplateArgumentListPolicy::TemplateArgumentListPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
     : srcDispatch::PolicyDispatcher(listeners),
       data{},
-      argumentListDepth(0),
-      namePolicy(nullptr) {
+      argumentListDepth(0) {
     InitializeTemplateArgumentListPolicyHandlers();
 }
 
-TemplateArgumentListPolicy::~TemplateArgumentListPolicy() {
-    if (namePolicy)       delete namePolicy;
-    if (expressionPolicy) delete expressionPolicy;
-}
+TemplateArgumentListPolicy::~TemplateArgumentListPolicy() {}
 
 void TemplateArgumentListPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
     if (typeid(NamePolicy) == typeid(*policy)) {
@@ -91,8 +87,8 @@ void TemplateArgumentListPolicy::CollectArgumentHandler() {
             if(!argumentListDepth) return;
             if((argumentListDepth + 2) != ctx.depth) return;
 
-            if(!expressionPolicy) expressionPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(expressionPolicy);
+            if(!expressionPolicy) expressionPolicy = make_unique_policy<ExpressionPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(expressionPolicy.get());
         };
 
     };

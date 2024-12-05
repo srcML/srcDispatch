@@ -34,22 +34,19 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    IncrData  data;
-    std::size_t      incrDepth;
-    ExpressionPolicy* exprPolicy;
+    IncrData                          data;
+    std::size_t                       incrDepth;
+    std::unique_ptr<ExpressionPolicy> exprPolicy;
 
 public:
     IncrPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          incrDepth(0),
-          exprPolicy(nullptr) {
+          incrDepth(0) {
         InitializeIncrPolicyHandlers();
     }
 
-    ~IncrPolicy() {
-        if (exprPolicy) delete exprPolicy;
-    }
+    ~IncrPolicy() {}
 
 protected:
     std::any DataInner() const override { return std::make_shared<IncrData>(data); }
@@ -95,8 +92,8 @@ private:
             if(!incrDepth) return;
             if((incrDepth + 1) != ctx.depth) return;
 
-            if (!exprPolicy) exprPolicy = new ExpressionPolicy{this};
-            ctx.dispatcher->AddListenerDispatch(exprPolicy);                
+            if (!exprPolicy) exprPolicy = make_unique_policy<ExpressionPolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(exprPolicy.get());                
         };
     }
 };

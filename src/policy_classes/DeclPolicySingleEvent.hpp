@@ -52,28 +52,21 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-    DeclData          data;
-    std::size_t       declDepth;
-    TypePolicy      * typePolicy;
-    NamePolicy      * namePolicy;
-    ExpressionPolicy* exprPolicy;
+    DeclData                          data;
+    std::size_t                       declDepth;
+    std::unique_ptr<TypePolicy>       typePolicy;
+    std::unique_ptr<NamePolicy>       namePolicy;
+    std::unique_ptr<ExpressionPolicy> exprPolicy;
 
 public:
     DeclPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners),
           data{},
-          declDepth(0),
-          typePolicy(nullptr),
-          namePolicy(nullptr),
-          exprPolicy(nullptr) {
+          declDepth(0) {
         InitializeDeclPolicyHandlers();
     }
 
-    ~DeclPolicy() {
-        if (typePolicy) delete typePolicy;
-        if (namePolicy) delete namePolicy;
-        if (exprPolicy) delete exprPolicy;
-    }
+    ~DeclPolicy() {}
 
 protected:
     std::any DataInner() const override { return std::make_shared<DeclData>(data); }
@@ -152,8 +145,8 @@ private:
         openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
             if(!declDepth || (declDepth + 1) != ctx.depth) return;
 
-            if (!typePolicy) typePolicy = new TypePolicy{this};
-            ctx.dispatcher->AddListenerDispatch(typePolicy);
+            if (!typePolicy) typePolicy = make_unique_policy<TypePolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(typePolicy.get());
         };
     }
 
@@ -162,8 +155,8 @@ private:
         openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
             if(!declDepth || (declDepth + 1) != ctx.depth) return;
  
-            if (!namePolicy) namePolicy = new NamePolicy{this};
-            ctx.dispatcher->AddListenerDispatch(namePolicy);
+            if (!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
+            ctx.dispatcher->AddListenerDispatch(namePolicy.get());
         };
     }
 
@@ -173,8 +166,8 @@ private:
             if(!declDepth || (declDepth + 1) != ctx.depth) return;
 
             openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-                if(!exprPolicy) exprPolicy = new ExpressionPolicy{this};
-                ctx.dispatcher->AddListenerDispatch(exprPolicy);
+                if(!exprPolicy) exprPolicy = make_unique_policy<ExpressionPolicy>({this});
+                ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
             };
         };
         closeEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
@@ -190,8 +183,8 @@ private:
             if(!declDepth || (declDepth + 1) != ctx.depth) return;
 
             openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-                if(!exprPolicy) exprPolicy = new ExpressionPolicy{this};
-                ctx.dispatcher->AddListenerDispatch(exprPolicy);
+                if(!exprPolicy) exprPolicy = make_unique_policy<ExpressionPolicy>({this});
+                ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
             };
         };
         closeEventMap[ParserState::range] = [this](srcSAXEventContext& ctx) {
