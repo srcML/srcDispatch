@@ -35,6 +35,7 @@ public:
 public:
     UnitPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners) :
                 srcDispatch::PolicyDispatcher(listeners),
+                declPolicy(nullptr), 
                 functionPolicy(nullptr),
                 classPolicy(nullptr) {
         InitializeUnitPolicyHandlers();
