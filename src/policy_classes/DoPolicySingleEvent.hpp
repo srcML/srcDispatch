@@ -18,8 +18,8 @@ struct DoData {
     unsigned int startLineNumber;
     unsigned int endLineNumber;
 
-    std::shared_ptr<ExpressionData> condition;
-    std::shared_ptr<BlockData>      block;
+    std::shared_ptr<ConditionData> condition;
+    std::shared_ptr<BlockData>     block;
 
     friend std::ostream& operator<<(std::ostream& out, const DoData& doData) {
         if(!doData.condition) return out;

@@ -24,8 +24,8 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 protected:
-    ConditionalData  data;
-    std::size_t      conditionalDepth;
+    ConditionalData                  data;
+    std::size_t                      conditionalDepth;
     std::unique_ptr<ConditionPolicy> conditionPolicy;
     std::unique_ptr<BlockPolicy>     blockPolicy;
 
@@ -44,7 +44,7 @@ protected:
 
     void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
         if (typeid(ConditionPolicy) == typeid(*policy)) {
-            data.condition = policy->Data<ExpressionData>();
+            data.condition = policy->Data<ConditionData>();
         } else if (typeid(BlockPolicy) == typeid(*policy)) {
             data.block = policy->Data<BlockData>();
         } else {

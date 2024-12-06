@@ -24,7 +24,7 @@ struct ControlData {
     unsigned int lineNumber;
 
     std::vector<std::any>                        init;
-    std::shared_ptr<ExpressionData>              condition;
+    std::shared_ptr<ConditionData>               condition;
     std::vector<std::shared_ptr<ExpressionData>> incr;
 
     friend std::ostream& operator<<(std::ostream& out, const ControlData& controlData) {
@@ -87,7 +87,7 @@ protected:
         } else if(typeid(ExpressionPolicy) == typeid(*policy)) {
             data.init.push_back(policy->Data<ExpressionData>());
         } else if(typeid(ConditionPolicy) == typeid(*policy)) {
-            data.condition = policy->Data<ExpressionData>();
+            data.condition = policy->Data<ConditionData>();
         } else if(typeid(IncrPolicy) == typeid(*policy)) {
             data.incr.push_back(policy->Data<ExpressionData>());
         } else {
