@@ -63,6 +63,7 @@ namespace srcDispatch {
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
+
     class srcSAXEventContext {
         public:
             srcSAXEventContext() = delete;
