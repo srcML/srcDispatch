@@ -26,10 +26,10 @@ struct TemplateArgumentListData;
 struct NameData {
 
     unsigned int lineNumber;
-    std::string                               name;
-    std::vector<std::any>                     names;
-    std::shared_ptr<TemplateArgumentListData> templateArgumentList;
-    std::shared_ptr<ExpressionData>           indices;
+    std::string                                  name;
+    std::vector<std::any>                        names;
+    std::shared_ptr<TemplateArgumentListData>    templateArgumentList;
+    std::vector<std::shared_ptr<ExpressionData>> indices;
 
     std::string SimpleName() const;
     std::string ToString() const;

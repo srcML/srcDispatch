@@ -12,7 +12,7 @@
 #include <cassert>
 
 std::string NameData::SimpleName() const {
-    if (!name.empty()) {
+    if(!name.empty()) {
         return ToString();
     }
 
@@ -31,7 +31,7 @@ std::string NameData::ToString() const {
         }
     }
 
-    if (templateArgumentList) {
+    if(templateArgumentList) {
         str += templateArgumentList->ToString();
     }
 
@@ -49,11 +49,12 @@ std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
             out << std::any_cast<std::shared_ptr<OperatorData>>(name_element)->op;
         }
     }
-    if (nameData.templateArgumentList) {
+    if(nameData.templateArgumentList) {
         out << *nameData.templateArgumentList;
     }
-    if (nameData.indices) {
-        out << '[' << *nameData.indices << ']';
+
+    for(std::shared_ptr<ExpressionData> index : nameData.indices) {
+        out << '[' << *index << ']';
     }
     return out;
 }
@@ -63,14 +64,14 @@ NamePolicy::~NamePolicy() {}
 
 void NamePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx)  {
 
-    if (typeid(NamePolicy) == typeid(*policy)) {
+    if(typeid(NamePolicy) == typeid(*policy)) {
         data.names.push_back(policy->Data<NameData>());
-    } else if (typeid(OperatorPolicy) == typeid(*policy)) {
+    } else if(typeid(OperatorPolicy) == typeid(*policy)) {
         data.names.push_back(policy->Data<OperatorData>());
-    } else if (typeid(TemplateArgumentListPolicy) == typeid(*policy)) {
+    } else if(typeid(TemplateArgumentListPolicy) == typeid(*policy)) {
         data.templateArgumentList = policy->Data<TemplateArgumentListData>();
-    } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
-        data.indices = policy->Data<ExpressionData>();
+    } else if(typeid(ExpressionPolicy) == typeid(*policy)) {
+        data.indices.push_back(policy->Data<ExpressionData>());
     } else {
         throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
@@ -81,31 +82,34 @@ void NamePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSA
 
 void NamePolicy::InitializeNamePolicyHandlers() {
     using namespace srcDispatch;
+
     // start of policy
     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-        if (!nameDepth) {
+        if(!nameDepth) {
             nameDepth = ctx.depth;
             data = NameData{};
             data.lineNumber = ctx.currentLineNumber;
             CollectOperatorsHandlers();
             CollectTemplateArgumentListHandlers();
             CollectArrayIndicesHandlers();
-        } else if ((nameDepth + 1) == ctx.depth) {
+        } else if((nameDepth + 1) == ctx.depth) {
             NopCloseEvents({ParserState::tokenstring});
-            if (!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
+            if(!namePolicy) namePolicy = make_unique_policy<NamePolicy>({this});
             ctx.dispatcher->AddListenerDispatch(namePolicy.get());
         }
     };
+
     // end of policy
     closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
-        if (nameDepth && nameDepth == ctx.depth) {
+        if(nameDepth && nameDepth == ctx.depth) {
             nameDepth = 0;
             NotifyAll(ctx);
             InitializeNamePolicyHandlers();
         }
     };
+
     closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-        if (nameDepth && nameDepth == ctx.depth) {
+        if(nameDepth && nameDepth == ctx.depth) {
             data.name += ctx.currentToken;
         }
     };
@@ -126,10 +130,10 @@ void NamePolicy::CollectOperatorsHandlers() {
 void NamePolicy::CollectTemplateArgumentListHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext& ctx) {
-        if (!nameDepth) return;
+        if(!nameDepth) return;
         if((nameDepth + 1) != ctx.depth) return;
 
-        if (!templateArgumentListPolicy) templateArgumentListPolicy = make_unique_policy<TemplateArgumentListPolicy>({this});
+        if(!templateArgumentListPolicy) templateArgumentListPolicy = make_unique_policy<TemplateArgumentListPolicy>({this});
         ctx.dispatcher->AddListenerDispatch(templateArgumentListPolicy.get());
     };
 }
