@@ -66,6 +66,8 @@ namespace srcDispatch {
         return listeners;
     }
 
+    const std::string DIFF_URI = "http://www.srcML.org/srcDiff";
+
     template<typename... policies>
     class srcDispatcher : public srcSAXHandler, public EventDispatcher {
     #pragma GCC diagnostic push
@@ -479,22 +481,6 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::stereotype];
                     DispatchEvent(ParserState::stereotype, ElementState::open);
                 } },
-                { "diff:delete", [this]() {
-                    ++ctx.triggerField[ParserState::diff_delete];
-                    DispatchEvent(ParserState::diff_delete, ElementState::open);
-                } },
-                { "diff:insert", [this]() {
-                    ++ctx.triggerField[ParserState::diff_insert];
-                    DispatchEvent(ParserState::diff_insert, ElementState::open);
-                } },
-                { "diff:common", [this]() {
-                    ++ctx.triggerField[ParserState::diff_common];
-                    DispatchEvent(ParserState::diff_common, ElementState::open);
-                } },
-                { "diff:ws", [this]() {
-                    ++ctx.triggerField[ParserState::diff_ws];
-                    DispatchEvent(ParserState::diff_ws, ElementState::open);
-                } },
                 { "unit", [this]() {
                     if(ctx.triggerField[ParserState::unit] == 0) {
                         ctx.triggerField[ParserState::archive] = 1;
@@ -778,22 +764,6 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::stereotype, ElementState::close);
                     --ctx.triggerField[ParserState::stereotype];
                 } },
-                { "diff:delete", [this]() {
-                    DispatchEvent(ParserState::diff_delete, ElementState::close);
-                    --ctx.triggerField[ParserState::diff_delete];
-                } },
-                { "diff_insert", [this]() {
-                    DispatchEvent(ParserState::diff_insert, ElementState::close);
-                    --ctx.triggerField[ParserState::diff_insert];
-                } },
-                { "diff_common", [this]() {
-                    DispatchEvent(ParserState::diff_common, ElementState::close);
-                    --ctx.triggerField[ParserState::diff_common];
-                } },
-                { "diff_ws", [this]() {
-                    DispatchEvent(ParserState::diff_ws, ElementState::close);
-                    --ctx.triggerField[ParserState::diff_ws];
-                } },
                 { "unit", [this]() {
                     --ctx.triggerField[ParserState::unit];
                     DispatchEvent(ParserState::unit, ElementState::close);
@@ -923,6 +893,21 @@ namespace srcDispatch {
             
             if(generateArchive) {
                 ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
+            }
+
+            if(URI == DIFF_URI) {
+                if(localname == std::string("ws")) return;
+
+                static std::unordered_map<std::string, DiffOperation> diff_op_map = { 
+                    { "delete", DiffOperation::DELETE },
+                    { "insert", DiffOperation::INSERT },
+                    { "common", DiffOperation::COMMON },
+                };
+
+                ctx.diffStack.emplace_back(diff_op_map[std::string(localname)], ctx.depth + 1);
+
+
+                return;
             }
             
             ++ctx.depth;
@@ -1067,6 +1052,14 @@ namespace srcDispatch {
         }
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
+
+
+            if(URI == DIFF_URI) {
+                if(localname == std::string("ws")) return;
+
+                ctx.diffStack.pop_back();
+                return;
+            }
 
             std::string localName;
             if(prefix) {
