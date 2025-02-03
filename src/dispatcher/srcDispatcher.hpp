@@ -35,7 +35,7 @@
 #include <string>
 #include <unordered_set>
 #include <memory>
-#include <string.h>
+#include <cstring>
 
 namespace srcDispatch {
 
@@ -954,14 +954,14 @@ namespace srcDispatch {
 
                     std::string attributeName = get_qualified_name(attributes[pos].localname, attributes[pos].prefix);
                     if(strcmp(attributes[pos].localname, "start") == 0) {
-                        std::string posString;
-                        for(int i = 0; attributes[pos].value[i] != ':'; ++i) {
-                            posString+=attributes[pos].value[i];
-                        }
-                        ctx.startLineNumber = std::stoi(posString);
+                        int length = ::index(attributes[pos].value, ':') - attributes[pos].value;
+                        ctx.startLineNumber = std::stoi(std::string(attributes[pos].value, length));
+                    } else if(strcmp(attributes[pos].localname, "end") == 0) {
+                        int length = ::index(attributes[pos].value, ':') - attributes[pos].value;
+                        ctx.endLineNumber = std::stoi(std::string(attributes[pos].value, length));
                     }
-                    std::string attributeValue = attributes[pos].value;
 
+                    std::string attributeValue = attributes[pos].value;
                     ctx.attributes.emplace(attributeName, attributeValue);         
 
                 }
