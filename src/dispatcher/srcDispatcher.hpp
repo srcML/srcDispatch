@@ -252,14 +252,8 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::ifgroup, ElementState::open);
                 } },
                 { "if", [this]() {
-                    if(!ifelseflagopen) {
-                        ifflagopen = true;
-                        ++ctx.triggerField[ParserState::ifstmt];
-                        DispatchEvent(ParserState::ifstmt, ElementState::open);
-                    } else {
-                        ++ctx.triggerField[ParserState::elseif];
-                        DispatchEvent(ParserState::elseif, ElementState::open);
-                    }
+                    ++ctx.triggerField[ParserState::ifstmt];
+                    DispatchEvent(ParserState::ifstmt, ElementState::open);
                 } },
                 { "else", [this]() {
                     ++ctx.triggerField[ParserState::elsestmt];
@@ -375,32 +369,6 @@ namespace srcDispatch {
                 } },
                 { "block", [this]() { 
                     ++ctx.triggerField[ParserState::block];
-                    if(constructorflagopen) {
-                        constructorflagopen = false;
-                        ++ctx.triggerField[ParserState::constructorblock];
-                        DispatchEvent(ParserState::constructorblock, ElementState::open);
-                    }
-                    if(functionflagopen) {
-                        functionflagopen = false;
-                        ++ctx.triggerField[ParserState::functionblock];
-                        DispatchEvent(ParserState::functionblock, ElementState::open);
-                    }
-                    if(classflagopen) {
-                        classflagopen = false; //next time it's set to true, we definitely are in a new one.
-                        ++ctx.triggerField[ParserState::classblock];
-                    }
-                    if(whileflagopen) {
-                        whileflagopen = false;
-                        ++ctx.triggerField[ParserState::whileblock];
-                    }
-                    if(ifelseflagopen) {
-                        ifflagopen = false;
-                        ++ctx.triggerField[ParserState::ifblock];
-                    }
-                    if(forflagopen) {
-                        forflagopen = false;
-                        ++ctx.triggerField[ParserState::forblock];
-                    }
                     DispatchEvent(ParserState::block, ElementState::open);
                 } },
                 { "init", [this]() {
@@ -562,22 +530,14 @@ namespace srcDispatch {
                     --ctx.triggerField[ParserState::ifgroup];
                 } },
                 { "if", [this]() {
-                    if(!ifelseflagopen) {
-                        --ctx.triggerField[ParserState::ifblock];
-                        DispatchEvent(ParserState::ifstmt, ElementState::close);
-                        --ctx.triggerField[ParserState::ifstmt];
-                    }else{
-                        --ctx.triggerField[ParserState::elseif];
-                        DispatchEvent(ParserState::elseif, ElementState::close);
-                        ifelseflagopen = false;
-                    }
+                    DispatchEvent(ParserState::ifstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::ifstmt];
                 } },  
                 { "else", [this]() {
                     --ctx.triggerField[ParserState::elsestmt];
                     DispatchEvent(ParserState::elsestmt, ElementState::close);
                 } },
                 { "for", [this]() {
-                    --ctx.triggerField[ParserState::forblock];
                     DispatchEvent(ParserState::forstmt, ElementState::close);
                     --ctx.triggerField[ParserState::forstmt];
                 } },  
@@ -586,7 +546,6 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::control, ElementState::close);
                 } },           
                 { "while", [this]() {
-                    --ctx.triggerField[ParserState::whileblock];
                     DispatchEvent(ParserState::whilestmt, ElementState::close);
                     --ctx.triggerField[ParserState::whilestmt];
                 } },
@@ -610,27 +569,14 @@ namespace srcDispatch {
                     --ctx.triggerField[ParserState::call];
                 } },            
                 { "function", [this]() {
-                    DispatchEvent(ParserState::functionblock, ElementState::close);
-                    ctx.currentFunctionName.clear();
-                    --ctx.triggerField[ParserState::functionblock];
-
                     DispatchEvent(ParserState::function, ElementState::close);
                     --ctx.triggerField[ParserState::function];
                 } },
                 { "constructor", [this]() {
-                      //This code causes problems for some reason. FIX.
-                    DispatchEvent(ParserState::constructorblock, ElementState::close);
-                    ctx.currentFunctionName.clear();
-                    --ctx.triggerField[ParserState::constructorblock];
-
                     DispatchEvent(ParserState::constructor, ElementState::close);
                     --ctx.triggerField[ParserState::constructor];
                 } },
                 { "destructor", [this]() {
-                      //This code causes problems for some reason. FIX.
-/*                    DispatchEvent(ParserState::functionblock, ElementState::close);
-                    --ctx.triggerField[ParserState::functionblock];*/
-                    
                     DispatchEvent(ParserState::destructor, ElementState::close);
                     --ctx.triggerField[ParserState::destructor];
                 } },
@@ -647,15 +593,13 @@ namespace srcDispatch {
                     --ctx.triggerField[ParserState::destructordecl];
                 } },
                 { "class", [this]() {
-                    --ctx.triggerField[ParserState::classblock];
-                    DispatchEvent(ParserState::classn, ElementState::close);
                     ctx.currentClassName.clear();
+                    DispatchEvent(ParserState::classn, ElementState::close);
                     --ctx.triggerField[ParserState::classn];
                 } },
                 { "struct", [this]() {
-                    --ctx.triggerField[ParserState::classblock];
-                    DispatchEvent(ParserState::structn, ElementState::close);
                     ctx.currentClassName.clear();
+                    DispatchEvent(ParserState::structn, ElementState::close);
                     --ctx.triggerField[ParserState::classn];
                 } },
                 { "namespace", [this]() {
@@ -1024,15 +968,6 @@ namespace srcDispatch {
         		collectedText->append(ch, len);
             }
             
-            if((ctx.And({ParserState::name, ParserState::function}) || ctx.And({ParserState::name, ParserState::constructor})) && ctx.Nor({ParserState::functionblock, ParserState::type, ParserState::parameterlist, ParserState::genericargumentlist, ParserState::constructorblock, ParserState::throws, ParserState::annotation})) {
-                ctx.currentFunctionName = std::all_of(
-                    std::begin(ctx.currentToken), 
-                    std::end(ctx.currentToken), 
-                    [](char c) {
-                        if(std::isalnum(c) || c == '_') return true;
-                        return false;
-                    }) ? ctx.currentToken : "";
-            }
             process->second();
             if (generateArchive) { ctx.write_content(ctx.currentToken); }
         }
