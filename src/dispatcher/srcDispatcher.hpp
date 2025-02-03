@@ -74,6 +74,8 @@ namespace srcDispatch {
     private:
         std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
 
+        std::vector<size_t> elseif_positions;
+
         bool dispatching;
         bool generateArchive;
         ParserState currentPState;
@@ -150,12 +152,12 @@ namespace srcDispatch {
             }
         }
 
-        srcDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(element_stack) {
+        srcDispatcher(PolicyListener * listener, bool genArchive = false) 
+            : EventDispatcher(element_stack),
+              elseif_positions(), dispatching(false), generateArchive(genArchive), collectedText(std::optional<std::string>()) {
+    
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
-            dispatching = false;
-            collectedText = std::optional<std::string>();
-            generateArchive = genArchive;
             
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
@@ -164,12 +166,12 @@ namespace srcDispatch {
             InitializeHandlers();
         }
 
-        srcDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(element_stack) {
+        srcDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) 
+            : EventDispatcher(element_stack),
+              elseif_positions(), dispatching(false), generateArchive(genArchive), collectedText(std::optional<std::string>()) {
+
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
-            dispatching = false;
-            collectedText = std::optional<std::string>();
-            generateArchive = genArchive;
 
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
@@ -891,6 +893,7 @@ namespace srcDispatch {
 
             if(name == "elseif" && localName == "if") {
                 localName = "elseif";
+                elseif_positions.push_back(element_stack.size());
             }
 
             if(localName != "") {
@@ -912,7 +915,7 @@ namespace srcDispatch {
 
                 }
 
-                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localname);
+                std::unordered_map<std::string, std::function<void()>>::const_iterator process = process_map.find(localName);
                 if (process != process_map.end()) {
                     process->second();
                 }
@@ -996,9 +999,15 @@ namespace srcDispatch {
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
 
             std::string localName =  srcSAXHandler::get_qualified_name(localname, prefix);
+
+            if(!elseif_positions.empty() && element_stack.size() == elseif_positions.back()) {
+                localName = "elseif";
+                elseif_positions.pop_back();
+            }
+
             ctx.currentTag = localName;
 
-            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localname);
+            std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localName);
             if (process2 != process_map2.end()) {
                 process2->second();
             }
