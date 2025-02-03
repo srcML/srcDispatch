@@ -1058,13 +1058,7 @@ namespace srcDispatch {
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
 
-            std::string localName;
-            if(prefix) {
-                localName += prefix;
-                localName += ':';
-            }
-            localName += localname;
-
+            std::string localName =  get_qualified_name(localname, prefix);
             ctx.currentTag = localName;
 
             std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localname);
