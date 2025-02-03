@@ -481,12 +481,6 @@ namespace srcDispatch {
         return std::make_unique<Policy>(args);
     }
 
-    constexpr std::string get_qualified_name(const char* localname, const char* prefix) {
-        if(prefix == nullptr) return localname;
-        return std::string(prefix) + ":" +  localname;
-    }
-
-
 }
 
 #endif

@@ -73,7 +73,6 @@ namespace srcDispatch {
 
     private:
         std::unordered_map< std::string, std::function<void()>> process_map, process_map2;
-        bool classflagopen, functionflagopen, constructorflagopen, whileflagopen, ifflagopen, elseflagopen, ifelseflagopen, forflagopen, switchflagopen;
 
         bool dispatching;
         bool generateArchive;
@@ -151,13 +150,12 @@ namespace srcDispatch {
             }
         }
 
-        srcDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(element_stack) {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             collectedText = std::optional<std::string>();
             generateArchive = genArchive;
-            classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
             
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
@@ -166,13 +164,13 @@ namespace srcDispatch {
             InitializeHandlers();
         }
 
-        srcDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(element_stack) {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
             collectedText = std::optional<std::string>();
             generateArchive = genArchive;
-            classflagopen = functionflagopen = constructorflagopen = whileflagopen = ifflagopen = elseflagopen = ifelseflagopen = forflagopen = switchflagopen = false;
+
             if(genArchive) {
                 ctx.archiveBuffer = xmlBufferCreate();
                 ctx.writer = xmlNewTextWriterMemory(ctx.archiveBuffer, 0);
@@ -255,6 +253,10 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::ifstmt];
                     DispatchEvent(ParserState::ifstmt, ElementState::open);
                 } },
+                { "elseif", [this]() {
+                    ++ctx.triggerField[ParserState::elseif];
+                    DispatchEvent(ParserState::elseif, ElementState::open);
+                } },
                 { "else", [this]() {
                     ++ctx.triggerField[ParserState::elsestmt];
                     DispatchEvent(ParserState::elsestmt, ElementState::open);
@@ -268,7 +270,6 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::control, ElementState::open);
                 } },
                 { "while", [this]() {
-                    whileflagopen = true;
                     ++ctx.triggerField[ParserState::whilestmt];
                     DispatchEvent(ParserState::whilestmt, ElementState::open);
                 } },
@@ -291,12 +292,10 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::call, ElementState::open);
                 } },
                 { "function", [this]() {
-                    functionflagopen = true;
                     ++ctx.triggerField[ParserState::function];
                     DispatchEvent(ParserState::function, ElementState::open);
                 } },
                 { "constructor", [this]() {
-                    constructorflagopen = true;
                     ++ctx.triggerField[ParserState::constructor];
                     DispatchEvent(ParserState::constructor, ElementState::open);
                 } },
@@ -313,12 +312,10 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::constructordecl, ElementState::open);
                 } },
                 { "class", [this]() {
-                    classflagopen = true;
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::classn, ElementState::open);
                 } },
                 { "struct", [this]() {
-                    classflagopen = true;
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::structn, ElementState::open);
                 } },
@@ -347,7 +344,6 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::privateaccess, ElementState::open);
                 } },
                 { "destructor", [this]() {
-                    //functionflagopen = true;
                     ++ctx.triggerField[ParserState::destructor];
                     DispatchEvent(ParserState::destructor, ElementState::open);
                 } },
@@ -532,7 +528,11 @@ namespace srcDispatch {
                 { "if", [this]() {
                     DispatchEvent(ParserState::ifstmt, ElementState::close);
                     --ctx.triggerField[ParserState::ifstmt];
-                } },  
+                } },
+                { "elseif", [this]() {
+                    DispatchEvent(ParserState::elseif, ElementState::close);
+                    --ctx.triggerField[ParserState::elseif];
+                } }, 
                 { "else", [this]() {
                     --ctx.triggerField[ParserState::elsestmt];
                     DispatchEvent(ParserState::elsestmt, ElementState::close);
@@ -871,9 +871,10 @@ namespace srcDispatch {
             
             ++ctx.depth;
 
-            std::string localName = get_qualified_name(localname, prefix);
+            std::string localName = srcSAXHandler::get_qualified_name(localname, prefix);
             ctx.currentTag = localName;
 
+            // Re-think this.  At least use processed list later and think about having a special object.
             std::string name;
             if(num_attributes) {
                 name = attributes[0].value;
@@ -887,16 +888,17 @@ namespace srcDispatch {
             if(name == "operator" && (localName == "function" || localName == "function_decl")) {
                 ctx.isOperator = true;
             }
+
             if(name == "elseif" && localName == "if") {
-                ifelseflagopen = true;
+                localName = "elseif";
             }
 
-
             if(localName != "") {
+
                 // form attribute map
                 for(int pos = 0; pos < num_attributes; ++pos) {
 
-                    std::string attributeName = get_qualified_name(attributes[pos].localname, attributes[pos].prefix);
+                    std::string attributeName = srcSAXHandler::get_qualified_name(attributes[pos].localname, attributes[pos].prefix);
                     if(strcmp(attributes[pos].localname, "start") == 0) {
                         int length = ::index(attributes[pos].value, ':') - attributes[pos].value;
                         ctx.startLineNumber = std::stoi(std::string(attributes[pos].value, length));
@@ -922,10 +924,10 @@ namespace srcDispatch {
                 ctx.currentNamespaces.emplace_back();
             }
 
-            if(ctx.currentTag == "name" && nameCollectElements.contains(srcml_element_stack.back())) {
+            if(ctx.currentTag == "name" && nameCollectElements.contains(element_stack.back())) {
                 collectedText = std::string();
             } else if(collectedText && (ctx.currentTag == "block" || ctx.currentTag == "super_list")) {
-                if(srcml_element_stack.back() == "namespace") {
+                if(element_stack.back() == "namespace") {
                     ctx.currentNamespaces.back() = *collectedText;
                 } else {
                     ctx.currentClassName = *collectedText;
@@ -993,7 +995,7 @@ namespace srcDispatch {
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
 
-            std::string localName =  get_qualified_name(localname, prefix);
+            std::string localName =  srcSAXHandler::get_qualified_name(localname, prefix);
             ctx.currentTag = localName;
 
             std::unordered_map<std::string, std::function<void()>>::const_iterator process2 = process_map2.find(localname);
