@@ -87,7 +87,7 @@ class ConditionalPolicy : public srcDispatch::EventListener, public srcDispatch:
                 currentExprName = ctx.currentToken;
 
                 if (ctx.IsOpen({ParserState::decl}) && ctx.IsClosed({ParserState::type}) && dvarSet.size() > 0 && insertDvar) {
-                    dvarSet.back().dvars.insert( std::make_pair(ctx.currentToken, ctx.currentLineNumber) );
+                    dvarSet.back().dvars.insert( std::make_pair(ctx.currentToken, ctx.startLineNumber) );
                 }
 
                 if ( ctx.IsClosed({ParserState::comment}) ) {
@@ -102,8 +102,8 @@ class ConditionalPolicy : public srcDispatch::EventListener, public srcDispatch:
                         // "a" with only def on line 4, and "i" use on 4
 
                         if (currentType.empty()) {    
-                            if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
-                                conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (conditionalUses[ctx.currentToken].empty() || ctx.startLineNumber != conditionalUses[ctx.currentToken].back()) {
+                                conditionalUses[ctx.currentToken].push_back(ctx.startLineNumber);
                             }
                         } else {
                             currentType.clear();
@@ -112,60 +112,60 @@ class ConditionalPolicy : public srcDispatch::EventListener, public srcDispatch:
 
                     // The following is for detecting possible uses within various Conditionals
                     if ( ctx.IsOpen({ParserState::whilestmt}) && ctx.IsOpen({ParserState::condition}) ){
-                        if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
-                            conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                        if (conditionalUses[ctx.currentToken].empty() || ctx.startLineNumber != conditionalUses[ctx.currentToken].back()) {
+                            conditionalUses[ctx.currentToken].push_back(ctx.startLineNumber);
                         }
                     }
                     
                     // The following is for detecting possible uses within various Conditionals
                     if ( ctx.IsOpen({ParserState::forstmt}) ) {
                         if ( ctx.And({ParserState::decl, ParserState::init, ParserState::expr}) ) {
-                            if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
-                                conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (conditionalUses[ctx.currentToken].empty() || ctx.startLineNumber != conditionalUses[ctx.currentToken].back()) {
+                                conditionalUses[ctx.currentToken].push_back(ctx.startLineNumber);
                             }
                         }
 
                         if ( ctx.IsOpen({ParserState::condition}) ){
-                            if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
-                                conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (conditionalUses[ctx.currentToken].empty() || ctx.startLineNumber != conditionalUses[ctx.currentToken].back()) {
+                                conditionalUses[ctx.currentToken].push_back(ctx.startLineNumber);
                             }
                         }
 
                         if ( ctx.IsOpen({ParserState::incr}) || ctx.IsOpen({ParserState::decr}) ){
-                            if (conditionalDefs[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalDefs[ctx.currentToken].back()) {
-                                conditionalDefs[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (conditionalDefs[ctx.currentToken].empty() || ctx.startLineNumber != conditionalDefs[ctx.currentToken].back()) {
+                                conditionalDefs[ctx.currentToken].push_back(ctx.startLineNumber);
                             }
 
-                            if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
-                                conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (conditionalUses[ctx.currentToken].empty() || ctx.startLineNumber != conditionalUses[ctx.currentToken].back()) {
+                                conditionalUses[ctx.currentToken].push_back(ctx.startLineNumber);
                             }
                         }
                     }
                     
                     // The following is for detecting possible uses within various Conditionals
                     if ( ctx.IsOpen({ParserState::dostmt}) && ctx.IsOpen({ParserState::condition}) ){
-                        if (conditionalUses[ctx.currentToken].empty() || ctx.currentLineNumber != conditionalUses[ctx.currentToken].back()) {
-                            conditionalUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                        if (conditionalUses[ctx.currentToken].empty() || ctx.startLineNumber != conditionalUses[ctx.currentToken].back()) {
+                            conditionalUses[ctx.currentToken].push_back(ctx.startLineNumber);
                         }
                     }
 
                     // Get uses or use/defs within switch conditions
                     if ( ctx.IsOpen({ParserState::switchstmt}) && ctx.IsOpen({ParserState::condition}) ){
                         if ( ctx.IsOpen({ParserState::init}) ) {
-                            if (switchUses[ctx.currentToken].empty() || ctx.currentLineNumber != switchUses[ctx.currentToken].back()) {
-                                switchUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (switchUses[ctx.currentToken].empty() || ctx.startLineNumber != switchUses[ctx.currentToken].back()) {
+                                switchUses[ctx.currentToken].push_back(ctx.startLineNumber);
                             }
                         } else {
                             switchControlVars[switchDepth].insert(ctx.currentToken);
 
-                            if (switchUses[ctx.currentToken].empty() || ctx.currentLineNumber != switchUses[ctx.currentToken].back()) {
-                                switchUses[ctx.currentToken].push_back(ctx.currentLineNumber);
+                            if (switchUses[ctx.currentToken].empty() || ctx.startLineNumber != switchUses[ctx.currentToken].back()) {
+                                switchUses[ctx.currentToken].push_back(ctx.startLineNumber);
                             }
                             
                             if (!currentExprOp.empty()) {
                                 // prefix : <operator>++</operator><name>c</name>
-                                if (switchDefs[ctx.currentToken].empty() || ctx.currentLineNumber != switchDefs[ctx.currentToken].back()) {
-                                    switchDefs[ctx.currentToken].push_back(ctx.currentLineNumber);
+                                if (switchDefs[ctx.currentToken].empty() || ctx.startLineNumber != switchDefs[ctx.currentToken].back()) {
+                                    switchDefs[ctx.currentToken].push_back(ctx.startLineNumber);
                                 }
                                 
                                 currentExprName = "";
@@ -181,8 +181,8 @@ class ConditionalPolicy : public srcDispatch::EventListener, public srcDispatch:
             closeEventMap[ParserState::switchcase] = [this](srcSAXEventContext &ctx) {
                 if ( ctx.IsOpen({ParserState::switchstmt}) ){
                     for (auto varName : switchControlVars[switchDepth]) {
-                        if (switchUses[varName].empty() || ctx.currentLineNumber != switchUses[varName].back()) {
-                            switchUses[varName].push_back(ctx.currentLineNumber);
+                        if (switchUses[varName].empty() || ctx.startLineNumber != switchUses[varName].back()) {
+                            switchUses[varName].push_back(ctx.startLineNumber);
                         }
                     }
                 }
@@ -211,7 +211,7 @@ class ConditionalPolicy : public srcDispatch::EventListener, public srcDispatch:
                     extractedToken == "/=" || extractedToken == "%=" || extractedToken == "=") {
 
                     if ( (ctx.IsOpen({ParserState::decl}) && ctx.IsClosed({ParserState::name}) && ctx.IsClosed({ParserState::type})) && !currentExprName.empty()) {
-                        dvarSet.push_back(DvarData(ctx.currentFunctionName, currentExprName, ctx.currentLineNumber));
+                        dvarSet.push_back(DvarData(ctx.currentFunctionName, currentExprName, ctx.startLineNumber));
                         insertDvar = true;
                     }
                 }
@@ -239,12 +239,12 @@ class ConditionalPolicy : public srcDispatch::EventListener, public srcDispatch:
                     currentExprOp = ctx.currentToken;
                     if (!currentExprName.empty()) {
                         // postfix : <name>c</name><operator>++</operator>
-                        if (conditionalDefs[currentExprName].empty() || ctx.currentLineNumber != conditionalDefs[currentExprName].back()) {
-                            conditionalDefs[currentExprName].push_back(ctx.currentLineNumber);
+                        if (conditionalDefs[currentExprName].empty() || ctx.startLineNumber != conditionalDefs[currentExprName].back()) {
+                            conditionalDefs[currentExprName].push_back(ctx.startLineNumber);
                         }
                         
-                        if (conditionalUses[currentExprName].empty() || ctx.currentLineNumber != conditionalUses[currentExprName].back()) {
-                            conditionalUses[currentExprName].push_back(ctx.currentLineNumber);
+                        if (conditionalUses[currentExprName].empty() || ctx.startLineNumber != conditionalUses[currentExprName].back()) {
+                            conditionalUses[currentExprName].push_back(ctx.startLineNumber);
                         }
 
                         currentExprName = "";
@@ -256,7 +256,7 @@ class ConditionalPolicy : public srcDispatch::EventListener, public srcDispatch:
                     ctx.currentToken == "*=" || ctx.currentToken == "/=" ||
                     ctx.currentToken == "%=" || ctx.currentToken == "=") {
                     if ( ctx.IsOpen({ParserState::decl}) && !currentExprName.empty() && !currentType.empty() ) {
-                        dvarSet.push_back(DvarData(ctx.currentFunctionName, currentExprName, ctx.currentLineNumber));
+                        dvarSet.push_back(DvarData(ctx.currentFunctionName, currentExprName, ctx.startLineNumber));
                     }
                 }
             };

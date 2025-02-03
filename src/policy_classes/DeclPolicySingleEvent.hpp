@@ -102,7 +102,7 @@ private:
 
             declDepth = ctx.depth;
             data = DeclData{};
-            data.lineNumber = ctx.currentLineNumber;
+            data.lineNumber = ctx.startLineNumber;
 
             CollectSpecifiersHandlers();
             CollectTypeHandlers();

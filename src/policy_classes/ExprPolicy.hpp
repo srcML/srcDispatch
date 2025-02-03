@@ -82,7 +82,7 @@ class ExprPolicy : public srcDispatch::EventListener, public srcDispatch::Policy
                     ctx.currentToken == "-=" || ctx.currentToken == "*=" ||
                     ctx.currentToken == "/=" || ctx.currentToken == "%=" ||
                     ctx.currentToken == "--" || ctx.currentToken == "++"){
-                    currentExprOp = std::make_pair(ctx.currentToken, ctx.currentLineNumber);
+                    currentExprOp = std::make_pair(ctx.currentToken, ctx.startLineNumber);
                     auto it = exprDataSet.dataSet.find(currentExprName);
 
                     if(it != exprDataSet.dataSet.end()){
@@ -98,8 +98,8 @@ class ExprPolicy : public srcDispatch::EventListener, public srcDispatch::Policy
 
             closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx){
 
-                if(currentLine.empty() || currentLine.back() != ctx.currentLineNumber){
-                    currentLine.push_back(ctx.currentLineNumber);
+                if(currentLine.empty() || currentLine.back() != ctx.startLineNumber){
+                    currentLine.push_back(ctx.startLineNumber);
                 }
                 
                 if(ctx.IsOpen({ParserState::exprstmt})){
@@ -107,14 +107,14 @@ class ExprPolicy : public srcDispatch::EventListener, public srcDispatch::Policy
                     if(it != exprDataSet.dataSet.end()){
                         it->second.uses.insert(currentLine.back()); //assume it's a use
 
-                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.currentLineNumber )
+                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.startLineNumber )
                             it->second.definitions.insert(currentLine.back());
                     }else{
                         data.nameOfIdentifier = currentExprName;
 
                         data.uses.insert(currentLine.back());
 
-                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.currentLineNumber )
+                        if ( (currentExprOp.first == "++" || currentExprOp.first == "--") && currentExprOp.second == ctx.startLineNumber )
                             data.definitions.insert(currentLine.back());
 
                         exprDataSet.dataSet.insert(std::make_pair(currentExprName, data));

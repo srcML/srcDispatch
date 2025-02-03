@@ -96,7 +96,7 @@ class FunctionSignaturePolicy : public srcDispatch::EventListener, public srcDis
             using namespace srcDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
                 ctx.dispatcher->AddListener(&parampolicy);
-                data.lineNumber = ctx.currentLineNumber;
+                data.lineNumber = ctx.startLineNumber;
             };
             closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx){
                 ctx.dispatcher->RemoveListener(&parampolicy);
@@ -109,7 +109,7 @@ class FunctionSignaturePolicy : public srcDispatch::EventListener, public srcDis
             };
 
             openEventMap[ParserState::function] = [this](srcSAXEventContext& ctx) {
-                data.lineNumber = ctx.currentLineNumber;
+                data.lineNumber = ctx.startLineNumber;
             };
 
             openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {

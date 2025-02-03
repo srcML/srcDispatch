@@ -72,7 +72,8 @@ namespace srcDispatch {
                   archiveBuffer{0},
                   dispatcher(dispatcher),
                   elementStack(elementStack),
-                  currentLineNumber{0},
+                  startLineNumber(0),
+                  endLineNumber(0),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
                   isPrev(false),
@@ -91,7 +92,8 @@ namespace srcDispatch {
             EventDispatcher * dispatcher;
             const std::vector<std::string> & elementStack;
             std::vector<unsigned int> genericDepth;
-            unsigned int currentLineNumber;
+            unsigned int startLineNumber;
+            unsigned int endLineNumber;
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
                         currentTag, currentToken, currentAttributeName, currentAttributeValue, currentFunctionName,
@@ -478,6 +480,12 @@ namespace srcDispatch {
     constexpr std::unique_ptr<Policy> make_unique_policy(std::initializer_list<PolicyListener*>&& args) {
         return std::make_unique<Policy>(args);
     }
+
+    constexpr std::string get_qualified_name(const char* localname, const char* prefix) {
+        if(prefix == nullptr) return localname;
+        return std::string(prefix) + ":" +  localname;
+    }
+
 
 }
 

@@ -927,13 +927,7 @@ namespace srcDispatch {
             
             ++ctx.depth;
 
-            std::string localName;
-            if(prefix) {
-                localName += prefix;
-                localName += ':';
-            }
-            localName += localname;
-
+            std::string localName = get_qualified_name(localname, prefix);
             ctx.currentTag = localName;
 
             std::string name;
@@ -957,18 +951,14 @@ namespace srcDispatch {
             if(localName != "") {
                 // form attribute map
                 for(int pos = 0; pos < num_attributes; ++pos) {
-                    std::string attributeName;
-                    if(attributes[pos].prefix) {
-                        attributeName += attributes[pos].prefix;
-                        attributeName += ':';
-                    }
-                    attributeName += attributes[pos].localname;
+
+                    std::string attributeName = get_qualified_name(attributes[pos].localname, attributes[pos].prefix);
                     if(strcmp(attributes[pos].localname, "start") == 0) {
                         std::string posString;
                         for(int i = 0; attributes[pos].value[i] != ':'; ++i) {
                             posString+=attributes[pos].value[i];
                         }
-                        ctx.currentLineNumber = std::stoi(posString);
+                        ctx.startLineNumber = std::stoi(posString);
                     }
                     std::string attributeValue = attributes[pos].value;
 

@@ -51,7 +51,7 @@ void ExpressionPolicy::InitializeExpressionPolicyHandlers() {
         if(!exprDepth) {
             exprDepth = ctx.depth;
             data = ExpressionData{};
-            data.lineNumber = ctx.currentLineNumber;
+            data.lineNumber = ctx.startLineNumber;
             CollectNameHandlers();
             CollectCallHandlers();
             CollectOperatorHandlers();

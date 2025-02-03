@@ -81,7 +81,7 @@ private:
             if (!ifStmtDepth) {                          
                 ifStmtDepth = ctx.depth;                 
                 data = IfStmtData{};                     
-                data.startLineNumber = ctx.currentLineNumber; 
+                data.startLineNumber = ctx.startLineNumber; 
                 CollectIfHandlers();                   
                 CollectElseIfHandlers();                 
                 CollectElseHandlers();                       
@@ -92,7 +92,7 @@ private:
         closeEventMap[ParserState::ifgroup] =[this](srcSAXEventContext& ctx) {
             if (ifStmtDepth && ifStmtDepth == ctx.depth) {
                 ifStmtDepth = 0;
-                data.endLineNumber = ctx.currentLineNumber;
+                data.endLineNumber = ctx.startLineNumber;
                 NotifyAll(ctx);
                 InitializeIfStmtPolicyHandlers();
             }

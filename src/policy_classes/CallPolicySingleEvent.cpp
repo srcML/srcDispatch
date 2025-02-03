@@ -40,7 +40,7 @@ void CallPolicy::InitializeCallPolicyHandlers() {
         if (!callDepth) {
             callDepth = ctx.depth;
             data = CallData{};
-            data.lineNumber = ctx.currentLineNumber;
+            data.lineNumber = ctx.startLineNumber;
             CollectNameHandlers();
             CollectCallArgumentHandlers();
         }

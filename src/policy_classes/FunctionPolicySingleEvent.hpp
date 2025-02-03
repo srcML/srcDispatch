@@ -138,7 +138,7 @@ private:
                 functionDepth = ctx.depth;
                 data = FunctionData{};
                 data.namespaces = ctx.currentNamespaces;
-                data.lineNumber = ctx.currentLineNumber;
+                data.lineNumber = ctx.startLineNumber;
                 data.language = ctx.currentFileLanguage;
                 data.filename = ctx.currentFilePath;
                 std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
