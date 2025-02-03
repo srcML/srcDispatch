@@ -73,7 +73,7 @@ protected:
         closeEventMap[DispatchEvent] =[this](srcSAXEventContext& ctx) {
             if (conditionalDepth && conditionalDepth == ctx.depth) {
                 conditionalDepth = 0;
-                data.endLineNumber = ctx.startLineNumber;
+                data.endLineNumber = ctx.endLineNumber;
                 NotifyAll(ctx);
                 InitializeConditionalPolicyHandlers();
             }

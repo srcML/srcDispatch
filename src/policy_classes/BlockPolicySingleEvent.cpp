@@ -86,7 +86,7 @@ void BlockPolicy::CollectBlockHandlers() {
     closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
         if(blockDepth && blockDepth == ctx.depth) {
             blockDepth = 0;
-            data.endLineNumber = ctx.startLineNumber;
+            data.endLineNumber = ctx.endLineNumber;
             NotifyAll(ctx);
             InitializeBlockPolicyHandlers();
         }
