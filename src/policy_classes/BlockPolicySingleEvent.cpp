@@ -77,6 +77,7 @@ void BlockPolicy::CollectBlockHandlers() {
             blockDepth = ctx.depth;
             data = BlockData{};
             data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber = ctx.endLineNumber;
         } else {
             if (!blockPolicy) blockPolicy = make_unique_policy<BlockPolicy>({this});
             ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
@@ -86,7 +87,6 @@ void BlockPolicy::CollectBlockHandlers() {
     closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
         if(blockDepth && blockDepth == ctx.depth) {
             blockDepth = 0;
-            data.endLineNumber = ctx.endLineNumber;
             NotifyAll(ctx);
             InitializeBlockPolicyHandlers();
         }

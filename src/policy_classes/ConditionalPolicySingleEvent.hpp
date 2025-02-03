@@ -64,6 +64,7 @@ protected:
                 conditionalDepth = ctx.depth;                 
                 data = ConditionalData{};                     
                 data.startLineNumber = ctx.startLineNumber; 
+                data.endLineNumber = ctx.endLineNumber;
                 CollectConditionHandlers();                   
                 CollectBlockHandlers();                       
             }                                                 
@@ -73,7 +74,6 @@ protected:
         closeEventMap[DispatchEvent] =[this](srcSAXEventContext& ctx) {
             if (conditionalDepth && conditionalDepth == ctx.depth) {
                 conditionalDepth = 0;
-                data.endLineNumber = ctx.endLineNumber;
                 NotifyAll(ctx);
                 InitializeConditionalPolicyHandlers();
             }

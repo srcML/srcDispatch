@@ -84,6 +84,7 @@ private:
                 forDepth = ctx.depth;
                 data = ForData{};
                 data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber = ctx.endLineNumber;
                 CollectControlHandlers();
                 CollectBlockHandlers();
             } 
@@ -93,7 +94,6 @@ private:
         closeEventMap[ParserState::forstmt] =[this](srcSAXEventContext& ctx) {
             if (forDepth && forDepth == ctx.depth) {
                 forDepth = 0;
-                data.endLineNumber = ctx.endLineNumber;
                 NotifyAll(ctx);
                 InitializeForPolicyHandlers();
             }
