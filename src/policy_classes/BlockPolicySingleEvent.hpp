@@ -12,6 +12,7 @@
 #include <DeclTypePolicySingleEvent.hpp>
 #include <ExprStmtPolicySingleEvent.hpp>
 #include <ReturnPolicySingleEvent.hpp>
+#include <CasePolicySingleEvent.hpp>
 
 class IfStmtPolicy;
 class SwitchPolicy;
@@ -36,8 +37,9 @@ struct BlockData {
 
     std::vector<std::shared_ptr<BlockData>>       blocks;
     std::vector<std::any>                         conditionals;
-};
 
+    std::vector<std::shared_ptr<ExpressionData>>  cases;
+};
 
 class BlockPolicy :
 public srcDispatch::EventListener,
@@ -57,6 +59,7 @@ private:
     std::unique_ptr<WhilePolicy>    whilePolicy;
     std::unique_ptr<ForPolicy>      forPolicy;
     std::unique_ptr<DoPolicy>       doPolicy;
+    std::unique_ptr<CasePolicy>     casePolicy;
 
 public:
     BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners);
@@ -80,6 +83,7 @@ private:
     void CollectWhileHandlers();
     void CollectForHandlers();
     void CollectDoHandlers();
+    void CollectCaseHandlers();
 
 };
 
