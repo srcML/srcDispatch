@@ -56,7 +56,7 @@ private:
             if (!operatorDepth) {                          
                 operatorDepth = ctx.depth;                 
                 data = OperatorData{};                     
-                data.startLineNumber = ctx.currentLineNumber; 
+                data.startLineNumber = ctx.startLineNumber; 
                 CollectTokenHandlers();                       
             }                                                 
         }; 

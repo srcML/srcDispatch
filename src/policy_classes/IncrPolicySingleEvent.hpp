@@ -71,7 +71,7 @@ private:
             if (!incrDepth) {                          
                 incrDepth = ctx.depth;                 
                 data = IncrData{};                     
-                data.startLineNumber = ctx.currentLineNumber; 
+                data.startLineNumber = ctx.startLineNumber; 
                 CollectExpressionHandlers();                       
             }                                                 
         }; 

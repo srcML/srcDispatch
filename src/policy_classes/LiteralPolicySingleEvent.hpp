@@ -56,7 +56,7 @@ private:
             if (!literalDepth) {                          
                 literalDepth = ctx.depth;                 
                 data = LiteralData{};                     
-                data.startLineNumber = ctx.currentLineNumber; 
+                data.startLineNumber = ctx.startLineNumber; 
                 CollectTokenHandlers();                       
             }                                                 
         }; 

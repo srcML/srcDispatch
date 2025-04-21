@@ -33,7 +33,7 @@ class ReturnPolicy : public srcDispatch::EventListener, public srcDispatch::Poli
             
             closeEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
                 if(ctx.IsOpen({ParserState::returnstmt}) && ctx.IsClosed({ParserState::comment})){
-                    returnUses[ctx.currentToken].insert(ctx.currentLineNumber);
+                    returnUses[ctx.currentToken].insert(ctx.startLineNumber);
 
                     NotifyAll(ctx);
                 }

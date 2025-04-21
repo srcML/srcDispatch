@@ -52,7 +52,7 @@ class DeclTypePolicy : public srcDispatch::EventListener, public srcDispatch::Po
 
                     data.nameOfContainingFunction = ctx.currentFunctionName;
 
-                    data.lineNumber = ctx.currentLineNumber;
+                    data.lineNumber = ctx.startLineNumber;
                     data.nameOfIdentifier = currentDeclName;
 
 
@@ -67,15 +67,15 @@ class DeclTypePolicy : public srcDispatch::EventListener, public srcDispatch::Po
                 }
 
                 if(ctx.And({ParserState::parameter})){
-                    data.lineNumber = ctx.currentLineNumber;
+                    data.lineNumber = ctx.startLineNumber;
                     data.nameOfIdentifier = currentDeclName;
                     
                     // Used to mark line numbers where parameters are declared
                     if (possibleDefs.size() == 0) {
-                        possibleDefs.push_back(ctx.currentLineNumber);
+                        possibleDefs.push_back(ctx.startLineNumber);
                     } else {
-                        if (possibleDefs.back() != ctx.currentLineNumber) {
-                            possibleDefs.push_back(ctx.currentLineNumber);
+                        if (possibleDefs.back() != ctx.startLineNumber) {
+                            possibleDefs.push_back(ctx.startLineNumber);
                         }
                     }
 

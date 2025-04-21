@@ -61,7 +61,7 @@ void TemplateArgumentListPolicy::InitializeTemplateArgumentListPolicyHandlers() 
         if (!argumentListDepth) {
             argumentListDepth = ctx.depth;
             data = TemplateArgumentListData{};
-            data.lineNumber = ctx.currentLineNumber;
+            data.lineNumber = ctx.startLineNumber;
             CollectArgumentHandler();
         }
     };

@@ -46,7 +46,7 @@ namespace srcDispatch {
         name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
         argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn, namespacen,
         super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
-        ifstmt, nonterminal, macro, classblock, functionblock, constructorblock, ifblock, whileblock, forblock,
+        ifstmt, nonterminal, macro,
         switchstmt, switchcase, specifier, throws, typedefexpr, userdefined, comment, annotation, condition,
         dostmt, incr, decr, control, ifgroup, range,
 
@@ -82,12 +82,14 @@ namespace srcDispatch {
                   dispatcher(dispatcher),
                   elementStack(elementStack),
                   diffStack(),
-                  currentLineNumber{0},
+                  startLineNumber(0),
+                  endLineNumber(0),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
                   isPrev(false),
                   isOperator(false),
                   endArchive(false) {}
+
             ~srcSAXEventContext(){
                 if(writer){
                     xmlBufferFree(archiveBuffer);
@@ -102,10 +104,11 @@ namespace srcDispatch {
             const std::vector<std::string>& elementStack;
             std::vector<Diff>               diffStack;
             std::vector<unsigned int> genericDepth;
-            unsigned int currentLineNumber;
+            unsigned int startLineNumber;
+            unsigned int endLineNumber;
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
-                        currentTag, currentToken, currentAttributeName, currentAttributeValue, currentFunctionName,
+                        currentTag, currentToken, currentAttributeName, currentAttributeValue,
                         currentClassName, currentFileChecksum;
             std::vector<std::string> currentNamespaces;
             std::size_t depth;

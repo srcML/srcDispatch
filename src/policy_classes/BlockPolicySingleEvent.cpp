@@ -48,7 +48,9 @@ void BlockPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcS
         data.conditionals.push_back(policy->Data<ForData>());
     } else if (typeid(DoPolicy) == typeid(*policy)) {
         data.conditionals.push_back(policy->Data<DoData>());
-    }  else {
+    } else if (typeid(CasePolicy) == typeid(*policy)) {
+        data.cases.push_back(policy->Data<ExpressionData>());
+    } else {
         throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
 
@@ -67,6 +69,7 @@ void BlockPolicy::InitializeBlockPolicyHandlers() {
     CollectWhileHandlers();
     CollectForHandlers();
     CollectDoHandlers();
+    CollectCaseHandlers();
 
 }
 
@@ -76,7 +79,8 @@ void BlockPolicy::CollectBlockHandlers() {
         if(!blockDepth) {
             blockDepth = ctx.depth;
             data = BlockData{};
-            data.startLineNumber = ctx.currentLineNumber;
+            data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber = ctx.endLineNumber;
         } else {
             if (!blockPolicy) blockPolicy = make_unique_policy<BlockPolicy>({this});
             ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
@@ -86,7 +90,6 @@ void BlockPolicy::CollectBlockHandlers() {
     closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
         if(blockDepth && blockDepth == ctx.depth) {
             blockDepth = 0;
-            data.endLineNumber = ctx.currentLineNumber;
             NotifyAll(ctx);
             InitializeBlockPolicyHandlers();
         }
@@ -162,3 +165,13 @@ void BlockPolicy::CollectDoHandlers() {
     };
 
 }
+
+void BlockPolicy::CollectCaseHandlers() {
+    using namespace srcDispatch;
+    openEventMap[ParserState::switchcase] = [this](srcSAXEventContext& ctx) {
+        if (!casePolicy) casePolicy = make_unique_policy<CasePolicy>({this});
+        ctx.dispatcher->AddListenerDispatch(casePolicy.get());
+    };
+
+}
+
