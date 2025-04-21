@@ -61,10 +61,10 @@ namespace srcDispatch {
         listeners.emplace_back(new policy({policyListener}));
         return CreateListenersImpl<remaining...>(policyListener, listeners);
     }
-    template<>
-    std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener [[maybe_unused]], std::list<EventListener*> & listeners) {
-        return listeners;
-    }
+    // template<>
+    // std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener [[maybe_unused]], std::list<EventListener*> & listeners) {
+    //     return listeners;
+    // }
 
     const std::string DIFF_URI = "http://www.srcML.org/srcDiff";
 
@@ -153,7 +153,7 @@ namespace srcDispatch {
             }
         }
 
-        srcDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatcher(PolicyListener * listener, bool genArchive = false) : EventDispatcher(element_stack) {
             elementListeners = CreateListeners<policies...>(listener);
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
@@ -168,7 +168,7 @@ namespace srcDispatch {
             InitializeHandlers();
         }
 
-        srcDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(srcml_element_stack) {
+        srcDispatcher(std::initializer_list<EventListener*> listeners, bool genArchive = false) : EventDispatcher(element_stack) {
             elementListeners = listeners;
             numberAllocatedListeners = elementListeners.size();
             dispatching = false;
@@ -904,7 +904,15 @@ namespace srcDispatch {
                     { "common", DiffOperation::COMMON },
                 };
 
-                ctx.diffStack.emplace_back(diff_op_map[std::string(localname)], ctx.depth + 1);
+                bool isReplace = false;
+                bool isConvert = false;
+                if(num_attributes) {
+                    isReplace = attributes[0].value == std::string("replace");
+                    isConvert = attributes[0].value == std::string("convert");
+
+                }
+
+                ctx.diffStack.emplace_back(diff_op_map[std::string(localname)], ctx.depth + 1, isReplace, isConvert);
 
 
                 return;
@@ -973,10 +981,10 @@ namespace srcDispatch {
                 ctx.currentNamespaces.emplace_back();
             }
 
-            if(ctx.currentTag == "name" && nameCollectElements.contains(srcml_element_stack.back())) {
+            if(ctx.currentTag == "name" && nameCollectElements.contains(element_stack.back())) {
                 collectedText = std::string();
             } else if(collectedText && (ctx.currentTag == "block" || ctx.currentTag == "super_list")) {
-                if(srcml_element_stack.back() == "namespace") {
+                if(element_stack.back() == "namespace") {
                     ctx.currentNamespaces.back() = *collectedText;
                 } else {
                     ctx.currentClassName = *collectedText;

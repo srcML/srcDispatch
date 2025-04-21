@@ -63,8 +63,13 @@ namespace srcDispatch {
 
         enum DiffOperation { DELETE, INSERT, COMMON };
         struct Diff {
+            Diff(DiffOperation operation, size_t depth, bool isReplace, bool isConvert) 
+                : operation(operation), depth(depth), isReplace(false), isConvert(false) {}
+
             DiffOperation operation;
             size_t depth;
+            bool isReplace;
+            bool isConvert;
         };
 
 
