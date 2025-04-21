@@ -61,10 +61,10 @@ namespace srcDispatch {
         listeners.emplace_back(new policy({policyListener}));
         return CreateListenersImpl<remaining...>(policyListener, listeners);
     }
-    // template<>
-    // std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener [[maybe_unused]], std::list<EventListener*> & listeners) {
-    //     return listeners;
-    // }
+    template<>
+    std::list<EventListener*> CreateListenersImpl<>(PolicyListener * listener [[maybe_unused]], std::list<EventListener*> & listeners) {
+        return listeners;
+    }
 
     const std::string DIFF_URI = "http://www.srcML.org/srcDiff";
 
