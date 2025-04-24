@@ -228,7 +228,8 @@ private:
 					}
 				};
 				std::function<void (srcSAXEventContext& ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
-					if ((classDepth + 3) == ctx.depth) {
+					if ((classDepth + 3) == ctx.depth
+						|| ((classDepth + 4) == ctx.depth && ctx.elementStack.back() == "friend")) {
 						if (!functionPolicy) functionPolicy = make_unique_policy<FunctionPolicy>({this});
 						ctx.dispatcher->AddListenerDispatch(functionPolicy.get());
 					}
