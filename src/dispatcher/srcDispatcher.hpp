@@ -890,6 +890,9 @@ namespace srcDispatch {
             if(name == "operator" && (localName == "function" || localName == "function_decl")) {
                 ctx.isOperator = true;
             }
+            if(name == "pseudo" && localName == "block") {
+                ctx.isPseudo = true;
+            }
 
             if(name == "elseif" && localName == "if") {
                 localName = "elseif";
