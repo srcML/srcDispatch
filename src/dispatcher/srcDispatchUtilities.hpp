@@ -113,7 +113,7 @@ namespace srcDispatch {
             std::vector<std::string> currentNamespaces;
             std::size_t depth;
             std::map<std::string, std::string> attributes;
-            bool isPrev, isOperator, endArchive;
+            bool isPrev, isOperator, isPseudo, endArchive;
 
           /**
             * write_start_tag
