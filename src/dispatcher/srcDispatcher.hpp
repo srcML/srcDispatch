@@ -802,7 +802,7 @@ namespace srcDispatch {
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
-    
+            ctx.isArchive = is_archive;
             if (generateArchive) {
                 ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             }

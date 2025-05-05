@@ -61,10 +61,10 @@ namespace srcDispatch {
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
 
-        enum DiffOperation { DELETE, INSERT, COMMON, CHANGE };
+        enum DiffOperation { COMMON, DELETE, INSERT, CHANGE };
         struct Diff {
-            Diff(DiffOperation operation, size_t depth, bool isReplace, bool isConvert) 
-                : operation(operation), depth(depth), isReplace(false), isConvert(false) {}
+            Diff(DiffOperation operation, size_t depth = 0, bool isReplace = false, bool isConvert = false) 
+                : operation(operation), depth(depth), isReplace(isReplace), isConvert(isConvert) {}
 
             DiffOperation operation;
             size_t depth;
@@ -81,11 +81,12 @@ namespace srcDispatch {
                   archiveBuffer{0},
                   dispatcher(dispatcher),
                   elementStack(elementStack),
-                  diffStack(),
+                  diffStack{COMMON},
                   startLineNumber(0),
                   endLineNumber(0),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
+                  isArchive(false),
                   isPrev(false),
                   isOperator(false),
                   endArchive(false) {}
@@ -113,7 +114,7 @@ namespace srcDispatch {
             std::vector<std::string> currentNamespaces;
             std::size_t depth;
             std::map<std::string, std::string> attributes;
-            bool isPrev, isOperator, isPseudo, endArchive;
+            bool isArchive, isPrev, isOperator, isPseudo, endArchive;
 
           /**
             * write_start_tag
