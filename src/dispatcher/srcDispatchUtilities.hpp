@@ -61,7 +61,7 @@ namespace srcDispatch {
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
 
-        enum DiffOperation { COMMON, DELETE, INSERT, CHANGE };
+        enum DiffOperation { COMMON, DELETE, INSERT, CHANGE, NONE };
         struct Diff {
             Diff(DiffOperation operation, size_t depth = 0, bool isReplace = false, bool isConvert = false) 
                 : operation(operation), depth(depth), isReplace(isReplace), isConvert(isConvert) {}
