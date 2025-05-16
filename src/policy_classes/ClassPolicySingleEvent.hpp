@@ -222,29 +222,31 @@ private:
 				NopCloseEvents({ParserState::name, ParserState::super_list, ParserState::tokenstring});
 				// set up to listen to decl_stmt, member, and class policies
 				openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
-					if ((classDepth + 3) == ctx.depth) {
+					if ((classDepth + 3) == ctx.depth || ((classDepth + 2) == ctx.depth && ctx.currentFileLanguage != "C" && ctx.currentFileLanguage != "C++" )) {
 						if (!declPolicy) declPolicy = make_unique_policy<DeclTypePolicy>({this});
 						ctx.dispatcher->AddListenerDispatch(declPolicy.get());
 					}
 				};
 				std::function<void (srcSAXEventContext& ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
 					if ((classDepth + 3) == ctx.depth
-						|| ((classDepth + 4) == ctx.depth && ctx.elementStack.back() == "friend")) {
+						|| ((classDepth + 4) == ctx.depth && ctx.elementStack.back() == "friend")
+						|| ((classDepth + 2) == ctx.depth && ctx.currentFileLanguage != "C" && ctx.currentFileLanguage != "C++" )) {
 						if (!functionPolicy) functionPolicy = make_unique_policy<FunctionPolicy>({this});
 						ctx.dispatcher->AddListenerDispatch(functionPolicy.get());
 					}
 				};
-				openEventMap[ParserState::function] = functionEvent;
-				openEventMap[ParserState::functiondecl] = functionEvent;
-				openEventMap[ParserState::constructor] = functionEvent;
+				openEventMap[ParserState::function]        = functionEvent;
+				openEventMap[ParserState::functiondecl]    = functionEvent;
+				openEventMap[ParserState::constructor]     = functionEvent;
 				openEventMap[ParserState::constructordecl] = functionEvent;
 
 				std::function<void (srcSAXEventContext& ctx)> destructorEvent = [this](srcSAXEventContext& ctx) {
-					if ((classDepth + 3) == ctx.depth) {
+					if ((classDepth + 3) == ctx.depth
+						|| ((classDepth + 2) == ctx.depth && ctx.currentFileLanguage != "C" && ctx.currentFileLanguage != "C++" )) {
 						data.hasDestructor = true;
 					}
 				};
-				openEventMap[ParserState::destructor] = destructorEvent;
+				openEventMap[ParserState::destructor]     = destructorEvent;
 				openEventMap[ParserState::destructordecl] = destructorEvent;
 			}
 		};
