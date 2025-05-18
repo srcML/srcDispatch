@@ -31,6 +31,8 @@ struct BlockData {
     unsigned int startLineNumber;
     unsigned int endLineNumber;
 
+    bool isPseudo;
+
     std::vector<std::shared_ptr<DeclData>>        locals;
     std::vector<std::shared_ptr<ExpressionData>>  returns;
     std::vector<std::shared_ptr<ExpressionData>>  expr_stmts;

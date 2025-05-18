@@ -40,6 +40,7 @@ struct FunctionData {
     bool isOverride;
     bool isConstExpr;
     bool isDelete;
+    bool isFriend;
 
     std::set<std::string> stereotypes;
 
@@ -141,6 +142,7 @@ private:
                 data.lineNumber = ctx.startLineNumber;
                 data.language = ctx.currentFileLanguage;
                 data.filename = ctx.currentFilePath;
+                data.isFriend = ctx.elementStack.back() == "friend";
                 std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
                 if (stereotype_attr_itr != ctx.attributes.end()){
                     std::istringstream stereostring(stereotype_attr_itr->second);

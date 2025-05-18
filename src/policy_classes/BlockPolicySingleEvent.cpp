@@ -81,6 +81,7 @@ void BlockPolicy::CollectBlockHandlers() {
             data = BlockData{};
             data.startLineNumber = ctx.startLineNumber;
             data.endLineNumber = ctx.endLineNumber;
+            data.isPseudo = ctx.isPseudo;
         } else {
             if (!blockPolicy) blockPolicy = make_unique_policy<BlockPolicy>({this});
             ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
