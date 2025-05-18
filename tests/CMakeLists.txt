@@ -19,17 +19,43 @@
 #  along with the srcSAXEventDispatch; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-file( GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Test* )
+file( GLOB NEWMAN_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/newman_tests/Test* )
 include_directories(${DISPATCH_INCLUDE_DIR})
-message(${SOURCES})
+message(${NEWMAN_SOURCES})
 
-add_definitions("-std=c++11")
+add_definitions("-std=c++20")
 
 find_package(LibXml2 REQUIRED)
 
-foreach( testsourcefile ${SOURCES} )
+foreach( testsourcefile ${NEWMAN_SOURCES} )
     string( REPLACE ".cpp" "" testname ${testsourcefile} )
     get_filename_component(file ${testsourcefile} NAME_WE)
     add_executable( ${file} EXCLUDE_FROM_ALL ${testsourcefile} )
     target_link_libraries( ${file} srcsaxeventdispatch srcsax_static srcml ${DISPATCH_LIBRARIES} LibXml2::LibXml2)
+endforeach( testsourcefile ${NEWMAN_SOURCES} )
+
+###############################################################################
+file(GLOB SRCDISPATCHTEST_SOURCE
+        srcDispatchTest.cpp
+        srcDispatchTest.hpp
+    )
+
+# glob of C# tests
+file( GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/dispatch_csharp/Test* )
+
+foreach( testsourcefile ${SOURCES} )
+    string( REPLACE ".cpp" "" testname ${testsourcefile} )
+    get_filename_component(file ${testsourcefile} NAME_WE)
+    add_executable( ${file} EXCLUDE_FROM_ALL ${SRCDISPATCHTEST_SOURCE} ${testsourcefile} )
+    target_link_libraries( ${file} srcdispatch srcsax_static srcml ${DISPATCH_LIBRARIES} LibXml2::LibXml2)
+endforeach( testsourcefile ${SOURCES} )
+
+# glob of Java tests
+file( GLOB SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/dispatch_java/Test* )
+
+foreach( testsourcefile ${SOURCES} )
+    string( REPLACE ".cpp" "" testname ${testsourcefile} )
+    get_filename_component(file ${testsourcefile} NAME_WE)
+    add_executable( ${file} EXCLUDE_FROM_ALL ${SRCDISPATCHTEST_SOURCE} ${testsourcefile} )
+    target_link_libraries( ${file} srcdispatch srcsax_static srcml ${DISPATCH_LIBRARIES} LibXml2::LibXml2)
 endforeach( testsourcefile ${SOURCES} )
