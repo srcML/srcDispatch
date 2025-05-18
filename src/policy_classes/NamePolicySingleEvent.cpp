@@ -22,20 +22,10 @@ std::string NameData::SimpleName() const {
 
 std::string NameData::ToString() const {
 
-    std::string str = name;
-    for(const std::any& name_element : names) {
-        if(name_element.type() == typeid(std::shared_ptr<NameData>)) {
-            str += std::any_cast<std::shared_ptr<NameData>>(name_element)->ToString();
-        } else {
-            str += std::any_cast<std::shared_ptr<OperatorData>>(name_element)->op;
-        }
-    }
+    std::ostringstream out;
+    out << *this;
 
-    if(templateArgumentList) {
-        str += templateArgumentList->ToString();
-    }
-
-    return str;
+    return out.str();
 }
 
 
@@ -53,9 +43,23 @@ std::ostream& operator<<(std::ostream& out, const NameData& nameData) {
         out << *nameData.templateArgumentList;
     }
 
-    for(std::shared_ptr<ExpressionData> index : nameData.indices) {
-        out << '[' << *index << ']';
+    if(nameData.indices) {
+        out << '[';
+
+        bool printComma = false;
+        for (const std::shared_ptr<ExpressionData>& index : *nameData.indices) {
+
+            if(printComma) {
+                out << ", ";
+            }
+
+            out << *index;
+            printComma = true;
+        }
+
+        out << ']';
     }
+
     return out;
 }
 
@@ -71,7 +75,7 @@ void NamePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSA
     } else if(typeid(TemplateArgumentListPolicy) == typeid(*policy)) {
         data.templateArgumentList = policy->Data<TemplateArgumentListData>();
     } else if(typeid(ExpressionPolicy) == typeid(*policy)) {
-        data.indices.push_back(policy->Data<ExpressionData>());
+        data.indices->push_back(policy->Data<ExpressionData>());
     } else {
         throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
     }
@@ -142,6 +146,7 @@ void NamePolicy::CollectTemplateArgumentListHandlers() {
 void NamePolicy::CollectArrayIndicesHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {
+        data.indices = std::vector<std::shared_ptr<ExpressionData>>();
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
             if(!expressionPolicy) expressionPolicy = make_unique_policy<ExpressionPolicy>({this});
             ctx.dispatcher->AddListenerDispatch(expressionPolicy.get());
