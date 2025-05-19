@@ -58,8 +58,8 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-	ClassData                  data;
-	std::size_t                classDepth;
+	ClassData       data;
+	std::size_t     classDepth;
     AccessSpecifier currentRegion;
 
 	std::unique_ptr<NamePolicy>     namePolicy;

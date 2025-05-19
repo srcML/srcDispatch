@@ -11,9 +11,10 @@
 #define INCLUDED_ACCESS_SPECIFIER_HPP
 
 enum AccessSpecifier {
-    PUBLIC    = 0,
-    PRIVATE   = 1,
-    PROTECTED = 2 
+    NONE      = 0,
+    PUBLIC    = 1,
+    PRIVATE   = 2,
+    PROTECTED = 3 
 };
 
 #endif
