@@ -146,7 +146,9 @@ void NamePolicy::CollectTemplateArgumentListHandlers() {
 void NamePolicy::CollectArrayIndicesHandlers() {
     using namespace srcDispatch;
     openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx) {
-        data.indices = std::vector<std::shared_ptr<ExpressionData>>();
+        if(!data.indices) {
+            data.indices = std::vector<std::shared_ptr<ExpressionData>>();
+        }
         openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
             if(!expressionPolicy) expressionPolicy = make_unique_policy<ExpressionPolicy>({this});
             ctx.dispatcher->AddListenerDispatch(expressionPolicy.get());
