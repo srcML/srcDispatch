@@ -60,7 +60,7 @@ public srcDispatch::PolicyListener {
 private:
 	ClassData                  data;
 	std::size_t                classDepth;
-    ClassData::AccessSpecifier currentRegion;
+    AccessSpecifier currentRegion;
 
 	std::unique_ptr<NamePolicy>     namePolicy;
 	std::unique_ptr<DeclTypePolicy> declPolicy;
