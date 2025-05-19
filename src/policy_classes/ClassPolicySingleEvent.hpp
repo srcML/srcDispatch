@@ -7,6 +7,7 @@
 
 #include <srcDispatchUtilities.hpp>
 
+#include <AccessSpecifier.hpp>
 #include <NamePolicySingleEvent.hpp>
 #include <DeclTypePolicySingleEvent.hpp>
 #include <FunctionPolicySingleEvent.hpp>
@@ -22,7 +23,6 @@ struct ParentData;
 
 struct ClassData {
     enum ClassType : std::size_t { CLASS, STRUCT };  //UNION, ENUM?
-    enum AccessSpecifier         { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
 
     std::vector<std::string> namespaces;
 
@@ -48,7 +48,7 @@ struct ClassData {
 struct ParentData {
     std::string name;
     bool isVirtual;
-    ClassData::AccessSpecifier accessSpecifier;
+    AccessSpecifier accessSpecifier;
 };
 
 
