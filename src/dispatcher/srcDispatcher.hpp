@@ -459,6 +459,10 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::throws];
                     DispatchEvent(ParserState::throws, ElementState::open);
                 } },
+                { "throw", [this]() {
+                    ++ctx.triggerField[ParserState::throwstmt];
+                    DispatchEvent(ParserState::throwstmt, ElementState::open);
+                } },
                 { "annotation", [this]() {
                     ++ctx.triggerField[ParserState::annotation];
                     DispatchEvent(ParserState::annotation, ElementState::open);
@@ -466,6 +470,22 @@ namespace srcDispatch {
                 { "return", [this]() {
                     ++ctx.triggerField[ParserState::returnstmt];
                     DispatchEvent(ParserState::returnstmt, ElementState::open);
+                } },
+                { "goto", [this]() {
+                    ++ctx.triggerField[ParserState::gotostmt];
+                    DispatchEvent(ParserState::gotostmt, ElementState::open);
+                } },
+                { "break", [this]() {
+                    ++ctx.triggerField[ParserState::breakstmt];
+                    DispatchEvent(ParserState::breakstmt, ElementState::open);
+                } },
+                { "continue", [this]() {
+                    ++ctx.triggerField[ParserState::continuestmt];
+                    DispatchEvent(ParserState::continuestmt, ElementState::open);
+                } },
+                { "label", [this]() {
+                    ++ctx.triggerField[ParserState::label];
+                    DispatchEvent(ParserState::label, ElementState::open);
                 } },
                 { "comment", [this]() {
                     ++ctx.triggerField[ParserState::comment];
@@ -722,9 +742,29 @@ namespace srcDispatch {
                     --ctx.triggerField[ParserState::returnstmt];
                     DispatchEvent(ParserState::returnstmt, ElementState::close);
                 } },
+                { "goto", [this]() {
+                    --ctx.triggerField[ParserState::gotostmt];
+                    DispatchEvent(ParserState::gotostmt, ElementState::close);
+                } },
+                { "break", [this]() {
+                    --ctx.triggerField[ParserState::breakstmt];
+                    DispatchEvent(ParserState::breakstmt, ElementState::close);
+                } },
+                { "continue", [this]() {
+                    --ctx.triggerField[ParserState::continuestmt];
+                    DispatchEvent(ParserState::continuestmt, ElementState::close);
+                } },
+                { "label", [this]() {
+                    --ctx.triggerField[ParserState::label];
+                    DispatchEvent(ParserState::label, ElementState::close);
+                } },
                 { "throws", [this]() {
                     --ctx.triggerField[ParserState::throws];
                     DispatchEvent(ParserState::throws, ElementState::close);
+                } },
+                { "throw", [this]() {
+                    --ctx.triggerField[ParserState::throwstmt];
+                    DispatchEvent(ParserState::throwstmt, ElementState::close);
                 } },
                 { "annotation", [this]() {
                     --ctx.triggerField[ParserState::annotation];
