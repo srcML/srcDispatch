@@ -89,6 +89,15 @@ namespace srcDispatch {
         std::optional<std::string> collectedText;
 
     protected:
+
+        ParserState CurrentPState() const {
+            return currentPState;
+        }
+
+        ElementState CurrentEState() const {
+            return currentEState;
+        }
+
         void DispatchEvent(ParserState pstate, ElementState estate) override {
 
             dispatching = true;
