@@ -41,15 +41,13 @@ namespace srcDispatch {
 
     class EventDispatcher;            
     enum ElementState {open, close};
-    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt,
-        argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, genericargumentlist,
-        name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
-        argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn, namespacen,
-        super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
-        ifstmt, nonterminal, macro,
-        switchstmt, switchcase, specifier, throws, typedefexpr, userdefined, comment, annotation, condition,
-        gotostmt, breakstmt, continuestmt, label, throwstmt, trystmt, catchstmt,
-        dostmt, incr, decr, control, ifgroup, range,
+    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt, argumentlist, argumentlisttemplate, 
+        call, templates, ctrlflow, endflow, genericargumentlist, name, function, functiondecl, constructor, constructordecl,
+        destructordecl, destructor, argument, index, block, type, typeprev, init, op, literal, 
+        modifier, memberlist, classn, structn, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,
+        preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, switchstmt, switchcase, specifier, throws, 
+        typedefexpr, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
+        trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt,
 
         // NLP states
         snoun, propersnoun, spronoun, sadjective, sverb,
@@ -57,7 +55,7 @@ namespace srcDispatch {
         // stereotype state
         stereotype, 
 
-        archive, unit, returnstmt,
+        archive, unit,
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
@@ -390,7 +388,7 @@ public:
     };
 
     template<class Policy>
-    constexpr std::unique_ptr<Policy> make_unique_policy(std::initializer_list<PolicyListener*>&& args) {
+    constexpr std::unique_ptr<Policy> make_unique_policy(const std::initializer_list<PolicyListener*>& args) {
         return std::make_unique<Policy>(args);
     }
 
