@@ -133,13 +133,13 @@ namespace srcDispatch {
             * Overide for desired behaviour.
             */
             void write_start_tag(const char* localname, const char* prefix, const char* URI [[maybe_unused]],
-                                int num_namespaces [[maybe_unused]], const struct srcsax_namespace * namespaces [[maybe_unused]], int num_attributes,
-                                const struct srcsax_attribute * attributes) {
-                xmlTextWriterStartElementNS(writer, (const xmlChar *)prefix, (const xmlChar *)localname, 0);
+                                int num_namespaces [[maybe_unused]], const struct srcsax_namespace* namespaces [[maybe_unused]], int num_attributes,
+                                const struct srcsax_attribute* attributes) {
+                xmlTextWriterStartElementNS(writer, (const xmlChar*)prefix, (const xmlChar*)localname, 0);
                 for(int pos = 0; pos < num_attributes; ++pos) {
                     std::string str(attributes[pos].localname);
-                    xmlTextWriterWriteAttributeNS(writer, (const xmlChar *)attributes[pos].prefix, (const xmlChar *)attributes[pos].localname,
-                        (const xmlChar *)attributes[pos].uri, (const xmlChar *)attributes[pos].value);
+                    xmlTextWriterWriteAttributeNS(writer, (const xmlChar*)attributes[pos].prefix, (const xmlChar*)attributes[pos].localname,
+                        (const xmlChar*)attributes[pos].uri, (const xmlChar )attributes[pos].value);
                 }
             }
           /**
@@ -148,7 +148,7 @@ namespace srcDispatch {
             *
             * Write out the provided text content, escaping everything but ".
             */
-            void write_content(const std::string &text_content) {        
+            void write_content(const std::string& text_content) {        
                 if(!text_content.empty()) {        
                     /*
                         Normal output of text is for the most part
@@ -230,6 +230,7 @@ namespace srcDispatch {
     class EventError : public std::runtime_error { 
         public: EventError(const std::string& msg) : std::runtime_error(msg) {}
     };
+
     class EventListener {
         typedef std::unordered_map<srcDispatch::ParserState, std::function<void(srcDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
         protected:
@@ -246,8 +247,8 @@ namespace srcDispatch {
 
             void SetDispatched(bool isDispatched) { dispatched = isDispatched; }
 
-            virtual const EventMap & GetOpenEventMap() const { return openEventMap; }
-            virtual const EventMap & GetCloseEventMap() const { return closeEventMap; }
+            virtual const EventMap& GetOpenEventMap()  const { return openEventMap;  }
+            virtual const EventMap& GetCloseEventMap() const { return closeEventMap; }
 
             virtual void HandleEvent() { dispatched = true; }
             virtual void HandleEvent(srcDispatch::ParserState pstate, srcDispatch::ElementState estate, srcDispatch::srcSAXEventContext& ctx) {
@@ -316,7 +317,7 @@ namespace srcDispatch {
         srcSAXEventContext ctx;
         std::list<EventListener*> elementListeners;
 
-        EventDispatcher(const std::vector<std::string> & elementStack)
+        EventDispatcher(const std::vector<std::string>& elementStack)
             : ctx(this, elementStack), elementListeners() {}
         virtual ~EventDispatcher() {}
         virtual void DispatchEvent(ParserState, ElementState) = 0;
@@ -332,12 +333,12 @@ namespace srcDispatch {
 
             PolicyListener() {}
             virtual ~PolicyListener() {}
-            virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventContext & ctx) = 0;
-            virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventContext & ctx) = 0;
+            virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventContext& ctx) = 0;
+            virtual void NotifyWrite(const PolicyDispatcher* policy, srcSAXEventContext& ctx) = 0;
         };
     class PolicyDispatcher{
     public:
-        PolicyDispatcher(std::initializer_list<PolicyListener *> listeners) : policyListeners(listeners){}
+        PolicyDispatcher(std::initializer_list<PolicyListener*> listeners) : policyListeners(listeners){}
         virtual ~PolicyDispatcher() {}
         virtual void AddListener(PolicyListener* listener){
             policyListeners.push_back(listener);
@@ -355,7 +356,7 @@ namespace srcDispatch {
         std::list<PolicyListener*> policyListeners;
         virtual std::any DataInner() const = 0;
         //TODO: These may not need to be synchronous or even called in the same method (i.e., notifyall)
-        virtual void NotifyAll(/*const*/ srcSAXEventContext & ctx) {
+        virtual void NotifyAll(/*const*/ srcSAXEventContext& ctx) {
             for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){
                 (*listener)->Notify(this, ctx);
             }
