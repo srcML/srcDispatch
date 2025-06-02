@@ -139,7 +139,7 @@ namespace srcDispatch {
                 for(int pos = 0; pos < num_attributes; ++pos) {
                     std::string str(attributes[pos].localname);
                     xmlTextWriterWriteAttributeNS(writer, (const xmlChar*)attributes[pos].prefix, (const xmlChar*)attributes[pos].localname,
-                        (const xmlChar*)attributes[pos].uri, (const xmlChar )attributes[pos].value);
+                        (const xmlChar*)attributes[pos].uri, (const xmlChar*)attributes[pos].value);
                 }
             }
           /**
