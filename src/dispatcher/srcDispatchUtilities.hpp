@@ -317,10 +317,31 @@ namespace srcDispatch {
         srcSAXEventContext ctx;
         std::list<EventListener*> elementListeners;
 
+        ParserState currentPState;
+        ElementState currentEState;
+
         EventDispatcher(const std::vector<std::string>& elementStack)
             : ctx(this, elementStack), elementListeners() {}
         virtual ~EventDispatcher() {}
         virtual void DispatchEvent(ParserState, ElementState) = 0;
+
+public:
+        const srcSAXEventContext& GetContext() const {
+            return ctx;
+        }
+
+        srcSAXEventContext& GetContext() {
+            return ctx;
+        }
+
+        ParserState CurrentPState() const {
+            return currentPState;
+        }
+
+        ElementState CurrentEState() const {
+            return currentEState;
+        }
+
     };
 
     class PolicyError : public std::runtime_error { 

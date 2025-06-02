@@ -79,8 +79,6 @@ namespace srcDispatch {
 
         bool dispatching;
         bool generateArchive;
-        ParserState currentPState;
-        ElementState currentEState;
 
         std::size_t numberAllocatedListeners;
 
@@ -89,13 +87,6 @@ namespace srcDispatch {
 
     protected:
 
-        ParserState CurrentPState() const {
-            return currentPState;
-        }
-
-        ElementState CurrentEState() const {
-            return currentEState;
-        }
 
         void DispatchEvent(ParserState pstate, ElementState estate) override {
 
