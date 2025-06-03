@@ -245,6 +245,18 @@ namespace srcDispatch {
             }
             virtual ~EventListener() {}
 
+            std::size_t GetDepth() const {
+                return depth;
+            }
+
+            virtual void SetDepth(std::size_t depth) {
+                this->depth = depth;
+            }
+
+            std::size_t GetOffset() const {
+                return offset;
+            }
+
             virtual void SetOffset(std::size_t offset) {
                 this->offset = offset;
             }
