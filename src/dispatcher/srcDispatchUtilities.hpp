@@ -232,16 +232,22 @@ namespace srcDispatch {
     class EventListener {
         typedef std::unordered_map<srcDispatch::ParserState, std::function<void(srcDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
         protected:
+           std::size_t depth;
+           std::size_t offset;
+
            bool dispatched;
            EventMap openEventMap, closeEventMap;
 
-
         public:
 
-            EventListener() : dispatched(false) {
+            EventListener() : depth(0), offset(0), dispatched(false){
                 DefaultEventHandlers();
             }
             virtual ~EventListener() {}
+
+            void SetOffset(std::size_t offset) {
+                this->offset = offset;
+            }
 
             void SetDispatched(bool isDispatched) { dispatched = isDispatched; }
 
