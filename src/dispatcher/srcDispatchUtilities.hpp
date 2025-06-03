@@ -245,7 +245,7 @@ namespace srcDispatch {
             }
             virtual ~EventListener() {}
 
-            void SetOffset(std::size_t offset) {
+            virtual void SetOffset(std::size_t offset) {
                 this->offset = offset;
             }
 
