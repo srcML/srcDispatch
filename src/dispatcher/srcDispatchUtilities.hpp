@@ -233,33 +233,17 @@ namespace srcDispatch {
         typedef std::unordered_map<srcDispatch::ParserState, std::function<void(srcDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
         protected:
            std::size_t depth;
-           std::size_t offset;
 
            bool dispatched;
            EventMap openEventMap, closeEventMap;
 
         public:
 
-            EventListener() : depth(0), offset(0), dispatched(false){
+            EventListener() : depth(0), dispatched(false){
                 DefaultEventHandlers();
             }
+
             virtual ~EventListener() {}
-
-            std::size_t GetDepth() const {
-                return depth;
-            }
-
-            virtual void SetDepth(std::size_t depth) {
-                this->depth = depth;
-            }
-
-            std::size_t GetOffset() const {
-                return offset;
-            }
-
-            virtual void SetOffset(std::size_t offset) {
-                this->offset = offset;
-            }
 
             void SetDispatched(bool isDispatched) { dispatched = isDispatched; }
 
