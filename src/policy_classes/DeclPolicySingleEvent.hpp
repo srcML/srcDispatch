@@ -21,22 +21,41 @@
 struct DeclData {
 
     unsigned int lineNumber;
-    std::shared_ptr<TypeData>       type;
-    std::shared_ptr<NameData>       name;
-    std::shared_ptr<ExpressionData> init;
-    std::shared_ptr<ExpressionData> range;
-    bool                            isStatic;
+    std::shared_ptr<TypeData>                    type;
+    std::shared_ptr<NameData>                    name;
+    std::shared_ptr<ExpressionData>              init;
+    std::vector<std::shared_ptr<ExpressionData>> arguments;
+    std::shared_ptr<ExpressionData>              range;
+
+    bool isStatic;
 
     friend std::ostream& operator<<(std::ostream& out, const DeclData& declData) {
         if(declData.type) {
             out << declData.type->ToString();
         }
+
         if (declData.name) {
             out << ' ' << *declData.name;
         }
+
         if (declData.init) {
             out << " = " << *declData.init;
         }
+
+        if (!declData.arguments.empty()) {
+
+            out << '(';
+            bool outputComma = false;
+            for(const std::shared_ptr<ExpressionData>& argument : declData.arguments) {
+                if(outputComma) {
+                    out << ", ";
+                }
+                out << *argument;
+                outputComma = true;
+            }
+            out << ')';
+        }
+
         if (declData.range) {
             out << " : " << *declData.range;
         }
@@ -80,8 +99,12 @@ protected:
         } else if (typeid(ExpressionPolicy) == typeid(*policy)) {
             if(ctx.IsOpen(ParserState::range)) {
                 data.range = policy->Data<ExpressionData>();
-            } else {
+            } else if(ctx.IsOpen(ParserState::init)) {
                 data.init = policy->Data<ExpressionData>();
+            } else  if(ctx.IsOpen(ParserState::argumentlist)) {
+                data.arguments.emplace_back(policy->Data<ExpressionData>());            
+            } else {
+                    throw std::string("Unhandled ExpressionPolicy condition");
             }
         } else {
             throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
@@ -108,6 +131,7 @@ private:
             CollectTypeHandlers();
             CollectNameHandlers();
             CollectInitHandlers();
+            CollectArgumentList();
             CollectRangeHandlers();
         };
 
@@ -174,6 +198,32 @@ private:
             if(!declDepth || (declDepth + 1) != ctx.depth) return;
 
             NopOpenEvents({ParserState::expr});
+        };
+    }
+
+
+    void CollectArgumentList() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext &ctx) {
+            if (!declDepth || (declDepth + 1) != ctx.depth) {
+                return;
+            }
+
+            openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
+                if (!exprPolicy) {
+                    exprPolicy = make_unique_policy<ExpressionPolicy>({this});
+                }
+                ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
+            };
+
+            closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
+                NopOpenEvents({ParserState::expr});
+            };
+
+        };
+
+        closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext &ctx) {
+            NopOpenEvents({ParserState::argument});
         };
     }
 

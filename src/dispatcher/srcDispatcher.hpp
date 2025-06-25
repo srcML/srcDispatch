@@ -18,7 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-
 #ifndef INCLUDED_SRCDISPATCHER_HPP
 #define INCLUDED_SRCDISPATCHER_HPP
 
@@ -80,8 +79,6 @@ namespace srcDispatch {
 
         bool dispatching;
         bool generateArchive;
-        ParserState currentPState;
-        ElementState currentEState;
 
         std::size_t numberAllocatedListeners;
 
@@ -89,6 +86,8 @@ namespace srcDispatch {
         std::optional<std::string> collectedText;
 
     protected:
+
+
         void DispatchEvent(ParserState pstate, ElementState estate) override {
 
             dispatching = true;
@@ -459,6 +458,18 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::throws];
                     DispatchEvent(ParserState::throws, ElementState::open);
                 } },
+                { "throw", [this]() {
+                    ++ctx.triggerField[ParserState::throwstmt];
+                    DispatchEvent(ParserState::throwstmt, ElementState::open);
+                } },
+                { "try", [this]() {
+                    ++ctx.triggerField[ParserState::trystmt];
+                    DispatchEvent(ParserState::trystmt, ElementState::open);
+                } },
+                { "catch", [this]() {
+                    ++ctx.triggerField[ParserState::catchstmt];
+                    DispatchEvent(ParserState::catchstmt, ElementState::open);
+                } },
                 { "annotation", [this]() {
                     ++ctx.triggerField[ParserState::annotation];
                     DispatchEvent(ParserState::annotation, ElementState::open);
@@ -466,6 +477,22 @@ namespace srcDispatch {
                 { "return", [this]() {
                     ++ctx.triggerField[ParserState::returnstmt];
                     DispatchEvent(ParserState::returnstmt, ElementState::open);
+                } },
+                { "goto", [this]() {
+                    ++ctx.triggerField[ParserState::gotostmt];
+                    DispatchEvent(ParserState::gotostmt, ElementState::open);
+                } },
+                { "break", [this]() {
+                    ++ctx.triggerField[ParserState::breakstmt];
+                    DispatchEvent(ParserState::breakstmt, ElementState::open);
+                } },
+                { "continue", [this]() {
+                    ++ctx.triggerField[ParserState::continuestmt];
+                    DispatchEvent(ParserState::continuestmt, ElementState::open);
+                } },
+                { "label", [this]() {
+                    ++ctx.triggerField[ParserState::label];
+                    DispatchEvent(ParserState::label, ElementState::open);
                 } },
                 { "comment", [this]() {
                     ++ctx.triggerField[ParserState::comment];
@@ -722,9 +749,37 @@ namespace srcDispatch {
                     --ctx.triggerField[ParserState::returnstmt];
                     DispatchEvent(ParserState::returnstmt, ElementState::close);
                 } },
+                { "goto", [this]() {
+                    --ctx.triggerField[ParserState::gotostmt];
+                    DispatchEvent(ParserState::gotostmt, ElementState::close);
+                } },
+                { "break", [this]() {
+                    --ctx.triggerField[ParserState::breakstmt];
+                    DispatchEvent(ParserState::breakstmt, ElementState::close);
+                } },
+                { "continue", [this]() {
+                    --ctx.triggerField[ParserState::continuestmt];
+                    DispatchEvent(ParserState::continuestmt, ElementState::close);
+                } },
+                { "label", [this]() {
+                    --ctx.triggerField[ParserState::label];
+                    DispatchEvent(ParserState::label, ElementState::close);
+                } },
                 { "throws", [this]() {
                     --ctx.triggerField[ParserState::throws];
                     DispatchEvent(ParserState::throws, ElementState::close);
+                } },
+                { "throw", [this]() {
+                    --ctx.triggerField[ParserState::throwstmt];
+                    DispatchEvent(ParserState::throwstmt, ElementState::close);
+                } },
+                { "try", [this]() {
+                    --ctx.triggerField[ParserState::trystmt];
+                    DispatchEvent(ParserState::trystmt, ElementState::close);
+                } },
+                { "catch", [this]() {
+                    --ctx.triggerField[ParserState::catchstmt];
+                    DispatchEvent(ParserState::catchstmt, ElementState::close);
                 } },
                 { "annotation", [this]() {
                     --ctx.triggerField[ParserState::annotation];
@@ -802,7 +857,7 @@ namespace srcDispatch {
         virtual void startUnit(const char * localname, const char * prefix, const char * URI,
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
-    
+            ctx.isArchive = is_archive;
             if (generateArchive) {
                 ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             }

@@ -2,8 +2,8 @@
  * @file TypePolicySingleEvent.hpp
  *
   */
-#ifndef INCLUDED_TYPE1_POLICY_SINGLE_EVENT_HPP
-#define INCLUDED_TYPE1_POLICY_SINGLE_EVENT_HPP
+#ifndef INCLUDED_TYPE_POLICY_SINGLE_EVENT_HPP
+#define INCLUDED_TYPE_POLICY_SINGLE_EVENT_HPP
 
 #include <srcDispatchUtilities.hpp>
 

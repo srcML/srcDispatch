@@ -57,6 +57,9 @@ namespace srcDispatch {
     protected:
         virtual void DispatchEvent(srcDispatch::ParserState pstate, srcDispatch::ElementState estate) override {
 
+            srcDispatcher<policies...>::currentPState = pstate;
+            srcDispatcher<policies...>::currentEState = estate;
+
             while(!dispatched) {
 
                 dispatched = true;

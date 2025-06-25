@@ -41,14 +41,13 @@ namespace srcDispatch {
 
     class EventDispatcher;            
     enum ElementState {open, close};
-    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt,
-        argumentlist, argumentlisttemplate, call, templates, ctrlflow, endflow, genericargumentlist,
-        name, function, functiondecl, constructor, constructordecl, destructordecl, destructor,
-        argument, index, block, type, typeprev, init, op, literal, modifier, memberlist, classn, structn, namespacen,
-        super_list, super, publicaccess, privateaccess, protectedaccess, preproc, whilestmt, forstmt, 
-        ifstmt, nonterminal, macro,
-        switchstmt, switchcase, specifier, throws, typedefexpr, userdefined, comment, annotation, condition,
-        dostmt, incr, decr, control, ifgroup, range,
+    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt, argumentlist, argumentlisttemplate, 
+        call, templates, ctrlflow, endflow, genericargumentlist, name, function, functiondecl, constructor, constructordecl,
+        destructordecl, destructor, argument, index, block, type, typeprev, init, op, literal, 
+        modifier, memberlist, classn, structn, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,
+        preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, switchstmt, switchcase, specifier, throws, 
+        typedefexpr, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
+        trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt,
 
         // NLP states
         snoun, propersnoun, spronoun, sadjective, sverb,
@@ -56,15 +55,15 @@ namespace srcDispatch {
         // stereotype state
         stereotype, 
 
-        archive, unit, returnstmt,
+        archive, unit,
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
 
-        enum DiffOperation { DELETE, INSERT, COMMON, CHANGE };
+        enum DiffOperation { COMMON, DELETE, INSERT, CHANGE, NONE };
         struct Diff {
-            Diff(DiffOperation operation, size_t depth, bool isReplace, bool isConvert) 
-                : operation(operation), depth(depth), isReplace(false), isConvert(false) {}
+            Diff(DiffOperation operation, size_t depth = 0, bool isReplace = false, bool isConvert = false) 
+                : operation(operation), depth(depth), isReplace(isReplace), isConvert(isConvert) {}
 
             DiffOperation operation;
             size_t depth;
@@ -81,11 +80,12 @@ namespace srcDispatch {
                   archiveBuffer{0},
                   dispatcher(dispatcher),
                   elementStack(elementStack),
-                  diffStack(),
+                  diffStack{COMMON},
                   startLineNumber(0),
                   endLineNumber(0),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
+                  isArchive(false),
                   isPrev(false),
                   isOperator(false),
                   endArchive(false) {}
@@ -113,7 +113,7 @@ namespace srcDispatch {
             std::vector<std::string> currentNamespaces;
             std::size_t depth;
             std::map<std::string, std::string> attributes;
-            bool isPrev, isOperator, isPseudo, endArchive;
+            bool isArchive, isPrev, isOperator, isPseudo, endArchive;
 
           /**
             * write_start_tag
@@ -131,13 +131,13 @@ namespace srcDispatch {
             * Overide for desired behaviour.
             */
             void write_start_tag(const char* localname, const char* prefix, const char* URI [[maybe_unused]],
-                                int num_namespaces [[maybe_unused]], const struct srcsax_namespace * namespaces [[maybe_unused]], int num_attributes,
-                                const struct srcsax_attribute * attributes) {
-                xmlTextWriterStartElementNS(writer, (const xmlChar *)prefix, (const xmlChar *)localname, 0);
+                                int num_namespaces [[maybe_unused]], const struct srcsax_namespace* namespaces [[maybe_unused]], int num_attributes,
+                                const struct srcsax_attribute* attributes) {
+                xmlTextWriterStartElementNS(writer, (const xmlChar*)prefix, (const xmlChar*)localname, 0);
                 for(int pos = 0; pos < num_attributes; ++pos) {
                     std::string str(attributes[pos].localname);
-                    xmlTextWriterWriteAttributeNS(writer, (const xmlChar *)attributes[pos].prefix, (const xmlChar *)attributes[pos].localname,
-                        (const xmlChar *)attributes[pos].uri, (const xmlChar *)attributes[pos].value);
+                    xmlTextWriterWriteAttributeNS(writer, (const xmlChar*)attributes[pos].prefix, (const xmlChar*)attributes[pos].localname,
+                        (const xmlChar*)attributes[pos].uri, (const xmlChar*)attributes[pos].value);
                 }
             }
           /**
@@ -146,7 +146,7 @@ namespace srcDispatch {
             *
             * Write out the provided text content, escaping everything but ".
             */
-            void write_content(const std::string &text_content) {        
+            void write_content(const std::string& text_content) {        
                 if(!text_content.empty()) {        
                     /*
                         Normal output of text is for the most part
@@ -228,24 +228,27 @@ namespace srcDispatch {
     class EventError : public std::runtime_error { 
         public: EventError(const std::string& msg) : std::runtime_error(msg) {}
     };
+
     class EventListener {
         typedef std::unordered_map<srcDispatch::ParserState, std::function<void(srcDispatch::srcSAXEventContext&)>, std::hash<int>> EventMap;
         protected:
+           std::size_t depth;
+
            bool dispatched;
            EventMap openEventMap, closeEventMap;
 
-
         public:
 
-            EventListener() : dispatched(false) {
+            EventListener() : depth(0), dispatched(false){
                 DefaultEventHandlers();
             }
+
             virtual ~EventListener() {}
 
             void SetDispatched(bool isDispatched) { dispatched = isDispatched; }
 
-            virtual const EventMap & GetOpenEventMap() const { return openEventMap; }
-            virtual const EventMap & GetCloseEventMap() const { return closeEventMap; }
+            virtual const EventMap& GetOpenEventMap()  const { return openEventMap;  }
+            virtual const EventMap& GetCloseEventMap() const { return closeEventMap; }
 
             virtual void HandleEvent() { dispatched = true; }
             virtual void HandleEvent(srcDispatch::ParserState pstate, srcDispatch::ElementState estate, srcDispatch::srcSAXEventContext& ctx) {
@@ -298,130 +301,7 @@ namespace srcDispatch {
         private:
 
             void DefaultEventHandlers() {
-                using namespace srcDispatch;
-
-                NopOpenEvents({
-                    ParserState::declstmt,
-                    ParserState::exprstmt,
-                    ParserState::parameterlist,
-                    ParserState::condition,
-                    ParserState::dostmt,
-                    ParserState::incr,
-                    ParserState::decr,
-                    ParserState::ifstmt,
-                    ParserState::forstmt,
-                    ParserState::control,
-                    ParserState::whilestmt,
-                    ParserState::switchstmt,
-                    ParserState::switchcase,
-                    ParserState::templates,
-                    ParserState::argumentlist,
-                    ParserState::genericargumentlist,
-                    ParserState::call,
-                    ParserState::function,
-                    ParserState::constructor,
-                    ParserState::functiondecl,
-                    ParserState::destructordecl,
-                    ParserState::constructordecl,
-                    ParserState::classn,
-                    ParserState::structn,
-                    ParserState::publicaccess,
-                    ParserState::protectedaccess,
-                    ParserState::privateaccess,
-                    ParserState::destructor,
-                    ParserState::parameter,
-                    ParserState::super,
-                    ParserState::super_list,
-                    ParserState::memberlist,
-                    ParserState::index,
-                    ParserState::op,
-                    ParserState::block,
-                    ParserState::init,
-                    ParserState::argument,
-                    ParserState::literal,
-                    ParserState::modifier,
-                    ParserState::decl,
-                    ParserState::type,
-                    ParserState::typedefexpr,
-                    ParserState::expr,
-                    ParserState::name,
-                    ParserState::macro,
-                    ParserState::specifier,
-                    ParserState::snoun,
-                    ParserState::propersnoun,
-                    ParserState::sadjective,
-                    ParserState::spronoun,
-                    ParserState::sverb,
-                    ParserState::returnstmt,
-                    ParserState::throws,
-                    ParserState::comment,
-                    ParserState::stereotype,
-                    ParserState::annotation,
-                    ParserState::archive,
-                });
-
-                NopCloseEvents({
-                    ParserState::declstmt,
-                    ParserState::exprstmt,
-                    ParserState::parameterlist,
-                    ParserState::condition,
-                    ParserState::dostmt,
-                    ParserState::incr,
-                    ParserState::decr,
-                    ParserState::ifstmt,
-                    ParserState::forstmt,
-                    ParserState::control,
-                    ParserState::whilestmt,
-                    ParserState::switchstmt,
-                    ParserState::switchcase,
-                    ParserState::templates,
-                    ParserState::argumentlist,
-                    ParserState::genericargumentlist,
-                    ParserState::call,
-                    ParserState::function,
-                    ParserState::constructor,
-                    ParserState::destructor,
-                    ParserState::functiondecl,
-                    ParserState::constructordecl,
-                    ParserState::destructordecl,
-                    ParserState::classn,
-                    ParserState::structn,
-                    ParserState::publicaccess,
-                    ParserState::protectedaccess,                  
-                    ParserState::privateaccess,
-                    ParserState::parameter,
-                    ParserState::super,
-                    ParserState::super_list,
-                    ParserState::memberlist,
-                    ParserState::index,
-                    ParserState::op,
-                    ParserState::block,
-                    ParserState::init,
-                    ParserState::argument,
-                    ParserState::literal,
-                    ParserState::modifier,
-                    ParserState::decl,
-                    ParserState::type,
-                    ParserState::typedefexpr,
-                    ParserState::expr,
-                    ParserState::name,
-                    ParserState::macro,
-                    ParserState::tokenstring,
-                    ParserState::specifier,
-                    ParserState::snoun,
-                    ParserState::propersnoun,
-                    ParserState::sadjective,
-                    ParserState::spronoun,
-                    ParserState::sverb,
-                    ParserState::stereotype,
-                    ParserState::returnstmt,
-                    ParserState::throws,
-                    ParserState::comment,
-                    ParserState::annotation,
-                    ParserState::archive,
-                });
-
-        }
+            }
 
     };
     class EventDispatcher {
@@ -437,10 +317,31 @@ namespace srcDispatch {
         srcSAXEventContext ctx;
         std::list<EventListener*> elementListeners;
 
-        EventDispatcher(const std::vector<std::string> & elementStack)
+        ParserState currentPState;
+        ElementState currentEState;
+
+        EventDispatcher(const std::vector<std::string>& elementStack)
             : ctx(this, elementStack), elementListeners() {}
         virtual ~EventDispatcher() {}
         virtual void DispatchEvent(ParserState, ElementState) = 0;
+
+public:
+        const srcSAXEventContext& GetContext() const {
+            return ctx;
+        }
+
+        srcSAXEventContext& GetContext() {
+            return ctx;
+        }
+
+        ParserState CurrentPState() const {
+            return currentPState;
+        }
+
+        ElementState CurrentEState() const {
+            return currentEState;
+        }
+
     };
 
     class PolicyError : public std::runtime_error { 
@@ -453,12 +354,12 @@ namespace srcDispatch {
 
             PolicyListener() {}
             virtual ~PolicyListener() {}
-            virtual void Notify(const PolicyDispatcher * policy, const srcSAXEventContext & ctx) = 0;
-            virtual void NotifyWrite(const PolicyDispatcher * policy, srcSAXEventContext & ctx) = 0;
+            virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventContext& ctx) = 0;
+            virtual void NotifyWrite(const PolicyDispatcher* policy, srcSAXEventContext& ctx) = 0;
         };
     class PolicyDispatcher{
     public:
-        PolicyDispatcher(std::initializer_list<PolicyListener *> listeners) : policyListeners(listeners){}
+        PolicyDispatcher(std::initializer_list<PolicyListener*> listeners) : policyListeners(listeners){}
         virtual ~PolicyDispatcher() {}
         virtual void AddListener(PolicyListener* listener){
             policyListeners.push_back(listener);
@@ -476,7 +377,7 @@ namespace srcDispatch {
         std::list<PolicyListener*> policyListeners;
         virtual std::any DataInner() const = 0;
         //TODO: These may not need to be synchronous or even called in the same method (i.e., notifyall)
-        virtual void NotifyAll(/*const*/ srcSAXEventContext & ctx) {
+        virtual void NotifyAll(/*const*/ srcSAXEventContext& ctx) {
             for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){
                 (*listener)->Notify(this, ctx);
             }
@@ -489,7 +390,7 @@ namespace srcDispatch {
     };
 
     template<class Policy>
-    constexpr std::unique_ptr<Policy> make_unique_policy(std::initializer_list<PolicyListener*>&& args) {
+    constexpr std::unique_ptr<Policy> make_unique_policy(const std::initializer_list<PolicyListener*>& args) {
         return std::make_unique<Policy>(args);
     }
 
