@@ -1,0 +1,82 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/**
+ * @file srcDiffNamePolicy.hpp
+ *
+ * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ *
+ * This file is part of the srcDiffDispatch Infrastructure.
+ */
+
+#ifndef INCLUDED_SRCDIFF_NAME_POLICY_HPP
+#define INCLUDED_SRCDIFF_NAME_POLICY_HPP
+
+#include <srcDispatchUtilities.hpp>
+#include <DeltaElement.hpp>
+#include <srcDiffGenericArgumentsPolicy.hpp>
+#include <srcDiffOperatorPolicy.hpp>
+
+#include <string>
+#include <vector>
+#include <iostream>
+
+namespace srcDiffDispatch {
+
+    class ExpressionPolicy;
+    struct ExpressionData;
+
+    class GenericArgumentsPolicy;
+    struct GenericArgumentsData;
+
+    struct NameData {
+
+        unsigned int lineNumber;
+        DeltaElement<std::string> name;
+        std::vector<DeltaElement<std::any>> names;
+        DeltaElement<std::shared_ptr<GenericArgumentsData>> templateArgumentList;
+        std::vector<DeltaElement<std::shared_ptr<ExpressionData>>> indices;
+
+        std::string SimpleName() const;
+        std::shared_ptr<NameData> copyAs(srcDispatch::DiffOperation operation) const;
+
+        template<class type>
+        friend class DeltaElement;
+    private:
+        std::string ToString(srcDispatch::DiffOperation operation) const;
+    };
+
+    class NamePolicy :
+    public srcDispatch::EventListener,
+    public srcDispatch::PolicyDispatcher,
+    public srcDispatch::PolicyListener {
+
+    private:
+        NameData data;
+
+        std::unique_ptr<NamePolicy> namePolicy;
+        std::unique_ptr<OperatorPolicy> operatorPolicy;
+        std::unique_ptr<GenericArgumentsPolicy> templateArgumentListPolicy;
+        std::unique_ptr<ExpressionPolicy> expressionPolicy;
+
+    public:
+        NamePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+            : srcDispatch::PolicyDispatcher(listeners), data{} {
+            InitializeNamePolicyHandlers();
+        }
+
+        ~NamePolicy();
+
+    protected:
+        std::any DataInner() const override { return std::make_shared<NameData>(data); }
+        virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override;
+        void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
+
+    private:
+        void InitializeNamePolicyHandlers();
+        void CollectOperatorsHandlers();
+        void CollectGenericArgumentsHandlers();
+        void CollectArrayIndicesHandlers();
+    };
+
+}
+
+#endif

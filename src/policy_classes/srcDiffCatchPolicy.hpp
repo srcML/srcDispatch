@@ -1,0 +1,133 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/**
+ * @file srcDiffCatchPolicy.hpp
+ *
+ * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ *
+ * This file is part of the srcDiffDispatch Infrastructure.
+ */
+
+#ifndef INCLUDED_SRCDIFF_CATCH_POLICY_HPP
+#define INCLUDED_SRCDIFF_CATCH_POLICY_HPP
+
+#include <srcSAXController.hpp>
+#include <srcDispatcher.hpp>
+#include <srcDispatchUtilities.hpp>
+#include <DeltaElement.hpp>
+
+#include <srcDiffDeclPolicy.hpp>
+#include <srcDiffBlockPolicy.hpp>
+
+#include <string>
+#include <vector>
+#include <iostream>
+
+namespace srcDiffDispatch {
+
+    struct CatchData {
+
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
+        std::vector<DeltaElement<std::shared_ptr<DeclData>>> parameters;
+        DeltaElement<std::shared_ptr<BlockData>> block;
+    };
+
+    class CatchPolicy :
+    public srcDispatch::EventListener,
+    public srcDispatch::PolicyDispatcher,
+    public srcDispatch::PolicyListener {
+
+    private:
+        CatchData   data;
+
+        std::unique_ptr<DeclPolicy>  declPolicy;
+        std::unique_ptr<BlockPolicy> blockPolicy;
+
+    public:
+        CatchPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+            : srcDispatch::PolicyDispatcher(listeners), data{} {
+            InitializeCatchPolicyHandlers();
+        }
+
+        ~CatchPolicy() {}
+
+    protected:
+        std::any DataInner() const { return std::make_shared<CatchData>(data); }
+
+        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
+            if(typeid(DeclPolicy) == typeid(*policy)) {
+                data.parameters.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclData>());
+            } else if(typeid(BlockPolicy) == typeid(*policy)) {
+                data.block.Update(ctx.diffStack.back().operation, policy->Data<BlockData>());
+            } else {
+                throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
+            }
+
+            ctx.dispatcher->RemoveListener(nullptr);
+        }
+
+        void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) {} // doesn't use other parsers
+
+    private:
+        void InitializeCatchPolicyHandlers() {
+            using namespace srcDispatch;
+
+            openEventMap[ParserState::catchstmt] = [this](srcSAXEventContext& ctx) {
+                if(!depth) {
+                    depth = ctx.depth;
+                    data = CatchData{};
+                    data.startLineNumber = ctx.startLineNumber;
+                    data.endLineNumber   = ctx.endLineNumber;
+                    CollectParametersHandlers();
+                    CollectBlockHandlers();
+                }
+            };
+
+            // end of policy
+            closeEventMap[ParserState::catchstmt] = [this](srcSAXEventContext& ctx) {
+                if(!depth || depth != ctx.depth) return;
+
+                depth = 0;
+                NotifyAll(ctx);
+                InitializeCatchPolicyHandlers();
+            };
+        }
+
+        void CollectParametersHandlers() {
+            using namespace srcDispatch;
+            openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+                if(!depth) return;
+
+                openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
+                    if(!declPolicy) {
+                        declPolicy = make_unique_policy<DeclPolicy>({this});
+                    }
+                    ctx.dispatcher->AddListenerDispatch(declPolicy.get());
+                };
+            };
+
+            closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+                if(!depth) return;
+
+                NopOpenEvents({ParserState::parameter});
+            };
+        }
+
+        void CollectBlockHandlers() {
+            using namespace srcDispatch;
+            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+                if(!depth) return;
+
+                if(!blockPolicy) {
+                    blockPolicy = make_unique_policy<BlockPolicy>({this});
+                }
+                ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
+            };
+        }
+
+    };
+
+}
+
+#endif
