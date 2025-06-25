@@ -7,6 +7,7 @@
 
 #include <srcDispatchUtilities.hpp>
 
+#include <AccessSpecifier.hpp>
 #include <NamePolicySingleEvent.hpp>
 #include <DeclTypePolicySingleEvent.hpp>
 #include <FunctionPolicySingleEvent.hpp>
@@ -22,7 +23,6 @@ struct ParentData;
 
 struct ClassData {
     enum ClassType : std::size_t { CLASS, STRUCT };  //UNION, ENUM?
-    enum AccessSpecifier         { PUBLIC = 0, PRIVATE = 1, PROTECTED = 2 };
 
     std::vector<std::string> namespaces;
 
@@ -48,7 +48,7 @@ struct ClassData {
 struct ParentData {
     std::string name;
     bool isVirtual;
-    ClassData::AccessSpecifier accessSpecifier;
+    AccessSpecifier accessSpecifier;
 };
 
 
@@ -58,9 +58,9 @@ public srcDispatch::PolicyDispatcher,
 public srcDispatch::PolicyListener {
 
 private:
-	ClassData                  data;
-	std::size_t                classDepth;
-    ClassData::AccessSpecifier currentRegion;
+	ClassData       data;
+	std::size_t     classDepth;
+    AccessSpecifier currentRegion;
 
 	std::unique_ptr<NamePolicy>     namePolicy;
 	std::unique_ptr<DeclTypePolicy> declPolicy;
@@ -72,7 +72,7 @@ public:
 		: srcDispatch::PolicyDispatcher(listeners),
 		  data{},
 		  classDepth(0),
-		  currentRegion(ClassData::PUBLIC) {
+		  currentRegion(PUBLIC) {
 		InitializeClassPolicyHandlers();
 	}
 
@@ -187,18 +187,18 @@ private:
 		openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 1) == ctx.depth) {
 				openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
-					data.parents.emplace_back(ParentData{ "", false, ClassData::PUBLIC });
+					data.parents.emplace_back(ParentData{ "", false, PUBLIC });
 				};
 				closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
 					if (ctx.And({ ParserState::specifier })) {
 						if (ctx.currentToken == "virtual") {
 							data.parents.back().isVirtual = true;
 						} else if (ctx.currentToken == "public") {
-							data.parents.back().accessSpecifier = ClassData::PUBLIC;
+							data.parents.back().accessSpecifier = PUBLIC;
 						} else if (ctx.currentToken == "private") {
-							data.parents.back().accessSpecifier = ClassData::PRIVATE;
+							data.parents.back().accessSpecifier = PRIVATE;
 						} else if (ctx.currentToken == "protected") {
-							data.parents.back().accessSpecifier = ClassData::PROTECTED;
+							data.parents.back().accessSpecifier = PROTECTED;
 						}
 					} else if (ctx.And({ ParserState::name })) {
 						data.parents.back().name += ctx.currentToken;
@@ -254,19 +254,19 @@ private:
 		// should always be in a region once block starts, so should not have to close
 		openEventMap[ParserState::publicaccess] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 2) == ctx.depth) {
-				currentRegion = ClassData::PUBLIC;
+				currentRegion = PUBLIC;
 			}
 		};
 
 		openEventMap[ParserState::protectedaccess] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 2) == ctx.depth) {
-				currentRegion = ClassData::PROTECTED;
+				currentRegion = PROTECTED;
 			}
 		};
 
 		openEventMap[ParserState::privateaccess] = [this](srcSAXEventContext& ctx) {
 			if ((classDepth + 2) == ctx.depth) {
-				currentRegion = ClassData::PRIVATE;
+				currentRegion = PRIVATE;
 			}
 		};
 
