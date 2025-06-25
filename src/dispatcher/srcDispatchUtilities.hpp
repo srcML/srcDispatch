@@ -56,13 +56,22 @@ namespace srcDispatch {
         // stereotype state
         stereotype, 
 
-        // srcDiff states
-        diff_common, diff_insert, diff_delete, diff_ws,
-
         archive, unit, returnstmt,
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
+
+        enum DiffOperation { DELETE, INSERT, COMMON, CHANGE };
+        struct Diff {
+            Diff(DiffOperation operation, size_t depth, bool isReplace, bool isConvert) 
+                : operation(operation), depth(depth), isReplace(false), isConvert(false) {}
+
+            DiffOperation operation;
+            size_t depth;
+            bool isReplace;
+            bool isConvert;
+        };
+
 
     class srcSAXEventContext {
         public:
@@ -72,6 +81,7 @@ namespace srcDispatch {
                   archiveBuffer{0},
                   dispatcher(dispatcher),
                   elementStack(elementStack),
+                  diffStack(),
                   startLineNumber(0),
                   endLineNumber(0),
                   triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
@@ -79,6 +89,7 @@ namespace srcDispatch {
                   isPrev(false),
                   isOperator(false),
                   endArchive(false) {}
+
             ~srcSAXEventContext(){
                 if(writer){
                     xmlBufferFree(archiveBuffer);
@@ -90,7 +101,8 @@ namespace srcDispatch {
             xmlBufferPtr archiveBuffer;
 
             EventDispatcher * dispatcher;
-            const std::vector<std::string> & elementStack;
+            const std::vector<std::string>& elementStack;
+            std::vector<Diff>               diffStack;
             std::vector<unsigned int> genericDepth;
             unsigned int startLineNumber;
             unsigned int endLineNumber;
