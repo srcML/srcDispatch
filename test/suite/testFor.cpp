@@ -1,0 +1,124 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/**
+ * @file testFor.cpp
+ *
+ * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ *
+ * This file is part of the srcDiff Infrastructure.
+ */
+
+#define BOOST_TEST_MODULE for_stmt tests
+#include <boost/test/included/unit_test.hpp>
+
+#include <DispatchRunner.hpp>
+
+#include <NamePolicy.hpp>
+#include <LiteralPolicy.hpp>
+#include <OperatorPolicy.hpp>
+
+#include <ForPolicy.hpp>
+
+// Define test data
+namespace data = boost::unit_test;
+
+// // for and control
+BOOST_AUTO_TEST_CASE(block_common_for) {
+
+    srcDiffDispatch::srcDiffDispatchRunner runner;
+    runner.RunDispatcher("void foo() { for(; 1; ) {} }", "void foo() { for(; 1; ) {} }");
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
+
+    const srcDiffDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDiffDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+
+    BOOST_TEST(forData.control.IsCommon());
+    BOOST_TEST(forData.control->init);
+    BOOST_TEST(forData.control->init.IsCommon());
+    BOOST_TEST(forData.control->init->inits.size() == 0);
+    BOOST_TEST(forData.control->condition.IsCommon());
+    BOOST_TEST(forData.control->condition.ToString() == "1");
+    BOOST_TEST(forData.control->incr.IsCommon());
+    BOOST_TEST(forData.control->incr->exprs.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ForData>>() == "; 1; ");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
+
+BOOST_AUTO_TEST_CASE(block_insert_for) {
+
+    srcDiffDispatch::srcDiffDispatchRunner runner;
+    runner.RunDispatcher("void foo() {}", "void foo() { for(; 1; ) {} }");
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsInsert());
+
+    const srcDiffDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDiffDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+
+    BOOST_TEST(forData.control.IsInsert());
+    BOOST_TEST(forData.control->init);
+    BOOST_TEST(forData.control->init.IsInsert());
+    BOOST_TEST(forData.control->init->inits.size() == 0);
+    BOOST_TEST(forData.control->condition.IsInsert());
+    BOOST_TEST(forData.control->condition.ToString() == "|1");
+    BOOST_TEST(forData.control->incr);
+    BOOST_TEST(forData.control->incr.IsInsert());
+    BOOST_TEST(forData.control->incr->exprs.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ForData>>() == "|; 1; ");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
+
+BOOST_AUTO_TEST_CASE(block_delete_for) {
+
+    srcDiffDispatch::srcDiffDispatchRunner runner;
+    runner.RunDispatcher("void foo() { for(; 1; ) {} }", "void foo() {}");
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsDelete());
+
+    const srcDiffDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDiffDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+
+    BOOST_TEST(forData.control.IsDelete());
+    BOOST_TEST(forData.control->init);
+    BOOST_TEST(forData.control->init.IsDelete());
+    BOOST_TEST(forData.control->init->inits.size() == 0);
+    BOOST_TEST(forData.control->condition.IsDelete());
+    BOOST_TEST(forData.control->condition.ToString() == "1|");
+    BOOST_TEST(forData.control->incr);
+    BOOST_TEST(forData.control->incr.IsDelete());
+    BOOST_TEST(forData.control->incr->exprs.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ForData>>() == "; 1; |");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
