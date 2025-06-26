@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffTypePolicy.hpp
+ * @file TypePolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #ifndef INCLUDED_SRCDIFF_TYPE_POLICY_HPP
@@ -16,7 +16,7 @@
 
 #include <exception>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     class NamePolicy;
 

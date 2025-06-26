@@ -21,7 +21,7 @@ namespace data = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(block_common_label) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { label: }", "void foo() { label: }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(block_common_label) {
 
 BOOST_AUTO_TEST_CASE(block_insert_label) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() {}", "void foo() { label: }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(block_insert_label) {
 
 BOOST_AUTO_TEST_CASE(block_delete_label) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { label: }", "void foo() {}");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(block_delete_label) {
 
 BOOST_AUTO_TEST_CASE(block_replace_label) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { foo: }", "void foo() { bar: }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);

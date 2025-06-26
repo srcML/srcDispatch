@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffNamePolicy.cpp
+ * @file NamePolicy.cpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #include <NamePolicy.hpp>
@@ -13,7 +13,7 @@
 
 #include <cassert>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     std::string NameData::SimpleName() const {
         if(name) return name.ToString();

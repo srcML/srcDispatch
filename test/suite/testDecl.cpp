@@ -23,7 +23,7 @@ namespace data = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(decl_common) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a = 0;", "type a = 0;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(decl_common) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type");
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(decl_common) {
 
 BOOST_AUTO_TEST_CASE(decl_insert) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("", "type a = 0;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(decl_insert) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsInsert());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsInsert());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsInsert());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "|type");
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(decl_insert) {
 
 BOOST_AUTO_TEST_CASE(decl_delete) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a = 0;", "");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(decl_delete) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsDelete());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type|");
 
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(decl_delete) {
 
 BOOST_AUTO_TEST_CASE(name_rename) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a = 0;", "type b = 0;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(name_rename) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type");
 
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(name_rename) {
 
 BOOST_AUTO_TEST_CASE(type_rename) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("foo a;", "bar a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -175,9 +175,9 @@ BOOST_AUTO_TEST_CASE(type_rename) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsChange());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsChange());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "foo|bar");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->name.IsCommon());
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(type_rename) {
 
 BOOST_AUTO_TEST_CASE(type_rename_two) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("foo a;", "foo* a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -206,12 +206,12 @@ BOOST_AUTO_TEST_CASE(type_rename_two) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 2);
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsCommon());
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.IsInsert());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDiffDispatch::TypeData::TypeType::POINTER);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDispatch::TypeData::TypeType::POINTER);
     BOOST_TEST(!runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first);
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "foo|foo *");
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(type_rename_two) {
 
 BOOST_AUTO_TEST_CASE(decl_init_literal_change) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a = 0;", "type a = 1;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(decl_init_literal_change) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type");
 
@@ -257,17 +257,17 @@ BOOST_AUTO_TEST_CASE(decl_init_literal_change) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetOriginal()->expr.at(0).IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetModified()->expr.at(0).IsInsert());
 
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetOriginal()->expr.at(0).GetOriginal())->literal.IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetModified()->expr.at(0).GetModified())->literal.IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetOriginal()->expr.at(0).GetOriginal())->literal.ToString() == "0|");
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetModified()->expr.at(0).GetModified())->literal.ToString() == "|1");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetOriginal()->expr.at(0).GetOriginal())->literal.IsDelete());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetModified()->expr.at(0).GetModified())->literal.IsInsert());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetOriginal()->expr.at(0).GetOriginal())->literal.ToString() == "0|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.GetModified()->expr.at(0).GetModified())->literal.ToString() == "|1");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0).ToString() == "type a = 0|type a = 1");
 }
 
 BOOST_AUTO_TEST_CASE(init_literal_change_2) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a(0);", "type a = 1;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(init_literal_change_2) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type");
 
@@ -296,22 +296,22 @@ BOOST_AUTO_TEST_CASE(init_literal_change_2) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0).IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.IsDelete());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.IsInsert());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.ToString() == "|1");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.IsInsert());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.ToString() == "|1");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0).ToString() == "type a(0)|type a = 1");
 }
 
 BOOST_AUTO_TEST_CASE(init_literal_change_3) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a{0};", "type a = 1;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -326,7 +326,7 @@ BOOST_AUTO_TEST_CASE(init_literal_change_3) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type");
 
@@ -340,22 +340,22 @@ BOOST_AUTO_TEST_CASE(init_literal_change_3) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0).IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.IsDelete());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.IsInsert());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.ToString() == "|1");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.IsInsert());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.ToString() == "|1");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0).ToString() == "type a(0)|type a = 1");
 }
 
 BOOST_AUTO_TEST_CASE(name_only_match) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type* a(0);", "typePtr a = 1;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -370,12 +370,12 @@ BOOST_AUTO_TEST_CASE(name_only_match) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 2);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsChange());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "type|typePtr");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsChange());
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "type|typePtr");
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.IsDelete());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDiffDispatch::TypeData::TypeType::POINTER);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDispatch::TypeData::TypeType::POINTER);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type *|typePtr");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->name.IsCommon());
@@ -388,22 +388,22 @@ BOOST_AUTO_TEST_CASE(name_only_match) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0).IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.IsDelete());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->arguments.at(0)->expr.at(0).GetOriginal())->literal.ToString() == "0|");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init.IsInsert());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.ToString() == "|1");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.IsInsert());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::LiteralData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->init->expr.at(0).GetModified())->literal.ToString() == "|1");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0).ToString() == "type * a(0)|typePtr a = 1");
 }
 
 BOOST_AUTO_TEST_CASE(comma_separated_decl) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a = 0, b = 1, c = 2;", "type a = 0, c = 2, d = 3;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -418,7 +418,7 @@ BOOST_AUTO_TEST_CASE(comma_separated_decl) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type");
 
@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_CASE(comma_separated_decl) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(1)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(1)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(1)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(1)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(1)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(1)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(1)->type.ToString() == "type");
 
@@ -456,7 +456,7 @@ BOOST_AUTO_TEST_CASE(comma_separated_decl) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(2)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(2)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(2)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(2)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(2)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(2)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(2)->type.ToString() == "type");
 
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE(comma_separated_decl) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(3)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(3)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(3)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(3)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(3)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(3)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(3)->type.ToString() == "type");
 
@@ -498,7 +498,7 @@ BOOST_AUTO_TEST_CASE(comma_separated_decl) {
 // compound name
 BOOST_AUTO_TEST_CASE(decl_compound_name_common) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("std::string str = \"\";", "std::string str = \"\";");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -513,50 +513,50 @@ BOOST_AUTO_TEST_CASE(decl_compound_name_common) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 3);
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first).IsCommon());
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 3);
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first).IsCommon());
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0)).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->names.size() == 0);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->name.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->name.ToString() == "std");
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1)).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1).GetElement())->op.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1).GetElement())->op.ToString() == "::");
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2)).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->names.size() == 0);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->name.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->name.ToString() == "string");
 
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "std::string");
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "std::string");
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "std::string");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->name.IsCommon());
@@ -574,7 +574,7 @@ BOOST_AUTO_TEST_CASE(decl_compound_name_common) {
 
 BOOST_AUTO_TEST_CASE(decl_compound_name_change) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("std::string str = \"\";", "std::wstring str = \"\";");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -589,50 +589,50 @@ BOOST_AUTO_TEST_CASE(decl_compound_name_change) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 3);
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first).IsCommon());
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 3);
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first).IsCommon());
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0)).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->names.size() == 0);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->name.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->name.ToString() == "std");
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1)).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1).GetElement())->op.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1).GetElement())->op.ToString() == "::");
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2)).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->names.size() == 0);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->name.IsChange());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->name.ToString() == "string|wstring");
 
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "std::string|std::wstring");
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "std::string|std::wstring");
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "std::string|std::wstring");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->name.IsCommon());
@@ -650,7 +650,7 @@ BOOST_AUTO_TEST_CASE(decl_compound_name_change) {
 
 BOOST_AUTO_TEST_CASE(decl_simple_to_complex_name) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("string str = \"\";", "std::string str = \"\";");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -665,50 +665,50 @@ BOOST_AUTO_TEST_CASE(decl_simple_to_complex_name) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsInsert());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsInsert());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 3);
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first).IsInsert());
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 3);
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first).IsInsert());
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0)).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->names.size() == 0);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->name.IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement())->name.ToString() == "|std");
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1)).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1).GetElement())->op.IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(1).GetElement())->op.ToString() == "|::");
 
-    BOOST_TEST(std::any_cast<srcDiffDispatch::DeltaElement<std::any>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<srcDispatch::DeltaElement<std::any>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2)).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->names.size() == 0);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->name.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-                std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+                std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
                     runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(2).GetElement())->name.ToString() == "string");
 
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "string|std::string");
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "string|std::string");
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "string|std::string");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->name.IsCommon());
@@ -727,7 +727,7 @@ BOOST_AUTO_TEST_CASE(decl_simple_to_complex_name) {
 // specifier test
 BOOST_AUTO_TEST_CASE(decl_add_specifier) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a = 0;", "const type a = 0;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -743,14 +743,14 @@ BOOST_AUTO_TEST_CASE(decl_add_specifier) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 2);
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsInsert());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::SPECIFIER);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::SPECIFIER);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsInsert());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<std::string>>() == "|const");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "type");
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "type");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type|const type");
 
@@ -770,7 +770,7 @@ BOOST_AUTO_TEST_CASE(decl_add_specifier) {
 // specifier test
 BOOST_AUTO_TEST_CASE(decl_remove_specifier) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("const type a = 0;", "type a = 0;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -786,14 +786,14 @@ BOOST_AUTO_TEST_CASE(decl_remove_specifier) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 2);
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsDelete());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::SPECIFIER);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::SPECIFIER);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<std::string>>() == "const|");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "type");
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "type");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "const type|type");
 
@@ -813,7 +813,7 @@ BOOST_AUTO_TEST_CASE(decl_remove_specifier) {
 // specifier test
 BOOST_AUTO_TEST_CASE(decl_change_specifier) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("static type a = 0;", "const type a = 0;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -829,19 +829,19 @@ BOOST_AUTO_TEST_CASE(decl_change_specifier) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 3);
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsDelete());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::SPECIFIER);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::SPECIFIER);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsDelete());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<std::string>>() == "static|");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.IsInsert());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDiffDispatch::TypeData::TypeType::SPECIFIER);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetElement() == srcDispatch::TypeData::TypeType::SPECIFIER);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.IsInsert());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).first.ToString<std::shared_ptr<std::string>>() == "|const");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(2).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(2).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(2).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(2).first.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(2).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "type");
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(2).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "type");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "static type|const type");
 
@@ -861,7 +861,7 @@ BOOST_AUTO_TEST_CASE(decl_change_specifier) {
 // modifier change test
 BOOST_AUTO_TEST_CASE(decl_modifier_change) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type* a;", "type& a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -876,13 +876,13 @@ BOOST_AUTO_TEST_CASE(decl_modifier_change) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 2);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "type");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name.IsCommon());
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.ToString<std::shared_ptr<srcDispatch::NameData>>() == "type");
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.IsChange());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetOriginal() == srcDiffDispatch::TypeData::TypeType::POINTER);
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetModified() == srcDiffDispatch::TypeData::TypeType::REFERENCE);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetOriginal() == srcDispatch::TypeData::TypeType::POINTER);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(1).second.GetModified() == srcDispatch::TypeData::TypeType::REFERENCE);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type *|type &");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->name.IsCommon());
@@ -897,7 +897,7 @@ BOOST_AUTO_TEST_CASE(decl_modifier_change) {
 // templated name
 BOOST_AUTO_TEST_CASE(decl_template_argument_common) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type<arg> a;", "type<arg> a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -912,24 +912,24 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_common) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.IsCommon()
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.ToString() == "type"
     );
 
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "arg");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "arg");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type<arg>");
 
@@ -944,7 +944,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_common) {
 
 BOOST_AUTO_TEST_CASE(decl_template_argument_insert) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type a;", "type<arg> a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -959,24 +959,24 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_insert) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsInsert());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsInsert());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.IsCommon()
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.ToString() == "type"
     );
 
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "|arg");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsInsert());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsInsert());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "|arg");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type|type<arg>");
 
@@ -991,7 +991,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_insert) {
 
 BOOST_AUTO_TEST_CASE(decl_template_argument_delete) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type<arg> a;", "type a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -1006,24 +1006,24 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_delete) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsDelete());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsDelete());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.IsCommon()
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.ToString() == "type"
     );
 
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "arg|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsDelete());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsDelete());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "arg|");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type<arg>|type");
 
@@ -1038,7 +1038,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_delete) {
 
 BOOST_AUTO_TEST_CASE(decl_template_argument_insert_arg) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type<foo> a;", "type<foo, bar> a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -1053,26 +1053,26 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_insert_arg) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.IsCommon()
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.ToString() == "type"
     );
 
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 2);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "foo");
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).ToString() == "|bar");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 2);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "foo");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).IsInsert());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).ToString() == "|bar");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type<foo>|type<foo, bar>");
 
@@ -1087,7 +1087,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_insert_arg) {
 
 BOOST_AUTO_TEST_CASE(decl_template_argument_delete_arg) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type<foo, bar> a;", "type<bar> a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -1102,26 +1102,26 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_delete_arg) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.IsCommon()
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.ToString() == "type"
     );
 
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 2);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "foo|");
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).ToString() == "bar");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 2);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsDelete());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "foo|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(1).ToString() == "bar");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type<foo, bar>|type<bar>");
 
@@ -1136,7 +1136,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_delete_arg) {
 
 BOOST_AUTO_TEST_CASE(decl_template_argument_change_arg) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("type<foo> a;", "type<bar> a;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -1151,46 +1151,46 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_change_arg) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
 
-    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(!std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->name);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.IsCommon()
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->names.at(0).GetElement()
         )->name.ToString() == "type"
     );
 
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.size() == 1);
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.at(0).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList.IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.size() == 1);
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.at(0).IsCommon());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
             runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.at(0).GetElement()
         )->names.size() == 0
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
             runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.at(0).GetElement()
         )->name.IsChange()
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
             runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.at(0).GetElement()
         )->name.GetOriginal() == "foo"
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
-        std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
+        std::any_cast<std::shared_ptr<srcDispatch::NameData>>(
             runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0)->expr.at(0).GetElement()
         )->name.GetModified() == "bar"
     );
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "foo|bar");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.GetElement())->templateArgumentList->arguments.at(0).ToString() == "foo|bar");
 
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type<foo>|type<bar>");
 
@@ -1206,7 +1206,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_change_arg) {
 // templated
 BOOST_AUTO_TEST_CASE(decl_template_common) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("template<typename type> type a = 0;", "template<typename type> type a = 0;");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
@@ -1223,7 +1223,7 @@ BOOST_AUTO_TEST_CASE(decl_template_common) {
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.size() == 1);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.IsCommon());
-    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDiffDispatch::TypeData::TypeType::TYPENAME);
+    BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).second.GetElement() == srcDispatch::TypeData::TypeType::TYPENAME);
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type->types.at(0).first.IsCommon());
     BOOST_TEST(runner.GetDeclStmtInfo().at(0)->decls.at(0)->type.ToString() == "type");
 

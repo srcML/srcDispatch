@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffCallPolicy.cpp
+ * @file CallPolicy.cpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #include <CallPolicy.hpp>
 #include <DeltaElement.hpp>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     std::string CallData::ToString(srcDispatch::DiffOperation operation) const {
 

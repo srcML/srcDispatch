@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffExprTypePolicy.hpp
+ * @file ExprTypePolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #ifndef INCLUDED_SRCDIFF_EXPR_TYPE_POLICY_HPP
@@ -20,7 +20,7 @@
 #include <vector>
 #include <iostream>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     template <typename ExprTypeData, srcDispatch::ParserState DispatchEvent>
     class ExprTypePolicy :

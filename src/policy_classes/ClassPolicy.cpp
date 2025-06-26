@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffBlockPolicy.cpp
+ * @file BlockPolicy.cpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #include <ClassPolicy.hpp>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
 const std::unordered_map<srcDispatch::ParserState, ClassData::ClassType> ClassPolicy::stateToTypeMapper = {
     {srcDispatch::ParserState::classn,  ClassData::CLASS},

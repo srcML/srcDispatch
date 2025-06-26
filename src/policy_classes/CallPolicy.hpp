@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffCallPolicy.hpp
+ * @file CallPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #ifndef INCLUDED_SRCDIFF_CALL_POLICY_HPP
@@ -27,7 +27,7 @@
 //  Gets the name and list of arguments
 //
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     struct ExpressionData;
     class ExpressionPolicy;

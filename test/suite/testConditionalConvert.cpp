@@ -25,7 +25,7 @@ namespace data = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(if_to_while) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { if(1) {} }", "void foo() { while(1) {} }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -38,10 +38,10 @@ BOOST_AUTO_TEST_CASE(if_to_while) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsChange());
 
-    const srcDiffDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
+    const srcDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
     BOOST_TEST(ifData.clauses.size() == 1);
 
-    const srcDiffDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfData>>(ifData.clauses.at(0).GetElement());
+    const srcDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDispatch::IfData>>(ifData.clauses.at(0).GetElement());
     BOOST_TEST(ifData.clauses.at(0).IsDelete());
     BOOST_TEST(ifClause.condition.IsCommon());
     BOOST_TEST(ifClause.condition->conditions.size() == 1);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(if_to_while) {
     BOOST_TEST(ifClause.block.IsCommon());
     BOOST_TEST(ifClause.block->statements.size() == 0);
 
-    const srcDiffDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDiffDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
+    const srcDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
     BOOST_TEST(whileData.condition);
     BOOST_TEST(whileData.condition.IsCommon());
     BOOST_TEST(whileData.condition->conditions.size() == 1);
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(if_to_while) {
 
 BOOST_AUTO_TEST_CASE(while_to_if) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { while(1) {} }", "void foo() { if(1) {} }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(while_to_if) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsChange());
 
-    const srcDiffDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDiffDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
+    const srcDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
     BOOST_TEST(whileData.condition);
     BOOST_TEST(whileData.condition.IsCommon());
     BOOST_TEST(whileData.condition->conditions.size() == 1);
@@ -90,10 +90,10 @@ BOOST_AUTO_TEST_CASE(while_to_if) {
     BOOST_TEST(whileData.block.IsCommon());
     BOOST_TEST(whileData.block->statements.size() == 0);
 
-    const srcDiffDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
+    const srcDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
     BOOST_TEST(ifData.clauses.size() == 1);
 
-    const srcDiffDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfData>>(ifData.clauses.at(0).GetElement());
+    const srcDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDispatch::IfData>>(ifData.clauses.at(0).GetElement());
     BOOST_TEST(ifData.clauses.at(0).IsInsert());
     BOOST_TEST(ifClause.condition.IsCommon());
     BOOST_TEST(ifClause.condition->conditions.size() == 1);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(while_to_if) {
 
 BOOST_AUTO_TEST_CASE(while_to_if_with_convert) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { while(1) { while(2) {} } }", "void foo() { if(1) { if(2) {} } }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -125,17 +125,17 @@ BOOST_AUTO_TEST_CASE(while_to_if_with_convert) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsChange());
 
-    const srcDiffDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDiffDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
+    const srcDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
     BOOST_TEST(whileData.condition);
     BOOST_TEST(whileData.condition.IsCommon());
     BOOST_TEST(whileData.condition->conditions.size() == 1);
     BOOST_TEST(whileData.condition->conditions.at(0).IsCommon());
     BOOST_TEST(whileData.condition.ToString() == "1");
 
-    const srcDiffDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
+    const srcDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
     BOOST_TEST(ifData.clauses.size() == 1);
 
-    const srcDiffDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfData>>(ifData.clauses.at(0).GetElement());
+    const srcDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDispatch::IfData>>(ifData.clauses.at(0).GetElement());
     BOOST_TEST(ifData.clauses.at(0).IsInsert());
     BOOST_TEST(ifClause.condition.IsCommon());
     BOOST_TEST(ifClause.condition->conditions.size() == 1);
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(while_to_if_with_convert) {
 
 BOOST_AUTO_TEST_CASE(if_to_for) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { if(i < 10) { sum += i; } }", "void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -169,10 +169,10 @@ BOOST_AUTO_TEST_CASE(if_to_for) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsChange());
 
-    const srcDiffDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
+    const srcDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
     BOOST_TEST(ifData.clauses.size() == 1);
 
-    const srcDiffDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfData>>(ifData.clauses.at(0).GetElement());
+    const srcDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDispatch::IfData>>(ifData.clauses.at(0).GetElement());
     BOOST_TEST(ifData.clauses.at(0).IsDelete());
     BOOST_TEST(ifClause.condition.IsCommon());
     BOOST_TEST(ifClause.condition->conditions.size() == 1);
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(if_to_for) {
     BOOST_TEST(ifClause.block.IsCommon());
     BOOST_TEST(ifClause.block->statements.size() == 1);
 
-    const srcDiffDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDiffDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
+    const srcDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
     BOOST_TEST(forData.control);
     BOOST_TEST(forData.control.IsInsert());
 
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(if_to_for) {
 
 BOOST_AUTO_TEST_CASE(for_to_if) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }", "void foo() { if(i < 10) { sum += i; } }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(for_to_if) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsChange());
 
-    const srcDiffDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDiffDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
+    const srcDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
     BOOST_TEST(forData.control);
     BOOST_TEST(forData.control.IsDelete());
 
@@ -243,10 +243,10 @@ BOOST_AUTO_TEST_CASE(for_to_if) {
     BOOST_TEST(forData.block.IsCommon());
     BOOST_TEST(forData.block->statements.size() == 1);
 
-    const srcDiffDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
+    const srcDispatch::IfStmtData& ifData = *std::any_cast<std::shared_ptr<srcDispatch::IfStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
     BOOST_TEST(ifData.clauses.size() == 1);
 
-    const srcDiffDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDiffDispatch::IfData>>(ifData.clauses.at(0).GetElement());
+    const srcDispatch::IfData& ifClause = *std::any_cast<std::shared_ptr<srcDispatch::IfData>>(ifData.clauses.at(0).GetElement());
     BOOST_TEST(ifData.clauses.at(0).IsInsert());
     BOOST_TEST(ifClause.condition.IsCommon());
     BOOST_TEST(ifClause.condition->conditions.size() == 1);
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE(for_to_if) {
 
 BOOST_AUTO_TEST_CASE(while_to_for) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { while(i < 10) { sum += i; } }", "void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE(while_to_for) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsChange());
 
-    const srcDiffDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDiffDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
+    const srcDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
     BOOST_TEST(whileData.condition.IsCommon());
     BOOST_TEST(whileData.condition->conditions.size() == 1);
     BOOST_TEST(whileData.condition->conditions.at(0).IsCommon());
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE(while_to_for) {
     BOOST_TEST(whileData.block.IsCommon());
     BOOST_TEST(whileData.block->statements.size() == 1);
 
-    const srcDiffDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDiffDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
+    const srcDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
     BOOST_TEST(forData.control);
     BOOST_TEST(forData.control.IsInsert());
 
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(while_to_for) {
 
 BOOST_AUTO_TEST_CASE(for_to_while) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }", "void foo() { while(i < 10) { sum += i; } }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(for_to_while) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsChange());
 
-    const srcDiffDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDiffDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
+    const srcDispatch::ForData& forData = *std::any_cast<std::shared_ptr<srcDispatch::ForData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetOriginal());
     BOOST_TEST(forData.control);
     BOOST_TEST(forData.control.IsDelete());
 
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE(for_to_while) {
     BOOST_TEST(forData.block.IsCommon());
     BOOST_TEST(forData.block->statements.size() == 1);
 
-    const srcDiffDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDiffDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
+    const srcDispatch::WhileData& whileData = *std::any_cast<std::shared_ptr<srcDispatch::WhileData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetModified());
     BOOST_TEST(whileData.condition.IsCommon());
     BOOST_TEST(whileData.condition->conditions.size() == 1);
     BOOST_TEST(whileData.condition->conditions.at(0).IsCommon());

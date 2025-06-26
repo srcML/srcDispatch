@@ -21,7 +21,7 @@ namespace data = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(block_change_common_expr_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { a; }", "void foo() { a; }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_expr_stmt) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
 
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ExprStmtData>>() == "a");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::ExprStmtData>>() == "a");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_expr_stmt) {
 
 BOOST_AUTO_TEST_CASE(block_insert_expr_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() {}", "void foo() { a; }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -56,15 +56,15 @@ BOOST_AUTO_TEST_CASE(block_insert_expr_stmt) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsInsert());
 
-    const srcDiffDispatch::ExprStmtData& expr = *std::any_cast<std::shared_ptr<srcDiffDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::ExprStmtData& expr = *std::any_cast<std::shared_ptr<srcDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(expr.expr);
     BOOST_TEST(expr.expr.IsInsert());
     BOOST_TEST(expr.expr->expr.size() == 1);
     BOOST_TEST(expr.expr->expr.at(0).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(expr.expr->expr.at(0).GetElement())->name.IsInsert());
-    BOOST_TEST(expr.expr->expr.at(0).ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "|a");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(expr.expr->expr.at(0).GetElement())->name.IsInsert());
+    BOOST_TEST(expr.expr->expr.at(0).ToString<std::shared_ptr<srcDispatch::NameData>>() == "|a");
     BOOST_TEST(expr.expr.ToString() == "|a");
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ExprStmtData>>() == "|a");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::ExprStmtData>>() == "|a");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(block_insert_expr_stmt) {
 
 BOOST_AUTO_TEST_CASE(block_delete_expr_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { a; }", "void foo() {}");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -87,15 +87,15 @@ BOOST_AUTO_TEST_CASE(block_delete_expr_stmt) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsDelete());
 
-    const srcDiffDispatch::ExprStmtData& expr = *std::any_cast<std::shared_ptr<srcDiffDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::ExprStmtData& expr = *std::any_cast<std::shared_ptr<srcDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(expr.expr);
     BOOST_TEST(expr.expr.IsDelete());
     BOOST_TEST(expr.expr->expr.size() == 1);
     BOOST_TEST(expr.expr->expr.at(0).IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(expr.expr->expr.at(0).GetElement())->name.IsDelete());
-    BOOST_TEST(expr.expr->expr.at(0).ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "a|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(expr.expr->expr.at(0).GetElement())->name.IsDelete());
+    BOOST_TEST(expr.expr->expr.at(0).ToString<std::shared_ptr<srcDispatch::NameData>>() == "a|");
     BOOST_TEST(expr.expr.ToString() == "a|");
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ExprStmtData>>() == "a|");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::ExprStmtData>>() == "a|");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(block_delete_expr_stmt) {
 
 BOOST_AUTO_TEST_CASE(block_change_expr_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { a - b; }", "void foo() { a + b; }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -118,20 +118,20 @@ BOOST_AUTO_TEST_CASE(block_change_expr_stmt) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
 
-    const srcDiffDispatch::ExprStmtData& expr = *std::any_cast<std::shared_ptr<srcDiffDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::ExprStmtData& expr = *std::any_cast<std::shared_ptr<srcDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(expr.expr);
     BOOST_TEST(expr.expr.IsCommon());
     BOOST_TEST(expr.expr->expr.size() == 3);
     BOOST_TEST(expr.expr->expr.at(0).IsCommon());
-    BOOST_TEST(expr.expr->expr.at(0).ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "a");
+    BOOST_TEST(expr.expr->expr.at(0).ToString<std::shared_ptr<srcDispatch::NameData>>() == "a");
     BOOST_TEST(expr.expr->expr.at(1).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(expr.expr->expr.at(1).GetElement())->op.IsChange());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::OperatorData>>(expr.expr->expr.at(1).GetElement())->op.ToString() == "-|+");
-    BOOST_TEST(expr.expr->expr.at(1).ToString<std::shared_ptr<srcDiffDispatch::OperatorData>>() == "-|+");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(expr.expr->expr.at(1).GetElement())->op.IsChange());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::OperatorData>>(expr.expr->expr.at(1).GetElement())->op.ToString() == "-|+");
+    BOOST_TEST(expr.expr->expr.at(1).ToString<std::shared_ptr<srcDispatch::OperatorData>>() == "-|+");
     BOOST_TEST(expr.expr->expr.at(2).IsCommon());
-    BOOST_TEST(expr.expr->expr.at(2).ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "b");
+    BOOST_TEST(expr.expr->expr.at(2).ToString<std::shared_ptr<srcDispatch::NameData>>() == "b");
     BOOST_TEST(expr.expr.ToString() == "a - b|a + b");
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ExprStmtData>>() == "a - b|a + b");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::ExprStmtData>>() == "a - b|a + b");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(block_change_expr_stmt) {
 
 BOOST_AUTO_TEST_CASE(block_replace_expr_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { a; }", "void foo() { b; }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -154,28 +154,28 @@ BOOST_AUTO_TEST_CASE(block_replace_expr_stmt) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 2);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsDelete());
 
-    const srcDiffDispatch::ExprStmtData& deletedExpr = *std::any_cast<std::shared_ptr<srcDiffDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::ExprStmtData& deletedExpr = *std::any_cast<std::shared_ptr<srcDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(deletedExpr.expr);
     BOOST_TEST(deletedExpr.expr.IsDelete());
     BOOST_TEST(deletedExpr.expr->expr.size() == 1);
     BOOST_TEST(deletedExpr.expr->expr.at(0).IsDelete());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(deletedExpr.expr->expr.at(0).GetElement())->name.IsDelete());
-    BOOST_TEST(deletedExpr.expr->expr.at(0).ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "a|");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(deletedExpr.expr->expr.at(0).GetElement())->name.IsDelete());
+    BOOST_TEST(deletedExpr.expr->expr.at(0).ToString<std::shared_ptr<srcDispatch::NameData>>() == "a|");
     BOOST_TEST(deletedExpr.expr.ToString() == "a|");
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::ExprStmtData>>() == "a|");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::ExprStmtData>>() == "a|");
 
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(1).IsInsert());
 
-    const srcDiffDispatch::ExprStmtData& insertedExpr = *std::any_cast<std::shared_ptr<srcDiffDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(1).GetElement());
+    const srcDispatch::ExprStmtData& insertedExpr = *std::any_cast<std::shared_ptr<srcDispatch::ExprStmtData>>(runner.GetFunctionInfo().at(0)->block->statements.at(1).GetElement());
     BOOST_TEST(insertedExpr.expr);
     BOOST_TEST(insertedExpr.expr.IsInsert());
     BOOST_TEST(insertedExpr.expr->expr.size() == 1);
     BOOST_TEST(insertedExpr.expr->expr.at(0).IsInsert());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(insertedExpr.expr->expr.at(0).GetElement())->name.IsInsert());
-    BOOST_TEST(insertedExpr.expr->expr.at(0).ToString<std::shared_ptr<srcDiffDispatch::NameData>>() == "|b");
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(insertedExpr.expr->expr.at(0).GetElement())->name.IsInsert());
+    BOOST_TEST(insertedExpr.expr->expr.at(0).ToString<std::shared_ptr<srcDispatch::NameData>>() == "|b");
     BOOST_TEST(insertedExpr.expr.ToString() == "|b");
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(1).ToString<std::shared_ptr<srcDiffDispatch::ExprStmtData>>() == "|b");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(1).ToString<std::shared_ptr<srcDispatch::ExprStmtData>>() == "|b");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);

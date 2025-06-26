@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffWhilePolicy.hpp
+ * @file WhilePolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #ifndef INCLUDED_SRCDIFF_SRCDIFF_WHILE_POLICY_HPP
@@ -18,7 +18,7 @@
 #include <vector>
 #include <iostream>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     struct WhileData {
 

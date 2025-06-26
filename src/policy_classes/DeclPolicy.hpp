@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffDeclPolicy.hpp
+ * @file DeclPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #ifndef INCLUDED_SRCDIFF_DECL_POLICY_HPP
@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     struct DeclData {
 

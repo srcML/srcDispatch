@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffUnitPolicy.hpp
+ * @file UnitPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  *
  * Policy for srcDispatch
  * Listens for both classes and functions
@@ -29,7 +29,7 @@
 #include <sstream>
 #include <iterator>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     struct UnitData {
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>    classInfo;

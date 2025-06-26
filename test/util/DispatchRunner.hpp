@@ -1,28 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffDispatchRunner.hpp
+ * @file DispatchRunner.hpp
  *
  * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_SRCDIFF_DISPATCH_RUNNER_HPP
-#define INCLUDED_SRCDIFF_DISPATCH_RUNNER_HPP
-
+#ifndef INCLUDED_DISPATCH_RUNNER_HPP
+#define INCLUDED_DISPATCH_RUNNER_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatchUtilities.hpp>
 #include <srcDispatcherSingleEvent.hpp>
 
-#include <srcDiffUnitPolicy.hpp>
+#include <UnitPolicy.hpp>
 #include <DeltaElement.hpp>
 
 #include <fstream>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
-class srcDiffDispatchRunner : public srcDispatch::PolicyListener  {
+class DispatchRunner : public srcDispatch::PolicyListener  {
 private:
     std::string srcDiff(const std::string& original, const std::string& modified) {
 
@@ -53,7 +52,7 @@ private:
     std::shared_ptr<UnitData> unit;
 
 public:
-    srcDiffDispatchRunner() {}
+    DispatchRunner() {}
 
     const std::vector<DeltaElement<std::shared_ptr<ClassData>>>& GetClassInfo() const {
         return unit->classInfo;
@@ -80,7 +79,7 @@ public:
         std::string srcDiffStr = srcDiff(original, modified);
         try {
             srcSAXController control(srcDiffStr);
-            srcDispatch::srcDispatcherSingleEvent<srcDiffDispatch::UnitPolicy> dispatch(this);
+            srcDispatch::srcDispatcherSingleEvent<srcDispatch::UnitPolicy> dispatch(this);
             control.parse(&dispatch); //Start parsing
         } catch(SAXError error) {
             std::cerr << error.message;

@@ -23,7 +23,7 @@ namespace data = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(block_common_case) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { switch(1) { case foo; } }", "void foo() { switch(1) { case foo: }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(block_common_case) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
 
-    const srcDiffDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDiffDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(switchData.block.IsCommon());
     BOOST_TEST(switchData.block->statements.size() == 0);
 
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(block_common_case) {
 
 BOOST_AUTO_TEST_CASE(block_insert_case) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { switch(1) {} }", "void foo() { switch(1) { case foo: }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(block_insert_case) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
 
-    const srcDiffDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDiffDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(switchData.block.IsCommon());
     BOOST_TEST(switchData.block->statements.size() == 0);
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(block_insert_case) {
 
 BOOST_AUTO_TEST_CASE(block_delete_case) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { switch(1) { case foo: } }", "void foo() { switch(1) {} }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(block_delete_case) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
 
-    const srcDiffDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDiffDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(switchData.block.IsCommon());
     BOOST_TEST(switchData.block->statements.size() == 0);
 
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(block_delete_case) {
 
 BOOST_AUTO_TEST_CASE(block_case_rename) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { switch(1) { case foo: } }", "void foo() { switch(1) { case bar: } }");
 
    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(block_case_rename) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
 
-    const srcDiffDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDiffDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(switchData.block.IsCommon());
     BOOST_TEST(switchData.block->statements.size() == 0);
 
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(block_case_rename) {
     BOOST_TEST(switchData.block->cases.at(0)->expr.IsCommon());
     BOOST_TEST(switchData.block->cases.at(0)->expr->expr.size() == 1);
     BOOST_TEST(switchData.block->cases.at(0)->expr->expr.at(0).IsCommon());
-    BOOST_TEST(std::any_cast<std::shared_ptr<srcDiffDispatch::NameData>>(switchData.block->cases.at(0)->expr->expr.at(0).GetElement())->name.IsChange());
+    BOOST_TEST(std::any_cast<std::shared_ptr<srcDispatch::NameData>>(switchData.block->cases.at(0)->expr->expr.at(0).GetElement())->name.IsChange());
     BOOST_TEST(switchData.block->cases.at(0).ToString() == "foo|bar");
 
     BOOST_TEST(switchData.block->blocks.size() == 0);
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(block_case_rename) {
 
 BOOST_AUTO_TEST_CASE(block_case_expr_replace) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { switch(1) { case 0: } }", "void foo() { switch(1) { case foo: } }");
 
    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(block_case_expr_replace) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
 
-    const srcDiffDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDiffDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    const srcDispatch::SwitchData& switchData = *std::any_cast<std::shared_ptr<srcDispatch::SwitchData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
     BOOST_TEST(switchData.block.IsCommon());
     BOOST_TEST(switchData.block->statements.size() == 0);
 

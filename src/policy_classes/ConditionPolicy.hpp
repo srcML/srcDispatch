@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcDiffConditionPolicy.hpp
+ * @file ConditionPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #ifndef INCLUDED_SRCDIFF_CONDITION_POLICY_HPP
@@ -21,7 +21,7 @@
 #include <vector>
 #include <iostream>
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
     struct ConditionData {
         std::vector<DeltaElement<std::any>> conditions;

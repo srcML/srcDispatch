@@ -2,9 +2,9 @@
 /**
  * @file DeltaElement.cpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcDiff.org)
+ * @copyright Copyright (C) 2025-2025 SDML (www..org)
  *
- * This file is part of the srcDiffDispatch Infrastructure.
+ * This file is part of the Dispatch Infrastructure.
  */
 
 #include <DeltaElement.hpp>
@@ -42,13 +42,13 @@ struct ValueConst<std::shared_ptr<type>> {
 };
 
 template <class type>
-std::ostream& operator<<(std::ostream& out, const srcDiffDispatch::DeltaElement<type>& element) {
+std::ostream& operator<<(std::ostream& out, const srcDispatch::DeltaElement<type>& element) {
     assert(element.GetOperation() != srcDispatch::NONE);
 
     return out << element.ToString(srcDispatch::NONE);
 }
 
-namespace srcDiffDispatch {
+namespace srcDispatch {
 
 template <class type>
 DeltaElement<type>::DeltaElement()

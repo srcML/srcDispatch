@@ -23,20 +23,20 @@ namespace data = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(class_to_struct) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("class foo {};", "struct foo {};");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
     BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDiffDispatch::DeltaElement<std::shared_ptr<srcDiffDispatch::ClassData>>& classData = runner.GetClassInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classData = runner.GetClassInfo().at(0);
     BOOST_TEST(classData.IsCommon());
 
     BOOST_TEST(classData->generics.empty());
     BOOST_TEST(classData->type.IsChange());
-    BOOST_TEST(classData->type.GetOriginal() == srcDiffDispatch::ClassData::CLASS);
-    BOOST_TEST(classData->type.GetModified() == srcDiffDispatch::ClassData::STRUCT);
+    BOOST_TEST(classData->type.GetOriginal() == srcDispatch::ClassData::CLASS);
+    BOOST_TEST(classData->type.GetModified() == srcDispatch::ClassData::STRUCT);
 
     BOOST_TEST(classData->name.IsCommon());
     BOOST_TEST(classData->name.ToString() == "foo");
@@ -55,20 +55,20 @@ BOOST_AUTO_TEST_CASE(class_to_struct) {
 
 BOOST_AUTO_TEST_CASE(struct_to_class) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("struct foo {};", "class foo {};");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
     BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDiffDispatch::DeltaElement<std::shared_ptr<srcDiffDispatch::ClassData>>& classData = runner.GetClassInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classData = runner.GetClassInfo().at(0);
     BOOST_TEST(classData.IsCommon());
 
     BOOST_TEST(classData->generics.empty());
     BOOST_TEST(classData->type.IsChange());
-    BOOST_TEST(classData->type.GetOriginal() == srcDiffDispatch::ClassData::STRUCT);
-    BOOST_TEST(classData->type.GetModified() == srcDiffDispatch::ClassData::CLASS);
+    BOOST_TEST(classData->type.GetOriginal() == srcDispatch::ClassData::STRUCT);
+    BOOST_TEST(classData->type.GetModified() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->name.IsCommon());
     BOOST_TEST(classData->name.ToString() == "foo");

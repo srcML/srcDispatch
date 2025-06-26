@@ -21,7 +21,7 @@ namespace data = boost::unit_test;
 
 BOOST_AUTO_TEST_CASE(block_common_decl_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { int i; }", "void foo() { int i; }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(block_common_decl_stmt) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
 
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::DeclStmtData>>() == "int i");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::DeclStmtData>>() == "int i");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(block_common_decl_stmt) {
 
 BOOST_AUTO_TEST_CASE(block_insert_decl_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() {}", "void foo() { foo bar; }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(block_insert_decl_stmt) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsInsert());
 
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::DeclStmtData>>() == "|foo bar");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::DeclStmtData>>() == "|foo bar");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(block_insert_decl_stmt) {
 
 BOOST_AUTO_TEST_CASE(block_delete_decl_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { foo bar; }", "void foo() {}");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(block_delete_decl_stmt) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsDelete());
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::DeclStmtData>>() == "foo bar|");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::DeclStmtData>>() == "foo bar|");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(block_delete_decl_stmt) {
 
 BOOST_AUTO_TEST_CASE(block_replace_decl_stmt) {
 
-    srcDiffDispatch::srcDiffDispatchRunner runner;
+    srcDispatch::DispatchRunner runner;
     runner.RunDispatcher("void foo() { foo f; }", "void foo() { bar b; }");
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
@@ -100,9 +100,9 @@ BOOST_AUTO_TEST_CASE(block_replace_decl_stmt) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 2);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsDelete());
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDiffDispatch::DeclStmtData>>() == "foo f|");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).ToString<std::shared_ptr<srcDispatch::DeclStmtData>>() == "foo f|");
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(1).IsInsert());
-    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(1).ToString<std::shared_ptr<srcDiffDispatch::DeclStmtData>>() == "|bar b");
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(1).ToString<std::shared_ptr<srcDispatch::DeclStmtData>>() == "|bar b");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
