@@ -7,8 +7,8 @@
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_SRCDIFF_GOTO_POLICY_HPP
-#define INCLUDED_SRCDIFF_GOTO_POLICY_HPP
+#ifndef INCLUDED_GOTO_POLICY_HPP
+#define INCLUDED_GOTO_POLICY_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>

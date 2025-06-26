@@ -7,8 +7,8 @@
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_SRCDIFF_NAME_POLICY_HPP
-#define INCLUDED_SRCDIFF_NAME_POLICY_HPP
+#ifndef INCLUDED_NAME_POLICY_HPP
+#define INCLUDED_NAME_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
 #include <DeltaElement.hpp>

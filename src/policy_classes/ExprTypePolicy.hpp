@@ -7,8 +7,8 @@
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_SRCDIFF_EXPR_TYPE_POLICY_HPP
-#define INCLUDED_SRCDIFF_EXPR_TYPE_POLICY_HPP
+#ifndef INCLUDED_EXPR_TYPE_POLICY_HPP
+#define INCLUDED_EXPR_TYPE_POLICY_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>

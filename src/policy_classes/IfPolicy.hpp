@@ -7,8 +7,8 @@
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_SRCDIFF_IF_POLICY_HPP
-#define INCLUDED_SRCDIFF_IF_POLICY_HPP
+#ifndef INCLUDED_IF_POLICY_HPP
+#define INCLUDED_IF_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
 #include <ConditionalPolicy.hpp>

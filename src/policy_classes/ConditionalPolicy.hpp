@@ -7,8 +7,8 @@
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_SRCDIFF_CONDITIONAL_POLICY_HPP
-#define INCLUDED_SRCDIFF_CONDITIONAL_POLICY_HPP
+#ifndef INCLUDED_CONDITIONAL_POLICY_HPP
+#define INCLUDED_CONDITIONAL_POLICY_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>

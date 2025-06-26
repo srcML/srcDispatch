@@ -12,8 +12,8 @@
  * Calls the FunctionPolicy for function
  *
  */
-#ifndef INCLUDED_SRCDIFF_UNIT_POLICY_HPP
-#define INCLUDED_SRCDIFF_UNIT_POLICY_HPP
+#ifndef INCLUDED_UNIT_POLICY_HPP
+#define INCLUDED_UNIT_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
 #include <DeclStmtPolicy.hpp>
