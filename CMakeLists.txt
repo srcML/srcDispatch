@@ -33,22 +33,22 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_definitions("-Wall")
 
-add_subdirectory(srcDispatch/CMake)
+add_subdirectory(srcSAX/CMake)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(SRCDIFF_DISPATCH_INCLUDE_DIR ${SRCSAX_INCLUDE_DIR}
+set(SRCDISPATCH_INCLUDE_DIR ${SRCSAX_INCLUDE_DIR}
                          src/policy_classes
                          src/dispatcher
     CACHE INTERNAL "Include directories for srcDispatch")
 
-set(SRCDIFF_DISPATCH_LIBRARIES ${SRCSAX_LIBRARIES} CACHE INTERNAL "Libraries for srcDiffDispatch")
+set(SRCDISPATCH_LIBRARIES ${SRCSAX_LIBRARIES} CACHE INTERNAL "Libraries for srcDiffDispatch")
 
 # include needed includes
-include_directories(${SRCDIFF_DISPATCH_INCLUDE_DIR})
+include_directories(${SRCDISPATCH_INCLUDE_DIR})
 
-# Continue to src
+# Continue to src/test
 add_subdirectory(src)
 add_subdirectory(test)
