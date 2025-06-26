@@ -78,6 +78,7 @@ namespace srcDispatch {
         std::vector<size_t> elseif_positions;
 
         bool dispatching;
+        bool dispatched;
         bool generateArchive;
 
         std::size_t numberAllocatedListeners;
@@ -87,21 +88,21 @@ namespace srcDispatch {
 
     protected:
 
+        virtual void DispatchEvent(srcDispatch::ParserState pstate, srcDispatch::ElementState estate) override {
 
-        void DispatchEvent(ParserState pstate, ElementState estate) override {
+            srcDispatcher<policies...>::currentPState = pstate;
+            srcDispatcher<policies...>::currentEState = estate;
 
-            dispatching = true;
-            currentPState = pstate;
-            currentEState = estate;
+            while(!dispatched) {
 
-            for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ) {
-                (*listener)->HandleEvent(pstate, estate, ctx);
+                dispatched = true;
+
+                EventDispatcher::elementListeners.back()->HandleEvent(pstate, estate, EventDispatcher::ctx);
+                EventDispatcher::elementListeners.back()->SetDispatched(false);
+
             }
-            for(std::list<EventListener*>::iterator listener = elementListeners.begin(); listener != elementListeners.end(); ++listener ) {
-                (*listener)->SetDispatched(false);
-            }
 
-            dispatching = false;
+            dispatched = false;
 
         }
 
@@ -180,34 +181,26 @@ namespace srcDispatch {
             }
             InitializeHandlers();
         }
-        void AddListener(EventListener* listener) override {
-            elementListeners.push_back(listener);
+        virtual void AddListener(EventListener * listener) override {
+            EventDispatcher::elementListeners.back()->SetDispatched(false);
+            EventDispatcher::elementListeners.push_back(listener);
         }
-        void AddListenerDispatch(EventListener* listener) override {
-            if(dispatching) {
-                listener->HandleEvent(currentPState, currentEState, ctx);
-            }
+        virtual void AddListenerDispatch(EventListener * listener) override {
+            AddListener(listener);
+            dispatched = false;
+        }
+        virtual void AddListenerNoDispatch(EventListener * listener) override {
             AddListener(listener);
         }
-        void AddListenerNoDispatch(EventListener* listener) override {
-            if(dispatching) {
-                listener->SetDispatched(true);
-            }
-            AddListener(listener);
+        virtual void RemoveListener(EventListener * listener) override {
+            EventDispatcher::elementListeners.back()->SetDispatched(false);
+            EventDispatcher::elementListeners.pop_back();
         }
-        void RemoveListener(EventListener* listener) override {
-            elementListeners.erase(std::find(elementListeners.begin(), elementListeners.end(), listener));
-        }
-        void RemoveListenerDispatch(EventListener* listener) override {
-            if(dispatching) {
-                listener->HandleEvent(currentPState, currentEState, ctx);
-            }
+        virtual void RemoveListenerDispatch(EventListener * listener) override {
             RemoveListener(listener);
+            dispatched = false;
         }
-        void RemoveListenerNoDispatch(EventListener* listener) override {
-            if(dispatching) {
-                listener->SetDispatched(true);
-            }
+        virtual void RemoveListenerNoDispatch(EventListener * listener) override {
             RemoveListener(listener);
         }
         void InitializeHandlers() {

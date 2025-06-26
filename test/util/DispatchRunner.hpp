@@ -12,7 +12,7 @@
 
 #include <srcSAXController.hpp>
 #include <srcDispatchUtilities.hpp>
-#include <srcDispatcherSingleEvent.hpp>
+#include <srcDispatcher.hpp>
 
 #include <UnitPolicy.hpp>
 #include <DeltaElement.hpp>
@@ -79,7 +79,7 @@ public:
         std::string srcDiffStr = srcDiff(original, modified);
         try {
             srcSAXController control(srcDiffStr);
-            srcDispatch::srcDispatcherSingleEvent<srcDispatch::UnitPolicy> dispatch(this);
+            srcDispatch::srcDispatcher<srcDispatch::UnitPolicy> dispatch(this);
             control.parse(&dispatch); //Start parsing
         } catch(SAXError error) {
             std::cerr << error.message;
