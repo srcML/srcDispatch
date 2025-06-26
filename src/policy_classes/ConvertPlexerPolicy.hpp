@@ -16,13 +16,13 @@
 
 #include <DeltaElement.hpp>
 
-#include <srcDiffIfStmtPolicy.hpp>
-#include <srcDiffWhilePolicy.hpp>
-#include <srcDiffForPolicy.hpp>
+#include <IfStmtPolicy.hpp>
+#include <WhilePolicy.hpp>
+#include <ForPolicy.hpp>
 
-#include <srcDiffDeclStmtPolicy.hpp>
-#include <srcDiffExprStmtPolicy.hpp>
-#include <srcDiffReturnPolicy.hpp>
+#include <DeclStmtPolicy.hpp>
+#include <ExprStmtPolicy.hpp>
+#include <ReturnPolicy.hpp>
 
 #include <string>
 #include <vector>
