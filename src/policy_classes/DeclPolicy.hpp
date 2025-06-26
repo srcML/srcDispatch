@@ -270,10 +270,12 @@ namespace srcDispatch {
                 if(!depth) return;
 
                 openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
-                    if(!exprPolicy) {
-                        exprPolicy = make_unique_policy<ExpressionPolicy>({this});
-                    }
-                    ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
+                    openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
+                        if(!exprPolicy) {fprintf(stderr, "HERE: %s %s %d\n", __FILE__, __FUNCTION__, __LINE__);
+                            exprPolicy = make_unique_policy<ExpressionPolicy>({this});
+                        }
+                        ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
+                    };
                 };
 
                 closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
