@@ -2,7 +2,7 @@
 /**
  * @file ConditionPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www..org)
+ * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  */
