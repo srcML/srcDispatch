@@ -1,7 +1,7 @@
 ##
 #  CMakeLists.txt
 #
-#  Copyright (C) 2025-2025 srcML, LLC. (www.srcDiff.org)
+#  Copyright (C) 2025-2025 srcML, LLC. (www.srcML.org)
 #
 #  This file is part of the srcDiffDispatch.
 #
