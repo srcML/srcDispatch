@@ -84,7 +84,7 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::unit] = [this](srcSAXEventContext& ctx) {
-                if (unitDepth == MAX_DEPTH && (!ctx.isArchive || ctx.depth > 0)) {
+                if (unitDepth == MAX_DEPTH && (ctx.isArchive || ctx.depth > 0)) {
                     unitDepth = ctx.depth;
                     data = UnitData{};
                 }

@@ -851,6 +851,7 @@ namespace srcDispatch {
                             int num_namespaces, const struct srcsax_namespace * namespaces, int num_attributes,
                             const struct srcsax_attribute * attributes) override {
             ctx.isArchive = is_archive;
+            ++ctx.depth;
             if (generateArchive) {
                 ctx.write_start_tag(localname, prefix, URI, num_namespaces, namespaces, num_attributes, attributes);
             }
@@ -1038,6 +1039,8 @@ namespace srcDispatch {
             }
 
             if (generateArchive) { xmlTextWriterEndElement(ctx.writer); }
+            --ctx.depth;
+
         }
     
         virtual void endElement(const char * localname, const char * prefix, const char * URI) override {
