@@ -22,7 +22,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_change_common_expr_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { a; }", "void foo() { a; }");
+    runner.RunDispatcher({{"void foo() { a; }", "void foo() { a; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_expr_stmt) {
 BOOST_AUTO_TEST_CASE(block_insert_expr_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { a; }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { a; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(block_insert_expr_stmt) {
 BOOST_AUTO_TEST_CASE(block_delete_expr_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { a; }", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { a; }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(block_delete_expr_stmt) {
 BOOST_AUTO_TEST_CASE(block_change_expr_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { a - b; }", "void foo() { a + b; }");
+    runner.RunDispatcher({{"void foo() { a - b; }", "void foo() { a + b; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(block_change_expr_stmt) {
 BOOST_AUTO_TEST_CASE(block_replace_expr_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { a; }", "void foo() { b; }");
+    runner.RunDispatcher({{"void foo() { a; }", "void foo() { b; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

@@ -26,7 +26,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(decl_to_expr) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { int i = 0; }", "void foo() { 0; }");
+    runner.RunDispatcher({{"void foo() { int i = 0; }", "void foo() { 0; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(decl_to_expr) {
 BOOST_AUTO_TEST_CASE(expr_to_decl) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { 0; }", "void foo() { int i = 0; }");
+    runner.RunDispatcher({{"void foo() { 0; }", "void foo() { int i = 0; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(expr_to_decl) {
 BOOST_AUTO_TEST_CASE(expr_to_return) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { 0; }", "void foo() { return 0; }");
+    runner.RunDispatcher({{"void foo() { 0; }", "void foo() { return 0; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(expr_to_return) {
 BOOST_AUTO_TEST_CASE(return_to_expr) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { return 0; }", "void foo() { 0; }");
+    runner.RunDispatcher({{"void foo() { return 0; }", "void foo() { 0; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(return_to_expr) {
 BOOST_AUTO_TEST_CASE(decl_to_return) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { int i = 0; }", "void foo() { return 0; }");
+    runner.RunDispatcher({{"void foo() { int i = 0; }", "void foo() { return 0; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(decl_to_return) {
 BOOST_AUTO_TEST_CASE(return_to_decl) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { return 0; }", "void foo() { int i = 0; }");
+    runner.RunDispatcher({{"void foo() { return 0; }", "void foo() { int i = 0; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

@@ -25,7 +25,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_change_common_switch) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) {} }", "void foo() { switch(1) {} }");
+    runner.RunDispatcher({{"void foo() { switch(1) {} }", "void foo() { switch(1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_switch) {
 BOOST_AUTO_TEST_CASE(block_insert_switch) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { switch(1) {}");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { switch(1) {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(block_insert_switch) {
 BOOST_AUTO_TEST_CASE(block_delete_switch) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) {}", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { switch(1) {}", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(block_delete_switch) {
 BOOST_AUTO_TEST_CASE(block_replace_switch) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) { default: a; } }", "void foo() { switch(2) { default: b; } }");
+    runner.RunDispatcher({{"void foo() { switch(1) { default: a; } }", "void foo() { switch(2) { default: b; } }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

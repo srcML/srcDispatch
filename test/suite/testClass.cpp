@@ -24,7 +24,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(class_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo {};", "class foo {};");
+    runner.RunDispatcher({{"class foo {};", "class foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(class_common) {
 BOOST_AUTO_TEST_CASE(struct_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("struct foo {};", "struct bar {};");
+    runner.RunDispatcher({{"struct foo {};", "struct bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(struct_common) {
 BOOST_AUTO_TEST_CASE(class_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("", "class foo {};");
+    runner.RunDispatcher({{"", "class foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(class_insert) {
 BOOST_AUTO_TEST_CASE(class_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo {};", "");
+    runner.RunDispatcher({{"class foo {};", ""}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(class_delete) {
 BOOST_AUTO_TEST_CASE(class_rename) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo {};", "class bar {};");
+    runner.RunDispatcher({{"class foo {};", "class bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(class_rename) {
 BOOST_AUTO_TEST_CASE(class_parent_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : bar {};", "class foo : bar {};");
+    runner.RunDispatcher({{"class foo : bar {};", "class foo : bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -217,7 +217,7 @@ BOOST_AUTO_TEST_CASE(class_parent_common) {
 BOOST_AUTO_TEST_CASE(class_parent_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo {};", "class foo : bar {};");
+    runner.RunDispatcher({{"class foo {};", "class foo : bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE(class_parent_insert) {
 BOOST_AUTO_TEST_CASE(class_parent_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : bar {};", "class foo {};");
+    runner.RunDispatcher({{"class foo : bar {};", "class foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE(class_parent_delete) {
 BOOST_AUTO_TEST_CASE(class_parent_rename) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : public bar {};", "class foo : public foobar {};");
+    runner.RunDispatcher({{"class foo : public bar {};", "class foo : public foobar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -329,7 +329,7 @@ BOOST_AUTO_TEST_CASE(class_parent_rename) {
 BOOST_AUTO_TEST_CASE(class_parent_common_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : public bar {};", "class foo : public bar {};");
+    runner.RunDispatcher({{"class foo : public bar {};", "class foo : public bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -368,7 +368,7 @@ BOOST_AUTO_TEST_CASE(class_parent_common_access) {
 BOOST_AUTO_TEST_CASE(class_parent_insert_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : bar {};", "class foo : public bar {};");
+    runner.RunDispatcher({{"class foo : bar {};", "class foo : public bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -407,7 +407,7 @@ BOOST_AUTO_TEST_CASE(class_parent_insert_access) {
 BOOST_AUTO_TEST_CASE(class_parent_delete_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : public bar {};", "class foo : bar {};");
+    runner.RunDispatcher({{"class foo : public bar {};", "class foo : bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(class_parent_delete_access) {
 BOOST_AUTO_TEST_CASE(class_parent_change_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : public bar {};", "class foo : private bar {};");
+    runner.RunDispatcher({{"class foo : public bar {};", "class foo : private bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -486,7 +486,7 @@ BOOST_AUTO_TEST_CASE(class_parent_change_access) {
 BOOST_AUTO_TEST_CASE(class_parent_common_virtual) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : virtual bar {};", "class foo : virtual bar {};");
+    runner.RunDispatcher({{"class foo : virtual bar {};", "class foo : virtual bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -524,7 +524,7 @@ BOOST_AUTO_TEST_CASE(class_parent_common_virtual) {
 BOOST_AUTO_TEST_CASE(class_parent_insert_virtual) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : bar {};", "class foo : virtual bar {};");
+    runner.RunDispatcher({{"class foo : bar {};", "class foo : virtual bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -562,7 +562,7 @@ BOOST_AUTO_TEST_CASE(class_parent_insert_virtual) {
 BOOST_AUTO_TEST_CASE(class_parent_delete_virtual) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : virtual bar {};", "class foo : bar {};");
+    runner.RunDispatcher({{"class foo : virtual bar {};", "class foo : bar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -600,7 +600,7 @@ BOOST_AUTO_TEST_CASE(class_parent_delete_virtual) {
 BOOST_AUTO_TEST_CASE(class_parent_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo : bar {};", "class foo : foobar {};");
+    runner.RunDispatcher({{"class foo : bar {};", "class foo : foobar {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -646,7 +646,7 @@ BOOST_AUTO_TEST_CASE(class_parent_replace) {
 BOOST_AUTO_TEST_CASE(class_fields_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { int i; };", "class foo { int i; };");
+    runner.RunDispatcher({{"class foo { int i; };", "class foo { int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -684,7 +684,7 @@ BOOST_AUTO_TEST_CASE(class_fields_common) {
 BOOST_AUTO_TEST_CASE(class_fields_private) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: int i; };", "class foo { private: int i; };");
+    runner.RunDispatcher({{"class foo { private: int i; };", "class foo { private: int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -722,7 +722,7 @@ BOOST_AUTO_TEST_CASE(class_fields_private) {
 BOOST_AUTO_TEST_CASE(class_fields_private_default) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { int i; };", "class foo { private: int i; };");
+    runner.RunDispatcher({{"class foo { int i; };", "class foo { private: int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -760,7 +760,7 @@ BOOST_AUTO_TEST_CASE(class_fields_private_default) {
 BOOST_AUTO_TEST_CASE(class_fields_public) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: int i; };", "class foo { public: int i; };");
+    runner.RunDispatcher({{"class foo { public: int i; };", "class foo { public: int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -798,7 +798,7 @@ BOOST_AUTO_TEST_CASE(class_fields_public) {
 BOOST_AUTO_TEST_CASE(class_fields_protected) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { protected: int i; };", "class foo { protected: int i; };");
+    runner.RunDispatcher({{"class foo { protected: int i; };", "class foo { protected: int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -836,7 +836,7 @@ BOOST_AUTO_TEST_CASE(class_fields_protected) {
 BOOST_AUTO_TEST_CASE(class_fields_access_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: int i; };", "class foo { protected: int i; };");
+    runner.RunDispatcher({{"class foo { private: int i; };", "class foo { protected: int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -875,7 +875,7 @@ BOOST_AUTO_TEST_CASE(class_fields_access_change) {
 BOOST_AUTO_TEST_CASE(class_fields_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: };", "class foo { private: int i; };");
+    runner.RunDispatcher({{"class foo { private: };", "class foo { private: int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -913,7 +913,7 @@ BOOST_AUTO_TEST_CASE(class_fields_insert) {
 BOOST_AUTO_TEST_CASE(class_fields_insert_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: };", "class foo { private: int i; };");
+    runner.RunDispatcher({{"class foo { public: };", "class foo { private: int i; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -951,7 +951,7 @@ BOOST_AUTO_TEST_CASE(class_fields_insert_with_access) {
 BOOST_AUTO_TEST_CASE(class_fields_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: int i; };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { private: int i; };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -989,7 +989,7 @@ BOOST_AUTO_TEST_CASE(class_fields_delete) {
 BOOST_AUTO_TEST_CASE(class_fields_delete_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: int i; };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { public: int i; };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1027,7 +1027,7 @@ BOOST_AUTO_TEST_CASE(class_fields_delete_with_access) {
 BOOST_AUTO_TEST_CASE(class_fields_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: int i; };", "class foo { private: double d; };");
+    runner.RunDispatcher({{"class foo { private: int i; };", "class foo { private: double d; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1072,7 +1072,7 @@ BOOST_AUTO_TEST_CASE(class_fields_replace) {
 BOOST_AUTO_TEST_CASE(class_fields_replace_with_namespace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: int i; };", "class foo { private: double d; };");
+    runner.RunDispatcher({{"class foo { public: int i; };", "class foo { private: double d; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1118,7 +1118,7 @@ BOOST_AUTO_TEST_CASE(class_fields_replace_with_namespace) {
 BOOST_AUTO_TEST_CASE(class_constructors_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { foo() {} };", "class foo { foo() {} };");
+    runner.RunDispatcher({{"class foo { foo() {} };", "class foo { foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1154,7 +1154,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_common) {
 BOOST_AUTO_TEST_CASE(class_constructors_private) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: foo() {} };", "class foo { private: foo() {} };");
+    runner.RunDispatcher({{"class foo { private: foo() {} };", "class foo { private: foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1190,7 +1190,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_private) {
 BOOST_AUTO_TEST_CASE(class_constructors_private_default) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { foo() {} };", "class foo { private: foo() {} };");
+    runner.RunDispatcher({{"class foo { foo() {} };", "class foo { private: foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1226,7 +1226,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_private_default) {
 BOOST_AUTO_TEST_CASE(class_constructors_public) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: foo() {} };", "class foo { public: foo() {} };");
+    runner.RunDispatcher({{"class foo { public: foo() {} };", "class foo { public: foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1262,7 +1262,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_public) {
 BOOST_AUTO_TEST_CASE(class_constructors_protected) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { protected: foo() {} };", "class foo { protected: foo() {} };");
+    runner.RunDispatcher({{"class foo { protected: foo() {} };", "class foo { protected: foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1298,7 +1298,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_protected) {
 BOOST_AUTO_TEST_CASE(class_constructors_access_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: foo() {} };", "class foo { protected: foo() {} };");
+    runner.RunDispatcher({{"class foo { private: foo() {} };", "class foo { protected: foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1335,7 +1335,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_access_change) {
 BOOST_AUTO_TEST_CASE(class_constructors_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: };", "class foo { private: foo() {} };");
+    runner.RunDispatcher({{"class foo { private: };", "class foo { private: foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1371,7 +1371,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_insert) {
 BOOST_AUTO_TEST_CASE(class_constructors_insert_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: };", "class foo { private: foo() {} };");
+    runner.RunDispatcher({{"class foo { public: };", "class foo { private: foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1407,7 +1407,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_insert_with_access) {
 BOOST_AUTO_TEST_CASE(class_constructors_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: foo() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { private: foo() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1443,7 +1443,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_delete) {
 BOOST_AUTO_TEST_CASE(class_constructors_delete_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: foo() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { public: foo() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1479,7 +1479,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_delete_with_access) {
 BOOST_AUTO_TEST_CASE(class_constructors_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: foo() { ab; } public: void f() { c; d; } };", "class bar { private: bar() { b; } public: void f() { c; d; } };");
+    runner.RunDispatcher({{"class foo { private: foo() { ab; } public: void f() { c; d; } };", "class bar { private: bar() { b; } public: void f() { c; d; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1520,7 +1520,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_replace) {
 BOOST_AUTO_TEST_CASE(class_constructors_replace_with_namespace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: foo() { a; } public: void f() { c + d + e + f; } };", "class bar { private: bar() { a; } public: void f() { c + d + e + f; } };");
+    runner.RunDispatcher({{"class foo { public: foo() { a; } public: void f() { c + d + e + f; } };", "class bar { private: bar() { a; } public: void f() { c + d + e + f; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1562,7 +1562,7 @@ BOOST_AUTO_TEST_CASE(class_constructors_replace_with_namespace) {
 BOOST_AUTO_TEST_CASE(class_destructors_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { ~foo() {} };", "class foo { ~foo() {} };");
+    runner.RunDispatcher({{"class foo { ~foo() {} };", "class foo { ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1598,7 +1598,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_common) {
 BOOST_AUTO_TEST_CASE(class_destructors_private) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: ~foo() {} };", "class foo { private: ~foo() {} };");
+    runner.RunDispatcher({{"class foo { private: ~foo() {} };", "class foo { private: ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1634,7 +1634,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_private) {
 BOOST_AUTO_TEST_CASE(class_destructors_private_default) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { ~foo() {} };", "class foo { private: ~foo() {} };");
+    runner.RunDispatcher({{"class foo { ~foo() {} };", "class foo { private: ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1670,7 +1670,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_private_default) {
 BOOST_AUTO_TEST_CASE(class_destructors_public) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: ~foo() {} };", "class foo { public: ~foo() {} };");
+    runner.RunDispatcher({{"class foo { public: ~foo() {} };", "class foo { public: ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1706,7 +1706,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_public) {
 BOOST_AUTO_TEST_CASE(class_destructors_protected) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { protected: ~foo() {} };", "class foo { protected: ~foo() {} };");
+    runner.RunDispatcher({{"class foo { protected: ~foo() {} };", "class foo { protected: ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1742,7 +1742,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_protected) {
 BOOST_AUTO_TEST_CASE(class_destructors_access_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: ~foo() {} };", "class foo { protected: ~foo() {} };");
+    runner.RunDispatcher({{"class foo { private: ~foo() {} };", "class foo { protected: ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1779,7 +1779,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_access_change) {
 BOOST_AUTO_TEST_CASE(class_destructors_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: };", "class foo { private: ~foo() {} };");
+    runner.RunDispatcher({{"class foo { private: };", "class foo { private: ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1815,7 +1815,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_insert) {
 BOOST_AUTO_TEST_CASE(class_destructors_insert_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: };", "class foo { private: ~foo() {} };");
+    runner.RunDispatcher({{"class foo { public: };", "class foo { private: ~foo() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1851,7 +1851,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_insert_with_access) {
 BOOST_AUTO_TEST_CASE(class_destructors_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: ~foo() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { private: ~foo() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1887,7 +1887,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_delete) {
 BOOST_AUTO_TEST_CASE(class_destructors_delete_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: ~foo() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { public: ~foo() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1923,7 +1923,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_delete_with_access) {
 BOOST_AUTO_TEST_CASE(class_destructors_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: ~foo() { ab; } public: void f() { c; d; } };", "class bar { private: ~bar() { b; } public: void f() { c; d; } };");
+    runner.RunDispatcher({{"class foo { private: ~foo() { ab; } public: void f() { c; d; } };", "class bar { private: ~bar() { b; } public: void f() { c; d; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1959,7 +1959,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_replace) {
 BOOST_AUTO_TEST_CASE(class_destructors_replace_with_namespace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: ~foo() { a; } public: void f() { c + d + e + f; } };", "class bar { private: ~bar() { a; } public: void f() { c + d + e + f; } };");
+    runner.RunDispatcher({{"class foo { public: ~foo() { a; } public: void f() { c + d + e + f; } };", "class bar { private: ~bar() { a; } public: void f() { c + d + e + f; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1995,7 +1995,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_replace_with_namespace) {
 BOOST_AUTO_TEST_CASE(class_destructors_replace_with_convert_namespace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: ~foo() {} void f(int c, double d, long e, float f) { c + d + e + f; } };", "class bar { private: ~bar() { delete a; } void f(int c, double d, long e, float f) { c + d + e + f; } };");
+    runner.RunDispatcher({{"class foo { public: ~foo() {} void f(int c, double d, long e, float f) { c + d + e + f; } };", "class bar { private: ~bar() { delete a; } void f(int c, double d, long e, float f) { c + d + e + f; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2033,7 +2033,7 @@ BOOST_AUTO_TEST_CASE(class_destructors_replace_with_convert_namespace) {
 BOOST_AUTO_TEST_CASE(class_operators_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { bool operator==() {} };", "class foo { bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { bool operator==() {} };", "class foo { bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2069,7 +2069,7 @@ BOOST_AUTO_TEST_CASE(class_operators_common) {
 BOOST_AUTO_TEST_CASE(class_operators_private) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: bool operator==() {} };", "class foo { private: bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { private: bool operator==() {} };", "class foo { private: bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2105,7 +2105,7 @@ BOOST_AUTO_TEST_CASE(class_operators_private) {
 BOOST_AUTO_TEST_CASE(class_operators_private_default) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { bool operator==() {} };", "class foo { private: bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { bool operator==() {} };", "class foo { private: bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2141,7 +2141,7 @@ BOOST_AUTO_TEST_CASE(class_operators_private_default) {
 BOOST_AUTO_TEST_CASE(class_operators_public) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: bool operator==() {} };", "class foo { public: bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { public: bool operator==() {} };", "class foo { public: bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2177,7 +2177,7 @@ BOOST_AUTO_TEST_CASE(class_operators_public) {
 BOOST_AUTO_TEST_CASE(class_operators_protected) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { protected: bool operator==() {} };", "class foo { protected: bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { protected: bool operator==() {} };", "class foo { protected: bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2213,7 +2213,7 @@ BOOST_AUTO_TEST_CASE(class_operators_protected) {
 BOOST_AUTO_TEST_CASE(class_operators_access_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: bool operator==() {} };", "class foo { protected: bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { private: bool operator==() {} };", "class foo { protected: bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2250,7 +2250,7 @@ BOOST_AUTO_TEST_CASE(class_operators_access_change) {
 BOOST_AUTO_TEST_CASE(class_operators_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: };", "class foo { private: bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { private: };", "class foo { private: bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2286,7 +2286,7 @@ BOOST_AUTO_TEST_CASE(class_operators_insert) {
 BOOST_AUTO_TEST_CASE(class_operators_insert_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: };", "class foo { private: bool operator==() {} };");
+    runner.RunDispatcher({{"class foo { public: };", "class foo { private: bool operator==() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2322,7 +2322,7 @@ BOOST_AUTO_TEST_CASE(class_operators_insert_with_access) {
 BOOST_AUTO_TEST_CASE(class_operators_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: bool operator==() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { private: bool operator==() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2358,7 +2358,7 @@ BOOST_AUTO_TEST_CASE(class_operators_delete) {
 BOOST_AUTO_TEST_CASE(class_operators_delete_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: bool operator==() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { public: bool operator==() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2394,7 +2394,7 @@ BOOST_AUTO_TEST_CASE(class_operators_delete_with_access) {
 BOOST_AUTO_TEST_CASE(class_operators_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: bool operator==(int b) { return std::max(b - a, 0); } };", "class foo { private: bool operator!=(const object& that) { return *this != that; } };");
+    runner.RunDispatcher({{"class foo { private: bool operator==(int b) { return std::max(b - a, 0); } };", "class foo { private: bool operator!=(const object& that) { return *this != that; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2435,7 +2435,7 @@ BOOST_AUTO_TEST_CASE(class_operators_replace) {
 BOOST_AUTO_TEST_CASE(class_operators_replace_with_namespace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: bool operator==(int b) { return std::max(b - a, 0); } };", "class foo { private: bool operator!=(const object& that) { return *this != that; } };");
+    runner.RunDispatcher({{"class foo { public: bool operator==(int b) { return std::max(b - a, 0); } };", "class foo { private: bool operator!=(const object& that) { return *this != that; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2477,7 +2477,7 @@ BOOST_AUTO_TEST_CASE(class_operators_replace_with_namespace) {
 BOOST_AUTO_TEST_CASE(class_methods_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { void f() {} };", "class foo { void f() {} };");
+    runner.RunDispatcher({{"class foo { void f() {} };", "class foo { void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2513,7 +2513,7 @@ BOOST_AUTO_TEST_CASE(class_methods_common) {
 BOOST_AUTO_TEST_CASE(class_methods_private) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: void f() {} };", "class foo { private: void f() {} };");
+    runner.RunDispatcher({{"class foo { private: void f() {} };", "class foo { private: void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2549,7 +2549,7 @@ BOOST_AUTO_TEST_CASE(class_methods_private) {
 BOOST_AUTO_TEST_CASE(class_methods_private_default) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { void f() {} };", "class foo { private: void f() {} };");
+    runner.RunDispatcher({{"class foo { void f() {} };", "class foo { private: void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2585,7 +2585,7 @@ BOOST_AUTO_TEST_CASE(class_methods_private_default) {
 BOOST_AUTO_TEST_CASE(class_methods_public) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: void f() {} };", "class foo { public: void f() {} };");
+    runner.RunDispatcher({{"class foo { public: void f() {} };", "class foo { public: void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2621,7 +2621,7 @@ BOOST_AUTO_TEST_CASE(class_methods_public) {
 BOOST_AUTO_TEST_CASE(class_methods_protected) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { protected: void f() {} };", "class foo { protected: void f() {} };");
+    runner.RunDispatcher({{"class foo { protected: void f() {} };", "class foo { protected: void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2657,7 +2657,7 @@ BOOST_AUTO_TEST_CASE(class_methods_protected) {
 BOOST_AUTO_TEST_CASE(class_methods_access_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: void f() {} };", "class foo { protected: void f() {} };");
+    runner.RunDispatcher({{"class foo { private: void f() {} };", "class foo { protected: void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2694,7 +2694,7 @@ BOOST_AUTO_TEST_CASE(class_methods_access_change) {
 BOOST_AUTO_TEST_CASE(class_methods_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: };", "class foo { private: void f() {} };");
+    runner.RunDispatcher({{"class foo { private: };", "class foo { private: void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2730,7 +2730,7 @@ BOOST_AUTO_TEST_CASE(class_methods_insert) {
 BOOST_AUTO_TEST_CASE(class_methods_insert_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: };", "class foo { private: void f() {} };");
+    runner.RunDispatcher({{"class foo { public: };", "class foo { private: void f() {} };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2766,7 +2766,7 @@ BOOST_AUTO_TEST_CASE(class_methods_insert_with_access) {
 BOOST_AUTO_TEST_CASE(class_methods_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: void f() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { private: void f() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2802,7 +2802,7 @@ BOOST_AUTO_TEST_CASE(class_methods_delete) {
 BOOST_AUTO_TEST_CASE(class_methods_delete_with_access) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: void f() {} };", "class foo { private: };");
+    runner.RunDispatcher({{"class foo { public: void f() {} };", "class foo { private: };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2838,7 +2838,7 @@ BOOST_AUTO_TEST_CASE(class_methods_delete_with_access) {
 BOOST_AUTO_TEST_CASE(class_methods_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { private: void f() { a; } };", "class foo { private: int g() { b; } };");
+    runner.RunDispatcher({{"class foo { private: void f() { a; } };", "class foo { private: int g() { b; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2879,7 +2879,7 @@ BOOST_AUTO_TEST_CASE(class_methods_replace) {
 BOOST_AUTO_TEST_CASE(class_methods_replace_with_namespace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { public: void f() { a; } };", "class foo { private: int g() { b; } };");
+    runner.RunDispatcher({{"class foo { public: void f() { a; } };", "class foo { private: int g() { b; } };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2921,7 +2921,7 @@ BOOST_AUTO_TEST_CASE(class_methods_replace_with_namespace) {
 BOOST_AUTO_TEST_CASE(class_is_abstract) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { virtual void f() = 0; };", "class foo { virtual void f() = 0; };");
+    runner.RunDispatcher({{"class foo { virtual void f() = 0; };", "class foo { virtual void f() = 0; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2954,7 +2954,7 @@ BOOST_AUTO_TEST_CASE(class_is_abstract) {
 BOOST_AUTO_TEST_CASE(class_becomes_abstract) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { };", "class foo { virtual void f() = 0; };");
+    runner.RunDispatcher({{"class foo { };", "class foo { virtual void f() = 0; };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -2987,7 +2987,7 @@ BOOST_AUTO_TEST_CASE(class_becomes_abstract) {
 BOOST_AUTO_TEST_CASE(class_was_abstract) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo { virtual void f() = 0; };", "class foo { };");
+    runner.RunDispatcher({{"class foo { virtual void f() = 0; };", "class foo { };"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -3021,7 +3021,7 @@ BOOST_AUTO_TEST_CASE(class_was_abstract) {
 BOOST_AUTO_TEST_CASE(class_is_generic) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> class foo {};", "template<typename type> class foo {};");
+    runner.RunDispatcher({{"template<typename type> class foo {};", "template<typename type> class foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -3055,7 +3055,7 @@ BOOST_AUTO_TEST_CASE(class_is_generic) {
 BOOST_AUTO_TEST_CASE(class_becomes_generic) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo {};", "template<typename type> class foo {};");
+    runner.RunDispatcher({{"class foo {};", "template<typename type> class foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -3089,7 +3089,7 @@ BOOST_AUTO_TEST_CASE(class_becomes_generic) {
 BOOST_AUTO_TEST_CASE(class_was_generic) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> class foo {};", "class foo {};");
+    runner.RunDispatcher({{"template<typename type> class foo {};", "class foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);

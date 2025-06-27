@@ -22,7 +22,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(template_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "template<typename type> void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "template<typename type> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(template_common) {
 BOOST_AUTO_TEST_CASE(template_insert_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename foo> void func() {}", "template<typename bar> template<typename foo> void func() {}");
+    runner.RunDispatcher({{"template<typename foo> void func() {}", "template<typename bar> template<typename foo> void func() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(template_insert_front) {
 BOOST_AUTO_TEST_CASE(template_insert_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename foo> void func() {}", "template<typename foo> template<typename bar> void func() {}");
+    runner.RunDispatcher({{"template<typename foo> void func() {}", "template<typename foo> template<typename bar> void func() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(template_insert_back) {
 BOOST_AUTO_TEST_CASE(template_delete_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename bar> template<typename foo> void func() {}", "template<typename foo> void func() {}");
+    runner.RunDispatcher({{"template<typename bar> template<typename foo> void func() {}", "template<typename foo> void func() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(template_delete_front) {
 BOOST_AUTO_TEST_CASE(template_delete_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename foo> template<typename bar> void func() {}", "template<typename foo> void func() {}");
+    runner.RunDispatcher({{"template<typename foo> template<typename bar> void func() {}", "template<typename foo> void func() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(template_delete_back) {
 BOOST_AUTO_TEST_CASE(template_insert_parameter_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "template<class bar, typename type> void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "template<class bar, typename type> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(template_insert_parameter_front) {
 BOOST_AUTO_TEST_CASE(template_insert_parameter_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "template<typename type, class bar> void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "template<typename type, class bar> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(template_insert_parameter_back) {
 BOOST_AUTO_TEST_CASE(template_delete_parameter_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<class bar, typename type> void foo() {}", "template<typename type> void foo() {}");
+    runner.RunDispatcher({{"template<class bar, typename type> void foo() {}", "template<typename type> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(template_delete_parameter_front) {
 BOOST_AUTO_TEST_CASE(template_delete_parameter_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type, class bar> void foo() {}", "template<typename type> void foo() {}");
+    runner.RunDispatcher({{"template<typename type, class bar> void foo() {}", "template<typename type> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -221,7 +221,7 @@ BOOST_AUTO_TEST_CASE(template_delete_parameter_back) {
 BOOST_AUTO_TEST_CASE(template_modify_parameter_type) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "template<class type> void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "template<class type> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(template_modify_parameter_type) {
 BOOST_AUTO_TEST_CASE(template_modify_parameter_name) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "template<typename T> void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "template<typename T> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -273,7 +273,7 @@ BOOST_AUTO_TEST_CASE(template_modify_parameter_name) {
 BOOST_AUTO_TEST_CASE(template_modify_parameter_init) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "template<typename type = object> void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "template<typename type = object> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(template_modify_parameter_init) {
 BOOST_AUTO_TEST_CASE(template_common_int) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<int num> void foo() {}", "template<int num> void foo() {}");
+    runner.RunDispatcher({{"template<int num> void foo() {}", "template<int num> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(template_common_int) {
 BOOST_AUTO_TEST_CASE(template_common_int_insert_init) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<int num> void foo() {}", "template<int num = 0> void foo() {}");
+    runner.RunDispatcher({{"template<int num> void foo() {}", "template<int num = 0> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

@@ -25,7 +25,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_change_common_break) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { break; }", "void foo() { break; }");
+    runner.RunDispatcher({{"void foo() { break; }", "void foo() { break; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_break) {
 BOOST_AUTO_TEST_CASE(block_change_insert_break) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { break; }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { break; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(block_change_insert_break) {
 BOOST_AUTO_TEST_CASE(block_change_delete_break) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { break; }", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { break; }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(block_change_delete_break) {
 BOOST_AUTO_TEST_CASE(block_change_common_continue) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { continue; }", "void foo() { continue; }");
+    runner.RunDispatcher({{"void foo() { continue; }", "void foo() { continue; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_continue) {
 BOOST_AUTO_TEST_CASE(block_change_insert_continue) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { continue; }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { continue; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(block_change_insert_continue) {
 BOOST_AUTO_TEST_CASE(block_change_delete_continue) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { continue; }", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { continue; }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(block_change_delete_continue) {
 BOOST_AUTO_TEST_CASE(block_change_common_goto) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { goto; }", "void foo() { goto; }");
+    runner.RunDispatcher({{"void foo() { goto; }", "void foo() { goto; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_goto) {
 BOOST_AUTO_TEST_CASE(block_change_insert_goto) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { goto; }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { goto; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(block_change_insert_goto) {
 BOOST_AUTO_TEST_CASE(block_change_delete_goto) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { goto; }", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { goto; }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(block_change_delete_goto) {
 BOOST_AUTO_TEST_CASE(block_change_common_label_goto) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { goto foo; }", "void foo() { goto foo; }");
+    runner.RunDispatcher({{"void foo() { goto foo; }", "void foo() { goto foo; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -296,7 +296,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_label_goto) {
 BOOST_AUTO_TEST_CASE(block_change_rename_label_goto) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { goto foo; }", "void foo() { goto bar; }");
+    runner.RunDispatcher({{"void foo() { goto foo; }", "void foo() { goto bar; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

@@ -105,20 +105,6 @@ public:
 
     void NotifyWrite(const srcDispatch::PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
-
-    void RunDispatcher(const std::string& original, const std::string& modified) {
-
-        std::string srcDiffStr = srcDiff(original, modified);
-        try {
-            srcSAXController control(srcDiffStr);
-            srcDispatch::srcDispatcher<srcDispatch::UnitPolicy> dispatch(this);
-            control.parse(&dispatch); //Start parsing
-        } catch(SAXError error) {
-            std::cerr << error.message;
-            exit(1);
-        }
-    }
-
     void RunDispatcher(const std::vector<SourcePair>& sourcePairs) {
 
         std::string srcDiffStr;

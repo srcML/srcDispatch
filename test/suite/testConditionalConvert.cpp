@@ -26,7 +26,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(if_to_while) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { if(1) {} }", "void foo() { while(1) {} }");
+    runner.RunDispatcher({{"void foo() { if(1) {} }", "void foo() { while(1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(if_to_while) {
 BOOST_AUTO_TEST_CASE(while_to_if) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(1) {} }", "void foo() { if(1) {} }");
+    runner.RunDispatcher({{"void foo() { while(1) {} }", "void foo() { if(1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(while_to_if) {
 BOOST_AUTO_TEST_CASE(while_to_if_with_convert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(1) { while(2) {} } }", "void foo() { if(1) { if(2) {} } }");
+    runner.RunDispatcher({{"void foo() { while(1) { while(2) {} } }", "void foo() { if(1) { if(2) {} } }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(while_to_if_with_convert) {
 BOOST_AUTO_TEST_CASE(if_to_for) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { if(i < 10) { sum += i; } }", "void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }");
+    runner.RunDispatcher({{"void foo() { if(i < 10) { sum += i; } }", "void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(if_to_for) {
 BOOST_AUTO_TEST_CASE(for_to_if) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }", "void foo() { if(i < 10) { sum += i; } }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }", "void foo() { if(i < 10) { sum += i; } }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE(for_to_if) {
 BOOST_AUTO_TEST_CASE(while_to_for) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(i < 10) { sum += i; } }", "void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }");
+    runner.RunDispatcher({{"void foo() { while(i < 10) { sum += i; } }", "void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -315,7 +315,7 @@ BOOST_AUTO_TEST_CASE(while_to_for) {
 BOOST_AUTO_TEST_CASE(for_to_while) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }", "void foo() { while(i < 10) { sum += i; } }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 10; ++i) { sum += i; } }", "void foo() { while(i < 10) { sum += i; } }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

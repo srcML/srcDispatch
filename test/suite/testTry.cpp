@@ -25,7 +25,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(try_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} }", "void foo() { try {} }");
+    runner.RunDispatcher({{"void foo() { try {} }", "void foo() { try {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(try_common) {
 BOOST_AUTO_TEST_CASE(try_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { try {} }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { try {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(try_insert) {
 BOOST_AUTO_TEST_CASE(try_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} }", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { try {} }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(try_delete) {
 BOOST_AUTO_TEST_CASE(catch_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch() {} }", "void foo() { try {} catch() {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch() {} }", "void foo() { try {} catch() {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(catch_common) {
 BOOST_AUTO_TEST_CASE(catch_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} }", "void foo() { try {} catch() {} }");
+    runner.RunDispatcher({{"void foo() { try {} }", "void foo() { try {} catch() {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(catch_insert) {
 BOOST_AUTO_TEST_CASE(catch_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch() {} }", "void foo() { try {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch() {} }", "void foo() { try {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(catch_delete) {
 BOOST_AUTO_TEST_CASE(catch_common_param) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch(Exception e) {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch(Exception e) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -242,7 +242,7 @@ BOOST_AUTO_TEST_CASE(catch_common_param) {
 BOOST_AUTO_TEST_CASE(catch_insert_param) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch() {} }", "void foo() { try {} catch(Exception e) {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch() {} }", "void foo() { try {} catch(Exception e) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -279,7 +279,7 @@ BOOST_AUTO_TEST_CASE(catch_insert_param) {
 BOOST_AUTO_TEST_CASE(catch_delete_param) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch() {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch() {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE(catch_delete_param) {
 BOOST_AUTO_TEST_CASE(catch_common_param_insert_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch(foo bar, Exception e) {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch(foo bar, Exception e) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -355,7 +355,7 @@ BOOST_AUTO_TEST_CASE(catch_common_param_insert_front) {
 BOOST_AUTO_TEST_CASE(catch_common_param_insert_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch(Exception e, foo bar) {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch(Exception e) {} }", "void foo() { try {} catch(Exception e, foo bar) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE(catch_common_param_insert_back) {
 BOOST_AUTO_TEST_CASE(catch_common_param_delete_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch(foo bar, Exception e) {} }", "void foo() { try {} catch(Exception e) {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch(foo bar, Exception e) {} }", "void foo() { try {} catch(Exception e) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -433,7 +433,7 @@ BOOST_AUTO_TEST_CASE(catch_common_param_delete_front) {
 BOOST_AUTO_TEST_CASE(catch_common_param_delete_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch(Exception e, foo bar) {} }", "void foo() { try {} catch(Exception e) {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch(Exception e, foo bar) {} }", "void foo() { try {} catch(Exception e) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE(catch_common_param_delete_back) {
 BOOST_AUTO_TEST_CASE(catch_common_param_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { try {} catch(std::string str) {} }", "void foo() { try {} catch(Exception e) {} }");
+    runner.RunDispatcher({{"void foo() { try {} catch(std::string str) {} }", "void foo() { try {} catch(Exception e) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

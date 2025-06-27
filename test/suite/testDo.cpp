@@ -24,7 +24,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_change_common_do) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { do {} while(1); }", "void foo() { do {} while(1); }");
+    runner.RunDispatcher({{"void foo() { do {} while(1); }", "void foo() { do {} while(1); }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(block_change_common_do) {
 BOOST_AUTO_TEST_CASE(block_insert_do) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { do {} while(1);");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { do {} while(1);"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(block_insert_do) {
 BOOST_AUTO_TEST_CASE(block_delete_do) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { do {} while(1);", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { do {} while(1);", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(block_delete_do) {
 BOOST_AUTO_TEST_CASE(block_replace_do) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { do { a; } while(1); }", "void foo() { do { b; } while(2); }");
+    runner.RunDispatcher({{"void foo() { do { a; } while(1); }", "void foo() { do { b; } while(2); }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

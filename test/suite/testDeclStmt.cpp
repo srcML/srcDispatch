@@ -22,7 +22,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_common_decl_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { int i; }", "void foo() { int i; }");
+    runner.RunDispatcher({{"void foo() { int i; }", "void foo() { int i; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(block_common_decl_stmt) {
 BOOST_AUTO_TEST_CASE(block_insert_decl_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { foo bar; }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { foo bar; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(block_insert_decl_stmt) {
 BOOST_AUTO_TEST_CASE(block_delete_decl_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { foo bar; }", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { foo bar; }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(block_delete_decl_stmt) {
 BOOST_AUTO_TEST_CASE(block_replace_decl_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { foo f; }", "void foo() { bar b; }");
+    runner.RunDispatcher({{"void foo() { foo f; }", "void foo() { bar b; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

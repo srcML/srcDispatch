@@ -24,7 +24,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_common_while) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(1) {} }", "void foo() { while(1) {} }");
+    runner.RunDispatcher({{"void foo() { while(1) {} }", "void foo() { while(1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(block_common_while) {
 BOOST_AUTO_TEST_CASE(block_insert_while) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { while(1) {} }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { while(1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(block_insert_while) {
 BOOST_AUTO_TEST_CASE(block_delete_while) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(1) {}", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { while(1) {}", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(block_delete_while) {
 BOOST_AUTO_TEST_CASE(block_change_condition_expr_while) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(1) {}", "void foo() { while(2) {} }");
+    runner.RunDispatcher({{"void foo() { while(1) {}", "void foo() { while(2) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(block_change_condition_expr_while) {
 BOOST_AUTO_TEST_CASE(block_replace_while) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(1) { a; }", "void foo() { while(2) { b; } }");
+    runner.RunDispatcher({{"void foo() { while(1) { a; }", "void foo() { while(2) { b; } }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

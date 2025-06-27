@@ -24,7 +24,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_common_control) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; 1; ++i) {} }", "void foo() { for(int i = 0; 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; 1; ++i) {} }", "void foo() { for(int i = 0; 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(block_common_control) {
 BOOST_AUTO_TEST_CASE(block_change_control) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 1; i < 2; ++j) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 1; i < 2; ++j) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(block_change_control) {
 BOOST_AUTO_TEST_CASE(block_expr_init_control_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(block_expr_init_control_common) {
 BOOST_AUTO_TEST_CASE(block_expr_init_control_minor_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(i = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(i = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(block_expr_init_control_minor_change) {
 BOOST_AUTO_TEST_CASE(block_expr_init_control_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE(block_expr_init_control_replace) {
 BOOST_AUTO_TEST_CASE(block_expr_init_control_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE(block_expr_init_control_insert) {
 BOOST_AUTO_TEST_CASE(block_expr_init_control_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(block_expr_init_control_delete) {
 BOOST_AUTO_TEST_CASE(block_decl_init_control_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -360,7 +360,7 @@ BOOST_AUTO_TEST_CASE(block_decl_init_control_insert) {
 BOOST_AUTO_TEST_CASE(block_decl_init_control_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(block_decl_init_control_delete) {
 BOOST_AUTO_TEST_CASE(block_init_control_decl_to_expr) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_decl_to_expr) {
 BOOST_AUTO_TEST_CASE(block_init_control_expr_to_decl) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -490,7 +490,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_expr_to_decl) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_decl) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -534,7 +534,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_decl) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_insert_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int j = 1; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int j = 1; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -578,7 +578,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_insert_front) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_insert_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -622,7 +622,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_insert_back) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_insert_middle) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0, k = 2; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1, k = 2; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0, k = 2; i < 1; ++i) {} }", "void foo() { for(int i = 0, j = 1, k = 2; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -668,7 +668,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_insert_middle) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_delete_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(int j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(int j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -712,7 +712,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_delete_front) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_delete_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -757,7 +757,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_delete_back) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_delete_middle) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0, j = 1, k = 2; i < 1; ++i) {} }", "void foo() { for(int i = 0, k = 2; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0, j = 1, k = 2; i < 1; ++i) {} }", "void foo() { for(int i = 0, k = 2; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -804,7 +804,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_decl_delete_middle) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_expr) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -848,7 +848,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_expr) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_insert_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(j = 1; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(j = 1; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -892,7 +892,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_insert_front) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_insert_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -936,7 +936,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_insert_back) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_insert_middle) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0, k = 2; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1, k = 2; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0, k = 2; i < 1; ++i) {} }", "void foo() { for(i = 0, j = 1, k = 2; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -982,7 +982,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_insert_middle) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_delete_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(j = 1; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(j = 1; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1026,7 +1026,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_delete_front) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_delete_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0, j = 1; i < 1; ++i) {} }", "void foo() { for(i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1070,7 +1070,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_delete_back) {
 BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_delete_middle) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(i = 0, j = 1, k = 2; i < 1; ++i) {} }", "void foo() { for(i = 0, k = 2; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(i = 0, j = 1, k = 2; i < 1; ++i) {} }", "void foo() { for(i = 0, k = 2; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1117,7 +1117,7 @@ BOOST_AUTO_TEST_CASE(block_init_control_multi_expr_delete_middle) {
 BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i, --j) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i, --j) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1161,7 +1161,7 @@ BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr) {
 BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_insert_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; --j) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; --j) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1205,7 +1205,7 @@ BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_insert_front) {
 BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_insert_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1249,7 +1249,7 @@ BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_insert_back) {
 BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_insert_middle) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i, k /= 2) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j, k /= 2) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i, k /= 2) {} }", "void foo() { for(int i = 0; i < 1; ++i, --j, k /= 2) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1295,7 +1295,7 @@ BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_insert_middle) {
 BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_delete_front) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i, --j) {} }", "void foo() { for(int i = 0; i < 1; --j) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i, --j) {} }", "void foo() { for(int i = 0; i < 1; --j) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1339,7 +1339,7 @@ BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_delete_front) {
 BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_delete_back) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i, --j) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i, --j) {} }", "void foo() { for(int i = 0; i < 1; ++i) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1383,7 +1383,7 @@ BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_delete_back) {
 BOOST_AUTO_TEST_CASE(block_incr_control_multi_expr_delete_middle) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { for(int i = 0; i < 1; ++i, --j, k /= 2) {} }", "void foo() { for(int i = 0; i < 1; ++i, k /= 2) {} }");
+    runner.RunDispatcher({{"void foo() { for(int i = 0; i < 1; ++i, --j, k /= 2) {} }", "void foo() { for(int i = 0; i < 1; ++i, k /= 2) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

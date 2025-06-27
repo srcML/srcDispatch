@@ -25,7 +25,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(decl_condition_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(int i = 1) {} }", "void foo() { while(int i = 1) {} }");
+    runner.RunDispatcher({{"void foo() { while(int i = 1) {} }", "void foo() { while(int i = 1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(decl_condition_common) {
 BOOST_AUTO_TEST_CASE(decl_condition_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { while(int i = 1) {} }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { while(int i = 1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(decl_condition_insert) {
 BOOST_AUTO_TEST_CASE(decl_condition_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(int i = 1) {} }", "void foo() {}");
+    runner.RunDispatcher({{"void foo() { while(int i = 1) {} }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(decl_condition_delete) {
 BOOST_AUTO_TEST_CASE(decl_condition_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(int i = 1) {} }", "void foo() { while(double d = 1.0) {} }");
+    runner.RunDispatcher({{"void foo() { while(int i = 1) {} }", "void foo() { while(double d = 1.0) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(decl_condition_replace) {
 BOOST_AUTO_TEST_CASE(decl_condition_modify) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { while(int i = 1) {} }", "void foo() { while(int i = 2) {} }");
+    runner.RunDispatcher({{"void foo() { while(int i = 1) {} }", "void foo() { while(int i = 2) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

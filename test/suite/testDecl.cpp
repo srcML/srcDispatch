@@ -24,7 +24,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(decl_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a = 0;", "type a = 0;");
+    runner.RunDispatcher({{"type a = 0;", "type a = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(decl_common) {
 BOOST_AUTO_TEST_CASE(decl_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("", "type a = 0;");
+    runner.RunDispatcher({{"", "type a = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(decl_insert) {
 BOOST_AUTO_TEST_CASE(decl_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a = 0;", "");
+    runner.RunDispatcher({{"type a = 0;", ""}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(decl_delete) {
 BOOST_AUTO_TEST_CASE(name_rename) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a = 0;", "type b = 0;");
+    runner.RunDispatcher({{"type a = 0;", "type b = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(name_rename) {
 BOOST_AUTO_TEST_CASE(type_rename) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("foo a;", "bar a;");
+    runner.RunDispatcher({{"foo a;", "bar a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(type_rename) {
 BOOST_AUTO_TEST_CASE(type_rename_two) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("foo a;", "foo* a;");
+    runner.RunDispatcher({{"foo a;", "foo* a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(type_rename_two) {
 BOOST_AUTO_TEST_CASE(decl_init_literal_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a = 0;", "type a = 1;");
+    runner.RunDispatcher({{"type a = 0;", "type a = 1;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(decl_init_literal_change) {
 BOOST_AUTO_TEST_CASE(init_literal_change_2) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a(0);", "type a = 1;");
+    runner.RunDispatcher({{"type a(0);", "type a = 1;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE(init_literal_change_2) {
 BOOST_AUTO_TEST_CASE(init_literal_change_3) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a{0};", "type a = 1;");
+    runner.RunDispatcher({{"type a{0};", "type a = 1;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(init_literal_change_3) {
 BOOST_AUTO_TEST_CASE(name_only_match) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type* a(0);", "typePtr a = 1;");
+    runner.RunDispatcher({{"type* a(0);", "typePtr a = 1;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_CASE(name_only_match) {
 BOOST_AUTO_TEST_CASE(comma_separated_decl) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a = 0, b = 1, c = 2;", "type a = 0, c = 2, d = 3;");
+    runner.RunDispatcher({{"type a = 0, b = 1, c = 2;", "type a = 0, c = 2, d = 3;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -499,7 +499,7 @@ BOOST_AUTO_TEST_CASE(comma_separated_decl) {
 BOOST_AUTO_TEST_CASE(decl_compound_name_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("std::string str = \"\";", "std::string str = \"\";");
+    runner.RunDispatcher({{"std::string str = \"\";", "std::string str = \"\";"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -575,7 +575,7 @@ BOOST_AUTO_TEST_CASE(decl_compound_name_common) {
 BOOST_AUTO_TEST_CASE(decl_compound_name_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("std::string str = \"\";", "std::wstring str = \"\";");
+    runner.RunDispatcher({{"std::string str = \"\";", "std::wstring str = \"\";"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -651,7 +651,7 @@ BOOST_AUTO_TEST_CASE(decl_compound_name_change) {
 BOOST_AUTO_TEST_CASE(decl_simple_to_complex_name) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("string str = \"\";", "std::string str = \"\";");
+    runner.RunDispatcher({{"string str = \"\";", "std::string str = \"\";"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -728,7 +728,7 @@ BOOST_AUTO_TEST_CASE(decl_simple_to_complex_name) {
 BOOST_AUTO_TEST_CASE(decl_add_specifier) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a = 0;", "const type a = 0;");
+    runner.RunDispatcher({{"type a = 0;", "const type a = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -771,7 +771,7 @@ BOOST_AUTO_TEST_CASE(decl_add_specifier) {
 BOOST_AUTO_TEST_CASE(decl_remove_specifier) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("const type a = 0;", "type a = 0;");
+    runner.RunDispatcher({{"const type a = 0;", "type a = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -814,7 +814,7 @@ BOOST_AUTO_TEST_CASE(decl_remove_specifier) {
 BOOST_AUTO_TEST_CASE(decl_change_specifier) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("static type a = 0;", "const type a = 0;");
+    runner.RunDispatcher({{"static type a = 0;", "const type a = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -862,7 +862,7 @@ BOOST_AUTO_TEST_CASE(decl_change_specifier) {
 BOOST_AUTO_TEST_CASE(decl_modifier_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type* a;", "type& a;");
+    runner.RunDispatcher({{"type* a;", "type& a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -898,7 +898,7 @@ BOOST_AUTO_TEST_CASE(decl_modifier_change) {
 BOOST_AUTO_TEST_CASE(decl_template_argument_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type<arg> a;", "type<arg> a;");
+    runner.RunDispatcher({{"type<arg> a;", "type<arg> a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -945,7 +945,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_common) {
 BOOST_AUTO_TEST_CASE(decl_template_argument_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type a;", "type<arg> a;");
+    runner.RunDispatcher({{"type a;", "type<arg> a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -992,7 +992,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_insert) {
 BOOST_AUTO_TEST_CASE(decl_template_argument_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type<arg> a;", "type a;");
+    runner.RunDispatcher({{"type<arg> a;", "type a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1039,7 +1039,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_delete) {
 BOOST_AUTO_TEST_CASE(decl_template_argument_insert_arg) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type<foo> a;", "type<foo, bar> a;");
+    runner.RunDispatcher({{"type<foo> a;", "type<foo, bar> a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1088,7 +1088,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_insert_arg) {
 BOOST_AUTO_TEST_CASE(decl_template_argument_delete_arg) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type<foo, bar> a;", "type<bar> a;");
+    runner.RunDispatcher({{"type<foo, bar> a;", "type<bar> a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1137,7 +1137,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_delete_arg) {
 BOOST_AUTO_TEST_CASE(decl_template_argument_change_arg) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("type<foo> a;", "type<bar> a;");
+    runner.RunDispatcher({{"type<foo> a;", "type<bar> a;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -1207,7 +1207,7 @@ BOOST_AUTO_TEST_CASE(decl_template_argument_change_arg) {
 BOOST_AUTO_TEST_CASE(decl_template_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> type a = 0;", "template<typename type> type a = 0;");
+    runner.RunDispatcher({{"template<typename type> type a = 0;", "template<typename type> type a = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);

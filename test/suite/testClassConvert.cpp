@@ -24,7 +24,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(class_to_struct) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("class foo {};", "struct foo {};");
+    runner.RunDispatcher({{"class foo {};", "struct foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(class_to_struct) {
 BOOST_AUTO_TEST_CASE(struct_to_class) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("struct foo {};", "class foo {};");
+    runner.RunDispatcher({{"struct foo {};", "class foo {};"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);

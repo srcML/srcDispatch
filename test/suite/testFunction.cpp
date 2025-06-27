@@ -19,22 +19,10 @@
 // Define test data
 namespace data = boost::unit_test;
 
-BOOST_AUTO_TEST_CASE(function_foo) {
-
-    srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("#include <iostream>\n#include <string>\n\nclass Person {\nprivate:\n    std::string name_;\n    int age_;\n\npublic:\n    // Constructor\n    Person(const std::string& NAME, int AGE): name_(NAME), age_(AGE) {}\n\n    // Getter\n    std::string getName() const {\n        return name_;\n    }\n\n    // Setter\n    void setName(const std::string& newName) {\n        name_ = newName;\n    }\n\n    // Method\n    void sayHello() const {\n        std::cout << \"Hi, my name is \" << name_ << \" and I am \" << age_ << \" years old.\n\";\n   }\n", "#include <iostream>\n#include <string>\n\nclass Person {\nprivate:\n    std::string name_;\n    int age_;\n\npublic:\n    // Constructor\n    Person(const std::string& NAME, int AGE): name_(NAME), age_(AGE) {}\n\n    // Getter\n    std::string getName() const {\n        return name_;\n    }\n\n    // Setter\n    void setName(const std::string& newName) {\n        name_ = newName;\n    }\n\n    // Method\n    void sayHello() const {\n        std::cout << \"Hi, my name is \" << name_ << \" and I am \" << age_ << \" years old.\n\";\n   }\n");
-
-    BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
-    BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 1);
-
-    std::cerr << "HERE: " << __FILE__ << ' ' << __FUNCTION__ << ' ' << __LINE__ << ' ' << runner.GetClassInfo().at(0)->constructors.at(0) << '\n';
-}
-
 BOOST_AUTO_TEST_CASE(function_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() {}");
+    runner.RunDispatcher({{"void foo() {}", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -75,7 +63,7 @@ BOOST_AUTO_TEST_CASE(function_common) {
 BOOST_AUTO_TEST_CASE(function_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("", "void foo() {}");
+    runner.RunDispatcher({{"", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -116,7 +104,7 @@ BOOST_AUTO_TEST_CASE(function_insert) {
 BOOST_AUTO_TEST_CASE(function_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "");
+    runner.RunDispatcher({{"void foo() {}", ""}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -157,7 +145,7 @@ BOOST_AUTO_TEST_CASE(function_delete) {
 BOOST_AUTO_TEST_CASE(function_name_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void bar() {}");
+    runner.RunDispatcher({{"void foo() {}", "void bar() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -199,7 +187,7 @@ BOOST_AUTO_TEST_CASE(function_name_change) {
 BOOST_AUTO_TEST_CASE(function_return_type_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "int foo() {}");
+    runner.RunDispatcher({{"void foo() {}", "int foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -241,7 +229,7 @@ BOOST_AUTO_TEST_CASE(function_return_type_change) {
 BOOST_AUTO_TEST_CASE(function_add_parameter) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo(int i) {}");
+    runner.RunDispatcher({{"void foo() {}", "void foo(int i) {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -291,7 +279,7 @@ BOOST_AUTO_TEST_CASE(function_add_parameter) {
 BOOST_AUTO_TEST_CASE(function_remove_parameter) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo(double d) {}", "void foo() {}");
+    runner.RunDispatcher({{"void foo(double d) {}", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -340,7 +328,7 @@ BOOST_AUTO_TEST_CASE(function_remove_parameter) {
 BOOST_AUTO_TEST_CASE(function_parameter_type_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo(double d) {}", "void foo(int d) {}");
+    runner.RunDispatcher({{"void foo(double d) {}", "void foo(int d) {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -388,7 +376,7 @@ BOOST_AUTO_TEST_CASE(function_parameter_type_change) {
 BOOST_AUTO_TEST_CASE(function_parameter_name_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo(double d) {}", "void foo(double num) {}");
+    runner.RunDispatcher({{"void foo(double d) {}", "void foo(double num) {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -437,7 +425,7 @@ BOOST_AUTO_TEST_CASE(function_parameter_name_change) {
 BOOST_AUTO_TEST_CASE(function_parameter_multi_change) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo(int i, double d) {}", "void foo(double d, long l) {}");
+    runner.RunDispatcher({{"void foo(int i, double d) {}", "void foo(double d, long l) {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -505,7 +493,7 @@ BOOST_AUTO_TEST_CASE(function_parameter_multi_change) {
 BOOST_AUTO_TEST_CASE(function_decl_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo();", "void foo();");
+    runner.RunDispatcher({{"void foo();", "void foo();"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -546,7 +534,7 @@ BOOST_AUTO_TEST_CASE(function_decl_common) {
 BOOST_AUTO_TEST_CASE(function_specifier_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo();", "void foo() const;");
+    runner.RunDispatcher({{"void foo();", "void foo() const;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -589,7 +577,7 @@ BOOST_AUTO_TEST_CASE(function_specifier_insert) {
 BOOST_AUTO_TEST_CASE(function_specifier_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() const;", "void foo();");
+    runner.RunDispatcher({{"void foo() const;", "void foo();"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -632,7 +620,7 @@ BOOST_AUTO_TEST_CASE(function_specifier_delete) {
 BOOST_AUTO_TEST_CASE(function_pure_virtual_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo();", "void foo() = 0;");
+    runner.RunDispatcher({{"void foo();", "void foo() = 0;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -676,7 +664,7 @@ BOOST_AUTO_TEST_CASE(function_pure_virtual_insert) {
 BOOST_AUTO_TEST_CASE(function_pure_virtual_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() = 0;", "void foo();");
+    runner.RunDispatcher({{"void foo() = 0;", "void foo();"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -721,7 +709,7 @@ BOOST_AUTO_TEST_CASE(function_pure_virtual_delete) {
 BOOST_AUTO_TEST_CASE(function_pure_delete_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo();", "void foo() = delete;");
+    runner.RunDispatcher({{"void foo();", "void foo() = delete;"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -764,7 +752,7 @@ BOOST_AUTO_TEST_CASE(function_pure_delete_insert) {
 BOOST_AUTO_TEST_CASE(function_pure_delete_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() = delete;", "void foo();");
+    runner.RunDispatcher({{"void foo() = delete;", "void foo();"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -807,7 +795,7 @@ BOOST_AUTO_TEST_CASE(function_pure_delete_delete) {
 BOOST_AUTO_TEST_CASE(function_block_insert_expr_stmt) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "void foo() { a; }");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { a; }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -866,7 +854,7 @@ BOOST_AUTO_TEST_CASE(function_block_insert_expr_stmt) {
 BOOST_AUTO_TEST_CASE(function_operator_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("bool operator==() {}", "bool operator==() {}");
+    runner.RunDispatcher({{"bool operator==() {}", "bool operator==() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -907,7 +895,7 @@ BOOST_AUTO_TEST_CASE(function_operator_common) {
 BOOST_AUTO_TEST_CASE(function_operator_common_decl) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("bool operator==();", "bool operator==();");
+    runner.RunDispatcher({{"bool operator==();", "bool operator==();"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -946,7 +934,7 @@ BOOST_AUTO_TEST_CASE(function_operator_common_decl) {
 BOOST_AUTO_TEST_CASE(function_operator_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("", "bool operator==() {}");
+    runner.RunDispatcher({{"", "bool operator==() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -987,7 +975,7 @@ BOOST_AUTO_TEST_CASE(function_operator_insert) {
 BOOST_AUTO_TEST_CASE(function_operator_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("bool operator==() {}", "");
+    runner.RunDispatcher({{"bool operator==() {}", ""}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1028,7 +1016,7 @@ BOOST_AUTO_TEST_CASE(function_operator_delete) {
 BOOST_AUTO_TEST_CASE(function_operator_type) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("operator bool() {}", "operator bool() {}");
+    runner.RunDispatcher({{"operator bool() {}", "operator bool() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1065,7 +1053,7 @@ BOOST_AUTO_TEST_CASE(function_operator_type) {
 BOOST_AUTO_TEST_CASE(function_template_common) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "template<typename type> void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "template<typename type> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1108,7 +1096,7 @@ BOOST_AUTO_TEST_CASE(function_template_common) {
 BOOST_AUTO_TEST_CASE(function_template_insert) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() {}", "template<typename type> void foo() {}");
+    runner.RunDispatcher({{"void foo() {}", "template<typename type> void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -1151,7 +1139,7 @@ BOOST_AUTO_TEST_CASE(function_template_insert) {
 BOOST_AUTO_TEST_CASE(function_template_delete) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("template<typename type> void foo() {}", "void foo() {}");
+    runner.RunDispatcher({{"template<typename type> void foo() {}", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);

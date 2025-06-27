@@ -24,7 +24,7 @@ namespace data = boost::unit_test;
 BOOST_AUTO_TEST_CASE(block_common_case) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) { case foo; } }", "void foo() { switch(1) { case foo: }");
+    runner.RunDispatcher({{"void foo() { switch(1) { case foo; } }", "void foo() { switch(1) { case foo: }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(block_common_case) {
 BOOST_AUTO_TEST_CASE(block_insert_case) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) {} }", "void foo() { switch(1) { case foo: }");
+    runner.RunDispatcher({{"void foo() { switch(1) {} }", "void foo() { switch(1) { case foo: }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(block_insert_case) {
 BOOST_AUTO_TEST_CASE(block_delete_case) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) { case foo: } }", "void foo() { switch(1) {} }");
+    runner.RunDispatcher({{"void foo() { switch(1) { case foo: } }", "void foo() { switch(1) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(block_delete_case) {
 BOOST_AUTO_TEST_CASE(block_case_rename) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) { case foo: } }", "void foo() { switch(1) { case bar: } }");
+    runner.RunDispatcher({{"void foo() { switch(1) { case foo: } }", "void foo() { switch(1) { case bar: } }"}});
 
    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(block_case_rename) {
 BOOST_AUTO_TEST_CASE(block_case_expr_replace) {
 
     srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher("void foo() { switch(1) { case 0: } }", "void foo() { switch(1) { case foo: } }");
+    runner.RunDispatcher({{"void foo() { switch(1) { case 0: } }", "void foo() { switch(1) { case foo: } }"}});
 
    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
