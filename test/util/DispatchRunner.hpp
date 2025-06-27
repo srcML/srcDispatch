@@ -21,29 +21,61 @@
 
 namespace srcDispatch {
 
+typedef std::pair<std::string, std::string> SourcePair;
+
 class DispatchRunner : public srcDispatch::PolicyListener  {
 private:
-    std::string srcDiff(const std::string& original, const std::string& modified) {
 
-        std::ofstream originalFile("original.cpp");
-        originalFile << original;
-        originalFile.close();
+    void writeFile(const std::string& filename, const std::string& contents) {
+        std::ofstream file(filename);
+        file << contents;
+    }
 
-        std::ofstream modifiedFile("modified.cpp");
-        modifiedFile << modified;
-        modifiedFile.close();
-
-        std::system("srcdiff original.cpp modified.cpp -o srcdiff.xml");
-
+    std::string readDiffFile() {
         std::ifstream srcDiffFile("srcdiff.xml", std::ios::ate);
         std::size_t size = srcDiffFile.tellg();
         srcDiffFile.seekg(0);
 
         std::string srcDiffStr(size, '\0');
         srcDiffFile.read(&srcDiffStr[0], size);
+        return srcDiffStr;
+    }
+
+    std::string srcDiff(const std::string& original, const std::string& modified) {
+
+        writeFile("original.cpp", original);
+        writeFile("modified.cpp", modified);
+
+        std::system("srcdiff original.cpp modified.cpp -o srcdiff.xml");
+
+        std::string srcDiffStr = readDiffFile();
 
         std::remove("original.cpp");
         std::remove("modified.cpp");
+        std::remove("srcdiff.xml");
+
+        return srcDiffStr;
+    }
+
+    std::string srcDiff(const std::vector<SourcePair>& sourcePairs) {
+
+        std::filesystem::create_directory("original");
+        std::filesystem::create_directory("modified");
+
+        int pairNum = 0;
+        for(const SourcePair& pair : sourcePairs) {
+            std::string numStr = std::to_string(pairNum);
+            writeFile("original/file" + numStr + ".cpp", pair.first);
+            writeFile("modified/file" + numStr + ".cpp", pair.second);
+            ++pairNum;
+        }
+
+        std::system("srcdiff original modified -o srcdiff.xml");
+
+        std::string srcDiffStr = readDiffFile();
+
+        std::filesystem::remove_all("original");
+        std::filesystem::remove_all("modified");
         std::remove("srcdiff.xml");
 
         return srcDiffStr;
@@ -86,6 +118,26 @@ public:
             exit(1);
         }
     }
+
+    void RunDispatcher(const std::vector<SourcePair>& sourcePairs) {
+
+        std::string srcDiffStr;
+        if(sourcePairs.size() == 1) {
+            srcDiffStr = srcDiff(sourcePairs.at(0).first, sourcePairs.at(0).second);
+        } else {
+            srcDiffStr = srcDiff(sourcePairs);        
+        }
+
+        try {
+            srcSAXController control(srcDiffStr);
+            srcDispatch::srcDispatcher<srcDispatch::UnitPolicy> dispatch(this);
+            control.parse(&dispatch); //Start parsing
+        } catch(SAXError error) {
+            std::cerr << error.message;
+            exit(1);
+        }
+    }
+
 
 };
 
