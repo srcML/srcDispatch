@@ -62,9 +62,11 @@ public:
     auto operator->();
 
     operator bool() const;
-    bool operator==(const DeltaElement& that);
-    bool operator==(const type& that);
-    friend bool operator==(const type& lhs, const DeltaElement& rhs);
+    bool operator==(const DeltaElement& that) const;
+    bool operator==(const type& that) const;
+
+    template<typename compare_type>
+    friend bool operator==(const compare_type& lhs, const DeltaElement<compare_type>& rhs);
 
     srcDispatch::DiffOperation GetOperation() const;
     void SetOperation(srcDispatch::DiffOperation operation);

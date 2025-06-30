@@ -188,7 +188,7 @@ DeltaElement<type>::operator bool() const {
 }
 
 template <class type>
-bool DeltaElement<type>::operator==(const DeltaElement<type>& that) {
+bool DeltaElement<type>::operator==(const DeltaElement<type>& that) const {
     if(this->operation != that.operation)                      return false;
     if(this->HasOriginal() != that.HasOriginal())              return false;
     if(this->HasModified() != that.HasModified())              return false;
@@ -199,13 +199,13 @@ bool DeltaElement<type>::operator==(const DeltaElement<type>& that) {
 }
 
 template <class type>
-bool DeltaElement<type>::operator==(const type& that) {
+bool DeltaElement<type>::operator==(const type& that) const {
     return *this == DeltaElement<type>(that);
 }
 
 template <class type>
 bool operator==(const type& lhs, const DeltaElement<type>& rhs) {
-    return DeltaElement<type>(lhs) == rhs;
+    return rhs == lhs;
 }
 
 template <class type>
