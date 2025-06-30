@@ -200,12 +200,13 @@ bool DeltaElement<type>::operator==(const DeltaElement<type>& that) {
 
 template <class type>
 bool DeltaElement<type>::operator==(const type& that) {
-    if(!*this) return false;
-
-    return GetElement() == that;
+    return *this == DeltaElement<type>(that);
 }
 
-
+template <class type>
+bool operator==(const type& lhs, const DeltaElement<type>& rhs) {
+    return DeltaElement<type>(lhs) == rhs;
+}
 
 template <class type>
 srcDispatch::DiffOperation DeltaElement<type>::GetOperation() const {

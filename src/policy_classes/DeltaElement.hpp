@@ -64,6 +64,7 @@ public:
     operator bool() const;
     bool operator==(const DeltaElement& that);
     bool operator==(const type& that);
+    friend bool operator==(const type& lhs, const DeltaElement& rhs);
 
     srcDispatch::DiffOperation GetOperation() const;
     void SetOperation(srcDispatch::DiffOperation operation);
