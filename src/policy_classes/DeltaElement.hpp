@@ -61,6 +61,10 @@ public:
     const auto operator->() const;
     auto operator->();
 
+    operator bool() const;
+    bool operator==(const DeltaElement& that);
+    bool operator==(const type& that);
+
     srcDispatch::DiffOperation GetOperation() const;
     void SetOperation(srcDispatch::DiffOperation operation);
 
@@ -72,12 +76,6 @@ public:
     template<class any_type = type>
     void Append(srcDispatch::DiffOperation operation, const std::string& str);
     void Clear();
-
-    operator bool() const;
-
-
-    std::string GetOriginalStr() const;
-    std::string GetModifiedStr() const;
 
     template <class any_type = type>
     std::string ToString(srcDispatch::DiffOperation operation = srcDispatch::NONE) const;

@@ -183,6 +183,31 @@ auto DeltaElement<type>::operator->() {
 }
 
 template <class type>
+DeltaElement<type>::operator bool() const {
+    return operation != srcDispatch::NONE;
+}
+
+template <class type>
+bool DeltaElement<type>::operator==(const DeltaElement<type>& that) {
+    if(this->operation != that.operation)                      return false;
+    if(this->HasOriginal() != that.HasOriginal())              return false;
+    if(this->HasModified() != that.HasModified())              return false;
+    if(this->HasOriginal() && this->original != that.original) return false;
+    if(this->HasModified() && this->modified != that.modified) return false;
+
+    return true;    
+}
+
+template <class type>
+bool DeltaElement<type>::operator==(const type& that) {
+    if(!*this) return false;
+
+    return GetElement() == that;
+}
+
+
+
+template <class type>
 srcDispatch::DiffOperation DeltaElement<type>::GetOperation() const {
     return operation;
 }
@@ -281,11 +306,6 @@ template <class type>
 void DeltaElement<type>::Clear() {
     original = std::optional<type>();
     modified = std::optional<type>();
-}
-
-template <class type>
-DeltaElement<type>::operator bool() const {
-    return operation != srcDispatch::NONE;
 }
 
 template <class type>

@@ -21,7 +21,7 @@ namespace srcDispatch {
     class NamePolicy;
 
     struct TypeData {
-        enum TypeType { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };
+        enum TypeType : int { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };
 
         unsigned int lineNumber;
         std::vector<std::pair<DeltaElement<std::any>, DeltaElement<TypeType>>> types;
