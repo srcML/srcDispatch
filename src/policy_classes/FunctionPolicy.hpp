@@ -36,7 +36,9 @@ namespace srcDispatch {
         // std::vector<DeltaElement<std::string>> namespaces;
         std::vector<std::string> namespaces;
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         std::string language;
         std::string filename;
 
@@ -183,41 +185,43 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             std::function<void(srcSAXEventContext& ctx)> startFunction = [this](srcSAXEventContext& ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = FunctionData{};
-                    data.namespaces = ctx.currentNamespaces;
-                    data.lineNumber = ctx.startLineNumber;
-                    data.language = ctx.currentFileLanguage;
-                    data.filename = ctx.currentFilePath;
-                    std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
-                    if(stereotype_attr_itr != ctx.attributes.end()) {
-                        std::istringstream stereostring(stereotype_attr_itr->second);
-                        data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
-                    }
-                    if(ctx.currentTag == "function" || ctx.currentTag == "function_decl") {
-                        if(ctx.isOperator) {
-                            data.type.Update(ctx.diffStack.back().operation, FunctionData::OPERATOR);
-                        } else {
-                            data.type.Update(ctx.diffStack.back().operation, FunctionData::FUNCTION);
-                        }
-                    } else if(ctx.currentTag == "constructor" || ctx.currentTag == "constructor_decl") {
-                        data.type.Update(ctx.diffStack.back().operation, FunctionData::CONSTRUCTOR);
-                    } else if(ctx.currentTag == "destructor" || ctx.currentTag == "destructor_decl") {
-                        data.type.Update(ctx.diffStack.back().operation, FunctionData::DESTRUCTOR);
-                    }
+                if(depth) return;
 
-                    data.isDecl.Update(ctx.diffStack.back().operation, ctx.currentTag == "function_decl" || ctx.currentTag == "constructor_decl" || ctx.currentTag == "destructor_decl");
+                depth = ctx.depth;
+                data = FunctionData{};
+                data.namespaces = ctx.currentNamespaces;
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                data.language = ctx.currentFileLanguage;
+                data.filename = ctx.currentFilePath;
 
-                    CollectXMLAttributeHandlers();
-                    CollectGenericHandlers();
-                    CollectTypeHandlers();
-                    CollectNameHandlers();
-                    CollectParameterHandlers();
-                    CollectCallHandlers();
-                    CollectOtherHandlers();
-                    CollectBlockHandlers();
+                std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
+                if(stereotype_attr_itr != ctx.attributes.end()) {
+                    std::istringstream stereostring(stereotype_attr_itr->second);
+                    data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
                 }
+                if(ctx.currentTag == "function" || ctx.currentTag == "function_decl") {
+                    if(ctx.isOperator) {
+                        data.type.Update(ctx.diffStack.back().operation, FunctionData::OPERATOR);
+                    } else {
+                        data.type.Update(ctx.diffStack.back().operation, FunctionData::FUNCTION);
+                    }
+                } else if(ctx.currentTag == "constructor" || ctx.currentTag == "constructor_decl") {
+                    data.type.Update(ctx.diffStack.back().operation, FunctionData::CONSTRUCTOR);
+                } else if(ctx.currentTag == "destructor" || ctx.currentTag == "destructor_decl") {
+                    data.type.Update(ctx.diffStack.back().operation, FunctionData::DESTRUCTOR);
+                }
+
+                data.isDecl.Update(ctx.diffStack.back().operation, ctx.currentTag == "function_decl" || ctx.currentTag == "constructor_decl" || ctx.currentTag == "destructor_decl");
+
+                CollectXMLAttributeHandlers();
+                CollectGenericHandlers();
+                CollectTypeHandlers();
+                CollectNameHandlers();
+                CollectParameterHandlers();
+                CollectCallHandlers();
+                CollectOtherHandlers();
+                CollectBlockHandlers();
             };
 
             // end of policy

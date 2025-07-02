@@ -60,11 +60,13 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = ExprTypeData{};
-                    CollectExpressionHandlers();
-                }
+                if(depth) return;
+
+                depth = ctx.depth;
+                data = ExprTypeData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                CollectExpressionHandlers();
             };
 
             // end of policy

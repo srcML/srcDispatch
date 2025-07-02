@@ -37,7 +37,9 @@ namespace srcDispatch {
 
     struct CallData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         DeltaElement<std::shared_ptr<NameData>> name;
         std::vector<DeltaElement<std::shared_ptr<ExpressionData>>> arguments; // expressions
 

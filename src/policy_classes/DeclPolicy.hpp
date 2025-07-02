@@ -26,7 +26,8 @@ namespace srcDispatch {
 
     struct DeclData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
         
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>    generics;
         DeltaElement<AccessSpecifier>                              accessSpecifier;
@@ -152,13 +153,12 @@ namespace srcDispatch {
 
             // start of policy
             std::function<void(srcSAXEventContext& ctx)> startDecl = [this](srcSAXEventContext &ctx) {
-                if(depth) {
-                    return;
-                }
+                if(depth) return;
 
                 depth = ctx.depth;
                 data = DeclData{};
-                data.lineNumber = ctx.startLineNumber;
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
 
                 CollectGenericHandlers();
                 CollectSpecifiersHandlers();

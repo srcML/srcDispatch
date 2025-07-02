@@ -24,6 +24,10 @@
 namespace srcDispatch {
 
     struct LabelData {
+
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         DeltaElement<std::shared_ptr<NameData>> name;
 
         template<class type>
@@ -71,11 +75,13 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             openEventMap[ParserState::label] = [this](srcSAXEventContext &ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = LabelData{};
-                    CollectNameHandlers();
-                }
+                if(depth) return;
+
+                depth = ctx.depth;
+                data = LabelData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                CollectNameHandlers();
             };
 
             // end of policy

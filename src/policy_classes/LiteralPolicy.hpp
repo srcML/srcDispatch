@@ -23,6 +23,8 @@ namespace srcDispatch {
     struct LiteralData {
 
         unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         DeltaElement<std::string> literal;
 
         std::shared_ptr<LiteralData> copyAs(srcDispatch::DiffOperation operation) const {
@@ -65,12 +67,13 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::literal] = [this](srcSAXEventContext& ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = LiteralData{};
-                    data.startLineNumber = ctx.startLineNumber;
-                    CollectTokenHandlers();
-                }
+                if(depth) return;
+
+                depth = ctx.depth;
+                data = LiteralData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                CollectTokenHandlers();
             };
 
             // end of policy

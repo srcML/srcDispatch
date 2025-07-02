@@ -26,6 +26,8 @@ namespace srcDispatch {
     struct InitData {
 
         unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         std::vector<DeltaElement<std::any>> inits;
 
         template<class type>
@@ -109,12 +111,13 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = InitData{};
-                    data.startLineNumber = ctx.startLineNumber;
-                    CollectExpressionHandlers();
-                }
+                if(depth) return;
+
+                depth = ctx.depth;
+                data = InitData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                CollectExpressionHandlers();
             };
 
             // end of policy

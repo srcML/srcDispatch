@@ -65,14 +65,14 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if (!depth) {
-                    depth = ctx.depth;
-                    data = ConditionalData{};
-                    data.startLineNumber = ctx.startLineNumber;
-                    data.endLineNumber = ctx.endLineNumber;
-                    CollectConditionHandlers();
-                    CollectBlockHandlers();
-                }
+                if (depth) return;
+
+                depth = ctx.depth;
+                data = ConditionalData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber = ctx.endLineNumber;
+                CollectConditionHandlers();
+                CollectBlockHandlers();
             };
 
             // end of policy

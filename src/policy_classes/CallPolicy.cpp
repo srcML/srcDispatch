@@ -43,7 +43,8 @@ namespace srcDispatch {
 
     std::shared_ptr<CallData> CallData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<CallData> data = std::make_shared<CallData>();
-        data->lineNumber = lineNumber;
+        data->startLineNumber = startLineNumber;
+        data->endLineNumber   = endLineNumber;
 
         data->name = name.GetElement()->copyAs(operation);
 
@@ -75,13 +76,14 @@ namespace srcDispatch {
         using namespace srcDispatch;
         // start of policy
         openEventMap[ParserState::call] = [this](srcSAXEventContext& ctx) {
-            if(!depth) {
-                depth = ctx.depth;
-                data = CallData{};
-                data.lineNumber = ctx.startLineNumber;
-                CollectNameHandlers();
-                CollectCallArgumentHandlers();
-            }
+            if(depth) return;
+
+            depth = ctx.depth;
+            data = CallData{};
+            data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber   = ctx.endLineNumber;
+            CollectNameHandlers();
+            CollectCallArgumentHandlers();
         };
 
         // end of policy

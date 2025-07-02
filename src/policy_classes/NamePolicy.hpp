@@ -29,7 +29,9 @@ namespace srcDispatch {
 
     struct NameData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         DeltaElement<std::string> name;
         std::vector<DeltaElement<std::any>> names;
         DeltaElement<std::shared_ptr<GenericArgumentsData>> templateArgumentList;

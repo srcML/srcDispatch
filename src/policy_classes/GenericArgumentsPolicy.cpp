@@ -47,7 +47,8 @@ namespace srcDispatch {
 
     std::shared_ptr<GenericArgumentsData> GenericArgumentsData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<GenericArgumentsData> data = std::make_shared<GenericArgumentsData>();
-        data->lineNumber = lineNumber;
+        data->startLineNumber = startLineNumber;
+        data->endLineNumber   = endLineNumber;
 
         for (const DeltaElement<std::shared_ptr<ExpressionData>>& argument : arguments) {
             data->arguments.emplace_back(DeltaElement(operation, argument.GetElement()->copyAs(operation)));
@@ -82,12 +83,13 @@ namespace srcDispatch {
         using namespace srcDispatch;
         // start of policy
         openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext &ctx) {
-            if(!depth) {
-                depth = ctx.depth;
-                data = GenericArgumentsData{};
-                data.lineNumber = ctx.startLineNumber;
-                CollectArgumentHandler();
-            }
+            if(depth) return;
+
+            depth = ctx.depth;
+            data = GenericArgumentsData{};
+            data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber   = ctx.endLineNumber;
+            CollectArgumentHandler();
         };
 
         // end of policy

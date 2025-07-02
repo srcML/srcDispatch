@@ -21,7 +21,8 @@ namespace srcDispatch {
 
      struct DeclStmtData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
         
         std::vector<DeltaElement<std::shared_ptr<DeclData>>> decls;
 
@@ -82,11 +83,13 @@ namespace srcDispatch {
 
             // start of policy
             openEventMap[ParserState::declstmt] = [this](srcSAXEventContext &ctx) {
-                if (!depth) {
-                    depth = ctx.depth;
-                    data = DeclStmtData{};
-                    CollectDeclHandlers(ctx);
-                }
+                if (depth) return;
+
+                depth = ctx.depth;
+                data = DeclStmtData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;                    
+                CollectDeclHandlers(ctx);
             };
 
             // end of policy

@@ -74,14 +74,14 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::trystmt] = [this](srcSAXEventContext &ctx) {
-                if (!depth) {
-                    depth = ctx.depth;
-                    data = TryData{};
-                    data.startLineNumber = ctx.startLineNumber;
-                    data.endLineNumber   = ctx.endLineNumber;
-                    CollectBlockHandlers();
-                    CollectCatchHandlers();
-                }
+                if (depth) return; 
+
+                depth = ctx.depth;
+                data = TryData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                CollectBlockHandlers();
+                CollectCatchHandlers();
             };
 
             // end of policy

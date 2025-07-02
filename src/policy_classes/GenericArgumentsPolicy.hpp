@@ -22,7 +22,9 @@ namespace srcDispatch {
 
     struct GenericArgumentsData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         std::vector<DeltaElement<std::shared_ptr<ExpressionData>>> arguments;
 
         std::shared_ptr<GenericArgumentsData> copyAs(srcDispatch::DiffOperation operation) const;

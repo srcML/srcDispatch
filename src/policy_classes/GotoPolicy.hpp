@@ -26,7 +26,8 @@ namespace srcDispatch {
     struct GotoData {
         enum GotoType { GOTO, BREAK, CONTINUE };
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
 
         DeltaElement<GotoType>                  type;
         DeltaElement<std::shared_ptr<NameData>> label;
@@ -70,21 +71,22 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             std::function<void(srcSAXEventContext& ctx)> startGoto = [this](srcSAXEventContext& ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = GotoData{};
-                    data.lineNumber = ctx.startLineNumber;
+                if(depth) return;
 
-                    if(ctx.currentTag == "break") {
-                        data.type.Update(ctx.diffStack.back().operation, GotoData::BREAK);
-                    } else if(ctx.currentTag == "continue") {
-                        data.type.Update(ctx.diffStack.back().operation, GotoData::CONTINUE);
-                    } else {
-                        data.type.Update(ctx.diffStack.back().operation, GotoData::GOTO);
-                    }
+                depth = ctx.depth;
+                data = GotoData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
 
-                    CollectLabelHandlers();
+                if(ctx.currentTag == "break") {
+                    data.type.Update(ctx.diffStack.back().operation, GotoData::BREAK);
+                } else if(ctx.currentTag == "continue") {
+                    data.type.Update(ctx.diffStack.back().operation, GotoData::CONTINUE);
+                } else {
+                    data.type.Update(ctx.diffStack.back().operation, GotoData::GOTO);
                 }
+
+                CollectLabelHandlers();
             };
 
             // end of policy

@@ -46,7 +46,9 @@ namespace srcDispatch {
 
     std::shared_ptr<TypeData> TypeData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<TypeData> data = std::make_shared<TypeData>();
-        data->lineNumber = lineNumber;
+        data->startLineNumber = startLineNumber;
+        data->endLineNumber   = endLineNumber;
+
         for(const std::pair<DeltaElement<std::any>, DeltaElement<TypeType>>& type : types) {
             DeltaElement<std::any> typeAny;
             if(type.second.GetElement() == TypeData::SPECIFIER) {
@@ -80,14 +82,15 @@ namespace srcDispatch {
         using namespace srcDispatch;
         // start of policy
         openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
-            if(!depth) {
-                depth = ctx.depth;
-                data = TypeData{};
-                data.lineNumber = ctx.startLineNumber;
-                CollectNamesHandler();
-                CollectModifersHandler();
-                CollectSpecifiersHandler();
-            }
+            if(depth) return; 
+
+            depth = ctx.depth;
+            data = TypeData{};
+            data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber   = ctx.endLineNumber;
+            CollectNamesHandler();
+            CollectModifersHandler();
+            CollectSpecifiersHandler();
         };
 
         // end of policy

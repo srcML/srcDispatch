@@ -27,7 +27,8 @@ namespace srcDispatch {
 
     struct ControlData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
 
         DeltaElement<std::shared_ptr<InitData>>      init;
         DeltaElement<std::shared_ptr<ConditionData>> condition;
@@ -105,13 +106,15 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
-                if (!depth) {
-                    depth = ctx.depth;
-                    data = ControlData{};
-                    CollectInitHandlers();
-                    CollectConditionHandlers();
-                    CollectIncrHandlers();
-                }
+                if (depth) return;
+
+                depth = ctx.depth;
+                data = ControlData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                CollectInitHandlers();
+                CollectConditionHandlers();
+                CollectIncrHandlers();
             };
 
             // end of policy

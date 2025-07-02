@@ -71,12 +71,13 @@ namespace srcDispatch {
         using namespace srcDispatch;
         // start of policy
         openEventMap[ParserState::templates] = [this](srcSAXEventContext &ctx) {
-            if(!depth) {
-                depth = ctx.depth;
-                data = GenericData{};
-                data.lineNumber = ctx.startLineNumber;
-                CollectParameterHandlers();
-            }
+            if(depth) return;
+
+            depth = ctx.depth;
+            data = GenericData{};
+            data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber   = ctx.endLineNumber;  
+            CollectParameterHandlers();
         };
 
         // end of policy

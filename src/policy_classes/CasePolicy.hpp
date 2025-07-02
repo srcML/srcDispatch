@@ -23,6 +23,10 @@
 namespace srcDispatch {
 
     struct CaseData {
+
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         DeltaElement<std::shared_ptr<ExpressionData>> expr;
 
         template<class type>

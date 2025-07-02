@@ -37,7 +37,9 @@ namespace srcDispatch {
 
     struct ExpressionData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         std::vector<DeltaElement<std::any>> expr;
 
         std::shared_ptr<ExpressionData> copyAs(srcDispatch::DiffOperation operation) const;

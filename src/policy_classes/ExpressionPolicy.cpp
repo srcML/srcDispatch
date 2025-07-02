@@ -43,7 +43,8 @@ namespace srcDispatch {
 
     std::shared_ptr<ExpressionData> ExpressionData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<ExpressionData> data = std::make_shared<ExpressionData>();
-        data->lineNumber = lineNumber;
+        data->startLineNumber = startLineNumber;
+        data->endLineNumber   = endLineNumber;
 
         for (const DeltaElement<std::any>& item : expr) {
             DeltaElement<std::any> exprAny;
@@ -87,15 +88,16 @@ namespace srcDispatch {
         using namespace srcDispatch;
         // start of policy
         std::function<void(srcSAXEventContext& ctx)> expressionStart = [this](srcSAXEventContext& ctx) {
-            if(!depth) {
-                depth = ctx.depth;
-                data = ExpressionData{};
-                data.lineNumber = ctx.startLineNumber;
-                CollectNameHandlers();
-                CollectCallHandlers();
-                CollectOperatorHandlers();
-                CollectLiteralHandlers();
-            }
+            if(depth) return;
+
+            depth = ctx.depth;
+            data = ExpressionData{};
+            data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber   = ctx.endLineNumber;
+            CollectNameHandlers();
+            CollectCallHandlers();
+            CollectOperatorHandlers();
+            CollectLiteralHandlers();
         };
 
         // end of policy

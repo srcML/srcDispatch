@@ -88,15 +88,15 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::ifgroup] = [this](srcSAXEventContext& ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = IfStmtData{};
-                    data.startLineNumber = ctx.startLineNumber;
-                    data.endLineNumber = ctx.endLineNumber;
-                    CollectIfHandlers();
-                    CollectElseIfHandlers();
-                    CollectElseHandlers();
-                }
+                if(depth) return;
+
+                depth = ctx.depth;
+                data = IfStmtData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber = ctx.endLineNumber;
+                CollectIfHandlers();
+                CollectElseIfHandlers();
+                CollectElseHandlers();
             };
 
             // end of policy

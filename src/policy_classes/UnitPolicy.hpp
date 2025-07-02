@@ -32,6 +32,9 @@
 namespace srcDispatch {
 
     struct UnitData {
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>    classInfo;
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> functionInfo;
         std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>> declStmtInfo;
@@ -87,6 +90,8 @@ namespace srcDispatch {
                 if (unitDepth == MAX_DEPTH && (ctx.isArchive || ctx.depth > 0)) {
                     unitDepth = ctx.depth;
                     data = UnitData{};
+                    data.startLineNumber = ctx.startLineNumber;
+                    data.endLineNumber   = ctx.endLineNumber;
                 }
             };
 

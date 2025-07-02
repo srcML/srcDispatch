@@ -34,7 +34,8 @@ namespace srcDispatch {
 
         std::vector<std::string> namespaces;
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
 
         std::string language;
         std::string filename;
@@ -147,10 +148,12 @@ namespace srcDispatch {
             // start of policy
             std::function<void(srcDispatch::srcSAXEventContext& )> startPolicy = [this](srcSAXEventContext& ctx) {
                 if(!depth) {
+
                     depth = ctx.depth;
                     data = ClassData{};
                     data.namespaces = ctx.currentNamespaces;
-                    data.lineNumber = ctx.startLineNumber;
+                    data.startLineNumber = ctx.startLineNumber;
+                    data.endLineNumber   = ctx.endLineNumber;
                     std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
                     if(stereotype_attr_itr != ctx.attributes.end()) {
                         std::istringstream stereostring(stereotype_attr_itr->second);

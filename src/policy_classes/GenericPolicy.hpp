@@ -27,7 +27,9 @@ namespace srcDispatch {
 
     struct GenericData {
 
-        unsigned int lineNumber;
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         std::vector<DeltaElement<std::shared_ptr<DeclData>>> parameters;
 
         template<class type>

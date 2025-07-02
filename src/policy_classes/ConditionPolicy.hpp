@@ -24,6 +24,10 @@
 namespace srcDispatch {
 
     struct ConditionData {
+
+        unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         std::vector<DeltaElement<std::any>> conditions;
 
         template<class type>
@@ -109,12 +113,14 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
-                if (!depth) {
-                    depth = ctx.depth;
-                    data = ConditionData{};
-                    CollectExpressionHandlers();
-                    CollectDeclPolicyHandlers();
-                }
+                if (depth) return;
+
+                depth = ctx.depth;
+                data = ConditionData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;                
+                CollectExpressionHandlers();
+                CollectDeclPolicyHandlers();
             };
 
             // end of policy

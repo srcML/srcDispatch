@@ -107,13 +107,12 @@ namespace srcDispatch {
 
     void BlockPolicy::CollectBlockHandlers() {
         using namespace srcDispatch;
-        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx)
-        {
+        openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
             if(!depth) {
                 depth = ctx.depth;
                 data = BlockData{};
                 data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber = ctx.endLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
             } else {
                 if(!blockPolicy)
                     blockPolicy = make_unique_policy<BlockPolicy>({this});

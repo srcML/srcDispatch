@@ -23,6 +23,8 @@ namespace srcDispatch {
     struct OperatorData {
 
         unsigned int startLineNumber;
+        unsigned int endLineNumber;
+
         DeltaElement<std::string> op;
 
         std::shared_ptr<OperatorData> copyAs(srcDispatch::DiffOperation operation) const {
@@ -65,12 +67,13 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
-                if(!depth) {
-                    depth = ctx.depth;
-                    data = OperatorData{};
-                    data.startLineNumber = ctx.startLineNumber;
-                    CollectTokenHandlers();
-                }
+                if(depth) return;
+
+                depth = ctx.depth;
+                data = OperatorData{};
+                data.startLineNumber = ctx.startLineNumber;
+                data.endLineNumber   = ctx.endLineNumber;
+                CollectTokenHandlers();
             };
 
             // end of policy
