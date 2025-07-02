@@ -17,9 +17,9 @@ namespace srcDispatch {
 
     std::string NameData::SimpleName() const {
         if(name) return name.ToString();
+        if(names.empty()) throw std::logic_error("NameData is empty");
 
         // Not sure how safe GetElement use is
-        assert(names.size());
         assert(names.back().GetElement().type() == typeid(std::shared_ptr<NameData>));
         return names.back().ToString<std::shared_ptr<NameData>>();
     }
