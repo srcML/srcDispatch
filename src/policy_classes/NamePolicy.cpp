@@ -19,6 +19,7 @@ namespace srcDispatch {
         if(name) return name.ToString();
 
         // Not sure how safe GetElement use is
+        assert(names.size());
         assert(names.back().GetElement().type() == typeid(std::shared_ptr<NameData>));
         return names.back().ToString<std::shared_ptr<NameData>>();
     }
