@@ -42,13 +42,13 @@ namespace srcDispatch {
 
                 bool outputRaw = condition.IsOfOperation(operation);
                 if(outputRaw) {
-                    if (printComma) {
+                    if(printComma) {
                         str += ", ";
                     }
                     printComma = true;
                 }
 
-                if (condition.GetElement().type() == typeid(std::shared_ptr<DeclData>)) {
+                if(condition.GetElement().type() == typeid(std::shared_ptr<DeclData>)) {
                     str += condition.ToString<std::shared_ptr<DeclData>>(operation);
                 } else {
                     str += condition.ToString<std::shared_ptr<ExpressionData>>(operation);
@@ -84,16 +84,16 @@ namespace srcDispatch {
         std::any DataInner() const override { return std::make_shared<ConditionData>(data); }
 
         virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
-            if (typeid(ExpressionPolicy) == typeid(*policy)) {
+            if(typeid(ExpressionPolicy) == typeid(*policy)) {
                 if(data.conditions.size() && ctx.diffStack.back().isReplace && data.conditions.back().GetElement().type() == typeid(std::shared_ptr<ExpressionData>)) {
                     data.conditions.back().Update(ctx.diffStack.back().operation, policy->Data<ExpressionData>());
                 } else {
                     data.conditions.emplace_back(ctx.diffStack.back().operation, policy->Data<ExpressionData>());
                 }
-            } else if (typeid(DeclPolicy) == typeid(*policy)) {
+            } else if(typeid(DeclPolicy) == typeid(*policy)) {
                 // not sure how safe GetElement is here
                 std::shared_ptr<DeclData> decl = policy->Data<DeclData>();
-                if (data.conditions.size() && decl->type->types.empty()
+                if(data.conditions.size() && decl->type->types.empty()
                  && data.conditions.back().GetElement().type() == typeid(std::shared_ptr<DeclData>)) {
                     decl->type     = std::any_cast<std::shared_ptr<DeclData>>(data.conditions.back().GetElement())->type;
                     decl->isStatic = std::any_cast<std::shared_ptr<DeclData>>(data.conditions.back().GetElement())->isStatic;
@@ -113,7 +113,7 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
-                if (depth) return;
+                if(depth) return;
 
                 depth = ctx.depth;
                 data = ConditionData{};
@@ -125,7 +125,7 @@ namespace srcDispatch {
 
             // end of policy
             closeEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
-                if (!depth || depth != ctx.depth) return;
+                if(!depth || depth != ctx.depth) return;
 
                 depth = 0;
                 NotifyAll(ctx);
@@ -136,9 +136,9 @@ namespace srcDispatch {
         void CollectExpressionHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!exprPolicy) {
+                if(!exprPolicy) {
                     exprPolicy = make_unique_policy<ExpressionPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
@@ -148,9 +148,9 @@ namespace srcDispatch {
         void CollectDeclPolicyHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!declPolicy) {
+                if(!declPolicy) {
                     declPolicy = make_unique_policy<DeclPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(declPolicy.get());

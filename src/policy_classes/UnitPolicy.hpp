@@ -87,7 +87,7 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::unit] = [this](srcSAXEventContext& ctx) {
-                if (unitDepth == MAX_DEPTH && (ctx.isArchive || ctx.depth > 0)) {
+                if(unitDepth == MAX_DEPTH && (ctx.isArchive || ctx.depth > 0)) {
                     unitDepth = ctx.depth;
                     data = UnitData{};
                     data.startLineNumber = ctx.startLineNumber;
@@ -96,7 +96,7 @@ namespace srcDispatch {
             };
 
             closeEventMap[ParserState::unit] = [this](srcSAXEventContext& ctx) {
-                if (unitDepth != ctx.depth) return;
+                if(unitDepth != ctx.depth) return;
 
                 unitDepth = MAX_DEPTH;
                 NotifyAll(ctx);
@@ -106,7 +106,7 @@ namespace srcDispatch {
             std::function<void(srcDispatch::srcSAXEventContext& )> startClassPolicy = [this](srcSAXEventContext& ctx) {
                 if(depth == MAX_DEPTH) return;
 
-                if (!classPolicy) {
+                if(!classPolicy) {
                     classPolicy = make_unique_policy<ClassPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(classPolicy.get());
@@ -125,7 +125,7 @@ namespace srcDispatch {
             std::function<void(srcDispatch::srcSAXEventContext& )> startFunction = [this](srcSAXEventContext& ctx) {
                 if(depth == MAX_DEPTH) return;
 
-                if (!functionPolicy) {
+                if(!functionPolicy) {
                     functionPolicy = make_unique_policy<FunctionPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(functionPolicy.get());
@@ -151,7 +151,7 @@ namespace srcDispatch {
             openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
                 if(depth == MAX_DEPTH) return;
 
-                if (!declStmtPolicy) {
+                if(!declStmtPolicy) {
                     declStmtPolicy = make_unique_policy<DeclStmtPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(declStmtPolicy.get());

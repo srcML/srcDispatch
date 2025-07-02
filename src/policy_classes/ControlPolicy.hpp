@@ -41,7 +41,7 @@ namespace srcDispatch {
 
             std::string str = init.ToString(operation);
 
-            if (condition) {
+            if(condition) {
                 if(condition.IsOfOperation(operation)) {
                     str += "; ";
                 }
@@ -86,11 +86,11 @@ namespace srcDispatch {
 
         virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
             using namespace srcDispatch;
-            if (typeid(InitPolicy) == typeid(*policy)) {
+            if(typeid(InitPolicy) == typeid(*policy)) {
                 data.init.Update(ctx.diffStack.back().operation, policy->Data<InitData>());
-            } else if (typeid(ConditionPolicy) == typeid(*policy)) {
+            } else if(typeid(ConditionPolicy) == typeid(*policy)) {
                 data.condition = DeltaElement(ctx.diffStack.back().operation, policy->Data<ConditionData>());
-            } else if (typeid(IncrPolicy) == typeid(*policy)) {
+            } else if(typeid(IncrPolicy) == typeid(*policy)) {
                 data.incr.Update(ctx.diffStack.back().operation, policy->Data<IncrData>());
             } else {
                 throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
@@ -106,7 +106,7 @@ namespace srcDispatch {
             using namespace srcDispatch;
             // start of policy
             openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
-                if (depth) return;
+                if(depth) return;
 
                 depth = ctx.depth;
                 data = ControlData{};
@@ -119,7 +119,7 @@ namespace srcDispatch {
 
             // end of policy
             closeEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
-                if (!depth || depth != ctx.depth)
+                if(!depth || depth != ctx.depth)
 
                 depth = 0;
                 NotifyAll(ctx);
@@ -130,9 +130,9 @@ namespace srcDispatch {
         void CollectInitHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!initPolicy) {
+                if(!initPolicy) {
                     initPolicy = make_unique_policy<InitPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(initPolicy.get());
@@ -142,9 +142,9 @@ namespace srcDispatch {
         void CollectConditionHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!conditionPolicy) {
+                if(!conditionPolicy) {
                     conditionPolicy = make_unique_policy<ConditionPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(conditionPolicy.get());
@@ -154,9 +154,9 @@ namespace srcDispatch {
         void CollectIncrHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::incr] = [this](srcSAXEventContext& ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!incrPolicy) {
+                if(!incrPolicy) {
                     incrPolicy = make_unique_policy<IncrPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(incrPolicy.get());

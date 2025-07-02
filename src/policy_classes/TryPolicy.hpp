@@ -56,9 +56,9 @@ namespace srcDispatch {
         std::any DataInner() const { return std::make_shared<TryData>(data); }
 
         void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
-            if (typeid(BlockPolicy) == typeid(*policy)) {
+            if(typeid(BlockPolicy) == typeid(*policy)) {
                 data.block.Update(ctx.diffStack.back().operation, policy->Data<BlockData>());
-            } else if (typeid(CatchPolicy) == typeid(*policy)) {
+            } else if(typeid(CatchPolicy) == typeid(*policy)) {
                 data.clauses.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<CatchData>()));
             } else {
                 throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
@@ -74,7 +74,7 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::trystmt] = [this](srcSAXEventContext &ctx) {
-                if (depth) return; 
+                if(depth) return; 
 
                 depth = ctx.depth;
                 data = TryData{};
@@ -86,7 +86,7 @@ namespace srcDispatch {
 
             // end of policy
             closeEventMap[ParserState::trystmt] = [this](srcSAXEventContext &ctx) {
-                if (!depth || depth != ctx.depth) return;
+                if(!depth || depth != ctx.depth) return;
 
                 depth = 0;
                 NotifyAll(ctx);
@@ -97,9 +97,9 @@ namespace srcDispatch {
         void CollectBlockHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::block] = [this](srcSAXEventContext &ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!blockPolicy) {
+                if(!blockPolicy) {
                     blockPolicy = make_unique_policy<BlockPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
@@ -109,9 +109,9 @@ namespace srcDispatch {
         void CollectCatchHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::catchstmt] = [this](srcSAXEventContext &ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!catchPolicy) {
+                if(!catchPolicy) {
                     catchPolicy = make_unique_policy<CatchPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(catchPolicy.get());

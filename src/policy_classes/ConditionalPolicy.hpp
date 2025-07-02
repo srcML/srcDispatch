@@ -47,9 +47,9 @@ namespace srcDispatch {
         std::any DataInner() const override { return std::make_shared<ConditionalData>(data); }
 
         void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
-            if (typeid(ConditionPolicy) == typeid(*policy)) {
+            if(typeid(ConditionPolicy) == typeid(*policy)) {
                 data.condition = DeltaElement(ctx.diffStack.back().operation, policy->Data<ConditionData>());
-            } else if (typeid(BlockPolicy) == typeid(*policy)) {
+            } else if(typeid(BlockPolicy) == typeid(*policy)) {
                 data.block = DeltaElement(ctx.diffStack.back().operation, policy->Data<BlockData>());
             } else {
                 throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
@@ -65,7 +65,7 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if (depth) return;
+                if(depth) return;
 
                 depth = ctx.depth;
                 data = ConditionalData{};
@@ -77,7 +77,7 @@ namespace srcDispatch {
 
             // end of policy
             closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if (!depth || depth != ctx.depth) return ;
+                if(!depth || depth != ctx.depth) return ;
 
                 depth = 0;
                 NotifyAll(ctx);
@@ -90,7 +90,7 @@ namespace srcDispatch {
             openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
                 if(!depth) return; 
 
-                if (!conditionPolicy) {
+                if(!conditionPolicy) {
                     conditionPolicy = make_unique_policy<ConditionPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(conditionPolicy.get());
@@ -102,7 +102,7 @@ namespace srcDispatch {
             openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
                 if(!depth) return; 
 
-                if (!blockPolicy) {
+                if(!blockPolicy) {
                     blockPolicy = make_unique_policy<BlockPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(blockPolicy.get());

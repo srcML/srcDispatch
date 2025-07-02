@@ -60,11 +60,11 @@ namespace srcDispatch {
         std::any DataInner() const override { return std::make_shared<DeclStmtData>(data); }
 
         virtual void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
-            if (typeid(DeclPolicy) == typeid(*policy)) {
+            if(typeid(DeclPolicy) == typeid(*policy)) {
                 // not sure how safe GetElement is here
                 srcDispatch::DiffOperation operation = ctx.diffStack.back().operation;
                 DeltaElement<std::shared_ptr<DeclData>> decl(operation, policy->Data<DeclData>());
-                if (data.decls.size() && decl.GetElement()->type->types.empty()) {
+                if(data.decls.size() && decl.GetElement()->type->types.empty()) {
                     decl.GetElement()->type     = data.decls.back().GetElement()->type;
                     decl.GetElement()->isStatic = data.decls.back().GetElement()->isStatic;
                 }
@@ -83,7 +83,7 @@ namespace srcDispatch {
 
             // start of policy
             openEventMap[ParserState::declstmt] = [this](srcSAXEventContext &ctx) {
-                if (depth) return;
+                if(depth) return;
 
                 depth = ctx.depth;
                 data = DeclStmtData{};
@@ -94,7 +94,7 @@ namespace srcDispatch {
 
             // end of policy
             closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext &ctx) {
-                if (!depth || depth != ctx.depth) return;
+                if(!depth || depth != ctx.depth) return;
 
                 depth = 0;
                 NotifyAll(ctx);
@@ -107,9 +107,9 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             openEventMap[ParserState::decl] = [this](srcSAXEventContext &ctx) {
-                if (!depth) return;
+                if(!depth) return;
 
-                if (!declPolicy) {
+                if(!declPolicy) {
                     declPolicy = make_unique_policy<DeclPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(declPolicy.get());

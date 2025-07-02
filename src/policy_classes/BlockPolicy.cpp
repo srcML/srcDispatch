@@ -324,7 +324,7 @@ namespace srcDispatch {
         std::function<void(srcDispatch::srcSAXEventContext& )> startClassPolicy = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
 
-            if (!classPolicy) {
+            if(!classPolicy) {
                 classPolicy = make_unique_policy<ClassPolicy>({this});
             }
             ctx.dispatcher->AddListenerDispatch(classPolicy.get());
