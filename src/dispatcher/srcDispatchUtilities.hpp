@@ -81,8 +81,8 @@ namespace srcDispatch {
                   isOperator(false),
                   endArchive(false) {}
 
-            ~srcSAXEventContext(){
-                if(writer){
+            ~srcSAXEventContext() {
+                if(writer) {
                     xmlBufferFree(archiveBuffer);
                     xmlFreeTextWriter(writer);
                 }
@@ -160,58 +160,58 @@ namespace srcDispatch {
                     xmlTextWriterWriteString(writer, (const xmlChar *)text);
                 }  
             }
-            inline bool And(const std::vector<ParserState> vec) const{
-                for(auto field : vec){
+            inline bool And(const std::vector<ParserState> vec) const {
+                for(auto field : vec) {
                     if(triggerField[field]) continue;
                     else return false;
                 }
                 return true;
             }
-            inline bool Nand(const std::vector<ParserState> vec) const{
-                for(auto field : vec){
+            inline bool Nand(const std::vector<ParserState> vec) const {
+                for(auto field : vec) {
                     if(triggerField[field]) return false;
                     else continue;
                 }
                 return true;
             }
-            inline bool Or(const std::vector<ParserState> vec) const{
-                for(auto field : vec){
+            inline bool Or(const std::vector<ParserState> vec) const {
+                for(auto field : vec) {
                     if(triggerField[field]) return true;
                     else continue;
                 }
                 return false;
             }
-            inline bool Nor(const std::vector<ParserState> vec) const{
-                for(auto field : vec){
+            inline bool Nor(const std::vector<ParserState> vec) const {
+                for(auto field : vec) {
                     if(triggerField[field]) return false;
                     else continue;
                 }
                 return true;
             }
-            inline bool IsEqualTo(const ParserState lhs, const ParserState rhs) const{
+            inline bool IsEqualTo(const ParserState lhs, const ParserState rhs) const {
                 return triggerField[lhs] == triggerField[rhs] ? true : false;
             }
-            inline bool IsGreaterThan(const ParserState lhs, const ParserState rhs) const{
+            inline bool IsGreaterThan(const ParserState lhs, const ParserState rhs) const {
                 return triggerField[lhs] > triggerField[rhs] ? true : false;
             }
-            inline bool IsGreaterThanOrEqualTo(const ParserState lhs, const ParserState rhs) const{
+            inline bool IsGreaterThanOrEqualTo(const ParserState lhs, const ParserState rhs) const {
                 return triggerField[lhs] >= triggerField[rhs] ? true : false;   
             }
-            inline bool IsLessThan(const ParserState lhs, const ParserState rhs) const{
+            inline bool IsLessThan(const ParserState lhs, const ParserState rhs) const {
                 return triggerField[lhs] < triggerField[rhs] ? true : false;    
             }
-            inline bool IsLessThanOrEqualTo(const ParserState lhs, const ParserState rhs) const{
+            inline bool IsLessThanOrEqualTo(const ParserState lhs, const ParserState rhs) const {
                 return triggerField[lhs] <= triggerField[rhs] ? true : false;   
             }
-            inline bool IsOpen(const ParserState field) const{
+            inline bool IsOpen(const ParserState field) const {
                 if(triggerField[field]) return true;
                 else return false;
             }
-            inline bool IsClosed(const ParserState field) const{
+            inline bool IsClosed(const ParserState field) const {
                 if(triggerField[field]) return false;
                 else return true;
             }
-            inline unsigned int NumCurrentlyOpen(const ParserState field){
+            inline unsigned int NumCurrentlyOpen(const ParserState field) {
                 return triggerField[field];
             }
     };
@@ -230,7 +230,7 @@ namespace srcDispatch {
 
         public:
 
-            EventListener() : depth(0), dispatched(false){
+            EventListener() : depth(0), dispatched(false) {
                 DefaultEventHandlers();
             }
 
@@ -248,11 +248,11 @@ namespace srcDispatch {
 
                 dispatched = true;
 
-                switch(estate){
+                switch(estate) {
 
                     case srcDispatch::ElementState::open: {
                         auto event = openEventMap.find(pstate);
-                        if(event != openEventMap.end()){
+                        if(event != openEventMap.end()) {
                             event->second(ctx);
                         }
                         break;
@@ -260,7 +260,7 @@ namespace srcDispatch {
 
                     case srcDispatch::ElementState::close: {
                         auto event = closeEventMap.find(pstate);
-                        if(event != closeEventMap.end()){
+                        if(event != closeEventMap.end()) {
                             event->second(ctx);
                         }
                         break;
@@ -303,7 +303,7 @@ namespace srcDispatch {
         virtual void RemoveListener(EventListener* l) = 0;
         virtual void RemoveListenerDispatch(EventListener* listener) = 0;
         virtual void RemoveListenerNoDispatch(EventListener* listener) = 0;
-        xmlBufferPtr GetXmlBuffer(){return ctx.archiveBuffer;}
+        xmlBufferPtr GetXmlBuffer() {return ctx.archiveBuffer;}
     protected:
         srcSAXEventContext ctx;
         std::list<EventListener*> elementListeners;
@@ -348,14 +348,14 @@ public:
             virtual void Notify(const PolicyDispatcher* policy, const srcSAXEventContext& ctx) = 0;
             virtual void NotifyWrite(const PolicyDispatcher* policy, srcSAXEventContext& ctx) = 0;
         };
-    class PolicyDispatcher{
+    class PolicyDispatcher {
     public:
-        PolicyDispatcher(std::initializer_list<PolicyListener*> listeners) : policyListeners(listeners){}
+        PolicyDispatcher(std::initializer_list<PolicyListener*> listeners) : policyListeners(listeners) {}
         virtual ~PolicyDispatcher() {}
-        virtual void AddListener(PolicyListener* listener){
+        virtual void AddListener(PolicyListener* listener) {
             policyListeners.push_back(listener);
         }
-        virtual void RemoveListener(PolicyListener* listener){
+        virtual void RemoveListener(PolicyListener* listener) {
             policyListeners.erase(std::find(policyListeners.begin(), policyListeners.end(), listener));
         }
 
@@ -369,10 +369,10 @@ public:
         virtual std::any DataInner() const = 0;
         //TODO: These may not need to be synchronous or even called in the same method (i.e., notifyall)
         virtual void NotifyAll(/*const*/ srcSAXEventContext& ctx) {
-            for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){
+            for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener) {
                 (*listener)->Notify(this, ctx);
             }
-            for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener){
+            for(std::list<PolicyListener*>::iterator listener = policyListeners.begin(); listener != policyListeners.end(); ++listener) {
                 (*listener)->NotifyWrite(this, ctx);
             }
 

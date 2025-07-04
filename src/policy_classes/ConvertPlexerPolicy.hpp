@@ -46,12 +46,11 @@ namespace srcDispatch {
     protected:
         ConvertData data;
 
-        std::stack<EventDispatcher*> dispatcherStack;
+        std::stack<EventDispatcher*>           dispatcherStack;
+        std::stack<srcDispatch::DiffOperation> dispatchingState;
 
         std::unique_ptr<EventListener> originalPolicy;
         std::unique_ptr<EventListener> modifiedPolicy;
-
-        std::stack<srcDispatch::DiffOperation> dispatchingState;
 
         std::stack<EventListener*> originalPolicyStack;
         std::stack<EventListener*> modifiedPolicyStack;
@@ -78,6 +77,14 @@ protected:
             dispatcherStack.top()->GetContext().dispatcher = dispatcherStack.top();
             NotifyAll(dispatcherStack.top()->GetContext());
             dispatcherStack.top()->GetContext().dispatcher = currentDispatcher;
+        }
+
+        virtual void AddListener(PolicyListener* listener) override {
+            PolicyDispatcher::AddListener(listener);
+        }
+
+        virtual void RemoveListener(PolicyListener* listener) override {
+            PolicyDispatcher::RemoveListener(listener);
         }
 
         virtual void AddListener(EventListener* listener) override {
