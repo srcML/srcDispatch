@@ -21,8 +21,8 @@ namespace srcDispatch {
 
      struct DeclStmtData {
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
         
         std::vector<DeltaElement<std::shared_ptr<DeclData>>> decls;
 

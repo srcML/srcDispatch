@@ -22,8 +22,8 @@ namespace srcDispatch {
 
     struct LiteralData {
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         DeltaElement<std::string> literal;
 

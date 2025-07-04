@@ -27,8 +27,8 @@ namespace srcDispatch {
 
     struct ControlData {
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         DeltaElement<std::shared_ptr<InitData>>      init;
         DeltaElement<std::shared_ptr<ConditionData>> condition;

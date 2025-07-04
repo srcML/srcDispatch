@@ -34,8 +34,8 @@ namespace srcDispatch {
 
         std::vector<std::string> namespaces;
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         std::string language;
         std::string filename;

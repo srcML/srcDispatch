@@ -31,6 +31,9 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <Diff.hpp>
+#include <DeltaElement.hpp>
+
 #include <libxml/xmlwriter.h>
 #include <srcSAXHandler.hpp>
 
@@ -59,18 +62,6 @@ namespace srcDispatch {
 
         // do not put anything after these
         xmlattribute, tokenstring, empty, MAXENUMVALUE = empty};
-
-        enum DiffOperation { COMMON, DELETE, INSERT, CHANGE, NONE };
-        struct Diff {
-            Diff(DiffOperation operation, size_t depth = 0, bool isReplace = false, bool isConvert = false) 
-                : operation(operation), depth(depth), isReplace(isReplace), isConvert(isConvert) {}
-
-            DiffOperation operation;
-            size_t depth;
-            bool isReplace;
-            bool isConvert;
-        };
-
 
     class srcSAXEventContext {
         public:
@@ -104,8 +95,8 @@ namespace srcDispatch {
             const std::vector<std::string>& elementStack;
             std::vector<Diff>               diffStack;
             std::vector<unsigned int> genericDepth;
-            unsigned int startLineNumber;
-            unsigned int endLineNumber;
+            DeltaElement<unsigned int> startLineNumber;
+            DeltaElement<unsigned int> endLineNumber;
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
                         currentTag, currentToken, currentAttributeName, currentAttributeValue,

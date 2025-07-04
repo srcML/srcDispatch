@@ -26,8 +26,8 @@ namespace srcDispatch {
 
     struct TryData {
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         DeltaElement<std::shared_ptr<BlockData>> block;
         std::vector<DeltaElement<std::any>>     clauses;

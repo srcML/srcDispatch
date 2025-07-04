@@ -26,8 +26,8 @@ namespace srcDispatch {
     struct GotoData {
         enum GotoType { GOTO, BREAK, CONTINUE };
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         DeltaElement<GotoType>                  type;
         DeltaElement<std::shared_ptr<NameData>> label;

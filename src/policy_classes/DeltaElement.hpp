@@ -10,7 +10,7 @@
 #ifndef INCLUDED_DELTA_ELEMENT_HPP
 #define INCLUDED_DELTA_ELEMENT_HPP
 
-#include <srcDispatchUtilities.hpp>
+#include <Diff.hpp>
 
 #include <iostream>
 #include <optional>

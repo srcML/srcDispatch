@@ -26,8 +26,8 @@ namespace srcDispatch {
 
     struct DeclData {
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
         
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>    generics;
         DeltaElement<AccessSpecifier>                              accessSpecifier;

@@ -43,8 +43,8 @@ namespace srcDispatch {
 
     struct BlockData {
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         std::vector<DeltaElement<std::any>>                   statements;
         std::vector<DeltaElement<std::shared_ptr<ClassData>>> localClasses;

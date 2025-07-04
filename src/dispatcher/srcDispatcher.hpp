@@ -868,6 +868,23 @@ namespace srcDispatch {
                 ctx.currentsrcMLRevision = std::string(attributes[0].value);
             }
         }
+
+
+        static DeltaElement<unsigned int> parseLineAttr(const char* attrValue) {
+            DeltaElement<std::string> posAttr(attrValue);
+
+            DeltaElement<unsigned int> lineNumber(posAttr.GetOperation());
+            if(posAttr.HasOriginal()) {
+                int length = posAttr.GetOriginal().find(':');
+                lineNumber.SetOriginal(std::stoi(posAttr.GetOriginal().substr(0, length)));
+            }
+
+            if(posAttr.HasModified()) {
+                int length = posAttr.GetModified().find(':');
+                lineNumber.SetModified(std::stoi(posAttr.GetModified().substr(0, length)));
+            }
+            return lineNumber;
+        }
         /**
         * startElementNs
         * @param localname the name of the element tag
@@ -948,11 +965,9 @@ namespace srcDispatch {
 
                     std::string attributeName = srcSAXHandler::get_qualified_name(attributes[pos].localname, attributes[pos].prefix);
                     if(strcmp(attributes[pos].localname, "start") == 0) {
-                        int length = ::index(attributes[pos].value, ':') - attributes[pos].value;
-                        ctx.startLineNumber = std::stoi(std::string(attributes[pos].value, length));
+                        ctx.startLineNumber = parseLineAttr(attributes[pos].value);
                     } else if(strcmp(attributes[pos].localname, "end") == 0) {
-                        int length = ::index(attributes[pos].value, ':') - attributes[pos].value;
-                        ctx.endLineNumber = std::stoi(std::string(attributes[pos].value, length));
+                        ctx.endLineNumber   =  parseLineAttr(attributes[pos].value);
                     }
 
                     std::string attributeValue = attributes[pos].value;

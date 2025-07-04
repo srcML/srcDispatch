@@ -23,8 +23,8 @@ namespace srcDispatch {
     struct TypeData {
         enum TypeType : int { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         std::vector<std::pair<DeltaElement<std::any>, DeltaElement<TypeType>>> types;
 

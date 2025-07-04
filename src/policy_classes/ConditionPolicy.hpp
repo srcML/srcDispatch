@@ -25,8 +25,8 @@ namespace srcDispatch {
 
     struct ConditionData {
 
-        unsigned int startLineNumber;
-        unsigned int endLineNumber;
+        DeltaElement<unsigned int> startLineNumber;
+        DeltaElement<unsigned int> endLineNumber;
 
         std::vector<DeltaElement<std::any>> conditions;
 
