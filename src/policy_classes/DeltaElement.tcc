@@ -58,6 +58,25 @@ DeltaElement<type>::DeltaElement()
 template <class type>
 DeltaElement<type>::DeltaElement(const type& element)
     : original(element), modified(), operation(srcDispatch::COMMON) {
+
+    static const char ATTR_SEPARATOR = '|';
+    if constexpr (std::is_same_v<type, std::string> || std::is_same_v<type, std::shared_ptr<std::string>>) {
+        std::string str = ValueConst(element).value;
+        std::size_t pos = str.find(ATTR_SEPARATOR);
+        if(pos != std::string::npos) {
+            std::size_t length = element.size();
+            operation = pos == 0? srcDispatch::INSERT : (pos == (length - 1)? srcDispatch::DELETE : srcDispatch::CHANGE);
+
+            original.reset();
+            if(operation == srcDispatch::DELETE || operation == srcDispatch::CHANGE) {
+                original = str.substr(0, pos);
+            }
+
+            if(operation == srcDispatch::INSERT || operation == srcDispatch::CHANGE) {
+                modified = str.substr(pos + 1, length - (pos + 1));
+            }
+        }
+    }
 }
 
 template <class type>
