@@ -14,6 +14,7 @@ namespace srcDispatch {
 const std::unordered_map<srcDispatch::ParserState, ClassData::ClassType> ClassPolicy::stateToTypeMapper = {
     {srcDispatch::ParserState::classn,  ClassData::CLASS},
     {srcDispatch::ParserState::structn, ClassData::STRUCT},
+    {srcDispatch::ParserState::interfacen, ClassData::INTERFACE},
 };
 
 }

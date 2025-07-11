@@ -112,14 +112,16 @@ namespace srcDispatch {
                 ctx.dispatcher->AddListenerDispatch(classPolicy.get());
             };
 
-            openEventMap[ParserState::classn]  = startClassPolicy;
-            openEventMap[ParserState::structn] = startClassPolicy;
+            openEventMap[ParserState::classn]     = startClassPolicy;
+            openEventMap[ParserState::structn]    = startClassPolicy;
+            openEventMap[ParserState::interfacen] = startClassPolicy;
 
             // end of policy
             std::function<void(srcDispatch::srcSAXEventContext& )> endClassPolicy = [](srcSAXEventContext& ctx) {};
 
-            closeEventMap[ParserState::classn]  = endClassPolicy;
-            closeEventMap[ParserState::structn] = endClassPolicy;
+            closeEventMap[ParserState::classn]     = endClassPolicy;
+            closeEventMap[ParserState::structn]    = endClassPolicy;
+            closeEventMap[ParserState::interfacen] = endClassPolicy;
 
             // start function of policy
             std::function<void(srcDispatch::srcSAXEventContext& )> startFunction = [this](srcSAXEventContext& ctx) {

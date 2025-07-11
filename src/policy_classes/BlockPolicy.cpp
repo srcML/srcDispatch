@@ -330,8 +330,9 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(classPolicy.get());
         };
 
-        openEventMap[ParserState::classn]  = startClassPolicy;
-        openEventMap[ParserState::structn] = startClassPolicy;
+        openEventMap[ParserState::classn]     = startClassPolicy;
+        openEventMap[ParserState::structn]    = startClassPolicy;
+        openEventMap[ParserState::interfacen] = startClassPolicy;
     }
 
     void BlockPolicy::CollectCaseHandlers() {

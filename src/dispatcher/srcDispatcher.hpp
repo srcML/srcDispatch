@@ -315,6 +315,10 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::structn, ElementState::open);
                 } },
+                { "interface", [this]() {
+                    ++ctx.triggerField[ParserState::classn];
+                    DispatchEvent(ParserState::interfacen, ElementState::open);
+                } },
                 { "namespace", [this]() {
                     ++ctx.triggerField[ParserState::namespacen];
                     DispatchEvent(ParserState::namespacen, ElementState::open);
@@ -608,6 +612,11 @@ namespace srcDispatch {
                 { "struct", [this]() {
                     ctx.currentClassName.clear();
                     DispatchEvent(ParserState::structn, ElementState::close);
+                    --ctx.triggerField[ParserState::classn];
+                } },
+                { "interface", [this]() {
+                    ctx.currentClassName.clear();
+                    DispatchEvent(ParserState::interfacen, ElementState::close);
                     --ctx.triggerField[ParserState::classn];
                 } },
                 { "namespace", [this]() {
