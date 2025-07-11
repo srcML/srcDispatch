@@ -47,6 +47,7 @@ namespace srcDispatch {
         DeltaElement<ClassType>                                  type;
         DeltaElement<std::shared_ptr<NameData>>                  name;
         std::vector<DeltaElement<std::shared_ptr<ParentData>>>   parents;
+        DeltaElement<AccessSpecifier>                            visibility;
 
         std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>> fields;
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> constructors;
@@ -55,6 +56,8 @@ namespace srcDispatch {
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> operators;
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> methods;
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>    innerClasses;
+
+        std::vector<DeltaElement<std::shared_ptr<std::string>>>  specifiers;
 
         DeltaElement<bool> isAbstract;
     };
@@ -168,6 +171,7 @@ namespace srcDispatch {
                     CollectNameHandlers();
                     CollectSuperHanders();
                     CollectBlockHanders();
+                    CollectSpecifierHandlers();
                 } else {
 
                     if(ctx.diffStack.back().isConvert && ctx.diffStack.back().operation == srcDispatch::INSERT) {
@@ -340,6 +344,25 @@ namespace srcDispatch {
                                ParserState::declstmt,
                                ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
                 NopCloseEvents({ParserState::block});
+            };
+        }
+
+        void CollectSpecifierHandlers() {
+            using namespace srcDispatch;
+            closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+                if (!depth) return;
+
+                if (ctx.And({ParserState::specifier})) {
+                    if (ctx.currentToken == "public") {
+                        data.visibility.Update(ctx.diffStack.back().operation, AccessSpecifier::PUBLIC);
+                    } else if (ctx.currentToken == "private") {
+                        data.visibility.Update(ctx.diffStack.back().operation, AccessSpecifier::PRIVATE);
+                    } else if (ctx.currentToken == "protected") {
+                        data.visibility.Update(ctx.diffStack.back().operation, AccessSpecifier::PROTECTED);
+                    } else {
+                        data.specifiers.emplace_back(ctx.diffStack.back().operation, std::make_shared<std::string>(ctx.currentToken));
+                    }
+                }
             };
         }
     };
