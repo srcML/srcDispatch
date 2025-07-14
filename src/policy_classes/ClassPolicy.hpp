@@ -106,6 +106,16 @@ namespace srcDispatch {
                     for (DeltaElement<std::shared_ptr<DeclData>>& decl : data.fields.back()->decls) {
                         decl->accessSpecifier = currentRegion;
                     }
+                } else {
+                    for (DeltaElement<std::shared_ptr<DeclData>>& decl : data.fields.back()->decls) {
+                        if (!decl->accessSpecifier.GetElement()) {
+                            ParserState pstate = data.type.GetElement() == ClassData::CLASS ? ParserState::classn :
+                                data.type.GetElement() == ClassData::STRUCT ? ParserState::structn :
+                                ParserState::block;
+                            AccessSpecifier accessSpecifier = getDefaultAccessSpecifier(pstate, data.language);
+                            decl->accessSpecifier.Update(ctx.diffStack.back().operation, accessSpecifier);
+                        }
+                    }
                 }
             } else if(typeid(FunctionPolicy) == typeid(*policy)) {
 
@@ -113,6 +123,13 @@ namespace srcDispatch {
                 FunctionData::FunctionType    f_type = f_data->type.GetElement();
                 if(currentRegion) {
                    f_data->accessSpecifier = currentRegion;
+                }
+                else if(!f_data->accessSpecifier.GetElement()) {
+                    ParserState pstate = data.type.GetElement() == ClassData::CLASS ? ParserState::classn :
+                        data.type.GetElement() == ClassData::STRUCT ? ParserState::structn :
+                        ParserState::block;
+                    AccessSpecifier accessSpecifier = getDefaultAccessSpecifier(pstate, data.language);
+                    f_data->accessSpecifier.Update(ctx.diffStack.back().operation, accessSpecifier);
                 }
                 if(f_data->isPureVirtual) {
                     data.isAbstract.Update(ctx.diffStack.back().operation, true);

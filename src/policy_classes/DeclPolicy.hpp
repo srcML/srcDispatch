@@ -31,6 +31,7 @@ namespace srcDispatch {
         
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>    generics;
         DeltaElement<AccessSpecifier>                              accessSpecifier;
+        std::vector<DeltaElement<std::shared_ptr<std::string>>>    specifiers;
         DeltaElement<std::shared_ptr<TypeData>>                    type;
         DeltaElement<std::shared_ptr<NameData>>                    name;
         DeltaElement<std::shared_ptr<ExpressionData>>              init;
@@ -126,6 +127,19 @@ namespace srcDispatch {
                 data.generics.emplace_back(ctx.diffStack.back().operation, policy->Data<GenericData>());
             } else if(typeid(TypePolicy) == typeid(*policy)) {
                 data.type = DeltaElement(ctx.diffStack.back().operation, policy->Data<TypeData>());
+                for (const std::pair<DeltaElement<std::any>, DeltaElement<TypeData::TypeType>>& type: data.type->types) {
+                    if (type.second.GetElement() == TypeData::SPECIFIER) {
+                        std::shared_ptr<std::string> specifier = std::any_cast<std::shared_ptr<std::string>>(type.first.GetElement());
+                        if (*specifier == "public")
+                            data.accessSpecifier.Update(ctx.diffStack.back().operation, AccessSpecifier::PUBLIC);
+                        else if (*specifier == "protected")
+                            data.accessSpecifier.Update(ctx.diffStack.back().operation, AccessSpecifier::PROTECTED);
+                        else if (*specifier == "private")
+                            data.accessSpecifier.Update(ctx.diffStack.back().operation, AccessSpecifier::PRIVATE);
+                        else 
+                            data.specifiers.emplace_back(ctx.diffStack.back().operation, specifier);
+                    }
+                } 
             } else if(typeid(NamePolicy) == typeid(*policy)) {
                 data.name = DeltaElement(ctx.diffStack.back().operation, policy->Data<NameData>());
             } else if(typeid(ExpressionPolicy) == typeid(*policy)) {

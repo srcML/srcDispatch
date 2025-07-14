@@ -163,6 +163,19 @@ namespace srcDispatch {
                 data.generics.emplace_back(ctx.diffStack.back().operation, policy->Data<GenericData>());
             } else if(typeid(TypePolicy) == typeid(*policy)) {
                 data.returnType = DeltaElement(ctx.diffStack.back().operation, policy->Data<TypeData>());
+                for (const std::pair<DeltaElement<std::any>, DeltaElement<TypeData::TypeType>>& type: data.returnType->types) {
+                    if (type.second.GetElement() == TypeData::SPECIFIER) {
+                        std::shared_ptr<std::string> specifier = std::any_cast<std::shared_ptr<std::string>>(type.first.GetElement());
+                        if (*specifier == "public")
+                            data.accessSpecifier.Update(ctx.diffStack.back().operation, AccessSpecifier::PUBLIC);
+                        else if (*specifier == "protected")
+                            data.accessSpecifier.Update(ctx.diffStack.back().operation, AccessSpecifier::PROTECTED);
+                        else if (*specifier == "private")
+                            data.accessSpecifier.Update(ctx.diffStack.back().operation, AccessSpecifier::PRIVATE);
+                        else 
+                            data.leadingSpecifiers.emplace_back(ctx.diffStack.back().operation, specifier);
+                    }
+                }
             } else if(typeid(NamePolicy) == typeid(*policy)) {
                 data.name = DeltaElement(ctx.diffStack.back().operation, policy->Data<NameData>());
             } else if(typeid(DeclPolicy) == typeid(*policy)) {
