@@ -67,6 +67,13 @@ namespace srcDispatch {
     void GenericArgumentsPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
         if(typeid(NamePolicy) == typeid(*policy)) {
             //data.arguments.push_back(DeltaElement(ctx.diffStack.back().operation, policy->Data<NameData>()));
+            std::shared_ptr<NameData> nameData = policy->Data<NameData>();
+            ExpressionData exprData;
+            exprData.startLineNumber.Update(nameData->startLineNumber.GetOperation(), nameData->startLineNumber.GetElement());
+            exprData.endLineNumber.Update(nameData->endLineNumber.GetOperation(), nameData->endLineNumber.GetElement());
+            DeltaElement<std::any> exprAny(ctx.diffStack.back().operation, nameData);
+            exprData.expr.emplace_back(exprAny);
+            data.arguments.push_back(DeltaElement(ctx.diffStack.back().operation, std::make_shared<ExpressionData>(exprData)));
         } else if(typeid(ExpressionPolicy) == typeid(*policy)) {
             data.arguments.push_back(DeltaElement(ctx.diffStack.back().operation, policy->Data<ExpressionData>()));
         } else {
@@ -100,6 +107,24 @@ namespace srcDispatch {
             NotifyAll(ctx);
             InitializeGenericArgumentsPolicyHandlers();
         };
+
+        openEventMap[ParserState::genericparameterlist] = [this](srcSAXEventContext &ctx) {
+            if(depth) return;
+
+            depth = ctx.depth;
+            data = GenericArgumentsData{};
+            data.startLineNumber = ctx.startLineNumber;
+            data.endLineNumber = ctx.endLineNumber;
+            CollectParameterHandler();
+        };
+
+        closeEventMap[ParserState::genericparameterlist] = [this](srcSAXEventContext &ctx) {
+            if(!depth || depth != ctx.depth) return;
+
+            depth = 0;
+            NotifyAll(ctx);
+            InitializeGenericArgumentsPolicyHandlers();
+        };
     }
 
     void GenericArgumentsPolicy::CollectArgumentHandler() {
@@ -116,12 +141,39 @@ namespace srcDispatch {
                 }
                 ctx.dispatcher->AddListenerDispatch(expressionPolicy.get());
             };
+
+            openEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
+                if(!depth) return;
+
+                if(!namePolicy) {
+                    namePolicy = make_unique_policy<NamePolicy>({this});
+                }
+                ctx.dispatcher->AddListenerDispatch(namePolicy.get());
+            };
         };
 
         closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
             if(!depth) return;
 
-            NopOpenEvents({ParserState::expr});
+            NopOpenEvents({ParserState::expr, ParserState::name});
+        };
+    }
+
+    void GenericArgumentsPolicy::CollectParameterHandler() {
+        using namespace srcDispatch;
+
+        openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+            openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
+                if(!namePolicy) {
+                    namePolicy = make_unique_policy<NamePolicy>({this});
+                }
+                ctx.dispatcher->AddListenerDispatch(namePolicy.get());
+            };
+        };
+        closeEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+            NopOpenEvents({ParserState::name});
         };
     }
 

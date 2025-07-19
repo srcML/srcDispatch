@@ -44,7 +44,7 @@ namespace srcDispatch {
 
     class EventDispatcher;            
     enum ElementState {open, close};
-    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt, argumentlist, argumentlisttemplate, 
+    enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, genericparameterlist, elseif, elsestmt, argumentlist, argumentlisttemplate, 
         call, templates, ctrlflow, endflow, genericargumentlist, name, function, functiondecl, constructor, constructordecl,
         destructordecl, destructor, argument, index, block, type, typeprev, init, op, literal, 
         modifier, memberlist, classn, structn, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,

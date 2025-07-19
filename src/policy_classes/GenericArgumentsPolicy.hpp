@@ -45,6 +45,7 @@ namespace srcDispatch {
         GenericArgumentsData data;
 
         std::unique_ptr<ExpressionPolicy> expressionPolicy;
+        std::unique_ptr<NamePolicy>       namePolicy;
 
     public:
         GenericArgumentsPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
@@ -58,6 +59,7 @@ namespace srcDispatch {
     private:
         void InitializeGenericArgumentsPolicyHandlers();
         void CollectArgumentHandler();
+        void CollectParameterHandler();
     };
 
 }

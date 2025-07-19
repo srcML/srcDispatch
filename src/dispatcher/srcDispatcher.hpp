@@ -214,6 +214,12 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::exprstmt, ElementState::open);
                 } },
                 { "parameter_list", [this]() {
+                    if(!ctx.genericDepth.empty()) {
+                        if(ctx.genericDepth.back() == ctx.depth) {
+                            ++ctx.triggerField[ParserState::genericparameterlist];
+                            DispatchEvent(ParserState::genericparameterlist, ElementState::open);
+                        }
+                    }
                     ++ctx.triggerField[ParserState::parameterlist];
                     DispatchEvent(ParserState::parameterlist, ElementState::open);
                 } },
@@ -502,6 +508,13 @@ namespace srcDispatch {
                     --ctx.triggerField[ParserState::exprstmt];
                 } },            
                 { "parameter_list", [this]() {
+                    if(!ctx.genericDepth.empty()) {
+                        if(ctx.genericDepth.back() == ctx.depth) {
+                            DispatchEvent(ParserState::genericparameterlist, ElementState::close);
+                            --ctx.triggerField[ParserState::genericparameterlist];
+                            ctx.genericDepth.pop_back();
+                        }
+                    }
                     DispatchEvent(ParserState::parameterlist, ElementState::close);
                     --ctx.triggerField[ParserState::parameterlist];
                 } },       
@@ -941,6 +954,9 @@ namespace srcDispatch {
                 name = attributes[0].value;
             }
             if(name == "generic" && localName == "argument_list") {
+                ctx.genericDepth.push_back(ctx.depth);
+            }
+            if(name == "generic" && localName == "parameter_list") {
                 ctx.genericDepth.push_back(ctx.depth);
             }
             if(name == "prev" && localName == "type") {

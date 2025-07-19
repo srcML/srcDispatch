@@ -174,6 +174,14 @@ namespace srcDispatch {
             }
             ctx.dispatcher->AddListenerDispatch(templateArgumentListPolicy.get());
         };
+        openEventMap[ParserState::genericparameterlist] = [this](srcSAXEventContext &ctx) {
+            if(!depth) return;
+
+            if(!templateArgumentListPolicy) {
+                templateArgumentListPolicy = make_unique_policy<GenericArgumentsPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(templateArgumentListPolicy.get());
+        };
     }
 
     void NamePolicy::CollectArrayIndicesHandlers() {
