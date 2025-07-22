@@ -80,6 +80,25 @@ DeltaElement<type>::DeltaElement(const type& element)
 }
 
 template <class type>
+DeltaElement<type>::DeltaElement(const std::optional<type>& original, const std::optional<type>& modified)
+    : original(), modified(), operation(srcDispatch::NONE) {
+
+    if(original && modified && *original == *modified) {
+        operation = srcDispatch::COMMON;
+        this->original = original;
+        return;
+    }
+
+    if(original) {
+        Update(srcDispatch::DELETE, *original);
+    }
+
+    if(modified) {
+        Update(srcDispatch::INSERT, *modified);
+    }
+}
+
+template <class type>
 DeltaElement<type>::DeltaElement(srcDispatch::DiffOperation operation, const type& element)
     : operation(srcDispatch::NONE) {
     Update(operation, element);

@@ -86,6 +86,27 @@ namespace srcDispatch {
             closeEventMap[ParserState::cppinclude] = [this](srcSAXEventContext& ctx) {
                 if(!depth || depth != ctx.depth) return;
 
+                std::optional<std::string> originalPath;
+                std::optional<bool>        originalIsRelative;
+                if(!data.path.GetOriginal().empty()) {
+                    originalIsRelative = data.path.GetOriginal()[0] == '"';
+
+                    std::size_t length = data.path.GetOriginal().size();
+                    originalPath       = data.path.GetOriginal().substr(1, length - 2);
+                }
+
+                std::optional<std::string> modifiedPath;
+                std::optional<bool>        modifiedIsRelative;
+                if(!data.path.GetModified().empty()) {
+                    modifiedIsRelative = data.path.GetModified()[0] == '"';
+
+                    std::size_t length = data.path.GetModified().size();
+                    modifiedPath       = data.path.GetModified().substr(1, length - 2);
+                }
+
+                data.path       = DeltaElement(originalPath,       modifiedPath);
+                data.isRelative = DeltaElement(originalIsRelative, modifiedIsRelative);
+
                 depth = 0;
                 NotifyAll(ctx);
                 InitializeIncludePolicyHandlers();
@@ -100,15 +121,13 @@ namespace srcDispatch {
 
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
                     if(data.path.GetOperation() == srcDispatch::NONE) {
-                        bool isChange = (ctx.depth + 1) == ctx.diffStack.back().depth && ctx.diffStack.back().isReplace;
-                        srcDispatch::DiffOperation operation = isChange? CHANGE : ctx.diffStack.back().operation;
-
-                        data.path       = DeltaElement<std::string>(operation);
-                        data.isRelative = DeltaElement<bool>(operation);
+                        data.path = DeltaElement<std::string>(srcDispatch::CHANGE);
                     }
 
-                    if(    ctx.diffStack.back().operation == srcDispatch::COMMON
-                        || ctx.diffStack.back().operation == srcDispatch::DELETE) {
+                    if(ctx.diffStack.back().operation == srcDispatch::COMMON) {
+                        data.path.GetOriginal() += ctx.currentToken;
+                        data.path.GetModified() += ctx.currentToken;
+                    } else if(ctx.diffStack.back().operation == srcDispatch::DELETE) {
                         data.path.GetOriginal() += ctx.currentToken;
                     } else if(ctx.diffStack.back().operation == srcDispatch::INSERT) {
                         data.path.GetModified() += ctx.currentToken;
@@ -117,30 +136,6 @@ namespace srcDispatch {
             };
             closeEventMap[ParserState::cppfile] = [this](srcSAXEventContext& ctx) {
                 NopCloseEvents({ParserState::tokenstring});
-
-                if(data.path.GetElement().empty()) return;
-
-                if(data.path.HasOriginal() && !data.path.GetOriginal().empty()) {
-                    if(data.path.GetOriginal()[0] == '"') {
-                        data.isRelative.SetOriginal(true);
-                    } else {
-                        data.isRelative.SetOriginal(false);
-                    }
-
-                    std::size_t length = data.path.GetOriginal().size();
-                    data.path.SetOriginal(data.path.GetOriginal().substr(1, length - 2));
-                }
-
-                if(data.path.HasModified() && !data.path.GetModified().empty()) {
-                    if(data.path.GetModified()[0] == '"') {
-                        data.isRelative.SetModified(true);
-                    } else {
-                        data.isRelative.SetModified(false);
-                    }
-
-                    std::size_t length = data.path.GetModified().size();
-                    data.path.SetModified(data.path.GetModified().substr(1, length - 2));
-                }
             };
         }
     };

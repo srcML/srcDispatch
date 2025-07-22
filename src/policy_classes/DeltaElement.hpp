@@ -31,7 +31,9 @@ protected:
 
 public:
     DeltaElement();
+    DeltaElement(const type& original, const type& modified);
     DeltaElement(const type& element);
+    DeltaElement(const std::optional<type>& original, const std::optional<type>& modified);
     DeltaElement(srcDispatch::DiffOperation operation, const type& element = type());
 
     DeltaElement copyAs(srcDispatch::DiffOperation operation) const;
