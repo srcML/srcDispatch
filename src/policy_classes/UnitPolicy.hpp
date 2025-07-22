@@ -28,9 +28,9 @@ namespace srcDispatch {
         DeltaElement<unsigned int> startLineNumber;
         DeltaElement<unsigned int> endLineNumber;
 
-        std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>> declStmtInfo;
-        std::vector<DeltaElement<std::shared_ptr<ClassData>>>    classInfo;
-        std::vector<DeltaElement<std::shared_ptr<FunctionData>>> functionInfo;
+        std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>> declStmts;
+        std::vector<DeltaElement<std::shared_ptr<ClassData>>>    classes;
+        std::vector<DeltaElement<std::shared_ptr<FunctionData>>> functions;
     };
 
     class UnitPolicy :

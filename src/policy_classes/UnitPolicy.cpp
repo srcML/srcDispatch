@@ -27,14 +27,14 @@ namespace srcDispatch {
 
 void UnitPolicy::Notify(const srcDispatch::PolicyDispatcher* policy,
             const srcDispatch::srcSAXEventContext&  ctx) {
-    // Save class and function information
-    if(typeid(ClassPolicy) == typeid(*policy)) {
+
+    if(typeid(DeclStmtPolicy) == typeid(*policy)) {
+        data.declStmts.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
+    } else if(typeid(ClassPolicy) == typeid(*policy)) {
         srcDispatch::DiffOperation operation = ctx.diffStack.back().isConvert? srcDispatch::COMMON : ctx.diffStack.back().operation;
-        data.classInfo.emplace_back(operation, policy->Data<ClassData>());
+        data.classes.emplace_back(operation, policy->Data<ClassData>());
     } else if(typeid(FunctionPolicy) == typeid(*policy)) {
-        data.functionInfo.emplace_back(ctx.diffStack.back().operation, policy->Data<FunctionData>());
-    } else if(typeid(DeclStmtPolicy) == typeid(*policy)) {
-        data.declStmtInfo.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
+        data.functions.emplace_back(ctx.diffStack.back().operation, policy->Data<FunctionData>());
     }
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 }

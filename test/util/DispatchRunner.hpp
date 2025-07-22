@@ -87,16 +87,16 @@ private:
 public:
     DispatchRunner() {}
 
+    const std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>>& GetDeclStmtInfo() const {
+        return unit->declStmts;
+    }
+
     const std::vector<DeltaElement<std::shared_ptr<ClassData>>>& GetClassInfo() const {
-        return unit->classInfo;
+        return unit->classes;
     }
 
     const std::vector<DeltaElement<std::shared_ptr<FunctionData>>>& GetFunctionInfo() const {
-        return unit->functionInfo;
-    }
-
-    const std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>>& GetDeclStmtInfo() const {
-        return unit->declStmtInfo;
+        return unit->functions;
     }
 
     void Notify(const srcDispatch::PolicyDispatcher * policy,
