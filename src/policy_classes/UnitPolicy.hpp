@@ -17,6 +17,7 @@
 
 #include <srcDispatchUtilities.hpp>
 
+#include <IncludePolicy.hpp>
 #include <DeclStmtPolicy.hpp>
 #include <FunctionPolicy.hpp>
 #include <ClassPolicy.hpp>
@@ -27,6 +28,8 @@ namespace srcDispatch {
     struct UnitData {
         DeltaElement<unsigned int> startLineNumber;
         DeltaElement<unsigned int> endLineNumber;
+
+        std::vector<DeltaElement<std::shared_ptr<IncludeData>>> includes;
 
         std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>> declStmts;
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>    classes;
@@ -44,6 +47,7 @@ namespace srcDispatch {
         UnitData data;
         std::size_t unitDepth;
 
+        std::unique_ptr<IncludePolicy>  includePolicy;
         std::unique_ptr<DeclStmtPolicy> declStmtPolicy;
         std::unique_ptr<FunctionPolicy> functionPolicy;
         std::unique_ptr<ClassPolicy>    classPolicy;
@@ -66,6 +70,8 @@ namespace srcDispatch {
 
     private:
         void InitializeUnitPolicyHandlers();
+
+        void InitializeIncludeHandlers();
         void InitializeDeclStmtHandlers();
         void InitializeClassHandlers();
         void InitializeFunctionHandlers();

@@ -491,6 +491,18 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::comment];
                     DispatchEvent(ParserState::comment, ElementState::open);
                 } },
+                { "cpp:include", [this]() {
+                    ++ctx.triggerField[ParserState::cppinclude];
+                    DispatchEvent(ParserState::cppinclude, ElementState::open);
+                } },
+                { "cpp:directive", [this]() {
+                    ++ctx.triggerField[ParserState::cppdirective];
+                    DispatchEvent(ParserState::cppdirective, ElementState::open);
+                } },
+                { "cpp:file", [this]() {
+                    ++ctx.triggerField[ParserState::cppfile];
+                    DispatchEvent(ParserState::cppfile, ElementState::open);
+                } },
             };
             process_map2 = {
                 {"decl_stmt", [this]() {
@@ -781,6 +793,18 @@ namespace srcDispatch {
                 { "comment", [this]() {
                     --ctx.triggerField[ParserState::comment];
                     DispatchEvent(ParserState::comment, ElementState::close);
+                } },
+                { "cpp:include", [this]() {
+                    --ctx.triggerField[ParserState::cppinclude];
+                    DispatchEvent(ParserState::cppinclude, ElementState::close);
+                } },
+                { "cpp:directive", [this]() {
+                    --ctx.triggerField[ParserState::cppdirective];
+                    DispatchEvent(ParserState::cppdirective, ElementState::close);
+                } },
+                { "cpp:file", [this]() {
+                    --ctx.triggerField[ParserState::cppfile];
+                    DispatchEvent(ParserState::cppfile, ElementState::close);
                 } },
                 { "xmlattribute", [this]() {
                     ctx.triggerField[ParserState::xmlattribute] = 1;

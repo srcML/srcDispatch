@@ -52,6 +52,9 @@ namespace srcDispatch {
         typedefexpr, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
         trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt,
 
+        // preprocessor
+        cppinclude, cppdirective, cppfile,
+
         // NLP states
         snoun, propersnoun, spronoun, sadjective, sverb,
 

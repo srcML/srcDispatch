@@ -28,7 +28,10 @@ namespace srcDispatch {
 void UnitPolicy::Notify(const srcDispatch::PolicyDispatcher* policy,
             const srcDispatch::srcSAXEventContext&  ctx) {
 
-    if(typeid(DeclStmtPolicy) == typeid(*policy)) {
+    if(typeid(IncludePolicy) == typeid(*policy)) {
+        data.includes.emplace_back(ctx.diffStack.back().operation, policy->Data<IncludeData>());
+        std::cerr << "HERE: " << __FILE__ << ' ' << __FUNCTION__ << ' ' << __LINE__ << ' ' << data.includes.back() << '\n';
+    } else if(typeid(DeclStmtPolicy) == typeid(*policy)) {
         data.declStmts.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
     } else if(typeid(ClassPolicy) == typeid(*policy)) {
         srcDispatch::DiffOperation operation = ctx.diffStack.back().isConvert? srcDispatch::COMMON : ctx.diffStack.back().operation;
@@ -49,6 +52,7 @@ void UnitPolicy::InitializeUnitPolicyHandlers() {
             data.startLineNumber = ctx.startLineNumber;
             data.endLineNumber   = ctx.endLineNumber;
 
+            InitializeIncludeHandlers();
             InitializeDeclStmtHandlers();
             InitializeClassHandlers();
             InitializeFunctionHandlers();
@@ -61,6 +65,18 @@ void UnitPolicy::InitializeUnitPolicyHandlers() {
         unitDepth = MAX_DEPTH;
         InitializeUnitPolicyHandlers();
         NotifyAll(ctx);
+    };
+
+}
+
+void UnitPolicy::InitializeIncludeHandlers() {
+    openEventMap[ParserState::cppinclude] = [this](srcSAXEventContext& ctx) {
+        if(depth == MAX_DEPTH) return;
+
+        if(!includePolicy) {
+            includePolicy = make_unique_policy<IncludePolicy>({this});
+        }
+        ctx.dispatcher->AddListenerDispatch(includePolicy.get());
     };
 
 }
