@@ -37,7 +37,7 @@ namespace srcDispatch {
                 str += std::string("#include ") + (isRelative.GetOfOperation(operation)? '"' : '<');
             }
 
-            str += path.ToString();
+            str += path.ToString(operation);
 
             if(isRelative.IsOfOperation(operation)) {
                 str += isRelative.GetOfOperation(operation)? '"' : '>';

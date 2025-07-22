@@ -87,6 +87,10 @@ private:
 public:
     DispatchRunner() {}
 
+    const std::vector<DeltaElement<std::shared_ptr<IncludeData>>>& GetIncludeInfo() const {
+        return unit->includes;
+    }
+
     const std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>>& GetDeclStmtInfo() const {
         return unit->declStmts;
     }
