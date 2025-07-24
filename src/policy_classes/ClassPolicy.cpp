@@ -15,6 +15,8 @@ const std::unordered_map<srcDispatch::ParserState, ClassData::ClassType> ClassPo
     {srcDispatch::ParserState::classn,  ClassData::CLASS},
     {srcDispatch::ParserState::structn, ClassData::STRUCT},
     {srcDispatch::ParserState::interfacen, ClassData::INTERFACE},
+    {srcDispatch::ParserState::enumn, ClassData::ENUM},
+    {srcDispatch::ParserState::unionn, ClassData::UNION},
 };
 
 }

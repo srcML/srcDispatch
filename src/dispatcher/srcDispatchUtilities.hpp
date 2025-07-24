@@ -47,7 +47,7 @@ namespace srcDispatch {
     enum ParserState {decl, expr, parameter, declstmt, exprstmt, parameterlist, elseif, elsestmt, argumentlist, argumentlisttemplate, 
         call, templates, ctrlflow, endflow, genericargumentlist, name, function, functiondecl, constructor, constructordecl,
         destructordecl, destructor, argument, index, block, type, typeprev, init, op, literal, 
-        modifier, memberlist, classn, structn, interfacen, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,
+        modifier, memberlist, classn, structn, interfacen, enumn, unionn, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,
         preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, switchstmt, switchcase, specifier, throws, 
         typedefexpr, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
         trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt,
@@ -79,6 +79,7 @@ namespace srcDispatch {
                   isArchive(false),
                   isPrev(false),
                   isOperator(false),
+                  isEnumClass(false),
                   endArchive(false) {}
 
             ~srcSAXEventContext() {
@@ -104,7 +105,7 @@ namespace srcDispatch {
             std::vector<std::string> currentNamespaces;
             std::size_t depth;
             std::map<std::string, std::string> attributes;
-            bool isArchive, isPrev, isOperator, isPseudo, endArchive;
+            bool isArchive, isPrev, isOperator, isEnumClass, isPseudo, endArchive;
 
           /**
             * write_start_tag

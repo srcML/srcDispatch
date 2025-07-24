@@ -83,7 +83,7 @@ namespace srcDispatch {
 
         std::size_t numberAllocatedListeners;
 
-        const std::unordered_set<std::string> nameCollectElements{ "class", "struct", "namespace" };
+        const std::unordered_set<std::string> nameCollectElements{ "class", "struct", "namespace", "interface", "enum", "union" };
         std::optional<std::string> collectedText;
 
     protected:
@@ -318,6 +318,14 @@ namespace srcDispatch {
                 { "interface", [this]() {
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::interfacen, ElementState::open);
+                } },
+                { "enum", [this]() {
+                    ++ctx.triggerField[ParserState::classn];
+                    DispatchEvent(ParserState::enumn, ElementState::open);
+                } },
+                { "union", [this]() {
+                    ++ctx.triggerField[ParserState::classn];
+                    DispatchEvent(ParserState::unionn, ElementState::open);
                 } },
                 { "namespace", [this]() {
                     ++ctx.triggerField[ParserState::namespacen];
@@ -617,6 +625,16 @@ namespace srcDispatch {
                 { "interface", [this]() {
                     ctx.currentClassName.clear();
                     DispatchEvent(ParserState::interfacen, ElementState::close);
+                    --ctx.triggerField[ParserState::classn];
+                } },
+                { "enum", [this]() {
+                    ctx.currentClassName.clear();
+                    DispatchEvent(ParserState::enumn, ElementState::close);
+                    --ctx.triggerField[ParserState::classn];
+                } },
+                { "union", [this]() {
+                    ctx.currentClassName.clear();
+                    DispatchEvent(ParserState::unionn, ElementState::close);
                     --ctx.triggerField[ParserState::classn];
                 } },
                 { "namespace", [this]() {
@@ -961,6 +979,9 @@ namespace srcDispatch {
             if(name == "pseudo" && localName == "block") {
                 ctx.isPseudo = true;
             }
+            if(name == "class" && localName == "enum") {
+                ctx.isEnumClass = true;
+            }
 
             if(name == "elseif" && localName == "if") {
                 localName = "elseif";
@@ -1024,6 +1045,7 @@ namespace srcDispatch {
 
             ctx.isPrev = false;
             ctx.isOperator = false;
+            ctx.isEnumClass = false;
         }
         /**
         * charactersUnit

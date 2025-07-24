@@ -333,6 +333,8 @@ namespace srcDispatch {
         openEventMap[ParserState::classn]     = startClassPolicy;
         openEventMap[ParserState::structn]    = startClassPolicy;
         openEventMap[ParserState::interfacen] = startClassPolicy;
+        openEventMap[ParserState::unionn]     = startClassPolicy;
+        openEventMap[ParserState::enumn]      = startClassPolicy;
     }
 
     void BlockPolicy::CollectCaseHandlers() {

@@ -115,6 +115,8 @@ namespace srcDispatch {
             openEventMap[ParserState::classn]     = startClassPolicy;
             openEventMap[ParserState::structn]    = startClassPolicy;
             openEventMap[ParserState::interfacen] = startClassPolicy;
+            openEventMap[ParserState::enumn]      = startClassPolicy;
+            openEventMap[ParserState::unionn]     = startClassPolicy;
 
             // end of policy
             std::function<void(srcDispatch::srcSAXEventContext& )> endClassPolicy = [](srcSAXEventContext& ctx) {};
@@ -122,6 +124,8 @@ namespace srcDispatch {
             closeEventMap[ParserState::classn]     = endClassPolicy;
             closeEventMap[ParserState::structn]    = endClassPolicy;
             closeEventMap[ParserState::interfacen] = endClassPolicy;
+            closeEventMap[ParserState::enumn]      = endClassPolicy;
+            closeEventMap[ParserState::unionn]     = endClassPolicy;
 
             // start function of policy
             std::function<void(srcDispatch::srcSAXEventContext& )> startFunction = [this](srcSAXEventContext& ctx) {

@@ -30,7 +30,7 @@ namespace srcDispatch {
     struct ParentData;
 
     struct ClassData {
-        enum ClassType : std::size_t { CLASS, STRUCT, INTERFACE };
+        enum ClassType : std::size_t { CLASS, STRUCT, INTERFACE, ENUM, ENUMCLASS, UNION };
 
         std::vector<std::string> namespaces;
 
@@ -47,6 +47,7 @@ namespace srcDispatch {
         DeltaElement<ClassType>                                  type;
         DeltaElement<std::shared_ptr<NameData>>                  name;
         std::vector<DeltaElement<std::shared_ptr<ParentData>>>   parents;
+        DeltaElement<std::shared_ptr<TypeData>>                  enumType;
 
         std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>> fields;
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> constructors;
@@ -77,7 +78,9 @@ namespace srcDispatch {
 
         std::unique_ptr<GenericPolicy>  genericPolicy;
         std::unique_ptr<NamePolicy>     namePolicy;
+        std::unique_ptr<TypePolicy>     typePolicy;
         std::unique_ptr<DeclStmtPolicy> declStmtPolicy;
+        std::unique_ptr<DeclPolicy>     declPolicy;
         std::unique_ptr<FunctionPolicy> functionPolicy;
         std::unique_ptr<ClassPolicy>    classPolicy;
 
@@ -100,6 +103,8 @@ namespace srcDispatch {
                 } else {
                     data.name = DeltaElement(ctx.diffStack.back().operation, policy->Data<NameData>());
                 }
+            } else if(typeid(TypePolicy) == typeid(*policy)) {
+                data.enumType.Update(ctx.diffStack.back().operation, policy->Data<TypeData>());
             } else if(typeid(DeclStmtPolicy) == typeid(*policy)) {
                 data.fields.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
                 if(currentRegion) {
@@ -107,6 +112,14 @@ namespace srcDispatch {
                         decl->accessSpecifier = currentRegion;
                     }
                 }
+            } else if(typeid(DeclPolicy) == typeid(*policy)) {
+                // Standardizing enum decls to decl statements to match struct, class, union, interface
+                std::shared_ptr<DeclData> declData = policy->Data<DeclData>();
+                DeclStmtData declStmt;
+                declStmt.startLineNumber.Update(declData->startLineNumber.GetOperation(), declData->startLineNumber.GetElement());
+                declStmt.endLineNumber.Update(declData->endLineNumber.GetOperation(), declData->endLineNumber.GetElement());
+                declStmt.decls.emplace_back(ctx.diffStack.back().operation, declData);
+                data.fields.emplace_back(ctx.diffStack.back().operation, std::make_shared<DeclStmtData>(declStmt));
             } else if(typeid(FunctionPolicy) == typeid(*policy)) {
 
                 std::shared_ptr<FunctionData> f_data = policy->Data<FunctionData>();
@@ -160,12 +173,16 @@ namespace srcDispatch {
                         data.stereotypes = std::set<std::string>(std::istream_iterator<std::string>(stereostring), std::istream_iterator<std::string>());
                     }
 
-                    data.type = DeltaElement(ctx.diffStack.back().operation, stateToTypeMapper.at(ctx.dispatcher->CurrentPState()));
+                    ClassData::ClassType classType = stateToTypeMapper.at(ctx.dispatcher->CurrentPState());
+                    if (ctx.isEnumClass && classType == ClassData::ENUM) 
+                        classType = ClassData::ENUMCLASS;
+                    data.type = DeltaElement(ctx.diffStack.back().operation, classType);
                     data.name = DeltaElement<std::shared_ptr<NameData>>();
                     data.language = ctx.currentFileLanguage;
                     data.filename = ctx.currentFilePath;
                     CollectGenericHandlers();
                     CollectNameHandlers();
+                    CollectTypeHandlers();
                     CollectSuperHanders();
                     CollectBlockHanders();
                 } else {
@@ -198,6 +215,12 @@ namespace srcDispatch {
 
             openEventMap[ParserState::interfacen] = startPolicy;
             closeEventMap[ParserState::interfacen] = endPolicy;
+
+            openEventMap[ParserState::enumn] = startPolicy;
+            closeEventMap[ParserState::enumn] = endPolicy;
+
+            openEventMap[ParserState::unionn] = startPolicy;
+            closeEventMap[ParserState::unionn] = endPolicy;
         }
 
         void CollectGenericHandlers() {
@@ -227,6 +250,21 @@ namespace srcDispatch {
 
                 NopOpenEvents({ParserState::name});
                 NopCloseEvents({ParserState::name});
+            };
+        }
+
+        // C++ treats the size_t in enum : size_t {}; as a type
+        // C# treats it as a super class
+        // May want to consider standardizing it in srcML
+        void CollectTypeHandlers() {
+            using namespace srcDispatch;
+            openEventMap[ParserState::type] = [this](srcSAXEventContext& ctx) {
+                if(!depth) return;
+
+                if(!typePolicy) {
+                    typePolicy = make_unique_policy<TypePolicy>({this});
+                }
+                ctx.dispatcher->AddListenerDispatch(typePolicy.get());
             };
         }
 
@@ -290,6 +328,13 @@ namespace srcDispatch {
                     ctx.dispatcher->AddListenerDispatch(declStmtPolicy.get());
                 };
 
+                openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx) {
+                    if(!declPolicy) {
+                        declPolicy = make_unique_policy<DeclPolicy>({this});
+                    }
+                    ctx.dispatcher->AddListenerDispatch(declPolicy.get());
+                };
+
                 std::function<void(srcSAXEventContext&  ctx)> functionEvent = [this](srcSAXEventContext& ctx) {
                     if(!functionPolicy) {
                         functionPolicy = make_unique_policy<FunctionPolicy>({this});
@@ -340,7 +385,7 @@ namespace srcDispatch {
 
                 NopOpenEvents({ParserState::block, ParserState::function, ParserState::functiondecl,
                                ParserState::constructor, ParserState::constructordecl, ParserState::destructor, ParserState::destructordecl,
-                               ParserState::declstmt,
+                               ParserState::declstmt, ParserState::decl,
                                ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
                 NopCloseEvents({ParserState::block});
             };
