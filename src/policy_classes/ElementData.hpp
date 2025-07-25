@@ -16,7 +16,11 @@ namespace srcDispatch {
         DeltaElement<unsigned int> startLineNumber;
         DeltaElement<unsigned int> endLineNumber;
 
-        virtual ~ElementData() {}
+        ElementData() : startLineNumber(0), endLineNumber(0) {
+        }
+
+        virtual ~ElementData() {
+        }
     };
 
 }
