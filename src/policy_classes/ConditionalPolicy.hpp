@@ -26,14 +26,27 @@
 
 namespace srcDispatch {
 
-    template <typename ConditionalData, srcDispatch::ParserState DispatchEvent>
+    struct ConditionalData : public ElementData {
+
+        DeltaElement<std::shared_ptr<ConditionData>> condition;
+        DeltaElement<std::shared_ptr<BlockData>>     block;
+
+        template<class type>
+        friend class DeltaElement;
+    private:
+        std::string ToString(srcDispatch::DiffOperation operation) const {
+            return condition.ToString(operation);
+        }
+    };
+
+    template <typename ConditionalDataParam, srcDispatch::ParserState DispatchEvent>
     class ConditionalPolicy :
     public srcDispatch::EventListener,
     public srcDispatch::PolicyDispatcher,
     public srcDispatch::PolicyListener {
 
     protected:
-        ConditionalData data;
+        ConditionalDataParam data;
 
         std::unique_ptr<ConditionPolicy> conditionPolicy;
         std::unique_ptr<BlockPolicy>     blockPolicy;
@@ -47,7 +60,7 @@ namespace srcDispatch {
         ~ConditionalPolicy() {}
 
     protected:
-        std::any DataInner() const override { return std::make_shared<ConditionalData>(data); }
+        std::any DataInner() const override { return std::make_shared<ConditionalDataParam>(data); }
 
         void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
             if(typeid(ConditionPolicy) == typeid(*policy)) {
@@ -71,7 +84,7 @@ namespace srcDispatch {
                 if(depth) return;
 
                 depth = ctx.depth;
-                data = ConditionalData{};
+                data = ConditionalDataParam{};
                 data.startLineNumber = ctx.startLineNumber;
                 data.endLineNumber = ctx.endLineNumber;
                 CollectConditionHandlers();

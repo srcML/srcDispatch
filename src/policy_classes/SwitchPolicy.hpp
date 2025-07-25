@@ -20,17 +20,7 @@
 
 namespace srcDispatch {
 
-    struct SwitchData : public ElementData {
-
-        DeltaElement<std::shared_ptr<ConditionData>> condition;
-        DeltaElement<std::shared_ptr<BlockData>>     block;
-
-        template<class type>
-        friend class DeltaElement;
-    private:
-        std::string ToString(srcDispatch::DiffOperation operation) const {
-            return condition.ToString(operation);
-        }
+    struct SwitchData : public ConditionalData {
     };
 
     class SwitchPolicy : public ConditionalPolicy<SwitchData, srcDispatch::ParserState::switchstmt> {

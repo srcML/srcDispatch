@@ -20,18 +20,7 @@
 
 namespace srcDispatch {
 
-    struct ElseData : public ElementData {
-
-        DeltaElement<std::shared_ptr<ConditionData>> condition;
-        DeltaElement<std::shared_ptr<BlockData>>     block;
-
-        template<class type>
-        friend class DeltaElement;
-    private:
-        std::string ToString(srcDispatch::DiffOperation operation) const {
-            assert(!condition);
-            return "";
-        }
+    struct ElseData : public ConditionalData {
     };
 
     class ElsePolicy : public ConditionalPolicy<ElseData, srcDispatch::ParserState::elsestmt> {
