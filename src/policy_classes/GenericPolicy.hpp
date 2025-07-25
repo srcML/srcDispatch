@@ -12,8 +12,8 @@
 
 #include <srcDispatchUtilities.hpp>
 
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
-
 
 namespace srcDispatch {
 
@@ -25,10 +25,7 @@ namespace srcDispatch {
     class  ExpressionPolicy;
     struct ExpressionData;
 
-    struct GenericData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct GenericData : public ElementData {
 
         std::vector<DeltaElement<std::shared_ptr<DeclData>>> parameters;
 

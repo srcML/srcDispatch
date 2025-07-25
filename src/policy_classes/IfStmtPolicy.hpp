@@ -13,7 +13,7 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
-#include <DeltaElement.hpp>
+
 #include <IfPolicy.hpp>
 #include <ElseIfPolicy.hpp>
 #include <ElsePolicy.hpp>
@@ -24,10 +24,7 @@
 
 namespace srcDispatch {
 
-    struct IfStmtData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct IfStmtData : public ElementData {
 
         std::vector<DeltaElement<std::any>> clauses;
 

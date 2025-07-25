@@ -13,7 +13,10 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
 #include <ConditionPolicy.hpp>
 #include <BlockPolicy.hpp>
 

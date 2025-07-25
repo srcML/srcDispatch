@@ -11,7 +11,10 @@
 #define INCLUDED_NAME_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
 #include <GenericArgumentsPolicy.hpp>
 #include <OperatorPolicy.hpp>
 
@@ -27,10 +30,7 @@ namespace srcDispatch {
     class GenericArgumentsPolicy;
     struct GenericArgumentsData;
 
-    struct NameData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct NameData : public ElementData {
 
         DeltaElement<std::string> name;
         std::vector<DeltaElement<std::any>> names;

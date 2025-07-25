@@ -17,17 +17,18 @@
 
 #include <srcDispatchUtilities.hpp>
 
+#include <ElementData.hpp>
+#include <DeltaElement.hpp>
+
 #include <IncludePolicy.hpp>
 #include <DeclStmtPolicy.hpp>
 #include <FunctionPolicy.hpp>
 #include <ClassPolicy.hpp>
-#include <DeltaElement.hpp>
+
 
 namespace srcDispatch {
 
-    struct UnitData {
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct UnitData : public ElementData {
 
         std::vector<DeltaElement<std::shared_ptr<IncludeData>>> includes;
 

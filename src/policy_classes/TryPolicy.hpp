@@ -13,6 +13,8 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <BlockPolicy.hpp>
@@ -24,10 +26,7 @@
 
 namespace srcDispatch {
 
-    struct TryData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct TryData : public ElementData {
 
         DeltaElement<std::shared_ptr<BlockData>> block;
         std::vector<DeltaElement<std::any>>     clauses;

@@ -11,7 +11,10 @@
 #define INCLUDED_DECL_TYPE_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
 #include <DeclPolicy.hpp>
 
 #include <string>
@@ -19,11 +22,8 @@
 
 namespace srcDispatch {
 
-     struct DeclStmtData {
+     struct DeclStmtData : public ElementData {
 
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
-        
         std::vector<DeltaElement<std::shared_ptr<DeclData>>> decls;
 
         template<class type>

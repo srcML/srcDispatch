@@ -12,6 +12,8 @@
 
 #include <srcDispatchUtilities.hpp>
 #include <AccessSpecifier.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <GenericPolicy.hpp>
@@ -24,10 +26,7 @@
 
 namespace srcDispatch {
 
-    struct DeclData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct DeclData : public ElementData {
         
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>    generics;
         DeltaElement<AccessSpecifier>                              accessSpecifier;

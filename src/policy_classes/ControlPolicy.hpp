@@ -13,7 +13,10 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
 #include <DeclPolicy.hpp>
 #include <InitPolicy.hpp>
 #include <ConditionPolicy.hpp>
@@ -25,7 +28,7 @@
 
 namespace srcDispatch {
 
-    struct ControlData {
+    struct ControlData : public ElementData {
 
         DeltaElement<unsigned int> startLineNumber;
         DeltaElement<unsigned int> endLineNumber;

@@ -11,8 +11,11 @@
 #define INCLUDED_GENERIC_ARGUMENTS_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
-#include <NamePolicy.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
+#include <NamePolicy.hpp>
 
 namespace srcDispatch {
 
@@ -20,10 +23,7 @@ namespace srcDispatch {
     class ExpressionPolicy;
     struct ExpressionData;
 
-    struct GenericArgumentsData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct GenericArgumentsData : public ElementData {
 
         std::vector<DeltaElement<std::shared_ptr<ExpressionData>>> arguments;
 

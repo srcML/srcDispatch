@@ -11,8 +11,8 @@
 #define INCLUDED_ELSEIF_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
 #include <ConditionalPolicy.hpp>
-#include <DeltaElement.hpp>
 
 #include <string>
 #include <vector>
@@ -20,10 +20,7 @@
 
 namespace srcDispatch {
 
-    struct ElseIfData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct ElseIfData : public ElementData {
 
         DeltaElement<std::shared_ptr<ConditionData>> condition;
         DeltaElement<std::shared_ptr<BlockData>>     block;

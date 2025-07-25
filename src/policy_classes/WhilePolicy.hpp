@@ -20,13 +20,10 @@
 
 namespace srcDispatch {
 
-    struct WhileData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct WhileData : public ElementData {
 
         DeltaElement<std::shared_ptr<ConditionData>> condition;
-        DeltaElement<std::shared_ptr<BlockData>> block;
+        DeltaElement<std::shared_ptr<BlockData>>     block;
 
         template<class type>
         friend class DeltaElement;

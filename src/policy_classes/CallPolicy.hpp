@@ -11,7 +11,10 @@
 #define INCLUDED_CALL_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
 #include <NamePolicy.hpp>
 #include <ExpressionPolicy.hpp>
 
@@ -35,10 +38,7 @@ namespace srcDispatch {
     struct NameData;
     class NamePolicy;
 
-    struct CallData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct CallData : public ElementData {
 
         DeltaElement<std::shared_ptr<NameData>> name;
         std::vector<DeltaElement<std::shared_ptr<ExpressionData>>> arguments; // expressions

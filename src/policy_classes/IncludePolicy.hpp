@@ -13,6 +13,8 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <string>
@@ -20,10 +22,7 @@
 
 namespace srcDispatch {
 
-    struct IncludeData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct IncludeData : public ElementData {
 
         DeltaElement<bool> isRelative;
         DeltaElement<std::string> path;

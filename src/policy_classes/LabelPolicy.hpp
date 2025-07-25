@@ -13,6 +13,8 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <NamePolicy.hpp>
@@ -23,10 +25,7 @@
 
 namespace srcDispatch {
 
-    struct LabelData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct LabelData : public ElementData {
 
         DeltaElement<std::shared_ptr<NameData>> name;
 

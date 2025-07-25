@@ -11,7 +11,10 @@
 #define INCLUDED_EXPRESSION_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
 #include <NamePolicy.hpp>
 #include <OperatorPolicy.hpp>
 #include <LiteralPolicy.hpp>
@@ -35,10 +38,7 @@ namespace srcDispatch {
     // Names, operators, calls in the correct order.
     // Need for determining variable use, variable modification, calls
 
-    struct ExpressionData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct ExpressionData : public ElementData {
 
         std::vector<DeltaElement<std::any>> expr;
 

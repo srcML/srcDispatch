@@ -20,10 +20,7 @@
 
 namespace srcDispatch {
 
-    struct DoData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct DoData : public ElementData {
 
         DeltaElement<std::shared_ptr<ConditionData>> condition;
         DeltaElement<std::shared_ptr<BlockData>>     block;

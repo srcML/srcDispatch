@@ -11,6 +11,8 @@
 #define INCLUDED_BLOCK_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <DeclStmtPolicy.hpp>
@@ -41,10 +43,7 @@ namespace srcDispatch {
 
     class ConvertPlexerPolicy;
 
-    struct BlockData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct BlockData : public ElementData {
 
         std::vector<DeltaElement<std::any>>                   statements;
         std::vector<DeltaElement<std::shared_ptr<ClassData>>> localClasses;

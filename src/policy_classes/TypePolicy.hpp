@@ -11,8 +11,11 @@
 #define INCLUDED_TYPE_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
-#include <NamePolicy.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
+#include <NamePolicy.hpp>
 
 #include <exception>
 
@@ -20,11 +23,8 @@ namespace srcDispatch {
 
     class NamePolicy;
 
-    struct TypeData {
+    struct TypeData : public ElementData {
         enum TypeType : int { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
 
         std::vector<std::pair<DeltaElement<std::any>, DeltaElement<TypeType>>> types;
 

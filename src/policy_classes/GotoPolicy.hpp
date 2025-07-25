@@ -13,6 +13,8 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <NamePolicy.hpp>
@@ -23,11 +25,8 @@
 
 namespace srcDispatch {
 
-    struct GotoData {
+    struct GotoData : public ElementData {
         enum GotoType { GOTO, BREAK, CONTINUE };
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
 
         DeltaElement<GotoType>                  type;
         DeltaElement<std::shared_ptr<NameData>> label;

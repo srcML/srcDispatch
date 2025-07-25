@@ -13,6 +13,8 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 #include <ExprTypePolicy.hpp>
 
@@ -22,9 +24,7 @@
 
 namespace srcDispatch {
 
-    struct ExprStmtData {
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct ExprStmtData : public ElementData {
 
         DeltaElement<std::shared_ptr<ExpressionData>> expr;
 

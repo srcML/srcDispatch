@@ -12,6 +12,8 @@
 
 #include <srcDispatchUtilities.hpp>
 #include <AccessSpecifier.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <GenericPolicy.hpp>
@@ -28,16 +30,13 @@
 
 namespace srcDispatch {
 
-    struct FunctionData {
+    struct FunctionData : public ElementData {
 
         enum FunctionType { CONSTRUCTOR, DESTRUCTOR, OPERATOR, FUNCTION };
 
         /*** @todo fix */
         // std::vector<DeltaElement<std::string>> namespaces;
         std::vector<std::string> namespaces;
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
 
         std::string language;
         std::string filename;

@@ -14,6 +14,7 @@
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
 
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <IfStmtPolicy.hpp>
@@ -33,7 +34,7 @@
 
 namespace srcDispatch {
 
-    struct ConvertData {
+    struct ConvertData : public ElementData {
         DeltaElement<std::any> construct;
     };
 

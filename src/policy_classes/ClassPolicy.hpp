@@ -11,6 +11,8 @@
 #define INCLUDED_CLASS_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
 #include <AccessSpecifier.hpp>
@@ -29,13 +31,10 @@ namespace srcDispatch {
 
     struct ParentData;
 
-    struct ClassData {
+    struct ClassData : public ElementData {
         enum ClassType : std::size_t { CLASS, STRUCT };
 
         std::vector<std::string> namespaces;
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
 
         std::string language;
         std::string filename;

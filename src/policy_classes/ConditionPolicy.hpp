@@ -13,7 +13,10 @@
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
 #include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
 #include <DeltaElement.hpp>
+
 #include <ExpressionPolicy.hpp>
 #include <DeclPolicy.hpp>
 
@@ -23,10 +26,7 @@
 
 namespace srcDispatch {
 
-    struct ConditionData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct ConditionData : public ElementData {
 
         std::vector<DeltaElement<std::any>> conditions;
 

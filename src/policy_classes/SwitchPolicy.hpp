@@ -11,8 +11,8 @@
 #define INCLUDED_SWITCH_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
+
 #include <ConditionalPolicy.hpp>
-#include <DeltaElement.hpp>
 
 #include <string>
 #include <vector>
@@ -20,13 +20,10 @@
 
 namespace srcDispatch {
 
-    struct SwitchData {
-
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+    struct SwitchData : public ElementData {
 
         DeltaElement<std::shared_ptr<ConditionData>> condition;
-        DeltaElement<std::shared_ptr<BlockData>> block;
+        DeltaElement<std::shared_ptr<BlockData>>     block;
 
         template<class type>
         friend class DeltaElement;
