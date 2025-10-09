@@ -157,6 +157,7 @@ namespace srcDispatch {
                     data.namespaces = ctx.currentNamespaces;
                     data.startLineNumber = ctx.startLineNumber;
                     data.endLineNumber   = ctx.endLineNumber;
+                    data.accessSpecifier = DeltaElement<AccessSpecifier>(AccessSpecifier::NONE);
                     std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
                     if(stereotype_attr_itr != ctx.attributes.end()) {
                         std::istringstream stereostring(stereotype_attr_itr->second);
@@ -357,13 +358,11 @@ namespace srcDispatch {
 
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
                     if(ctx.currentToken == "public") {
-                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PUBLIC);
+                        data.accessSpecifier.Update(ctx.diffStack.back().operation, PUBLIC);
                     } else if(ctx.currentToken == "private") {
-                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PRIVATE);
+                        data.accessSpecifier.Update(ctx.diffStack.back().operation, PRIVATE);
                     } else if(ctx.currentToken == "protected") {
-                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PROTECTED);
-                    } else if(ctx.currentToken == "package") {
-                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PACKAGE);
+                        data.accessSpecifier.Update(ctx.diffStack.back().operation, PROTECTED);
                     } else {
                         data.specifiers.emplace_back(ctx.diffStack.back().operation,  std::make_shared<std::string>(ctx.currentToken));
                     }
