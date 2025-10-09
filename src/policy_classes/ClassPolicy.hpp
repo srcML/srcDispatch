@@ -44,6 +44,10 @@ namespace srcDispatch {
 
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>  generics;
         DeltaElement<ClassType>                                  type;
+
+        DeltaElement<AccessSpecifier>                           accessSpecifier;
+        std::vector<DeltaElement<std::shared_ptr<std::string>>> specifiers;
+
         DeltaElement<std::shared_ptr<NameData>>                  name;
         std::vector<DeltaElement<std::shared_ptr<ParentData>>>   parents;
 
@@ -167,6 +171,7 @@ namespace srcDispatch {
                     CollectNameHandlers();
                     CollectSuperHanders();
                     CollectBlockHanders();
+                    CollectSpecifierHandlers();
                 } else {
 
                     if(ctx.diffStack.back().isConvert && ctx.diffStack.back().operation == srcDispatch::INSERT) {
@@ -231,11 +236,14 @@ namespace srcDispatch {
             openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
                 if(!depth) return;
 
+                NopOpenEvents({ParserState::specifier});
+                NopCloseEvents({ParserState::specifier});
+
                 openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
                     data.parents.emplace_back(ctx.diffStack.back().operation, 
                         std::make_shared<ParentData>(
                                             ParentData{DeltaElement<std::shared_ptr<NameData>>(), DeltaElement<bool>(), DeltaElement<AccessSpecifier>()}
-                                        )
+                                                    )
                     );
 
                     openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
@@ -276,8 +284,8 @@ namespace srcDispatch {
             openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
                 if(!depth) return;
 
-                NopOpenEvents({ParserState::name, ParserState::super_list, ParserState::super});
-                NopCloseEvents({ParserState::name, ParserState::super_list, ParserState::tokenstring});
+                NopOpenEvents({ParserState::name, ParserState::specifier, ParserState::super_list, ParserState::super});
+                NopCloseEvents({ParserState::name, ParserState::specifier, ParserState::super_list, ParserState::tokenstring});
 
                 openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
                     if(!declStmtPolicy) {
@@ -339,6 +347,32 @@ namespace srcDispatch {
                                ParserState::declstmt,
                                ParserState::publicaccess, ParserState::protectedaccess, ParserState::privateaccess});
                 NopCloseEvents({ParserState::block});
+            };
+        }
+
+        void CollectSpecifierHandlers() {
+            using namespace srcDispatch;
+            openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+                if(!depth) return;
+
+                closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
+                    if(ctx.currentToken == "public") {
+                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PUBLIC);
+                    } else if(ctx.currentToken == "private") {
+                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PRIVATE);
+                    } else if(ctx.currentToken == "protected") {
+                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PROTECTED);
+                    } else if(ctx.currentToken == "package") {
+                        data.accessSpecifier = DeltaElement(ctx.diffStack.back().operation, PACKAGE);
+                    } else {
+                        data.specifiers.emplace_back(ctx.diffStack.back().operation,  std::make_shared<std::string>(ctx.currentToken));
+                    }
+                };
+            };
+                    
+            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+                if(!depth) return;
+                NopCloseEvents({ParserState::tokenstring});
             };
         }
     };
