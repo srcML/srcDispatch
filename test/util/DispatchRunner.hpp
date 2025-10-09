@@ -44,15 +44,22 @@ private:
 
     std::string srcDiff(const std::string& original, const std::string& modified) {
 
-        writeFile("original.cpp", original);
-        writeFile("modified.cpp", modified);
+        static const std::string original_filename_base = "original";
+        static const std::string modified_filename_base = "modified";
 
-        std::system("srcdiff original.cpp modified.cpp -o srcdiff.xml");
+        std::string original_filename = original_filename_base + extension;
+        std::string modified_filename = modified_filename_base + extension;
+
+        writeFile(original_filename, original);
+        writeFile(modified_filename, modified);
+
+        const std::string command = "srcdiff " + original_filename + ' ' + modified_filename + " -o srcdiff.xml";
+        std::system(command.c_str());
 
         std::string srcDiffStr = readDiffFile();
 
-        std::remove("original.cpp");
-        std::remove("modified.cpp");
+        std::remove(original_filename.c_str());
+        std::remove(modified_filename.c_str());
         std::remove("srcdiff.xml");
 
         return srcDiffStr;
@@ -66,8 +73,8 @@ private:
         int pairNum = 0;
         for(const SourcePair& pair : sourcePairs) {
             std::string numStr = std::to_string(pairNum);
-            writeFile("original/file" + numStr + ".cpp", pair.first);
-            writeFile("modified/file" + numStr + ".cpp", pair.second);
+            writeFile("original/file" + numStr + extension, pair.first);
+            writeFile("modified/file" + numStr + extension, pair.second);
             ++pairNum;
         }
 
@@ -85,7 +92,18 @@ private:
     std::shared_ptr<UnitData> unit;
 
 public:
-    DispatchRunner() {}
+    DispatchRunner(const std::string& language = "C++") : extension() {
+        static const std::unordered_map<std::string, std::string> languageToExtension
+         = {
+                { "C++",  ".cpp"},
+                { "C",    ".c"},
+                { "Java", ".java"},
+                { "C#",   ".cs"},
+           };
+
+        extension = languageToExtension.at(language);
+
+    }
 
     const std::vector<DeltaElement<std::shared_ptr<IncludeData>>>& GetIncludeInfo() const {
         return unit->includes;
@@ -129,7 +147,8 @@ public:
         }
     }
 
-
+private:
+    std::string extension;
 };
 
 }
