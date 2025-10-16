@@ -45,7 +45,7 @@ namespace srcDispatch {
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>  generics;
         DeltaElement<ClassType>                                  type;
 
-        DeltaElement<AccessSpecifier>                           accessSpecifier;
+        DeltaElement<std::shared_ptr<AccessSpecifier>>          accessSpecifier;
         std::vector<DeltaElement<std::shared_ptr<std::string>>> specifiers;
 
         DeltaElement<std::shared_ptr<NameData>>                  name;
@@ -63,9 +63,9 @@ namespace srcDispatch {
     };
 
     struct ParentData {
-        DeltaElement<std::shared_ptr<NameData>> name;
-        DeltaElement<bool>                      isVirtual;
-        DeltaElement<AccessSpecifier>           accessSpecifier;
+        DeltaElement<std::shared_ptr<NameData>>        name;
+        DeltaElement<bool>                             isVirtual;
+        DeltaElement<std::shared_ptr<AccessSpecifier>> accessSpecifier;
     };
 
     class ClassPolicy :
@@ -74,9 +74,9 @@ namespace srcDispatch {
     public srcDispatch::PolicyListener {
 
     private:
-        ClassData                     data;
+        ClassData data;
 
-        DeltaElement<AccessSpecifier> currentRegion;
+        DeltaElement<std::shared_ptr<AccessSpecifier>> currentRegion;
 
         std::unique_ptr<GenericPolicy>  genericPolicy;
         std::unique_ptr<NamePolicy>     namePolicy;
@@ -157,7 +157,7 @@ namespace srcDispatch {
                     data.namespaces = ctx.currentNamespaces;
                     data.startLineNumber = ctx.startLineNumber;
                     data.endLineNumber   = ctx.endLineNumber;
-                    data.accessSpecifier = DeltaElement<AccessSpecifier>(AccessSpecifier::NONE);
+                    data.accessSpecifier = NULL_ACCESS;
                     std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
                     if(stereotype_attr_itr != ctx.attributes.end()) {
                         std::istringstream stereostring(stereotype_attr_itr->second);
@@ -243,7 +243,7 @@ namespace srcDispatch {
                 openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
                     data.parents.emplace_back(ctx.diffStack.back().operation, 
                         std::make_shared<ParentData>(
-                                            ParentData{DeltaElement<std::shared_ptr<NameData>>(), DeltaElement<bool>(), DeltaElement<AccessSpecifier>()}
+                            ParentData{DeltaElement<std::shared_ptr<NameData>>(), DeltaElement<bool>(), DeltaElement<std::shared_ptr<AccessSpecifier>>()}
                                                     )
                     );
 
@@ -256,14 +256,11 @@ namespace srcDispatch {
 
                     closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
                         if(ctx.And({ParserState::specifier})) {
-                            if(ctx.currentToken == "virtual") {
+                            std::shared_ptr<AccessSpecifier> specifier = AccessSpecifierFactory(ctx.currentToken);
+                            if(specifier == NULL_ACCESS) {
                                 data.parents.back()->isVirtual.Update(ctx.diffStack.back().operation, true);
-                            } else if(ctx.currentToken == "public") {
-                                data.parents.back()->accessSpecifier.Update(ctx.diffStack.back().operation, PUBLIC);
-                            } else if(ctx.currentToken == "private") {
-                                data.parents.back()->accessSpecifier.Update(ctx.diffStack.back().operation, PRIVATE);
-                            } else if(ctx.currentToken == "protected") {
-                                data.parents.back()->accessSpecifier.Update(ctx.diffStack.back().operation, PROTECTED);
+                            } else {
+                                data.parents.back()->accessSpecifier.Update(ctx.diffStack.back().operation, specifier);
                             }
                         }
                     };
@@ -314,9 +311,9 @@ namespace srcDispatch {
                 if(!depth) return;
 
                 if(ctx.diffStack.back().isConvert) {
-                    currentRegion.Update(ctx.diffStack.back().operation, PUBLIC);
+                    currentRegion.Update(ctx.diffStack.back().operation, PUBLIC_ACCESS);
                 } else {
-                    currentRegion = DeltaElement(ctx.diffStack.back().operation, PUBLIC);
+                    currentRegion = DeltaElement(ctx.diffStack.back().operation, PUBLIC_ACCESS);
                 }
             };
 
@@ -324,9 +321,9 @@ namespace srcDispatch {
                 if(!depth) return;
 
                 if(ctx.diffStack.back().isConvert) {
-                    currentRegion.Update(ctx.diffStack.back().operation, PROTECTED);
+                    currentRegion.Update(ctx.diffStack.back().operation, PROTECTED_ACCESS);
                 } else {
-                    currentRegion = DeltaElement(ctx.diffStack.back().operation, PROTECTED);
+                    currentRegion = DeltaElement(ctx.diffStack.back().operation, PROTECTED_ACCESS);
                 }
             };
 
@@ -334,9 +331,9 @@ namespace srcDispatch {
                 if(!depth) return;
 
                 if(ctx.diffStack.back().isConvert) {
-                    currentRegion.Update(ctx.diffStack.back().operation, PRIVATE);
+                    currentRegion.Update(ctx.diffStack.back().operation, PRIVATE_ACCESS);
                 } else {
-                    currentRegion = DeltaElement(ctx.diffStack.back().operation, PRIVATE);
+                    currentRegion = DeltaElement(ctx.diffStack.back().operation, PRIVATE_ACCESS);
                 }
             };
 
@@ -357,14 +354,11 @@ namespace srcDispatch {
                 if(!depth) return;
 
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                    if(ctx.currentToken == "public") {
-                        data.accessSpecifier.Update(ctx.diffStack.back().operation, PUBLIC);
-                    } else if(ctx.currentToken == "private") {
-                        data.accessSpecifier.Update(ctx.diffStack.back().operation, PRIVATE);
-                    } else if(ctx.currentToken == "protected") {
-                        data.accessSpecifier.Update(ctx.diffStack.back().operation, PROTECTED);
+                    std::shared_ptr<AccessSpecifier> specifier = AccessSpecifierFactory(ctx.currentToken);
+                    if(specifier == NULL_ACCESS) {
+                        data.specifiers.emplace_back(ctx.diffStack.back().operation, std::make_shared<std::string>(ctx.currentToken));
                     } else {
-                        data.specifiers.emplace_back(ctx.diffStack.back().operation,  std::make_shared<std::string>(ctx.currentToken));
+                        data.accessSpecifier.Update(ctx.diffStack.back().operation, specifier);
                     }
                 };
             };

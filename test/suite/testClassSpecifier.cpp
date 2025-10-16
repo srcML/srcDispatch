@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(class_access_common_none) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::NONE);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::NULL_ACCESS);
     
     BOOST_TEST(classData->specifiers.size() == 0);
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(class_access_common_public) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::PUBLIC);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::PUBLIC_ACCESS);
     
     BOOST_TEST(classData->specifiers.size() == 0);
 
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(class_access_common_private) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::PRIVATE);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::PRIVATE_ACCESS);
     
     BOOST_TEST(classData->specifiers.size() == 0);
 
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(class_access_common_protected) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::PROTECTED);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::PROTECTED_ACCESS);
     
     BOOST_TEST(classData->specifiers.size() == 0);
 
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(class_access_insert) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsInsert());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::PUBLIC);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::PUBLIC_ACCESS);
     
     BOOST_TEST(classData->specifiers.size() == 0);
 
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(class_access_delete) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsDelete());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::PUBLIC);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::PUBLIC_ACCESS);
     
     BOOST_TEST(classData->specifiers.size() == 0);
 
@@ -252,8 +252,8 @@ BOOST_AUTO_TEST_CASE(class_access_change) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsChange());
-    BOOST_TEST(classData->accessSpecifier.GetOriginal() == AccessSpecifier::PRIVATE);
-    BOOST_TEST(classData->accessSpecifier.GetModified() == AccessSpecifier::PUBLIC);
+    BOOST_TEST(classData->accessSpecifier.GetOriginal() == srcDispatch::PRIVATE_ACCESS);
+    BOOST_TEST(classData->accessSpecifier.GetModified() == srcDispatch::PUBLIC_ACCESS);
 
     BOOST_TEST(classData->specifiers.size() == 0);
 
@@ -289,7 +289,7 @@ BOOST_AUTO_TEST_CASE(class_specifier_common) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::NONE);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::NULL_ACCESS);
 
     BOOST_TEST(classData->specifiers.size() == 1);
     BOOST_TEST(classData->specifiers.at(0).IsCommon());
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE(class_specifier_multi_common) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::NONE);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::NULL_ACCESS);
 
     BOOST_TEST(classData->specifiers.size() == 2);
     BOOST_TEST(classData->specifiers.at(0).IsCommon());
@@ -369,7 +369,7 @@ BOOST_AUTO_TEST_CASE(class_specifier_insert) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::NONE);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::NULL_ACCESS);
 
     BOOST_TEST(classData->specifiers.size() == 1);
     BOOST_TEST(classData->specifiers.at(0).IsInsert());
@@ -407,7 +407,7 @@ BOOST_AUTO_TEST_CASE(class_specifier_delete) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::NONE);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::NULL_ACCESS);
 
     BOOST_TEST(classData->specifiers.size() == 1);
     BOOST_TEST(classData->specifiers.at(0).IsDelete());
@@ -445,7 +445,7 @@ BOOST_AUTO_TEST_CASE(class_specifier_change) {
     BOOST_TEST(classData->type.GetElement() == srcDispatch::ClassData::CLASS);
 
     BOOST_TEST(classData->accessSpecifier.IsCommon());
-    BOOST_TEST(classData->accessSpecifier.GetElement() == AccessSpecifier::NONE);
+    BOOST_TEST(classData->accessSpecifier.GetElement() == srcDispatch::NULL_ACCESS);
 
     BOOST_TEST(classData->specifiers.size() == 2);
     BOOST_TEST(classData->specifiers.at(0).IsDelete());

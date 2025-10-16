@@ -42,8 +42,8 @@ namespace srcDispatch {
         std::string filename;
 
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>  generics;
-        DeltaElement<FunctionType>    type;
-        DeltaElement<AccessSpecifier> accessSpecifier;
+        DeltaElement<FunctionType>                               type;
+        DeltaElement<std::shared_ptr<AccessSpecifier>>           accessSpecifier;
 
         std::vector<DeltaElement<std::shared_ptr<std::string>>> leadingSpecifiers;
         std::vector<DeltaElement<std::shared_ptr<std::string>>> trailingSpecifiers;

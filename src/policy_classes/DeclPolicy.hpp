@@ -29,7 +29,7 @@ namespace srcDispatch {
     struct DeclData : public ElementData {
         
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>    generics;
-        DeltaElement<AccessSpecifier>                              accessSpecifier;
+        DeltaElement<std::shared_ptr<AccessSpecifier>>             accessSpecifier;
         DeltaElement<std::shared_ptr<TypeData>>                    type;
         DeltaElement<std::shared_ptr<NameData>>                    name;
         DeltaElement<std::shared_ptr<ExpressionData>>              init;
