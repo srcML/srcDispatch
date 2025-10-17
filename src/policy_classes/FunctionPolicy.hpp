@@ -11,7 +11,7 @@
 #define INCLUDED_FUNCTION_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
-#include <AccessSpecifier.hpp>
+#include <Access.hpp>
 
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
@@ -41,9 +41,9 @@ namespace srcDispatch {
         std::string language;
         std::string filename;
 
-        std::vector<DeltaElement<std::shared_ptr<GenericData>>>  generics;
-        DeltaElement<FunctionType>                               type;
-        DeltaElement<std::shared_ptr<AccessSpecifier>>           accessSpecifier;
+        std::vector<DeltaElement<std::shared_ptr<GenericData>>> generics;
+        DeltaElement<FunctionType>                              type;
+        DeltaElement<std::shared_ptr<Access>>                   accessSpecifier;
 
         std::vector<DeltaElement<std::shared_ptr<std::string>>> leadingSpecifiers;
         std::vector<DeltaElement<std::shared_ptr<std::string>>> trailingSpecifiers;

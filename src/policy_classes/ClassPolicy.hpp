@@ -15,7 +15,7 @@
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
-#include <AccessSpecifier.hpp>
+#include <Access.hpp>
 #include <GenericPolicy.hpp>
 #include <NamePolicy.hpp>
 #include <DeclStmtPolicy.hpp>
@@ -45,7 +45,7 @@ namespace srcDispatch {
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>  generics;
         DeltaElement<ClassType>                                  type;
 
-        DeltaElement<std::shared_ptr<AccessSpecifier>>          accessSpecifier;
+        DeltaElement<std::shared_ptr<Access>>                   accessSpecifier;
         std::vector<DeltaElement<std::shared_ptr<std::string>>> specifiers;
 
         DeltaElement<std::shared_ptr<NameData>>                  name;
@@ -65,7 +65,7 @@ namespace srcDispatch {
     struct ParentData {
         DeltaElement<std::shared_ptr<NameData>>        name;
         DeltaElement<bool>                             isVirtual;
-        DeltaElement<std::shared_ptr<AccessSpecifier>> accessSpecifier;
+        DeltaElement<std::shared_ptr<Access>> accessSpecifier;
     };
 
     class ClassPolicy :
@@ -76,7 +76,7 @@ namespace srcDispatch {
     private:
         ClassData data;
 
-        DeltaElement<std::shared_ptr<AccessSpecifier>> currentRegion;
+        DeltaElement<std::shared_ptr<Access>> currentRegion;
 
         std::unique_ptr<GenericPolicy>  genericPolicy;
         std::unique_ptr<NamePolicy>     namePolicy;
@@ -243,7 +243,7 @@ namespace srcDispatch {
                 openEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
                     data.parents.emplace_back(ctx.diffStack.back().operation, 
                         std::make_shared<ParentData>(
-                            ParentData{DeltaElement<std::shared_ptr<NameData>>(), DeltaElement<bool>(), DeltaElement<std::shared_ptr<AccessSpecifier>>()}
+                            ParentData{DeltaElement<std::shared_ptr<NameData>>(), DeltaElement<bool>(), DeltaElement<std::shared_ptr<Access>>()}
                                                     )
                     );
 
@@ -256,7 +256,7 @@ namespace srcDispatch {
 
                     closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
                         if(ctx.And({ParserState::specifier})) {
-                            std::shared_ptr<AccessSpecifier> specifier = AccessSpecifierFactory(ctx.currentToken);
+                            std::shared_ptr<Access> specifier = AccessFactory(ctx.currentToken);
                             if(specifier == NULL_ACCESS) {
                                 data.parents.back()->isVirtual.Update(ctx.diffStack.back().operation, true);
                             } else {
@@ -354,7 +354,7 @@ namespace srcDispatch {
                 if(!depth) return;
 
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
-                    std::shared_ptr<AccessSpecifier> specifier = AccessSpecifierFactory(ctx.currentToken);
+                    std::shared_ptr<Access> specifier = AccessFactory(ctx.currentToken);
                     if(specifier == NULL_ACCESS) {
                         data.specifiers.emplace_back(ctx.diffStack.back().operation, std::make_shared<std::string>(ctx.currentToken));
                     } else {

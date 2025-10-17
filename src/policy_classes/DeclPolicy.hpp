@@ -11,7 +11,7 @@
 #define INCLUDED_DECL_POLICY_HPP
 
 #include <srcDispatchUtilities.hpp>
-#include <AccessSpecifier.hpp>
+#include <Access.hpp>
 
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
@@ -29,7 +29,7 @@ namespace srcDispatch {
     struct DeclData : public ElementData {
         
         std::vector<DeltaElement<std::shared_ptr<GenericData>>>    generics;
-        DeltaElement<std::shared_ptr<AccessSpecifier>>             accessSpecifier;
+        DeltaElement<std::shared_ptr<Access>>                      accessSpecifier;
         DeltaElement<std::shared_ptr<TypeData>>                    type;
         DeltaElement<std::shared_ptr<NameData>>                    name;
         DeltaElement<std::shared_ptr<ExpressionData>>              init;

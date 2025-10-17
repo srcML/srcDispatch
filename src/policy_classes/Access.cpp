@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file AccessSpecifier.cpp
+ * @file Access.cpp
  *
  * @copyright Copyright (C) 2025-2025 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML Infrastructure.
  */
 
-#include <AccessSpecifier.hpp>
+#include <Access.hpp>
 
 #include <unordered_map>
 
 namespace srcDispatch {
 
-void NullDeleter(AccessSpecifier*) {}
+void NullDeleter(Access*) {}
 
-std::shared_ptr<AccessSpecifier> AccessSpecifierFactory(const std::string& str) {
-    static std::unordered_map<std::string, std::shared_ptr<AccessSpecifier>> accessSpecifierMap
+std::shared_ptr<Access> AccessFactory(const std::string& str) {
+    static std::unordered_map<std::string, std::shared_ptr<Access>> accessSpecifierMap
      = {
         {"public",    PUBLIC_ACCESS    },
         {"private",   PRIVATE_ACCESS   },
