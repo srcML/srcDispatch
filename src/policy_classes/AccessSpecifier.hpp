@@ -12,44 +12,68 @@
 
 #include <string>
 #include <memory>
+#include <mutex>
 
 namespace srcDispatch {
 
 class AccessSpecifier {
 public:
-    AccessSpecifier() {}
     virtual ~AccessSpecifier() {}
     virtual std::string ToString() const = 0;
+protected:
+    AccessSpecifier() {}
 };
 
 class PublicAccess : public AccessSpecifier {
 public:
-    PublicAccess() {}
+    static PublicAccess& Get() {
+        static PublicAccess access;
+        return access; 
+    }
     virtual std::string ToString() const { return "public"; };
+private:
+    PublicAccess() {}
 };
 
 class PrivateAccess : public AccessSpecifier {
 public:
-    PrivateAccess() {}
+    static PrivateAccess& Get() {
+        static PrivateAccess access;
+        return access; 
+    }
     virtual std::string ToString() const { return "private"; };
+private:
+    PrivateAccess() {}
 };
 
 class ProtectedAccess : public AccessSpecifier {
 public:
-    ProtectedAccess() {}
+    static ProtectedAccess& Get() {
+        static ProtectedAccess access;
+        return access; 
+    }
     virtual std::string ToString() const { return "protected"; };
+private:
+    ProtectedAccess() {}
 };
 
 class NullAccess : public AccessSpecifier {
 public:
-    NullAccess() {}
+    static NullAccess& Get() {
+        static NullAccess access;
+        return access; 
+    }
     virtual std::string ToString() const { return "null"; };
+private:
+    NullAccess() {}
 };
 
-extern const std::shared_ptr<AccessSpecifier> PUBLIC_ACCESS;
-extern const std::shared_ptr<AccessSpecifier> PRIVATE_ACCESS;
-extern const std::shared_ptr<AccessSpecifier> PROTECTED_ACCESS;
-extern const std::shared_ptr<AccessSpecifier> NULL_ACCESS;
+void NullDeleter(AccessSpecifier*);
+
+const std::shared_ptr<AccessSpecifier> PUBLIC_ACCESS    = std::shared_ptr<AccessSpecifier>(static_cast<AccessSpecifier*>(&PublicAccess::Get()),    NullDeleter);
+const std::shared_ptr<AccessSpecifier> PRIVATE_ACCESS   = std::shared_ptr<AccessSpecifier>(static_cast<AccessSpecifier*>(&PrivateAccess::Get()),   NullDeleter);
+const std::shared_ptr<AccessSpecifier> PROTECTED_ACCESS = std::shared_ptr<AccessSpecifier>(static_cast<AccessSpecifier*>(&ProtectedAccess::Get()), NullDeleter);
+const std::shared_ptr<AccessSpecifier> NULL_ACCESS      = std::shared_ptr<AccessSpecifier>(static_cast<AccessSpecifier*>(&NullAccess::Get()),      NullDeleter);
 
 std::shared_ptr<AccessSpecifier> AccessSpecifierFactory(const std::string& str);
 
