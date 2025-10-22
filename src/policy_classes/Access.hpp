@@ -18,6 +18,8 @@ namespace srcDispatch {
 
 class Access {
 public:
+    Access(const Access&) = delete;
+    const Access& operator=(Access) = delete;
     virtual ~Access() {}
     virtual std::string ToString() const = 0;
 protected:
