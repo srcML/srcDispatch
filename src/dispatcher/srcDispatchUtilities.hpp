@@ -97,7 +97,7 @@ namespace srcDispatch {
             EventDispatcher * dispatcher;
             const std::vector<std::string>& elementStack;
             std::vector<Diff>               diffStack;
-            std::vector<unsigned int> genericDepth;
+            std::vector<unsigned int>  genericDepth;
             DeltaElement<unsigned int> startLineNumber;
             DeltaElement<unsigned int> endLineNumber;
             std::vector<unsigned short int> triggerField;

@@ -82,7 +82,7 @@ namespace srcDispatch {
         std::unique_ptr<SwitchPolicy>   switchPolicy;
         std::unique_ptr<CasePolicy>     casePolicy;
 
-        std::unique_ptr<ClassPolicy> classPolicy;
+        std::unique_ptr<ClassPolicy>    classPolicy;
 
         std::unique_ptr<ConvertPlexerPolicy> plexer;
 
