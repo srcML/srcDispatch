@@ -9,6 +9,8 @@
 
 #include <DeltaElement.hpp>
 
+#include <Position.hpp>
+
 #ifdef __linux__
     #include <execinfo.h>
 #endif
@@ -16,6 +18,7 @@
 #include <iterator>
 #include <type_traits>
 #include <sstream>
+
 
 template <class type>
 struct Value {
@@ -374,6 +377,10 @@ std::string DeltaElement<type>::ToString(srcDispatch::DiffOperation operation) c
             if(HasOriginal()) {
                 originalStr = ValueConst(*original).value;
             }
+        } else if constexpr (std::is_same_v<type, Position>) {
+            if(HasOriginal()) {
+                originalStr = original->ToString();
+            }
         } else {
             const type& element = HasOriginal()? *original : *modified;
             originalStr = ValueConst(*element).value.ToString(srcDispatch::DELETE);
@@ -384,7 +391,12 @@ std::string DeltaElement<type>::ToString(srcDispatch::DiffOperation operation) c
                 const type& element = this->operation == srcDispatch::COMMON? *original : *modified;
                 modifiedStr = ValueConst(element).value;
             }
-        } else {
+        } else if constexpr (std::is_same_v<type, Position>) {
+            if(HasModified() || this->operation == srcDispatch::COMMON) {
+                const type& element = this->operation == srcDispatch::COMMON? *original : *modified;
+                modifiedStr = element.ToString();
+            }
+        }  else {
             const type& element = HasModified()? *modified : *original;
             modifiedStr = ValueConst(element).value.ToString(srcDispatch::INSERT);
         }
