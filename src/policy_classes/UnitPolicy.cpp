@@ -48,8 +48,8 @@ void UnitPolicy::InitializeUnitPolicyHandlers() {
         if(unitDepth == MAX_DEPTH && (ctx.isArchive || ctx.depth > 0)) {
             unitDepth = ctx.depth;
             data = UnitData{};
-            data.startLineNumber = ctx.startLineNumber;
-            data.endLineNumber   = ctx.endLineNumber;
+            data.startPosition = ctx.startPosition;
+            data.endPosition   = ctx.endPosition;
 
             InitializeIncludeHandlers();
             InitializeDeclStmtHandlers();

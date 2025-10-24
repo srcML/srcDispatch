@@ -111,8 +111,8 @@ namespace srcDispatch {
             if(!depth) {
                 depth = ctx.depth;
                 data = BlockData{};
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber   = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition   = ctx.endPosition;
             } else {
                 if(!blockPolicy)
                     blockPolicy = make_unique_policy<BlockPolicy>({this});

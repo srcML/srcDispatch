@@ -43,8 +43,8 @@ namespace srcDispatch {
 
     std::shared_ptr<ExpressionData> ExpressionData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<ExpressionData> data = std::make_shared<ExpressionData>();
-        data->startLineNumber = startLineNumber;
-        data->endLineNumber   = endLineNumber;
+        data->startPosition = startPosition;
+        data->endPosition   = endPosition;
 
         for (const DeltaElement<std::any>& item : expr) {
             DeltaElement<std::any> exprAny;
@@ -92,8 +92,8 @@ namespace srcDispatch {
 
             depth = ctx.depth;
             data = ExpressionData{};
-            data.startLineNumber = ctx.startLineNumber;
-            data.endLineNumber   = ctx.endLineNumber;
+            data.startPosition = ctx.startPosition;
+            data.endPosition   = ctx.endPosition;
             CollectNameHandlers();
             CollectCallHandlers();
             CollectOperatorHandlers();

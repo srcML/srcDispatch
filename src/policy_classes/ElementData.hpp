@@ -9,14 +9,16 @@
 #ifndef INCLUDED_ELEMENT_DATA_HPP
 #define INCLUDED_ELEMENT_DATA_HPP
 
+#include <Position.hpp>
+
 namespace srcDispatch {
 
     struct ElementData {
 
-        DeltaElement<unsigned int> startLineNumber;
-        DeltaElement<unsigned int> endLineNumber;
+        DeltaElement<Position> startPosition;
+        DeltaElement<Position> endPosition;
 
-        ElementData() : startLineNumber(0), endLineNumber(0) {
+        ElementData() : startPosition(), endPosition() {
         }
 
         virtual ~ElementData() {

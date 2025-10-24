@@ -47,8 +47,8 @@ namespace srcDispatch {
 
     std::shared_ptr<GenericArgumentsData> GenericArgumentsData::copyAs(DiffOperation operation) const {
         std::shared_ptr<GenericArgumentsData> data = std::make_shared<GenericArgumentsData>();
-        data->startLineNumber = startLineNumber;
-        data->endLineNumber   = endLineNumber;
+        data->startPosition = startPosition;
+        data->endPosition   = endPosition;
 
         for (const DeltaElement<std::shared_ptr<ExpressionData>>& argument : arguments) {
             data->arguments.emplace_back(DeltaElement(operation, argument.GetElement()->copyAs(operation)));
@@ -87,8 +87,8 @@ namespace srcDispatch {
 
             depth = ctx.depth;
             data = GenericArgumentsData{};
-            data.startLineNumber = ctx.startLineNumber;
-            data.endLineNumber   = ctx.endLineNumber;
+            data.startPosition = ctx.startPosition;
+            data.endPosition   = ctx.endPosition;
             CollectArgumentHandler();
         };
 

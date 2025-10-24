@@ -76,10 +76,11 @@ namespace srcDispatch {
                   dispatcher(dispatcher),
                   elementStack(elementStack),
                   diffStack{COMMON},
-                  startLineNumber(0),
-                  endLineNumber(0),
-                  triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   depth(0),
+                  genericDepth(),
+                  startPosition(),
+                  endPosition(),
+                  triggerField(std::vector<unsigned short int>(MAXENUMVALUE, 0)),
                   isArchive(false),
                   isPrev(false),
                   isOperator(false),
@@ -96,17 +97,23 @@ namespace srcDispatch {
             xmlBufferPtr archiveBuffer;
 
             EventDispatcher * dispatcher;
+
             const std::vector<std::string>& elementStack;
             std::vector<Diff>               diffStack;
-            std::vector<unsigned int>  genericDepth;
-            DeltaElement<unsigned int> startLineNumber;
-            DeltaElement<unsigned int> endLineNumber;
+
+            std::size_t depth;
+            std::vector<unsigned int> genericDepth;
+
+            DeltaElement<Position> startPosition;
+            DeltaElement<Position> endPosition;
+
             std::vector<unsigned short int> triggerField;
             std::string currentFilePath, currentFileName, currentFileLanguage, currentsrcMLRevision,
                         currentTag, currentToken, currentAttributeName, currentAttributeValue,
                         currentClassName, currentFileChecksum;
-            std::vector<std::string> currentNamespaces;
-            std::size_t depth;
+
+            std::vector<std::string>  currentNamespaces;
+
             std::map<std::string, std::string> attributes;
             bool isArchive, isPrev, isOperator, isPseudo, endArchive;
 

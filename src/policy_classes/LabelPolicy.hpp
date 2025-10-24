@@ -78,8 +78,8 @@ namespace srcDispatch {
 
                 depth = ctx.depth;
                 data = LabelData{};
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber   = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition   = ctx.endPosition;
                 CollectNameHandlers();
             };
 

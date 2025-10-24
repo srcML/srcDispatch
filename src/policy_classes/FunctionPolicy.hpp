@@ -189,8 +189,8 @@ namespace srcDispatch {
                 depth = ctx.depth;
                 data = FunctionData{};
                 data.namespaces = ctx.currentNamespaces;
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber   = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition   = ctx.endPosition;
                 data.language = ctx.currentFileLanguage;
                 data.filename = ctx.currentFilePath;
 

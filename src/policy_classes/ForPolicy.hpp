@@ -87,8 +87,8 @@ namespace srcDispatch {
 
                 depth = ctx.depth;
                 data = ForData{};
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition = ctx.endPosition;
                 CollectControlHandlers();
                 CollectBlockHandlers();
             };

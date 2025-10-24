@@ -16,10 +16,11 @@ namespace srcDispatch {
 Position::Position() : line(0), column(0) {
 }
 
-Position::Position(const std::string& posStr) {
+Position::Position(const std::string& posStr) : Position() {
 
    int colonPos = posStr.find(':');
-   assert(colonPos != std::string::npos);
+   if(colonPos == std::string::npos) return;
+
    line   = std::stoi(posStr.substr(0, colonPos));
    column = std::stoi(posStr.substr(colonPos + 1));
 

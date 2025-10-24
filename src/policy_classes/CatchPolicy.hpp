@@ -77,8 +77,8 @@ namespace srcDispatch {
 
                 depth = ctx.depth;
                 data = CatchData{};
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber   = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition   = ctx.endPosition;
                 CollectParametersHandlers();
                 CollectBlockHandlers();
             };

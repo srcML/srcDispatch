@@ -46,8 +46,8 @@ namespace srcDispatch {
 
     std::shared_ptr<TypeData> TypeData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<TypeData> data = std::make_shared<TypeData>();
-        data->startLineNumber = startLineNumber;
-        data->endLineNumber   = endLineNumber;
+        data->startPosition = startPosition;
+        data->endPosition   = endPosition;
 
         for(const std::pair<DeltaElement<std::any>, DeltaElement<TypeType>>& type : types) {
             DeltaElement<std::any> typeAny;
@@ -86,8 +86,8 @@ namespace srcDispatch {
 
             depth = ctx.depth;
             data = TypeData{};
-            data.startLineNumber = ctx.startLineNumber;
-            data.endLineNumber   = ctx.endLineNumber;
+            data.startPosition = ctx.startPosition;
+            data.endPosition   = ctx.endPosition;
             CollectNamesHandler();
             CollectModifersHandler();
             CollectSpecifiersHandler();

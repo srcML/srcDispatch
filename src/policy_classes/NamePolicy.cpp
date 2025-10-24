@@ -57,8 +57,8 @@ namespace srcDispatch {
 
     std::shared_ptr<NameData> NameData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<NameData> data = std::make_shared<NameData>();
-        data->startLineNumber = startLineNumber;
-        data->endLineNumber   = endLineNumber;
+        data->startPosition = startPosition;
+        data->endPosition   = endPosition;
 
         if(name) {
             data->name = DeltaElement<std::string>(operation, name.GetElement());
@@ -111,8 +111,8 @@ namespace srcDispatch {
             if(!depth) {
                 depth = ctx.depth;
                 data = NameData{};
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber   = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition   = ctx.endPosition;
                 CollectOperatorsHandlers();
                 CollectGenericArgumentsHandlers();
                 CollectArrayIndicesHandlers();

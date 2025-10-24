@@ -89,8 +89,8 @@ namespace srcDispatch {
 
                 depth = ctx.depth;
                 data = IfStmtData{};
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition = ctx.endPosition;
                 CollectIfHandlers();
                 CollectElseIfHandlers();
                 CollectElseHandlers();

@@ -155,8 +155,8 @@ namespace srcDispatch {
                     depth = ctx.depth;
                     data = ClassData{};
                     data.namespaces = ctx.currentNamespaces;
-                    data.startLineNumber = ctx.startLineNumber;
-                    data.endLineNumber   = ctx.endLineNumber;
+                    data.startPosition = ctx.startPosition;
+                    data.endPosition   = ctx.endPosition;
                     data.accessSpecifier = NULL_ACCESS;
                     std::map<std::string, std::string>::const_iterator stereotype_attr_itr = ctx.attributes.find("stereotype");
                     if(stereotype_attr_itr != ctx.attributes.end()) {

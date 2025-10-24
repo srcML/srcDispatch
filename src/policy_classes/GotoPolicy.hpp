@@ -74,8 +74,8 @@ namespace srcDispatch {
 
                 depth = ctx.depth;
                 data = GotoData{};
-                data.startLineNumber = ctx.startLineNumber;
-                data.endLineNumber   = ctx.endLineNumber;
+                data.startPosition = ctx.startPosition;
+                data.endPosition   = ctx.endPosition;
 
                 if(ctx.currentTag == "break") {
                     data.type.Update(ctx.diffStack.back().operation, GotoData::BREAK);

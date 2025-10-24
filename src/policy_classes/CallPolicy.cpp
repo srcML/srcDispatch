@@ -43,8 +43,8 @@ namespace srcDispatch {
 
     std::shared_ptr<CallData> CallData::copyAs(srcDispatch::DiffOperation operation) const {
         std::shared_ptr<CallData> data = std::make_shared<CallData>();
-        data->startLineNumber = startLineNumber;
-        data->endLineNumber   = endLineNumber;
+        data->startPosition = startPosition;
+        data->endPosition   = endPosition;
 
         data->name = name.GetElement()->copyAs(operation);
 
@@ -80,8 +80,8 @@ namespace srcDispatch {
 
             depth = ctx.depth;
             data = CallData{};
-            data.startLineNumber = ctx.startLineNumber;
-            data.endLineNumber   = ctx.endLineNumber;
+            data.startPosition = ctx.startPosition;
+            data.endPosition   = ctx.endPosition;
             CollectNameHandlers();
             CollectCallArgumentHandlers();
         };
