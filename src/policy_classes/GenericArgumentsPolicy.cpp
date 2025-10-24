@@ -15,7 +15,7 @@
 
 namespace srcDispatch {
 
-    std::string GenericArgumentsData::ToString(srcDispatch::DiffOperation operation) const {
+    std::string GenericArgumentsData::ToString(DiffOperation operation) const {
 
         std::string str;
 
@@ -45,7 +45,7 @@ namespace srcDispatch {
         return str;
     }
 
-    std::shared_ptr<GenericArgumentsData> GenericArgumentsData::copyAs(srcDispatch::DiffOperation operation) const {
+    std::shared_ptr<GenericArgumentsData> GenericArgumentsData::copyAs(DiffOperation operation) const {
         std::shared_ptr<GenericArgumentsData> data = std::make_shared<GenericArgumentsData>();
         data->startLineNumber = startLineNumber;
         data->endLineNumber   = endLineNumber;

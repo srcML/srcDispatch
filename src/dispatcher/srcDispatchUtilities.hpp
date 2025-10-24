@@ -33,6 +33,7 @@
 
 #include <Diff.hpp>
 #include <DeltaElement.hpp>
+#include <Position.hpp>
 
 #include <libxml/xmlwriter.h>
 #include <srcSAXHandler.hpp>

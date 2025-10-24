@@ -27,12 +27,12 @@ namespace srcDispatch {
 
         std::vector<DeltaElement<std::shared_ptr<ExpressionData>>> arguments;
 
-        std::shared_ptr<GenericArgumentsData> copyAs(srcDispatch::DiffOperation operation) const;
+        std::shared_ptr<GenericArgumentsData> copyAs(DiffOperation operation) const;
 
         template<class type>
         friend class DeltaElement;
     private:
-        std::string ToString(srcDispatch::DiffOperation operation) const;
+        std::string ToString(DiffOperation operation) const;
     };
 
     class GenericArgumentsPolicy :
