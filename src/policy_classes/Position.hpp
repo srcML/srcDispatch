@@ -19,6 +19,9 @@ public:
     Position();
     Position(const std::string& posStr);
 
+    std::size_t GetLine() const;
+    std::size_t GetColumn() const;
+
     bool operator==(const Position& that);
     std::string ToString() const;
 private:

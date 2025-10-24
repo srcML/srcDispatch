@@ -26,6 +26,14 @@ Position::Position(const std::string& posStr) : Position() {
 
 }
 
+std::size_t Position::GetLine() const {
+   return line;
+}
+
+std::size_t Position::GetColumn() const {
+   return column;
+}
+
 bool Position::operator==(const Position& that) {
    return line == that.line && column == that.column;
 
