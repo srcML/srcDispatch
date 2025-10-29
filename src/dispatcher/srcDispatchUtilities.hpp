@@ -50,7 +50,7 @@ namespace srcDispatch {
         destructordecl, destructor, argument, index, block, type, typeprev, init, op, literal, 
         modifier, memberlist, classn, structn, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,
         preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, switchstmt, switchcase, specifier, throws, 
-        typedefexpr, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
+        typedefdecl, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
         trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt,
 
         // preprocessor

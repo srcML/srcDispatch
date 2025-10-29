@@ -396,8 +396,8 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::type, ElementState::open);
                 } },
                 { "typedef", [this]() {
-                    ++ctx.triggerField[ParserState::typedefexpr]; 
-                    DispatchEvent(ParserState::typedefexpr, ElementState::open);
+                    ++ctx.triggerField[ParserState::typedefdecl]; 
+                    DispatchEvent(ParserState::typedefdecl, ElementState::open);
                 } },          
                 { "expr", [this]() {
                     ++ctx.triggerField[ParserState::expr];
@@ -699,8 +699,8 @@ namespace srcDispatch {
                     --ctx.triggerField[ParserState::type];
                 } },
                 { "typedef", [this]() {
-                    DispatchEvent(ParserState::typedefexpr, ElementState::close);
-                    --ctx.triggerField[ParserState::typedefexpr]; 
+                    DispatchEvent(ParserState::typedefdecl, ElementState::close);
+                    --ctx.triggerField[ParserState::typedefdecl]; 
                 } },    
                 { "expr", [this]() {
                     DispatchEvent(ParserState::expr, ElementState::close);
