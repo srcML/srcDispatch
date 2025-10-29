@@ -39,6 +39,19 @@ namespace srcDispatch {
     private:
         std::string ToString(srcDispatch::DiffOperation operation) const {
             std::string str;
+            if(type) {
+                str += type.ToString(operation);
+            }
+
+            if(functionDecl) {
+                str += functionDecl.ToString(operation);
+            }
+
+            if(name) {
+                str += ' ';
+                str += name.ToString(operation);
+            }
+
             return str;
         }
     };
