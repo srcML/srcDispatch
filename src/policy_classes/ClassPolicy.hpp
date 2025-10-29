@@ -63,6 +63,21 @@ namespace srcDispatch {
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>    innerClasses;
 
         DeltaElement<bool> isAbstract;
+
+        template<class type>
+        friend class DeltaElement;
+    private:
+        std::string ToString(srcDispatch::DiffOperation operation) const {
+            std::string str;
+
+            if(name && name.IsOfOperation(operation)) {
+                str = type == CLASS? "class " : "struct "; 
+            }
+
+            str += name.ToString(operation);
+
+            return str;
+        }
     };
 
     struct ParentData {

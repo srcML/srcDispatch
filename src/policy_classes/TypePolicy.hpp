@@ -22,9 +22,10 @@
 namespace srcDispatch {
 
     class NamePolicy;
+    class ClassPolicy;
 
     struct TypeData : public ElementData {
-        enum TypeType : int { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, NONE };
+        enum TypeType : int { TYPENAME, POINTER, REFERENCE, RVALUE, SPECIFIER, CLASS, NONE };
 
         std::vector<std::pair<DeltaElement<std::any>, DeltaElement<TypeType>>> types;
 
@@ -45,6 +46,7 @@ namespace srcDispatch {
         TypeData data;
 
         std::unique_ptr<NamePolicy> namePolicy;
+        std::unique_ptr<ClassPolicy> classPolicy;
 
     public:
         TypePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
@@ -58,6 +60,7 @@ namespace srcDispatch {
     private:
         void InitializeTypePolicyHandlers();
         void CollectNamesHandler();
+        void CollectClassHandler();
         void CollectModifersHandler();
         void CollectSpecifiersHandler();
     };

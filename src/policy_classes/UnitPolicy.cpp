@@ -110,7 +110,7 @@ void UnitPolicy::InitializeTypeDefHandlers() {
 }
 
 void UnitPolicy::InitializeFunctionHandlers() {
-    std::function<void(srcDispatch::srcSAXEventContext& )> startFunction = [this](srcSAXEventContext& ctx) {
+    std::function<void(srcDispatch::srcSAXEventContext&)> startFunction = [this](srcSAXEventContext& ctx) {
         if(depth == MAX_DEPTH) return;
 
         if(!functionPolicy) {
@@ -127,7 +127,7 @@ void UnitPolicy::InitializeFunctionHandlers() {
     openEventMap[ParserState::destructordecl]  = startFunction;
 
     // end of policy
-    std::function<void(srcDispatch::srcSAXEventContext& )> endFunction = [](srcSAXEventContext& ctx) {};
+    std::function<void(srcDispatch::srcSAXEventContext&)> endFunction = [](srcSAXEventContext& ctx) {};
 
     closeEventMap[ParserState::function]        = endFunction;
     closeEventMap[ParserState::functiondecl]    = endFunction;
@@ -140,7 +140,7 @@ void UnitPolicy::InitializeFunctionHandlers() {
 void UnitPolicy::InitializeClassHandlers() {
     using namespace srcDispatch;
 
-    std::function<void(srcDispatch::srcSAXEventContext& )> startClassPolicy = [this](srcSAXEventContext& ctx) {
+    std::function<void(srcDispatch::srcSAXEventContext&)> startClassPolicy = [this](srcSAXEventContext& ctx) {
         if(depth == MAX_DEPTH) return;
 
         if(!classPolicy) {
@@ -153,7 +153,7 @@ void UnitPolicy::InitializeClassHandlers() {
     openEventMap[ParserState::structn] = startClassPolicy;
 
     // end of policy
-    std::function<void(srcDispatch::srcSAXEventContext& )> endClassPolicy = [](srcSAXEventContext& ctx) {};
+    std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [](srcSAXEventContext& ctx) {};
 
     closeEventMap[ParserState::classn]  = endClassPolicy;
     closeEventMap[ParserState::structn] = endClassPolicy;

@@ -7,8 +7,11 @@
  * This file is part of the Dispatch Infrastructure.
  */
 
-#include <ExpressionPolicy.hpp>
 #include <TypePolicy.hpp>
+
+#include <ExpressionPolicy.hpp>
+#include <ClassPolicy.hpp>
+
 #include <srcDispatchUtilities.hpp>
 #include <DeltaElement.hpp>
 
@@ -38,6 +41,8 @@ namespace srcDispatch {
                 str += type.first.ToString<std::shared_ptr<std::string>>(operation);
             } else if(outputsType == TypeData::TYPENAME) {
                 str += type.first.ToString<std::shared_ptr<NameData>>(operation);
+            } else if(outputsType == TypeData::CLASS) {
+                str += type.first.ToString<std::shared_ptr<ClassData>>(operation);
             }
 
         }
@@ -55,6 +60,9 @@ namespace srcDispatch {
                 typeAny = DeltaElement<std::any>(operation, std::any_cast<std::shared_ptr<std::string>>(type.first));
             } else if(type.second.GetElement() == TypeData::TYPENAME) {
                 typeAny = DeltaElement<std::any>(operation, std::any_cast<std::shared_ptr<NameData>>(type.first.GetElement())->copyAs(operation));
+            } else if(type.second.GetElement() == TypeData::CLASS) {
+                std::cerr << "IMPLEMENT CLASS copyAs()\n";
+                // typeAny = DeltaElement<std::any>(operation, std::any_cast<std::shared_ptr<ClassData>>(type.first.GetElement())->copyAs(operation));
             }
             data->types.emplace_back(typeAny, DeltaElement(operation, type.second.GetElement()));
         }
@@ -70,7 +78,13 @@ namespace srcDispatch {
     TypePolicy::~TypePolicy() {}
 
     void TypePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
-        data.types.push_back(std::make_pair(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<NameData>()), DeltaElement(ctx.diffStack.back().operation, TypeData::TYPENAME)));
+        if(typeid(NamePolicy) == typeid(*policy)) {
+            data.types.push_back(std::make_pair(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<NameData>()), DeltaElement(ctx.diffStack.back().operation, TypeData::TYPENAME)));
+        } else if(typeid(ClassPolicy) == typeid(*policy)) {
+            data.types.push_back(std::make_pair(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<ClassData>()), DeltaElement(ctx.diffStack.back().operation, TypeData::CLASS)));
+        } else {
+            throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
+        }
         ctx.dispatcher->RemoveListenerDispatch(nullptr);
     }
 
@@ -89,6 +103,7 @@ namespace srcDispatch {
             data.startPosition = ctx.startPosition;
             data.endPosition   = ctx.endPosition;
             CollectNamesHandler();
+            CollectClassHandler();
             CollectModifersHandler();
             CollectSpecifiersHandler();
         };
@@ -113,6 +128,23 @@ namespace srcDispatch {
             }
             ctx.dispatcher->AddListenerDispatch(namePolicy.get());
         };
+    }
+
+    void TypePolicy::CollectClassHandler() {
+        using namespace srcDispatch;
+    
+        std::function<void(srcDispatch::srcSAXEventContext&)> startClassPolicy = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!classPolicy) {
+                classPolicy = make_unique_policy<ClassPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(classPolicy.get());
+        };
+
+        openEventMap[ParserState::classn]  = startClassPolicy;
+        openEventMap[ParserState::structn] = startClassPolicy;
+
     }
 
     void TypePolicy::CollectModifersHandler() {
