@@ -36,6 +36,8 @@ namespace srcDispatch {
     void BlockPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
         if(typeid(DeclStmtPolicy) == typeid(*policy)) {
             data.statements.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
+        } else if(typeid(TypeDefPolicy) == typeid(*policy)) {
+            data.statements.emplace_back(ctx.diffStack.back().operation, policy->Data<TypeDefData>());
         } else if(typeid(ExprStmtPolicy) == typeid(*policy)) {
             data.statements.emplace_back(ctx.diffStack.back().operation, policy->Data<ExprStmtData>());
         } else if(typeid(ReturnPolicy) == typeid(*policy)) {

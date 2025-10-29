@@ -134,6 +134,8 @@ namespace srcDispatch {
                 } else {
                     data.methods.emplace_back(ctx.diffStack.back().operation, f_data);
                 }
+            } else if(typeid(TypeDefPolicy) == typeid(*policy)) {
+                data.typedefs.emplace_back(ctx.diffStack.back().operation, policy->Data<TypeDefData>());
             } else if(typeid(ClassPolicy) == typeid(*policy)) {
                 srcDispatch::DiffOperation operation = ctx.diffStack.back().isConvert? srcDispatch::COMMON : ctx.diffStack.back().operation;
                 data.innerClasses.emplace_back(operation, policy->Data<ClassData>());
