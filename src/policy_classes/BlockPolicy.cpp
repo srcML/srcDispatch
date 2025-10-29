@@ -77,7 +77,8 @@ namespace srcDispatch {
         using namespace srcDispatch;
 
         CollectBlockHandlers();
-        CollectDeclstmtHandlers();
+        CollectDeclStmtHandlers();
+        CollectTypeDefHandlers();
         CollectExpressionHandlers();
         CollectReturnHandlers();
         CollectIfStmtHandlers();
@@ -129,7 +130,7 @@ namespace srcDispatch {
         };
     }
 
-    void BlockPolicy::CollectDeclstmtHandlers() {
+    void BlockPolicy::CollectDeclStmtHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
@@ -147,6 +148,18 @@ namespace srcDispatch {
             if(plexer) {
                 plexer.reset();
             }
+        };
+    }
+
+    void BlockPolicy::CollectTypeDefHandlers() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::typedefdecl] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!typeDefPolicy) {
+                typeDefPolicy = make_unique_policy<TypeDefPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(typeDefPolicy.get());
         };
     }
 

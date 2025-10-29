@@ -32,11 +32,13 @@ void UnitPolicy::Notify(const srcDispatch::PolicyDispatcher* policy,
         data.includes.emplace_back(ctx.diffStack.back().operation, policy->Data<IncludeData>());
     } else if(typeid(DeclStmtPolicy) == typeid(*policy)) {
         data.declStmts.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
+    } else if(typeid(TypeDefPolicy) == typeid(*policy)) {
+        data.typedefs.emplace_back(ctx.diffStack.back().operation, policy->Data<TypeDefData>());
+    } else if(typeid(FunctionPolicy) == typeid(*policy)) {
+        data.functions.emplace_back(ctx.diffStack.back().operation, policy->Data<FunctionData>());
     } else if(typeid(ClassPolicy) == typeid(*policy)) {
         srcDispatch::DiffOperation operation = ctx.diffStack.back().isConvert? srcDispatch::COMMON : ctx.diffStack.back().operation;
         data.classes.emplace_back(operation, policy->Data<ClassData>());
-    } else if(typeid(FunctionPolicy) == typeid(*policy)) {
-        data.functions.emplace_back(ctx.diffStack.back().operation, policy->Data<FunctionData>());
     }
     ctx.dispatcher->RemoveListenerDispatch(nullptr);
 }
@@ -52,6 +54,7 @@ void UnitPolicy::InitializeUnitPolicyHandlers() {
             data.endPosition   = ctx.endPosition;
 
             InitializeIncludeHandlers();
+            InitializeTypeDefHandlers();
             InitializeDeclStmtHandlers();
             InitializeClassHandlers();
             InitializeFunctionHandlers();
@@ -93,26 +96,17 @@ void UnitPolicy::InitializeDeclStmtHandlers() {
     closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {};
 }
 
-void UnitPolicy::InitializeClassHandlers() {
-    using namespace srcDispatch;
-
-    std::function<void(srcDispatch::srcSAXEventContext& )> startClassPolicy = [this](srcSAXEventContext& ctx) {
+void UnitPolicy::InitializeTypeDefHandlers() {
+    openEventMap[ParserState::typedefdecl] = [this](srcSAXEventContext& ctx) {
         if(depth == MAX_DEPTH) return;
 
-        if(!classPolicy) {
-            classPolicy = make_unique_policy<ClassPolicy>({this});
+        if(!typeDefPolicy) {
+            typeDefPolicy = make_unique_policy<TypeDefPolicy>({this});
         }
-        ctx.dispatcher->AddListenerDispatch(classPolicy.get());
+        ctx.dispatcher->AddListenerDispatch(typeDefPolicy.get());
     };
 
-    openEventMap[ParserState::classn]  = startClassPolicy;
-    openEventMap[ParserState::structn] = startClassPolicy;
-
-    // end of policy
-    std::function<void(srcDispatch::srcSAXEventContext& )> endClassPolicy = [](srcSAXEventContext& ctx) {};
-
-    closeEventMap[ParserState::classn]  = endClassPolicy;
-    closeEventMap[ParserState::structn] = endClassPolicy;
+    closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {};
 }
 
 void UnitPolicy::InitializeFunctionHandlers() {
@@ -141,6 +135,28 @@ void UnitPolicy::InitializeFunctionHandlers() {
     closeEventMap[ParserState::constructordecl] = endFunction;
     closeEventMap[ParserState::destructor]      = endFunction;
     closeEventMap[ParserState::destructordecl]  = endFunction;
+}
+
+void UnitPolicy::InitializeClassHandlers() {
+    using namespace srcDispatch;
+
+    std::function<void(srcDispatch::srcSAXEventContext& )> startClassPolicy = [this](srcSAXEventContext& ctx) {
+        if(depth == MAX_DEPTH) return;
+
+        if(!classPolicy) {
+            classPolicy = make_unique_policy<ClassPolicy>({this});
+        }
+        ctx.dispatcher->AddListenerDispatch(classPolicy.get());
+    };
+
+    openEventMap[ParserState::classn]  = startClassPolicy;
+    openEventMap[ParserState::structn] = startClassPolicy;
+
+    // end of policy
+    std::function<void(srcDispatch::srcSAXEventContext& )> endClassPolicy = [](srcSAXEventContext& ctx) {};
+
+    closeEventMap[ParserState::classn]  = endClassPolicy;
+    closeEventMap[ParserState::structn] = endClassPolicy;
 }
 
 }
