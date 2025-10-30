@@ -16,7 +16,7 @@
 #include <DeltaElement.hpp>
 
 #include <DeclStmtPolicy.hpp>
-#include <TypeDefPolicy.hpp>
+#include <TypedefPolicy.hpp>
 #include <ExprStmtPolicy.hpp>
 #include <ReturnPolicy.hpp>
 #include <ThrowPolicy.hpp>
@@ -65,7 +65,7 @@ namespace srcDispatch {
         std::unique_ptr<BlockPolicy>    blockPolicy;
 
         std::unique_ptr<DeclStmtPolicy> declstmtPolicy;
-        std::unique_ptr<TypeDefPolicy>  typeDefPolicy;
+        std::unique_ptr<TypedefPolicy>  typedefPolicy;
         std::unique_ptr<ExprStmtPolicy> exprStmtPolicy;
         std::unique_ptr<ReturnPolicy>   returnPolicy;
 
@@ -103,7 +103,7 @@ namespace srcDispatch {
 
         void CollectBlockHandlers();
         void CollectDeclStmtHandlers();
-        void CollectTypeDefHandlers();
+        void CollectTypedefHandlers();
         void CollectExpressionHandlers();
         void CollectReturnHandlers();
         void CollectIfStmtHandlers();

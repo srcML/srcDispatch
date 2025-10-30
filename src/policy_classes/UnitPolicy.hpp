@@ -24,7 +24,7 @@
 #include <DeclStmtPolicy.hpp>
 #include <FunctionPolicy.hpp>
 #include <ClassPolicy.hpp>
-#include <TypeDefPolicy.hpp>
+#include <TypedefPolicy.hpp>
 
 namespace srcDispatch {
 
@@ -33,7 +33,7 @@ namespace srcDispatch {
         std::vector<DeltaElement<std::shared_ptr<IncludeData>>> includes;
 
         std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>> declStmts;
-        std::vector<DeltaElement<std::shared_ptr<TypeDefData>>>  typedefs;
+        std::vector<DeltaElement<std::shared_ptr<TypedefData>>>  typedefs;
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>    classes;
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> functions;
 
@@ -52,7 +52,7 @@ namespace srcDispatch {
 
         std::unique_ptr<IncludePolicy>  includePolicy;
         std::unique_ptr<DeclStmtPolicy> declStmtPolicy;
-        std::unique_ptr<TypeDefPolicy>  typeDefPolicy;
+        std::unique_ptr<TypedefPolicy>  typedefPolicy;
         std::unique_ptr<FunctionPolicy> functionPolicy;
         std::unique_ptr<ClassPolicy>    classPolicy;
 
@@ -77,7 +77,7 @@ namespace srcDispatch {
 
         void InitializeIncludeHandlers();
         void InitializeDeclStmtHandlers();
-        void InitializeTypeDefHandlers();
+        void InitializeTypedefHandlers();
         void InitializeFunctionHandlers();
         void InitializeClassHandlers();
 

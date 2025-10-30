@@ -36,8 +36,8 @@ namespace srcDispatch {
     void BlockPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
         if(typeid(DeclStmtPolicy) == typeid(*policy)) {
             data.statements.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
-        } else if(typeid(TypeDefPolicy) == typeid(*policy)) {
-            data.statements.emplace_back(ctx.diffStack.back().operation, policy->Data<TypeDefData>());
+        } else if(typeid(TypedefPolicy) == typeid(*policy)) {
+            data.statements.emplace_back(ctx.diffStack.back().operation, policy->Data<TypedefData>());
         } else if(typeid(ExprStmtPolicy) == typeid(*policy)) {
             data.statements.emplace_back(ctx.diffStack.back().operation, policy->Data<ExprStmtData>());
         } else if(typeid(ReturnPolicy) == typeid(*policy)) {
@@ -80,7 +80,7 @@ namespace srcDispatch {
 
         CollectBlockHandlers();
         CollectDeclStmtHandlers();
-        CollectTypeDefHandlers();
+        CollectTypedefHandlers();
         CollectExpressionHandlers();
         CollectReturnHandlers();
         CollectIfStmtHandlers();
@@ -153,15 +153,15 @@ namespace srcDispatch {
         };
     }
 
-    void BlockPolicy::CollectTypeDefHandlers() {
+    void BlockPolicy::CollectTypedefHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::typedefdecl] = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
 
-            if(!typeDefPolicy) {
-                typeDefPolicy = make_unique_policy<TypeDefPolicy>({this});
+            if(!typedefPolicy) {
+                typedefPolicy = make_unique_policy<TypedefPolicy>({this});
             }
-            ctx.dispatcher->AddListenerDispatch(typeDefPolicy.get());
+            ctx.dispatcher->AddListenerDispatch(typedefPolicy.get());
         };
     }
 

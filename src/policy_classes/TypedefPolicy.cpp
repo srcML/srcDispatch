@@ -1,28 +1,28 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file TypeDefPolicy.cpp
+ * @file TypedefPolicy.cpp
  *
  * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  */
 
-#include <TypeDefPolicy.hpp>
+#include <TypedefPolicy.hpp>
 
 #include <FunctionPolicy.hpp>
 
 namespace srcDispatch {
 
-TypeDefPolicy::TypeDefPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+TypedefPolicy::TypedefPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
     : srcDispatch::PolicyDispatcher(listeners), data{} {
-    InitializeTypeDefPolicyHandlers();
+    InitializeTypedefPolicyHandlers();
 }
 
-TypeDefPolicy::~TypeDefPolicy() {}
+TypedefPolicy::~TypedefPolicy() {}
 
-std::any TypeDefPolicy::DataInner() const { return std::make_shared<TypeDefData>(data); }
+std::any TypedefPolicy::DataInner() const { return std::make_shared<TypedefData>(data); }
 
-void TypeDefPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
+void TypedefPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
     if(typeid(TypePolicy) == typeid(*policy)) {
         data.type = DeltaElement(ctx.diffStack.back().operation, policy->Data<TypeData>());
     } else if(typeid(NamePolicy) == typeid(*policy)) {
@@ -35,9 +35,9 @@ void TypeDefPolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::sr
     ctx.dispatcher->RemoveListener(nullptr);
 }
 
-void TypeDefPolicy::NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) {}
+void TypedefPolicy::NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) {}
 
-void TypeDefPolicy::InitializeTypeDefPolicyHandlers() {
+void TypedefPolicy::InitializeTypedefPolicyHandlers() {
     using namespace srcDispatch;
 
     // start of policy
@@ -45,7 +45,7 @@ void TypeDefPolicy::InitializeTypeDefPolicyHandlers() {
         if(depth) return;
 
         depth = ctx.depth;
-        data = TypeDefData{};
+        data = TypedefData{};
         data.startPosition = ctx.startPosition;
         data.endPosition   = ctx.endPosition;                    
         CollectTypeHandlers(ctx);
@@ -59,12 +59,12 @@ void TypeDefPolicy::InitializeTypeDefPolicyHandlers() {
 
         depth = 0;
         NotifyAll(ctx);
-        data = TypeDefData{};
-        InitializeTypeDefPolicyHandlers();
+        data = TypedefData{};
+        InitializeTypedefPolicyHandlers();
     };
 }
 
-void TypeDefPolicy::CollectTypeHandlers(srcDispatch::srcSAXEventContext& ctx) {
+void TypedefPolicy::CollectTypeHandlers(srcDispatch::srcSAXEventContext& ctx) {
     using namespace srcDispatch;
 
     openEventMap[ParserState::type] = [this](srcSAXEventContext &ctx) {
@@ -77,7 +77,7 @@ void TypeDefPolicy::CollectTypeHandlers(srcDispatch::srcSAXEventContext& ctx) {
     };
 }
 
-void TypeDefPolicy::CollectNameHandlers(srcDispatch::srcSAXEventContext& ctx) {
+void TypedefPolicy::CollectNameHandlers(srcDispatch::srcSAXEventContext& ctx) {
     using namespace srcDispatch;
 
     openEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
@@ -90,7 +90,7 @@ void TypeDefPolicy::CollectNameHandlers(srcDispatch::srcSAXEventContext& ctx) {
     };
 }
 
-void TypeDefPolicy::CollectFunctionDeclHandlers(srcDispatch::srcSAXEventContext& ctx) {
+void TypedefPolicy::CollectFunctionDeclHandlers(srcDispatch::srcSAXEventContext& ctx) {
     using namespace srcDispatch;
 
     openEventMap[ParserState::functiondecl] = [this](srcSAXEventContext &ctx) {

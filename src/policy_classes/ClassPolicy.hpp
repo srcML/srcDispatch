@@ -20,7 +20,7 @@
 #include <NamePolicy.hpp>
 #include <DeclStmtPolicy.hpp>
 #include <FunctionPolicy.hpp>
-#include <TypeDefPolicy.hpp>
+#include <TypedefPolicy.hpp>
 
 #include <string>
 #include <vector>
@@ -59,7 +59,7 @@ namespace srcDispatch {
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> operators;
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>> methods;
 
-        std::vector<DeltaElement<std::shared_ptr<TypeDefData>>>  typedefs;
+        std::vector<DeltaElement<std::shared_ptr<TypedefData>>>  typedefs;
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>    innerClasses;
 
         DeltaElement<bool> isAbstract;
@@ -100,7 +100,7 @@ namespace srcDispatch {
         std::unique_ptr<NamePolicy>     namePolicy;
         std::unique_ptr<DeclStmtPolicy> declStmtPolicy;
         std::unique_ptr<FunctionPolicy> functionPolicy;
-        std::unique_ptr<TypeDefPolicy>  typeDefPolicy;
+        std::unique_ptr<TypedefPolicy>  typedefPolicy;
         std::unique_ptr<ClassPolicy>    classPolicy;
 
         static const std::unordered_map<srcDispatch::ParserState, ClassData::ClassType> stateToTypeMapper;
@@ -149,8 +149,8 @@ namespace srcDispatch {
                 } else {
                     data.methods.emplace_back(ctx.diffStack.back().operation, f_data);
                 }
-            } else if(typeid(TypeDefPolicy) == typeid(*policy)) {
-                data.typedefs.emplace_back(ctx.diffStack.back().operation, policy->Data<TypeDefData>());
+            } else if(typeid(TypedefPolicy) == typeid(*policy)) {
+                data.typedefs.emplace_back(ctx.diffStack.back().operation, policy->Data<TypedefData>());
             } else if(typeid(ClassPolicy) == typeid(*policy)) {
                 srcDispatch::DiffOperation operation = ctx.diffStack.back().isConvert? srcDispatch::COMMON : ctx.diffStack.back().operation;
                 data.innerClasses.emplace_back(operation, policy->Data<ClassData>());
@@ -328,10 +328,10 @@ namespace srcDispatch {
                 openEventMap[ParserState::destructordecl]  = functionEvent;
 
                 openEventMap[ParserState::typedefdecl] = [this](srcSAXEventContext& ctx) {
-                    if(!typeDefPolicy) {
-                        typeDefPolicy = make_unique_policy<TypeDefPolicy>({this});
+                    if(!typedefPolicy) {
+                        typedefPolicy = make_unique_policy<TypedefPolicy>({this});
                     }
-                    ctx.dispatcher->AddListenerDispatch(typeDefPolicy.get());
+                    ctx.dispatcher->AddListenerDispatch(typedefPolicy.get());
                 };
             };
 

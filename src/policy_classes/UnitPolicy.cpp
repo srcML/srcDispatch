@@ -32,8 +32,8 @@ void UnitPolicy::Notify(const srcDispatch::PolicyDispatcher* policy,
         data.includes.emplace_back(ctx.diffStack.back().operation, policy->Data<IncludeData>());
     } else if(typeid(DeclStmtPolicy) == typeid(*policy)) {
         data.declStmts.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclStmtData>());
-    } else if(typeid(TypeDefPolicy) == typeid(*policy)) {
-        data.typedefs.emplace_back(ctx.diffStack.back().operation, policy->Data<TypeDefData>());
+    } else if(typeid(TypedefPolicy) == typeid(*policy)) {
+        data.typedefs.emplace_back(ctx.diffStack.back().operation, policy->Data<TypedefData>());
     } else if(typeid(FunctionPolicy) == typeid(*policy)) {
         data.functions.emplace_back(ctx.diffStack.back().operation, policy->Data<FunctionData>());
     } else if(typeid(ClassPolicy) == typeid(*policy)) {
@@ -54,7 +54,7 @@ void UnitPolicy::InitializeUnitPolicyHandlers() {
             data.endPosition   = ctx.endPosition;
 
             InitializeIncludeHandlers();
-            InitializeTypeDefHandlers();
+            InitializeTypedefHandlers();
             InitializeDeclStmtHandlers();
             InitializeClassHandlers();
             InitializeFunctionHandlers();
@@ -96,14 +96,14 @@ void UnitPolicy::InitializeDeclStmtHandlers() {
     closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {};
 }
 
-void UnitPolicy::InitializeTypeDefHandlers() {
+void UnitPolicy::InitializeTypedefHandlers() {
     openEventMap[ParserState::typedefdecl] = [this](srcSAXEventContext& ctx) {
         if(depth == MAX_DEPTH) return;
 
-        if(!typeDefPolicy) {
-            typeDefPolicy = make_unique_policy<TypeDefPolicy>({this});
+        if(!typedefPolicy) {
+            typedefPolicy = make_unique_policy<TypedefPolicy>({this});
         }
-        ctx.dispatcher->AddListenerDispatch(typeDefPolicy.get());
+        ctx.dispatcher->AddListenerDispatch(typedefPolicy.get());
     };
 
     closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {};
