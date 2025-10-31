@@ -19,6 +19,11 @@
 #include <type_traits>
 #include <sstream>
 
+template<class type>
+struct IsSharedPtr : std::false_type {};
+
+template<class type>
+struct IsSharedPtr<std::shared_ptr<type>> : std::true_type {};
 
 template <class type>
 struct Value {
@@ -108,7 +113,7 @@ DeltaElement<type>::DeltaElement(srcDispatch::DiffOperation operation, const typ
 }
 template <class type>
 DeltaElement<type> DeltaElement<type>::copyAs(srcDispatch::DiffOperation operation) const {
-    if constexpr (std::is_same_v<type, std::shared_ptr<typename type::element_type>>) {
+    if constexpr (IsSharedPtr<type>::value) {
         return DeltaElement<type>(operation, std::make_shared(this->GetElement()->copyAs()));
     } else {
         return DeltaElement<type>(operation, this->GetElement()->copyAs());
@@ -207,7 +212,7 @@ type& DeltaElement<type>::GetElement() {
 
 template <class type>
 const auto DeltaElement<type>::operator->() const {
-    if constexpr (std::is_same_v<type, std::shared_ptr<typename type::element_type>>) {
+    if constexpr (IsSharedPtr<type>::value) {
         return &*GetElement();
     } else {
         return &GetElement();    
@@ -216,7 +221,7 @@ const auto DeltaElement<type>::operator->() const {
 
 template <class type>
 auto DeltaElement<type>::operator->() {
-    if constexpr (std::is_same_v<type, std::shared_ptr<typename type::element_type>> ) {
+    if constexpr (IsSharedPtr<type>::value) {
         return &*GetElement();
     } else {
         return &GetElement();    
