@@ -23,7 +23,7 @@ file(GLOB DISPATCHER_SOURCE dispatcher/*.cpp)
 file(GLOB DISPATCHER_HEADER dispatcher/*.hpp)
 
 file(GLOB POLICY_CLASSES_SOURCE policy_classes/*.cpp)
-file(GLOB POLICY_CLASSES_HEADER policy_classes/*.hpp)
+file(GLOB POLICY_CLASSES_HEADER policy_classes/*.hpp policy_classes/*.tcc)
 
 # find needed libraries
 find_package(LibXml2 REQUIRED)
