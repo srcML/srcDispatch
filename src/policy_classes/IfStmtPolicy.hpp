@@ -62,9 +62,9 @@ namespace srcDispatch {
         ~IfStmtPolicy() {}
 
     protected:
-        std::any DataInner() const { return std::make_shared<IfStmtData>(data); }
+        std::any DataInner() const override { return std::make_shared<IfStmtData>(data); }
 
-        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
+        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
             if(typeid(IfPolicy) == typeid(*policy)) {
                 data.clauses.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<IfData>()));
             } else if(typeid(ElseIfPolicy) == typeid(*policy)) {
@@ -78,7 +78,7 @@ namespace srcDispatch {
             ctx.dispatcher->RemoveListener(nullptr);
         }
 
-        void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) {} // doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
     private:
         void InitializeIfStmtPolicyHandlers() {

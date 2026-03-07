@@ -52,9 +52,9 @@ namespace srcDispatch {
         ~TryPolicy() {}
 
     protected:
-        std::any DataInner() const { return std::make_shared<TryData>(data); }
+        std::any DataInner() const override { return std::make_shared<TryData>(data); }
 
-        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
+        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
             if(typeid(BlockPolicy) == typeid(*policy)) {
                 data.block.Update(ctx.diffStack.back().operation, policy->Data<BlockData>());
             } else if(typeid(CatchPolicy) == typeid(*policy)) {
@@ -66,7 +66,7 @@ namespace srcDispatch {
             ctx.dispatcher->RemoveListener(nullptr);
         }
 
-        void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) {} // doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
     private:
         void InitializeTryPolicyHandlers() {

@@ -62,9 +62,9 @@ namespace srcDispatch {
         ~ForPolicy() {}
 
     protected:
-        std::any DataInner() const { return std::make_shared<ForData>(data); }
+        std::any DataInner() const override { return std::make_shared<ForData>(data); }
 
-        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {
+        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
             if(typeid(ControlPolicy) == typeid(*policy)) {
                 data.control = DeltaElement(ctx.diffStack.back().operation, policy->Data<ControlData>());
             } else if(typeid(BlockPolicy) == typeid(*policy)) {
@@ -76,7 +76,7 @@ namespace srcDispatch {
             ctx.dispatcher->RemoveListener(nullptr);
         }
 
-        void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx) {} // doesn't use other parsers
+        void NotifyWrite(const PolicyDispatcher* policy, srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
     private:
         void InitializeForPolicyHandlers() {

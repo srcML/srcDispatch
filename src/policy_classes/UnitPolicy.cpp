@@ -93,7 +93,7 @@ void UnitPolicy::InitializeDeclStmtHandlers() {
         ctx.dispatcher->AddListenerDispatch(declStmtPolicy.get());
     };
 
-    closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {};
+    closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx [[maybe_unused]]) {};
 }
 
 void UnitPolicy::InitializeTypedefHandlers() {
@@ -106,7 +106,7 @@ void UnitPolicy::InitializeTypedefHandlers() {
         ctx.dispatcher->AddListenerDispatch(typedefPolicy.get());
     };
 
-    closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx) {};
+    closeEventMap[ParserState::declstmt] = [](srcSAXEventContext& ctx [[maybe_unused]]) {};
 }
 
 void UnitPolicy::InitializeFunctionHandlers() {
@@ -127,7 +127,7 @@ void UnitPolicy::InitializeFunctionHandlers() {
     openEventMap[ParserState::destructordecl]  = startFunction;
 
     // end of policy
-    std::function<void(srcDispatch::srcSAXEventContext&)> endFunction = [](srcSAXEventContext& ctx) {};
+    std::function<void(srcDispatch::srcSAXEventContext&)> endFunction = [](srcSAXEventContext& ctx [[maybe_unused]]) {};
 
     closeEventMap[ParserState::function]        = endFunction;
     closeEventMap[ParserState::functiondecl]    = endFunction;
@@ -153,7 +153,7 @@ void UnitPolicy::InitializeClassHandlers() {
     openEventMap[ParserState::structn] = startClassPolicy;
 
     // end of policy
-    std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [](srcSAXEventContext& ctx) {};
+    std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [](srcSAXEventContext& ctx [[maybe_unused]]) {};
 
     closeEventMap[ParserState::classn]  = endClassPolicy;
     closeEventMap[ParserState::structn] = endClassPolicy;
