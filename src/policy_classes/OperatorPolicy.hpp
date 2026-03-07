@@ -58,7 +58,7 @@ namespace srcDispatch {
 
     protected:
         std::any DataInner() const override { return std::make_shared<OperatorData>(data); }
-        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
+        void Notify(const PolicyDispatcher* policy [[maybe_unused]], const srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
     private:
