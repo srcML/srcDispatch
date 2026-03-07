@@ -68,7 +68,7 @@ namespace srcDispatch {
             if(typeid(ControlPolicy) == typeid(*policy)) {
                 data.control = DeltaElement(ctx.diffStack.back().operation, policy->Data<ControlData>());
             } else if(typeid(BlockPolicy) == typeid(*policy)) {
-                data.block = DeltaElement(ctx.diffStack.back().operation, policy->Data<BlockData>());
+                data.block.Update(ctx.diffStack.back().operation, policy->Data<BlockData>());
             } else {
                 throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
             }

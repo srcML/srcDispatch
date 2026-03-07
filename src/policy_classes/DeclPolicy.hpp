@@ -270,7 +270,7 @@ namespace srcDispatch {
 
                 openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
                     openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
-                        if(!exprPolicy) {fprintf(stderr, "HERE: %s %s %d\n", __FILE__, __FUNCTION__, __LINE__);
+                        if(!exprPolicy) {
                             exprPolicy = make_unique_policy<ExpressionPolicy>({this});
                         }
                         ctx.dispatcher->AddListenerDispatch(exprPolicy.get());
