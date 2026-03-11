@@ -36,7 +36,9 @@ namespace srcDispatch {
                 str += std::string("#include ") + (isRelative.GetOfOperation(operation)? '"' : '<');
             }
 
-            str += path.ToString(operation);
+            if(path) {
+                str += path.ToString(operation);
+            }
 
             if(isRelative.IsOfOperation(operation)) {
                 str += isRelative.GetOfOperation(operation)? '"' : '>';
@@ -84,6 +86,7 @@ namespace srcDispatch {
             // end of policy
             closeEventMap[ParserState::cppinclude] = [this](srcSAXEventContext& ctx) {
                 if(!depth || depth != ctx.depth) return;
+                if(!data.path)                   return;
 
                 std::optional<std::string> originalPath;
                 std::optional<bool>        originalIsRelative;
