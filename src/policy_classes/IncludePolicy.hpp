@@ -86,29 +86,32 @@ namespace srcDispatch {
             // end of policy
             closeEventMap[ParserState::cppinclude] = [this](srcSAXEventContext& ctx) {
                 if(!depth || depth != ctx.depth) return;
-                if(!data.path)                   return;
 
-                std::optional<std::string> originalPath;
-                std::optional<bool>        originalIsRelative;
-                if(!data.path.GetOriginal().empty()) {
-                    originalIsRelative = data.path.GetOriginal()[0] == '"';
+                if(!data.path) goto reset_policy;     
 
-                    std::size_t length = data.path.GetOriginal().size();
-                    originalPath       = data.path.GetOriginal().substr(1, length - 2);
+                {
+                    std::optional<std::string> originalPath;
+                    std::optional<bool>        originalIsRelative;
+                    if(!data.path.GetOriginal().empty()) {
+                        originalIsRelative = data.path.GetOriginal()[0] == '"';
+
+                        std::size_t length = data.path.GetOriginal().size();
+                        originalPath       = data.path.GetOriginal().substr(1, length - 2);
+                    }
+
+                    std::optional<std::string> modifiedPath;
+                    std::optional<bool>        modifiedIsRelative;
+                    if(!data.path.GetModified().empty()) {
+                        modifiedIsRelative = data.path.GetModified()[0] == '"';
+
+                        std::size_t length = data.path.GetModified().size();
+                        modifiedPath       = data.path.GetModified().substr(1, length - 2);
+                    }
+
+                    data.path       = DeltaElement(originalPath,       modifiedPath);
+                    data.isRelative = DeltaElement(originalIsRelative, modifiedIsRelative);
                 }
-
-                std::optional<std::string> modifiedPath;
-                std::optional<bool>        modifiedIsRelative;
-                if(!data.path.GetModified().empty()) {
-                    modifiedIsRelative = data.path.GetModified()[0] == '"';
-
-                    std::size_t length = data.path.GetModified().size();
-                    modifiedPath       = data.path.GetModified().substr(1, length - 2);
-                }
-
-                data.path       = DeltaElement(originalPath,       modifiedPath);
-                data.isRelative = DeltaElement(originalIsRelative, modifiedIsRelative);
-
+reset_policy:
                 depth = 0;
                 NotifyAll(ctx);
                 InitializeIncludePolicyHandlers();
