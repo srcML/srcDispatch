@@ -18,7 +18,7 @@ Position::Position() : line(0), column(0) {
 
 Position::Position(const std::string& posStr) : Position() {
 
-   int colonPos = posStr.find(':');
+   size_t colonPos = posStr.find(':');
    if(colonPos == std::string::npos) return;
 
    line   = std::stoi(posStr.substr(0, colonPos));
