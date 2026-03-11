@@ -105,7 +105,7 @@ namespace srcDispatch {
     void GenericArgumentsPolicy::CollectArgumentHandler() {
         using namespace srcDispatch;
 
-        openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
+        openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
             if(!depth) return;
 
             openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
@@ -118,7 +118,7 @@ namespace srcDispatch {
             };
         };
 
-        closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
+        closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
             if(!depth) return;
 
             NopOpenEvents({ParserState::expr});

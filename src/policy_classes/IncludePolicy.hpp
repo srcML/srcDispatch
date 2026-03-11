@@ -66,7 +66,7 @@ namespace srcDispatch {
 
     protected:
         std::any DataInner() const override { return std::make_shared<IncludeData>(data); }
-        void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
+        void Notify(const PolicyDispatcher* policy [[maybe_unused]], const srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
     private:
@@ -121,7 +121,7 @@ reset_policy:
         void CollectIncludeHandlers() {
             using namespace srcDispatch;
 
-            openEventMap[ParserState::cppfile] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::cppfile] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -139,7 +139,7 @@ reset_policy:
                     }
                 };
             };
-            closeEventMap[ParserState::cppfile] = [this](srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::cppfile] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 NopCloseEvents({ParserState::tokenstring});
             };
         }

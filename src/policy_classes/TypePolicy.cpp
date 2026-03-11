@@ -149,7 +149,7 @@ namespace srcDispatch {
 
     void TypePolicy::CollectModifersHandler() {
         using namespace srcDispatch;
-        openEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx)
+        openEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx [[maybe_unused]])
         {
             if(!depth) return;
 
@@ -168,7 +168,7 @@ namespace srcDispatch {
             };
         };
 
-        closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::modifier] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             NopCloseEvents({ParserState::tokenstring});
@@ -186,7 +186,7 @@ namespace srcDispatch {
             };
         };
 
-        closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             NopCloseEvents({ParserState::tokenstring});

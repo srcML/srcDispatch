@@ -144,7 +144,7 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(declstmtPolicy.get());
         };
 
-        closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             if(plexer) {
@@ -177,7 +177,7 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(exprStmtPolicy.get());
         };
 
-        closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::exprstmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             if(plexer) {
@@ -198,7 +198,7 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(returnPolicy.get());
         };
 
-        closeEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::returnstmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             if(plexer) {
@@ -219,7 +219,7 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(ifStmtPolicy.get());
         };
 
-        closeEventMap[ParserState::ifgroup] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::ifgroup] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             if(plexer) {
@@ -252,7 +252,7 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(whilePolicy.get());
         };
 
-        closeEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::whilestmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             if(plexer) {
@@ -273,7 +273,7 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(forPolicy.get());
         };
 
-        closeEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
+        closeEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             if(plexer) {

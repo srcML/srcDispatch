@@ -287,7 +287,7 @@ namespace srcDispatch {
 
         void CollectParameterHandlers() {
             using namespace srcDispatch;
-            openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 openEventMap[ParserState::parameter] = [this](srcSAXEventContext& ctx) {
@@ -298,7 +298,7 @@ namespace srcDispatch {
                 };
             };
 
-            closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 beforeParameters = false;

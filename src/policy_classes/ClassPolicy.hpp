@@ -245,7 +245,7 @@ namespace srcDispatch {
                 }
                 ctx.dispatcher->AddListenerDispatch(namePolicy.get());
             };
-            closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::name});
@@ -255,7 +255,7 @@ namespace srcDispatch {
 
         void CollectSuperHanders() {
             using namespace srcDispatch;
-            openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::specifier});
@@ -286,12 +286,12 @@ namespace srcDispatch {
                         }
                     };
                 };
-                closeEventMap[ParserState::super] = [this](srcSAXEventContext& ctx) {
+                closeEventMap[ParserState::super] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                     NopCloseEvents({ParserState::tokenstring});
                 };
             };
 
-            closeEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::super_list] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::super});
@@ -300,7 +300,7 @@ namespace srcDispatch {
 
         void CollectBlockHanders() {
             using namespace srcDispatch;
-            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::name, ParserState::specifier, ParserState::super_list, ParserState::super});
@@ -365,7 +365,7 @@ namespace srcDispatch {
                 }
             };
 
-            closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::block] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::block, ParserState::function, ParserState::functiondecl,
@@ -378,7 +378,7 @@ namespace srcDispatch {
 
         void CollectSpecifierHandlers() {
             using namespace srcDispatch;
-            openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
@@ -391,7 +391,7 @@ namespace srcDispatch {
                 };
             };
                     
-            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx) {
+            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
                 NopCloseEvents({ParserState::tokenstring});
             };

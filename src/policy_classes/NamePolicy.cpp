@@ -178,7 +178,7 @@ namespace srcDispatch {
 
     void NamePolicy::CollectArrayIndicesHandlers() {
         using namespace srcDispatch;
-        openEventMap[ParserState::index] = [this](srcSAXEventContext &ctx) {
+        openEventMap[ParserState::index] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
             if(!depth) return;
 
             openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {

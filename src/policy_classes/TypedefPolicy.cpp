@@ -64,7 +64,7 @@ void TypedefPolicy::InitializeTypedefPolicyHandlers() {
     };
 }
 
-void TypedefPolicy::CollectTypeHandlers(srcDispatch::srcSAXEventContext& ctx) {
+void TypedefPolicy::CollectTypeHandlers(srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) {
     using namespace srcDispatch;
 
     openEventMap[ParserState::type] = [this](srcSAXEventContext &ctx) {
@@ -77,7 +77,7 @@ void TypedefPolicy::CollectTypeHandlers(srcDispatch::srcSAXEventContext& ctx) {
     };
 }
 
-void TypedefPolicy::CollectNameHandlers(srcDispatch::srcSAXEventContext& ctx) {
+void TypedefPolicy::CollectNameHandlers(srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) {
     using namespace srcDispatch;
 
     openEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
@@ -90,7 +90,7 @@ void TypedefPolicy::CollectNameHandlers(srcDispatch::srcSAXEventContext& ctx) {
     };
 }
 
-void TypedefPolicy::CollectFunctionDeclHandlers(srcDispatch::srcSAXEventContext& ctx) {
+void TypedefPolicy::CollectFunctionDeclHandlers(srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) {
     using namespace srcDispatch;
 
     openEventMap[ParserState::functiondecl] = [this](srcSAXEventContext &ctx) {

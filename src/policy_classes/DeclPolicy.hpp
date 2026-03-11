@@ -201,7 +201,7 @@ namespace srcDispatch {
 
         void CollectSpecifiersHandlers() {
             using namespace srcDispatch;
-            openEventMap[ParserState::specifier] = [this](srcSAXEventContext &ctx) {
+            openEventMap[ParserState::specifier] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext &ctx) {
@@ -211,7 +211,7 @@ namespace srcDispatch {
                 };
             };
 
-            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext &ctx) {
+            closeEventMap[ParserState::specifier] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopCloseEvents({ParserState::tokenstring});
@@ -244,7 +244,7 @@ namespace srcDispatch {
 
         void CollectInitHandlers() {
             using namespace srcDispatch;
-            openEventMap[ParserState::init] = [this](srcSAXEventContext &ctx) {
+            openEventMap[ParserState::init] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
@@ -255,7 +255,7 @@ namespace srcDispatch {
                 };
             };
 
-            closeEventMap[ParserState::init] = [this](srcSAXEventContext &ctx) {
+            closeEventMap[ParserState::init] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::expr});
@@ -265,10 +265,10 @@ namespace srcDispatch {
 
         void CollectArgumentList() {
             using namespace srcDispatch;
-            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext &ctx) {
+            openEventMap[ParserState::argumentlist] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 if(!depth) return;
 
-                openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
+                openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                     openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
                         if(!exprPolicy) {
                             exprPolicy = make_unique_policy<ExpressionPolicy>({this});
@@ -277,20 +277,20 @@ namespace srcDispatch {
                     };
                 };
 
-                closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx) {
+                closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                     NopOpenEvents({ParserState::expr});
                 };
 
             };
 
-            closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext &ctx) {
+            closeEventMap[ParserState::argumentlist] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 NopOpenEvents({ParserState::argument});
             };
         }
 
         void CollectRangeHandlers() {
             using namespace srcDispatch;
-            openEventMap[ParserState::range] = [this](srcSAXEventContext &ctx) {
+            openEventMap[ParserState::range] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
@@ -301,7 +301,7 @@ namespace srcDispatch {
                 };
             };
 
-            closeEventMap[ParserState::range] = [this](srcSAXEventContext &ctx) {
+            closeEventMap[ParserState::range] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::expr});

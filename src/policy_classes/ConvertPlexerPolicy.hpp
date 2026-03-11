@@ -112,11 +112,11 @@ protected:
             dispatched = false;             
         }
 
-        virtual void AddListenerNoDispatch(EventListener* listener) override {
+        virtual void AddListenerNoDispatch(EventListener* listener [[maybe_unused]]) override {
             throw std::string("AddListenerNoDispatch not implemented");
         }
 
-        virtual void RemoveListener(EventListener* listener) override {
+        virtual void RemoveListener(EventListener* listener [[maybe_unused]]) override {
             if(dispatchingState.top() == srcDispatch::DELETE) {
 #ifdef CONVERT_DEBUG 
                 std::cerr << "REMOVE: " << std::string(index * 4, ' ') << index << ' ' << __LINE__ << '\n';
@@ -137,7 +137,7 @@ protected:
             dispatched = false;             
         }
 
-        virtual void RemoveListenerNoDispatch(EventListener* listener) override {
+        virtual void RemoveListenerNoDispatch(EventListener* listener [[maybe_unused]]) override {
             throw std::string("RemoveListenerNoDispatch not implemented");
         }
 
