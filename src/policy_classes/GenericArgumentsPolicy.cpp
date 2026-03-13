@@ -57,7 +57,7 @@ namespace srcDispatch {
         return data;
     }
 
-    GenericArgumentsPolicy::GenericArgumentsPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+    GenericArgumentsPolicy::GenericArgumentsPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
         : srcDispatch::PolicyDispatcher(listeners), data{} {
         InitializeGenericArgumentsPolicyHandlers();
     }
@@ -82,7 +82,7 @@ namespace srcDispatch {
     void GenericArgumentsPolicy::InitializeGenericArgumentsPolicyHandlers() {
         using namespace srcDispatch;
         // start of policy
-        openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext &ctx) {
+        openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext& ctx) {
             if(depth) return;
 
             depth = ctx.depth;
@@ -93,7 +93,7 @@ namespace srcDispatch {
         };
 
         // end of policy
-        closeEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext &ctx) {
+        closeEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext& ctx) {
             if(!depth || depth != ctx.depth) return;
 
             depth = 0;
@@ -105,10 +105,10 @@ namespace srcDispatch {
     void GenericArgumentsPolicy::CollectArgumentHandler() {
         using namespace srcDispatch;
 
-        openEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
+        openEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
-            openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
+            openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
                 if(!depth) return;
 
                 if(!expressionPolicy) {
@@ -118,7 +118,7 @@ namespace srcDispatch {
             };
         };
 
-        closeEventMap[ParserState::argument] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
+        closeEventMap[ParserState::argument] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
             NopOpenEvents({ParserState::expr});

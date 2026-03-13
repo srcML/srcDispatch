@@ -107,7 +107,7 @@ namespace srcDispatch {
         using namespace srcDispatch;
 
         // start of policy
-        openEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
+        openEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
             if(!depth) {
                 depth = ctx.depth;
                 data = NameData{};
@@ -126,7 +126,7 @@ namespace srcDispatch {
         };
 
         // end of policy
-        closeEventMap[ParserState::name] = [this](srcSAXEventContext &ctx) {
+        closeEventMap[ParserState::name] = [this](srcSAXEventContext& ctx) {
             if(!depth || depth != ctx.depth) return;
 
             depth = 0;
@@ -134,7 +134,7 @@ namespace srcDispatch {
             InitializeNamePolicyHandlers();
         };
 
-        closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext &ctx) {
+        closeEventMap[ParserState::tokenstring] = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
 
             if(data.name.GetOperation() == srcDispatch::NONE) {
@@ -154,7 +154,7 @@ namespace srcDispatch {
 
     void NamePolicy::CollectOperatorsHandlers() {
         using namespace srcDispatch;
-        openEventMap[ParserState::op] = [this](srcSAXEventContext &ctx) {
+        openEventMap[ParserState::op] = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
 
             if(!operatorPolicy) {
@@ -166,7 +166,7 @@ namespace srcDispatch {
 
     void NamePolicy::CollectGenericArgumentsHandlers() {
         using namespace srcDispatch;
-        openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext &ctx) {
+        openEventMap[ParserState::genericargumentlist] = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
 
             if(!templateArgumentListPolicy) {
@@ -178,10 +178,10 @@ namespace srcDispatch {
 
     void NamePolicy::CollectArrayIndicesHandlers() {
         using namespace srcDispatch;
-        openEventMap[ParserState::index] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
+        openEventMap[ParserState::index] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
             if(!depth) return;
 
-            openEventMap[ParserState::expr] = [this](srcSAXEventContext &ctx) {
+            openEventMap[ParserState::expr] = [this](srcSAXEventContext& ctx) {
                 if(!expressionPolicy) {
                     expressionPolicy = make_unique_policy<ExpressionPolicy>({this});
                 }

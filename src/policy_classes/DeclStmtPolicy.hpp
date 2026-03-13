@@ -82,7 +82,7 @@ namespace srcDispatch {
             using namespace srcDispatch;
 
             // start of policy
-            openEventMap[ParserState::declstmt] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
+            openEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(depth) return;
 
                 depth = ctx.depth;
@@ -93,7 +93,7 @@ namespace srcDispatch {
             };
 
             // end of policy
-            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
+            closeEventMap[ParserState::declstmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth || depth != ctx.depth) return;
 
                 depth = 0;
@@ -106,7 +106,7 @@ namespace srcDispatch {
         void CollectDeclHandlers(srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) {
             using namespace srcDispatch;
 
-            openEventMap[ParserState::decl] = [this](srcSAXEventContext &ctx [[maybe_unused]]) {
+            openEventMap[ParserState::decl] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
                 if(!declPolicy) {
