@@ -315,6 +315,22 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::classn];
                     DispatchEvent(ParserState::structn, ElementState::open);
                 } },
+                { "class_decl", [this]() {
+                    ++ctx.triggerField[ParserState::classdecl];
+                    DispatchEvent(ParserState::classdecl, ElementState::open);
+                } },
+                { "enum_decl", [this]() {
+                    ++ctx.triggerField[ParserState::classdecl];
+                    DispatchEvent(ParserState::enumdecl, ElementState::open);
+                } },
+                { "struct_decl", [this]() {
+                    ++ctx.triggerField[ParserState::classdecl];
+                    DispatchEvent(ParserState::structdecl, ElementState::open);
+                } },
+                { "union_decl", [this]() {
+                    ++ctx.triggerField[ParserState::classdecl];
+                    DispatchEvent(ParserState::uniondecl, ElementState::open);
+                } },
                 { "namespace", [this]() {
                     ++ctx.triggerField[ParserState::namespacen];
                     DispatchEvent(ParserState::namespacen, ElementState::open);
@@ -621,6 +637,22 @@ namespace srcDispatch {
                     ctx.currentClassName.clear();
                     DispatchEvent(ParserState::structn, ElementState::close);
                     --ctx.triggerField[ParserState::classn];
+                } },
+                { "class_decl", [this]() {
+                    DispatchEvent(ParserState::classdecl, ElementState::close);
+                    --ctx.triggerField[ParserState::classdecl];
+                } },
+                { "enum_decl", [this]() {
+                    DispatchEvent(ParserState::classdecl, ElementState::close);
+                    --ctx.triggerField[ParserState::enumdecl];
+                } },
+                { "struct_decl", [this]() {
+                    DispatchEvent(ParserState::classdecl, ElementState::close);
+                    --ctx.triggerField[ParserState::structdecl];
+                } },
+                { "union_decl", [this]() {
+                    DispatchEvent(ParserState::classdecl, ElementState::close);
+                    --ctx.triggerField[ParserState::uniondecl];
                 } },
                 { "namespace", [this]() {
                     DispatchEvent(ParserState::namespacen, ElementState::close);

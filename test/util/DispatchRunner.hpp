@@ -121,6 +121,10 @@ public:
         return unit->functions;
     }
 
+    const std::vector<DeltaElement<std::shared_ptr<ClassDeclData>>>& GetClassDeclInfo() const {
+        return unit->classDecls;
+    }
+
     void Notify(const srcDispatch::PolicyDispatcher * policy,
                 const srcDispatch::srcSAXEventContext & ctx) override {
         unit = policy->Data<UnitData>();

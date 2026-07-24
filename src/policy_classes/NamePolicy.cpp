@@ -85,6 +85,11 @@ namespace srcDispatch {
         return data;
     }
 
+    NamePolicy::NamePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+        : srcDispatch::PolicyDispatcher(listeners), data{} {
+        InitializeNamePolicyHandlers();
+    }
+
     NamePolicy::~NamePolicy() {}
 
     void NamePolicy::Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) {

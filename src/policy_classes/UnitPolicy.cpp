@@ -159,4 +159,31 @@ void UnitPolicy::InitializeClassHandlers() {
     closeEventMap[ParserState::structn] = endClassPolicy;
 }
 
+void UnitPolicy::InitializeClassDeclHandlers() {
+    using namespace srcDispatch;
+
+    std::function<void(srcDispatch::srcSAXEventContext&)> startClassDeclPolicy = [this](srcSAXEventContext& ctx) {
+        if(depth == MAX_DEPTH) return;
+
+        if(!classDeclPolicy) {
+            classDeclPolicy = make_unique_policy<ClassDeclPolicy>({this});
+        }
+        std::cerr <<"hello?" <<std::endl;
+        ctx.dispatcher->AddListenerDispatch(classDeclPolicy.get());
+    };
+
+    openEventMap[ParserState::classdecl]  = startClassDeclPolicy;
+    openEventMap[ParserState::enumdecl]   = startClassDeclPolicy;
+    openEventMap[ParserState::structdecl] = startClassDeclPolicy;
+    openEventMap[ParserState::uniondecl]  = startClassDeclPolicy;
+
+    // end of policy
+    std::function<void(srcDispatch::srcSAXEventContext&)> endClassDeclPolicy = [](srcSAXEventContext& ctx [[maybe_unused]]) {};
+
+    closeEventMap[ParserState::classdecl]  = endClassDeclPolicy;
+    closeEventMap[ParserState::enumdecl]   = endClassDeclPolicy;
+    closeEventMap[ParserState::structdecl] = endClassDeclPolicy;
+    closeEventMap[ParserState::uniondecl]  = endClassDeclPolicy;
+}
+
 }

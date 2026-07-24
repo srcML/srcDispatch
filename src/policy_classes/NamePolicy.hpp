@@ -60,10 +60,7 @@ namespace srcDispatch {
         std::unique_ptr<ExpressionPolicy> expressionPolicy;
 
     public:
-        NamePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-            : srcDispatch::PolicyDispatcher(listeners), data{} {
-            InitializeNamePolicyHandlers();
-        }
+        NamePolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners);
 
         ~NamePolicy();
 
