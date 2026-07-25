@@ -17,13 +17,12 @@ BOOST_AUTO_TEST_CASE(typedecl_class_common) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::CLASS);
+    BOOST_TEST(classDeclData->type.IsCommon());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::CLASS_DECL);
 
     BOOST_TEST(classDeclData->name.IsCommon());
     BOOST_TEST(classDeclData->name.ToString() == "foo");
@@ -35,13 +34,12 @@ BOOST_AUTO_TEST_CASE(typedecl_enum_common) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::ENUM);
+    BOOST_TEST(classDeclData->type.IsCommon());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::ENUM_DECL);
 
     BOOST_TEST(classDeclData->name.IsCommon());
     BOOST_TEST(classDeclData->name.ToString() == "foo");
@@ -53,13 +51,12 @@ BOOST_AUTO_TEST_CASE(typedecl_struct_common) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::STRUCT);
+    BOOST_TEST(classDeclData->type.IsCommon());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::STRUCT_DECL);
 
     BOOST_TEST(classDeclData->name.IsCommon());
     BOOST_TEST(classDeclData->name.ToString() == "foo");
@@ -71,13 +68,12 @@ BOOST_AUTO_TEST_CASE(typedecl_union_common) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::UNION);
+    BOOST_TEST(classDeclData->type.IsCommon());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::UNION_DECL);
 
     BOOST_TEST(classDeclData->name.IsCommon());
     BOOST_TEST(classDeclData->name.ToString() == "foo");
@@ -89,13 +85,12 @@ BOOST_AUTO_TEST_CASE(typedecl_class_insert) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::CLASS);
+    BOOST_TEST(classDeclData->type.IsInsert());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::CLASS_DECL);
 
     BOOST_TEST(classDeclData->name.IsInsert());
     BOOST_TEST(classDeclData->name.ToString() == "|foo");
@@ -107,13 +102,12 @@ BOOST_AUTO_TEST_CASE(typedecl_enum_insert) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::ENUM);
+    BOOST_TEST(classDeclData->type.IsInsert());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::ENUM_DECL);
 
     BOOST_TEST(classDeclData->name.IsInsert());
     BOOST_TEST(classDeclData->name.ToString() == "|foo");
@@ -125,13 +119,12 @@ BOOST_AUTO_TEST_CASE(typedecl_struct_insert) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::STRUCT);
+    BOOST_TEST(classDeclData->type.IsInsert());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::STRUCT_DECL);
 
     BOOST_TEST(classDeclData->name.IsInsert());
     BOOST_TEST(classDeclData->name.ToString() == "|foo");
@@ -143,13 +136,12 @@ BOOST_AUTO_TEST_CASE(typedecl_union_insert) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.IsInsert());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::UNION);
+    BOOST_TEST(classDeclData->type.IsInsert());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::UNION_DECL);
 
     BOOST_TEST(classDeclData->name.IsInsert());
     BOOST_TEST(classDeclData->name.ToString() == "|foo");
@@ -161,13 +153,12 @@ BOOST_AUTO_TEST_CASE(typedecl_class_delete) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::CLASS);
+    BOOST_TEST(classDeclData->type.IsDelete());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::CLASS_DECL);
 
     BOOST_TEST(classDeclData->name.IsDelete());
     BOOST_TEST(classDeclData->name.ToString() == "foo|");
@@ -179,13 +170,12 @@ BOOST_AUTO_TEST_CASE(typedecl_enum_delete) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::ENUM);
+    BOOST_TEST(classDeclData->type.IsDelete());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::ENUM_DECL);
 
     BOOST_TEST(classDeclData->name.IsDelete());
     BOOST_TEST(classDeclData->name.ToString() == "foo|");
@@ -197,13 +187,12 @@ BOOST_AUTO_TEST_CASE(typedecl_struct_delete) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::STRUCT);
+    BOOST_TEST(classDeclData->type.IsDelete());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::STRUCT_DECL);
 
     BOOST_TEST(classDeclData->name.IsDelete());
     BOOST_TEST(classDeclData->name.ToString() == "foo|");
@@ -215,13 +204,12 @@ BOOST_AUTO_TEST_CASE(typedecl_union_delete) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.IsDelete());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::UNION);
+    BOOST_TEST(classDeclData->type.IsDelete());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::UNION_DECL);
 
     BOOST_TEST(classDeclData->name.IsDelete());
     BOOST_TEST(classDeclData->name.ToString() == "foo|");
@@ -233,13 +221,12 @@ BOOST_AUTO_TEST_CASE(typedecl_class_rename) {
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 0);
-    BOOST_TEST(runner.GetClassInfo().size()    == 0);
-    BOOST_TEST(runner.GetClassDeclInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 1);
 
-    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassDeclData>>& classDeclData = runner.GetClassDeclInfo().at(0);
+    const srcDispatch::DeltaElement<std::shared_ptr<srcDispatch::ClassData>>& classDeclData = runner.GetClassInfo().at(0); 
     BOOST_TEST(classDeclData.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.IsCommon());
-    BOOST_TEST(classDeclData->classDeclType.GetElement() == srcDispatch::ClassDeclData::CLASS);
+    BOOST_TEST(classDeclData->type.IsCommon());
+    BOOST_TEST(classDeclData->type.GetElement() == srcDispatch::ClassData::CLASS_DECL);
 
     BOOST_TEST(classDeclData->name.IsCommon());
     BOOST_TEST(classDeclData->name.ToString() == "foo|bar");

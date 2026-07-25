@@ -2,7 +2,7 @@
 /**
  * @file UnitPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
+ * @copyright Copyright (C) 2025-2026 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  *
@@ -25,7 +25,6 @@
 #include <FunctionPolicy.hpp>
 #include <ClassPolicy.hpp>
 #include <TypedefPolicy.hpp>
-#include <ClassDeclPolicy.hpp>
 
 namespace srcDispatch {
 
@@ -35,7 +34,6 @@ namespace srcDispatch {
 
         std::vector<DeltaElement<std::shared_ptr<DeclStmtData>>>  declStmts;
         std::vector<DeltaElement<std::shared_ptr<TypedefData>>>   typedefs;
-        std::vector<DeltaElement<std::shared_ptr<ClassDeclData>>> classDecls;
         std::vector<DeltaElement<std::shared_ptr<ClassData>>>     classes;
         std::vector<DeltaElement<std::shared_ptr<FunctionData>>>  functions;
 
@@ -57,7 +55,6 @@ namespace srcDispatch {
         std::unique_ptr<TypedefPolicy>   typedefPolicy;
         std::unique_ptr<FunctionPolicy>  functionPolicy;
         std::unique_ptr<ClassPolicy>     classPolicy;
-        std::unique_ptr<ClassDeclPolicy> classDeclPolicy;
 
     public:
         UnitPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners) 
@@ -83,7 +80,6 @@ namespace srcDispatch {
         void InitializeTypedefHandlers();
         void InitializeFunctionHandlers();
         void InitializeClassHandlers();
-        void InitializeClassDeclHandlers();
 
     };
 

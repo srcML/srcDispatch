@@ -2,7 +2,7 @@
 /**
  * @file UnitPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
+ * @copyright Copyright (C) 2025-2026 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  *
@@ -149,40 +149,23 @@ void UnitPolicy::InitializeClassHandlers() {
         ctx.dispatcher->AddListenerDispatch(classPolicy.get());
     };
 
-    openEventMap[ParserState::classn]  = startClassPolicy;
-    openEventMap[ParserState::structn] = startClassPolicy;
+    openEventMap[ParserState::classn]     = startClassPolicy;
+    openEventMap[ParserState::classdecl]  = startClassPolicy;
+    openEventMap[ParserState::structn]    = startClassPolicy;
+    openEventMap[ParserState::structdecl] = startClassPolicy;
+    openEventMap[ParserState::enumdecl]   = startClassPolicy;
+    openEventMap[ParserState::uniondecl]  = startClassPolicy;
+
 
     // end of policy
     std::function<void(srcDispatch::srcSAXEventContext&)> endClassPolicy = [](srcSAXEventContext& ctx [[maybe_unused]]) {};
 
-    closeEventMap[ParserState::classn]  = endClassPolicy;
-    closeEventMap[ParserState::structn] = endClassPolicy;
-}
-
-void UnitPolicy::InitializeClassDeclHandlers() {
-    using namespace srcDispatch;
-
-    std::function<void(srcDispatch::srcSAXEventContext&)> startClassDeclPolicy = [this](srcSAXEventContext& ctx) {
-        if(depth == MAX_DEPTH) return;
-
-        if(!classDeclPolicy) {
-            classDeclPolicy = make_unique_policy<ClassDeclPolicy>({this});
-        }
-        ctx.dispatcher->AddListenerDispatch(classDeclPolicy.get());
-    };
-
-    openEventMap[ParserState::classdecl]  = startClassDeclPolicy;
-    openEventMap[ParserState::enumdecl]   = startClassDeclPolicy;
-    openEventMap[ParserState::structdecl] = startClassDeclPolicy;
-    openEventMap[ParserState::uniondecl]  = startClassDeclPolicy;
-
-    // end of policy
-    std::function<void(srcDispatch::srcSAXEventContext&)> endClassDeclPolicy = [](srcSAXEventContext& ctx [[maybe_unused]]) {};
-
-    closeEventMap[ParserState::classdecl]  = endClassDeclPolicy;
-    closeEventMap[ParserState::enumdecl]   = endClassDeclPolicy;
-    closeEventMap[ParserState::structdecl] = endClassDeclPolicy;
-    closeEventMap[ParserState::uniondecl]  = endClassDeclPolicy;
+    closeEventMap[ParserState::classn]     = endClassPolicy;
+    closeEventMap[ParserState::classdecl]  = endClassPolicy;
+    closeEventMap[ParserState::structn]    = endClassPolicy;
+    closeEventMap[ParserState::structdecl] = endClassPolicy;
+    closeEventMap[ParserState::enumdecl]   = endClassPolicy;
+    closeEventMap[ParserState::uniondecl]  = endClassPolicy;
 }
 
 }

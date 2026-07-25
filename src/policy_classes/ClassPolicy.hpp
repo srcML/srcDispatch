@@ -33,7 +33,8 @@ namespace srcDispatch {
     struct ParentData;
 
     struct ClassData : public ElementData {
-        enum ClassType : std::size_t { CLASS, STRUCT };
+        enum ClassType : std::size_t { CLASS, CLASS_DECL, STRUCT, STRUCT_DECL, 
+                                       ENUM, ENUM_DECL, UNION, UNION_DECL };
 
         std::vector<std::string> namespaces;
 
@@ -219,8 +220,20 @@ namespace srcDispatch {
             openEventMap[ParserState::classn] = startPolicy;
             closeEventMap[ParserState::classn] = endPolicy;
 
+            openEventMap[ParserState::classdecl] = startPolicy;
+            closeEventMap[ParserState::classdecl] = endPolicy;
+
             openEventMap[ParserState::structn] = startPolicy;
             closeEventMap[ParserState::structn] = endPolicy;
+
+            openEventMap[ParserState::structdecl] = startPolicy;
+            closeEventMap[ParserState::structdecl] = endPolicy;
+
+            openEventMap[ParserState::enumdecl] = startPolicy;
+            closeEventMap[ParserState::enumdecl] = endPolicy;
+
+            openEventMap[ParserState::uniondecl] = startPolicy;
+            closeEventMap[ParserState::uniondecl] = endPolicy;
         }
 
         void CollectGenericHandlers() {
