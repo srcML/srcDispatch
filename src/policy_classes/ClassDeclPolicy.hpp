@@ -76,7 +76,6 @@ namespace srcDispatch {
     public:
         ClassDeclPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
         : srcDispatch::PolicyDispatcher(listeners), data{} {
-            std::cout << "in ClassDeclPolicy constructor\n";
             InitializeClassDeclPolicyHandlers();
         }
 
