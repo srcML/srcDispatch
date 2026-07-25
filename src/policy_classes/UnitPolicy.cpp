@@ -168,7 +168,6 @@ void UnitPolicy::InitializeClassDeclHandlers() {
         if(!classDeclPolicy) {
             classDeclPolicy = make_unique_policy<ClassDeclPolicy>({this});
         }
-        std::cerr <<"hello?" <<std::endl;
         ctx.dispatcher->AddListenerDispatch(classDeclPolicy.get());
     };
 

@@ -2,7 +2,7 @@
 /**
  * @file ClassDeclPolicy.hpp
  *
- * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
+ * @copyright Copyright (C) 2026-2026 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  */
@@ -114,8 +114,6 @@ void InitializeClassDeclPolicyHandlers() {
         data.name = DeltaElement<std::shared_ptr<NameData>>();
         data.language = ctx.currentFileLanguage;
         data.filename = ctx.currentFilePath;
-
-        std::cerr << "hello again?\n";
 
         CollectNameHandlers();
     };
