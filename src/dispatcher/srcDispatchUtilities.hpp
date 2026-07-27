@@ -53,6 +53,8 @@ namespace srcDispatch {
         typedefdecl, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
         trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt,
 
+        foreach,
+
         // preprocessor
         cppinclude, cppdirective, cppfile,
 

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file ForPolicy.hpp
+ * @file ForeachPolicy.hpp
  *
  * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_FOR_POLICY_HPP
-#define INCLUDED_FOR_POLICY_HPP
+#ifndef INCLUDED_FOREACH_POLICY_HPP
+#define INCLUDED_FOREACH_POLICY_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
@@ -25,7 +25,7 @@ namespace srcDispatch {
     class BlockPolicy;
     struct BlockData;
 
-    struct ForData : public ElementData {
+    struct ForeachData : public ElementData {
 
         DeltaElement<std::shared_ptr<ControlData>> control;
         DeltaElement<std::shared_ptr<BlockData>>   block;
@@ -38,10 +38,10 @@ namespace srcDispatch {
         }
     };
 
-    class ForPolicy : public ForLike<ForData, srcDispatch::ParserState::forstmt> {
+    class ForeachPolicy : public ForLike<ForeachData, srcDispatch::ParserState::foreach> {
     public:
-        ForPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-            : ForLike<ForData, srcDispatch::ParserState::forstmt>(listeners) {}
+        ForeachPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+            : ForLike<ForeachData, srcDispatch::ParserState::foreach>(listeners) {}
     };
 
 }

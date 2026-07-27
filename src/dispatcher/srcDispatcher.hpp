@@ -261,6 +261,10 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::forstmt];
                     DispatchEvent(ParserState::forstmt, ElementState::open);
                 } },
+                { "foreach", [this]() {
+                    ++ctx.triggerField[ParserState::foreach];
+                    DispatchEvent(ParserState::foreach, ElementState::open);
+                } },
                 { "control", [this]() {
                     ++ctx.triggerField[ParserState::control];
                     DispatchEvent(ParserState::control, ElementState::open);
@@ -561,6 +565,10 @@ namespace srcDispatch {
                     DispatchEvent(ParserState::forstmt, ElementState::close);
                     --ctx.triggerField[ParserState::forstmt];
                 } },  
+                { "foreach", [this]() {
+                    DispatchEvent(ParserState::foreach, ElementState::close);
+                    --ctx.triggerField[ParserState::foreach];
+                } },
                 { "control", [this]() {
                     --ctx.triggerField[ParserState::control];
                     DispatchEvent(ParserState::control, ElementState::close);

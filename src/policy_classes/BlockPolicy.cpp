@@ -18,6 +18,7 @@
 #include <SwitchPolicy.hpp>
 #include <WhilePolicy.hpp>
 #include <ForPolicy.hpp>
+#include <ForeachPolicy.hpp>
 #include <DoPolicy.hpp>
 #include <TryPolicy.hpp>
 #include <ClassPolicy.hpp>
@@ -50,6 +51,8 @@ namespace srcDispatch {
             data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<WhileData>()));
         } else if(typeid(ForPolicy) == typeid(*policy)) {
             data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<ForData>()));
+        } else if(typeid(ForeachPolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<ForeachData>()));
         } else if(typeid(DoPolicy) == typeid(*policy)) {
             data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<DoData>()));
         } else if(typeid(TryPolicy) == typeid(*policy)) {
@@ -86,7 +89,7 @@ namespace srcDispatch {
         CollectIfStmtHandlers();
         CollectSwitchHandlers();
         CollectWhileHandlers();
-        CollectForHandlers();
+        CollectForlikeHandlers();
         CollectDoHandlers();
         CollectTryHandlers();
         CollectThrowHandlers();
@@ -261,7 +264,7 @@ namespace srcDispatch {
         };
     }
 
-    void BlockPolicy::CollectForHandlers() {
+    void BlockPolicy::CollectForlikeHandlers() {
         using namespace srcDispatch;
         openEventMap[ParserState::forstmt] = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
@@ -280,6 +283,27 @@ namespace srcDispatch {
                 plexer.reset();
             }
         };
+
+        
+        openEventMap[ParserState::foreach] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+            if(ConvertRegistrationCheck<ForeachPolicy>(ctx)) return;
+
+            if(!foreachPolicy) {
+                foreachPolicy = make_unique_policy<ForeachPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(foreachPolicy.get());
+        };
+
+        // Unsure about the plexer and how best to handle it
+
+        // closeEventMap[ParserState::foreach] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
+        //     if(!depth) return;
+
+        //     if(plexer) {
+        //         plexer.reset();
+        //     }
+        // };
     }
 
     void BlockPolicy::CollectDoHandlers() {

@@ -36,6 +36,7 @@ namespace srcDispatch {
     class SwitchPolicy;
     class WhilePolicy;
     class ForPolicy;
+    class ForeachPolicy;
     class DoPolicy;
     class TryPolicy;
 
@@ -76,6 +77,7 @@ namespace srcDispatch {
         std::unique_ptr<IfStmtPolicy>   ifStmtPolicy;
 
         std::unique_ptr<ForPolicy>      forPolicy;
+        std::unique_ptr<ForeachPolicy>  foreachPolicy;
         std::unique_ptr<WhilePolicy>    whilePolicy;
         std::unique_ptr<DoPolicy>       doPolicy;
 
@@ -109,7 +111,7 @@ namespace srcDispatch {
         void CollectIfStmtHandlers();
         void CollectSwitchHandlers();
         void CollectWhileHandlers();
-        void CollectForHandlers();
+        void CollectForlikeHandlers();
         void CollectDoHandlers();
         void CollectTryHandlers();
         void CollectThrowHandlers();
