@@ -285,7 +285,7 @@ namespace srcDispatch {
         };
 
         
-        openEventMap[ParserState::foreach] = [this](srcSAXEventContext& ctx) {
+        openEventMap[ParserState::foreachstmt] = [this](srcSAXEventContext& ctx) {
             if(!depth) return;
             if(ConvertRegistrationCheck<ForeachPolicy>(ctx)) return;
 
@@ -295,15 +295,13 @@ namespace srcDispatch {
             ctx.dispatcher->AddListenerDispatch(foreachPolicy.get());
         };
 
-        // Unsure about the plexer and how best to handle it
+        closeEventMap[ParserState::foreachstmt] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
+            if(!depth) return;
 
-        // closeEventMap[ParserState::foreach] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
-        //     if(!depth) return;
-
-        //     if(plexer) {
-        //         plexer.reset();
-        //     }
-        // };
+            if(plexer) {
+                plexer.reset();
+            }
+        };
     }
 
     void BlockPolicy::CollectDoHandlers() {

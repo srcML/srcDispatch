@@ -38,10 +38,10 @@ namespace srcDispatch {
         }
     };
 
-    class ForeachPolicy : public ForLike<ForeachData, srcDispatch::ParserState::foreach> {
+    class ForeachPolicy : public ForLike<ForeachData, srcDispatch::ParserState::foreachstmt> {
     public:
         ForeachPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-            : ForLike<ForeachData, srcDispatch::ParserState::foreach>(listeners) {}
+            : ForLike<ForeachData, srcDispatch::ParserState::foreachstmt>(listeners) {}
     };
 
 }
