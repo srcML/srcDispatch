@@ -27,9 +27,6 @@
 
 namespace srcDispatch {
 
-    class BlockPolicy;
-    struct BlockData;
-
     template <typename ForLikeParam, srcDispatch::ParserState DispatchEvent>
     class ForLike : public BlockStmt<ForLikeParam, DispatchEvent> {
 
@@ -66,7 +63,7 @@ namespace srcDispatch {
     private:
         void InitializeForLikeHandlers() {
             using namespace srcDispatch;
-            this->openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
+            EventListener::openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
                 if(this->depth) return;
 
                 this->depth = ctx.depth;
@@ -77,7 +74,7 @@ namespace srcDispatch {
             };
 
             // end of policy
-            this->closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
+            EventListener::closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
                 if(!this->depth || this->depth != ctx.depth) return;
 
                 this->depth = 0;
@@ -88,7 +85,7 @@ namespace srcDispatch {
 
         void CollectControlHandlers() {
             using namespace srcDispatch;
-            this->openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
+            EventListener::openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
                 if(!this->depth) return;
 
                 if(!controlPolicy) {
