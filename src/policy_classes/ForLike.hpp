@@ -35,6 +35,9 @@ namespace srcDispatch {
 
         std::unique_ptr<ControlPolicy> controlPolicy;
 
+        using EventListener::openEventMap;
+        using EventListener::closeEventMap;
+
     public:
         ForLike(std::initializer_list<srcDispatch::PolicyListener *> listeners)
             : BlockStmt<ForLikeParam, DispatchEvent>(listeners), data{} {
@@ -63,7 +66,7 @@ namespace srcDispatch {
     private:
         void InitializeForLikeHandlers() {
             using namespace srcDispatch;
-            EventListener::openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
+            openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
                 if(this->depth) return;
 
                 this->depth = ctx.depth;
@@ -85,7 +88,7 @@ namespace srcDispatch {
 
         void CollectControlHandlers() {
             using namespace srcDispatch;
-            EventListener::openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
                 if(!this->depth) return;
 
                 if(!controlPolicy) {
