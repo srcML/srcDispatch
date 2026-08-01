@@ -17,6 +17,7 @@
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
+#include <BlockStmt.hpp>
 #include <ControlPolicy.hpp>
 #include <BlockPolicy.hpp>
 
@@ -30,20 +31,16 @@ namespace srcDispatch {
     struct BlockData;
 
     template <typename ForLikeParam, srcDispatch::ParserState DispatchEvent>
-    class ForLike :
-    public srcDispatch::EventListener,
-    public srcDispatch::PolicyDispatcher,
-    public srcDispatch::PolicyListener {
+    class ForLike : public BlockStmt<ForLikeParam, DispatchEvent> {
 
     private:
         ForLikeParam data;
 
         std::unique_ptr<ControlPolicy> controlPolicy;
-        std::unique_ptr<BlockPolicy>   blockPolicy;
 
     public:
         ForLike(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-            : srcDispatch::PolicyDispatcher(listeners), data{} {
+            : BlockStmt<ForLikeParam, DispatchEvent>(listeners), data{} {
             InitializeForLikeHandlers();
         }
 
@@ -69,49 +66,35 @@ namespace srcDispatch {
     private:
         void InitializeForLikeHandlers() {
             using namespace srcDispatch;
+            this->openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
+                if(this->depth) return;
 
-            openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(depth) return;
-
-                depth = ctx.depth;
+                this->depth = ctx.depth;
                 data = ForLikeParam{};
                 data.startPosition = ctx.startPosition;
                 data.endPosition = ctx.endPosition;
                 CollectControlHandlers();
-                CollectBlockHandlers();
             };
 
             // end of policy
-            closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(!depth || depth != ctx.depth) return;
+            this->closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
+                if(!this->depth || this->depth != ctx.depth) return;
 
-                depth = 0;
-                NotifyAll(ctx);
+                this->depth = 0;
+                this->NotifyAll(ctx);
                 InitializeForLikeHandlers();
             };
         }
 
         void CollectControlHandlers() {
             using namespace srcDispatch;
-            openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
-                if(!depth) return;
+            this->openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
+                if(!this->depth) return;
 
                 if(!controlPolicy) {
                     controlPolicy = make_unique_policy<ControlPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(controlPolicy.get());
-            };
-        }
-
-        void CollectBlockHandlers() {
-            using namespace srcDispatch;
-            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-                if(!depth) return;
-
-                if(!blockPolicy) {
-                    blockPolicy = make_unique_policy<BlockPolicy>({this});
-                }
-                ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
             };
         }
     };
