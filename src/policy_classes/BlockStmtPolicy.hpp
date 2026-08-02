@@ -62,19 +62,6 @@ namespace srcDispatch {
 
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
-        void CollectBlockHandlers() {
-            using namespace srcDispatch;
-            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-                if(!depth) return;
-
-                if(!blockPolicy) {
-                    blockPolicy = make_unique_policy<BlockPolicy>({this});
-                }
-                ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
-            };
-        }
-
-    private:
         void InitializeBlockStmtHandlers() {
             using namespace srcDispatch;
 
@@ -98,6 +85,19 @@ namespace srcDispatch {
                 InitializeBlockStmtHandlers();
             };
         }
+
+        void CollectBlockHandlers() {
+            using namespace srcDispatch;
+            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
+                if(!depth) return;
+
+                if(!blockPolicy) {
+                    blockPolicy = make_unique_policy<BlockPolicy>({this});
+                }
+                ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
+            };
+        }
+
     };
 
 }

@@ -17,7 +17,7 @@
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
-#include <InitStmt.hpp>
+#include <InitStmtPolicy.hpp>
 #include <BlockPolicy.hpp>
 
 #include <string>
@@ -26,15 +26,16 @@
 
 namespace srcDispatch {
 
-    class BlockPolicy;
+    class  BlockPolicy;
     struct BlockData;
-    class InitPolicy;
+
+    class  InitPolicy;
     struct InitData;
 
     struct LockStmtData : public ElementData {
 
-        DeltaElement<std::shared_ptr<BlockData>>   block;
-        DeltaElement<std::shared_ptr<InitData>>    init;
+        DeltaElement<std::shared_ptr<BlockData>> block;
+        DeltaElement<std::shared_ptr<InitData>>  init;
 
         template<class type>
         friend class DeltaElement;

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file Checked.hpp
+ * @file Unchecked.hpp
  *
  * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_CHECKED_POLICY_HPP
-#define INCLUDED_CHECKED_POLICY_HPP
+#ifndef INCLUDED_UNCHECKED_POLICY_HPP
+#define INCLUDED_UNCHECKED_POLICY_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
@@ -17,7 +17,7 @@
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
-#include <BlockStmt.hpp>
+#include <BlockStmtPolicy.hpp>
 #include <BlockPolicy.hpp>
 
 #include <string>
@@ -26,21 +26,21 @@
 
 namespace srcDispatch {
 
-    class BlockPolicy;
+    class  BlockPolicy;
     struct BlockData;
 
-    struct CheckedData : public ElementData {
+    struct UncheckedData : public ElementData {
 
-        DeltaElement<std::shared_ptr<BlockData>>   block;
+        DeltaElement<std::shared_ptr<BlockData>> block;
 
         template<class type>
         friend class DeltaElement;
     };
 
-    class CheckedPolicy : public BlockStmt<CheckedData, srcDispatch::ParserState::checkedstmt> {
+    class UncheckedPolicy : public BlockStmt<UncheckedData, srcDispatch::ParserState::uncheckedstmt> {
     public:
-        CheckedPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-            : BlockStmt<CheckedData, srcDispatch::ParserState::checkedstmt>(listeners) {}
+        UncheckedPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+            : BlockStmt<UncheckedData, srcDispatch::ParserState::uncheckedstmt>(listeners) {}
     };
 
 }

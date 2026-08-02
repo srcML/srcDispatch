@@ -23,9 +23,9 @@
 #include <TryPolicy.hpp>
 #include <ClassPolicy.hpp>
 
-#include <Checked.hpp>
-#include <Unchecked.hpp>
-#include <Unsafe.hpp>
+#include <CheckedPolicy.hpp>
+#include <UncheckedPolicy.hpp>
+#include <UnsafePolicy.hpp>
 
 #include <LockStmtPolicy.hpp>
 #include <FixedStmtPolicy.hpp>

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file InitStmt.hpp
+ * @file ForLike.hpp
  *
  * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
  *
  * This file is part of the Dispatch Infrastructure.
  */
 
-#ifndef INCLUDED_INITSTMT_POLICY_HPP
-#define INCLUDED_INITSTMT_POLICY_HPP
+#ifndef INCLUDED_FORLIKE_POLICY_HPP
+#define INCLUDED_FORLIKE_POLICY_HPP
 
 #include <srcSAXController.hpp>
 #include <srcDispatcher.hpp>
@@ -17,8 +17,8 @@
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
-#include <BlockStmt.hpp>
-#include <InitPolicy.hpp>
+#include <BlockStmtPolicy.hpp>
+#include <ControlPolicy.hpp>
 #include <BlockPolicy.hpp>
 
 #include <string>
@@ -27,34 +27,31 @@
 
 namespace srcDispatch {
 
-    class BlockPolicy;
-    struct BlockData;
-
-    template <typename InitStmtParam, srcDispatch::ParserState DispatchEvent>
-    class InitStmt : public BlockStmt<InitStmtParam, DispatchEvent> {
+    template <typename ForLikeParam, srcDispatch::ParserState DispatchEvent>
+    class ForLike : public BlockStmt<ForLikeParam, DispatchEvent> {
 
     private:
-        InitStmtParam data;
+        ForLikeParam data;
 
-        std::unique_ptr<InitPolicy> initPolicy;
+        std::unique_ptr<ControlPolicy> controlPolicy;
 
         using EventListener::openEventMap;
         using EventListener::closeEventMap;
 
     public:
-        InitStmt(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-            : BlockStmt<InitStmtParam, DispatchEvent>(listeners), data{} {
-            InitializeInitStmtHandlers();
+        ForLike(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+            : BlockStmt<ForLikeParam, DispatchEvent>(listeners), data{} {
+            InitializeForLikeHandlers();
         }
 
-        ~InitStmt() {}
+        ~ForLike() {}
 
     protected:
-        std::any DataInner() const override { return std::make_shared<InitStmtParam>(data); }
+        std::any DataInner() const override { return std::make_shared<ForLikeParam>(data); }
 
         void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
-            if(typeid(InitPolicy) == typeid(*policy)) {
-                data.init = DeltaElement(ctx.diffStack.back().operation, policy->Data<InitData>());
+            if(typeid(ControlPolicy) == typeid(*policy)) {
+                data.control = DeltaElement(ctx.diffStack.back().operation, policy->Data<ControlData>());
             } else if(typeid(BlockPolicy) == typeid(*policy)) {
                 data.block.Update(ctx.diffStack.back().operation, policy->Data<BlockData>());
             } else {
@@ -67,17 +64,16 @@ namespace srcDispatch {
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
     private:
-        void InitializeInitStmtHandlers() {
+        void InitializeForLikeHandlers() {
             using namespace srcDispatch;
             openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
                 if(this->depth) return;
 
                 this->depth = ctx.depth;
-                data = InitStmtParam{};
+                data = ForLikeParam{};
                 data.startPosition = ctx.startPosition;
                 data.endPosition = ctx.endPosition;
-                CollectInitHandlers();
-                this->CollectBlockHandlers();
+                CollectControlHandlers();
             };
 
             // end of policy
@@ -86,19 +82,19 @@ namespace srcDispatch {
 
                 this->depth = 0;
                 this->NotifyAll(ctx);
-                InitializeInitStmtHandlers();
+                InitializeForLikeHandlers();
             };
         }
 
-        void CollectInitHandlers() {
+        void CollectControlHandlers() {
             using namespace srcDispatch;
-            openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
+            openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
                 if(!this->depth) return;
 
-                if(!initPolicy) {
-                    initPolicy = make_unique_policy<InitPolicy>({this});
+                if(!controlPolicy) {
+                    controlPolicy = make_unique_policy<ControlPolicy>({this});
                 }
-                ctx.dispatcher->AddListenerDispatch(initPolicy.get());
+                ctx.dispatcher->AddListenerDispatch(controlPolicy.get());
             };
         }
     };

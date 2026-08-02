@@ -16,7 +16,7 @@
 #include <LiteralPolicy.hpp>
 #include <OperatorPolicy.hpp>
 
-#include <Unchecked.hpp>
+#include <UncheckedPolicy.hpp>
 
 // Define test data
 namespace data = boost::unit_test;

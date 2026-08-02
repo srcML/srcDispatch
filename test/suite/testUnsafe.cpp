@@ -16,7 +16,7 @@
 #include <LiteralPolicy.hpp>
 #include <OperatorPolicy.hpp>
 
-#include <Unsafe.hpp>
+#include <UnsafePolicy.hpp>
 
 // Define test data
 namespace data = boost::unit_test;
