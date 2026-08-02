@@ -51,7 +51,8 @@ namespace srcDispatch {
         modifier, memberlist, classn, structn, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,
         preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, switchstmt, switchcase, specifier, throws, 
         typedefdecl, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
-        trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt, foreachstmt,
+        trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt, foreachstmt, checkedstmt, uncheckedstmt,
+        unsafestmt, fixedstmt, lockstmt, usingstmt, syncstmt,
 
 
         // preprocessor

@@ -39,6 +39,9 @@ namespace srcDispatch {
     class ForeachPolicy;
     class DoPolicy;
     class TryPolicy;
+    class CheckedPolicy;
+    class UncheckedPolicy;
+    class UnsafePolicy;
 
     class  ClassPolicy;
     struct ClassData;
@@ -63,30 +66,34 @@ namespace srcDispatch {
     private:
         BlockData data;
 
-        std::unique_ptr<BlockPolicy>    blockPolicy;
+        std::unique_ptr<BlockPolicy>        blockPolicy;
 
-        std::unique_ptr<DeclStmtPolicy> declstmtPolicy;
-        std::unique_ptr<TypedefPolicy>  typedefPolicy;
-        std::unique_ptr<ExprStmtPolicy> exprStmtPolicy;
-        std::unique_ptr<ReturnPolicy>   returnPolicy;
+        std::unique_ptr<CheckedPolicy>      checkedPolicy;
+        std::unique_ptr<UncheckedPolicy>    uncheckedPolicy;
+        std::unique_ptr<UnsafePolicy>       unsafePolicy;
 
-        std::unique_ptr<GotoPolicy>     gotoPolicy;
-        std::unique_ptr<LabelPolicy>    labelPolicy;
-        std::unique_ptr<ThrowPolicy>    throwPolicy;
+        std::unique_ptr<DeclStmtPolicy>     declstmtPolicy;
+        std::unique_ptr<TypedefPolicy>      typedefPolicy;
+        std::unique_ptr<ExprStmtPolicy>     exprStmtPolicy;
+        std::unique_ptr<ReturnPolicy>       returnPolicy;
 
-        std::unique_ptr<IfStmtPolicy>   ifStmtPolicy;
+        std::unique_ptr<GotoPolicy>         gotoPolicy;
+        std::unique_ptr<LabelPolicy>        labelPolicy;
+        std::unique_ptr<ThrowPolicy>        throwPolicy;
 
-        std::unique_ptr<ForPolicy>      forPolicy;
-        std::unique_ptr<ForeachPolicy>  foreachPolicy;
-        std::unique_ptr<WhilePolicy>    whilePolicy;
-        std::unique_ptr<DoPolicy>       doPolicy;
+        std::unique_ptr<IfStmtPolicy>       ifStmtPolicy;
 
-        std::unique_ptr<TryPolicy>      tryPolicy;
+        std::unique_ptr<ForPolicy>          forPolicy;
+        std::unique_ptr<ForeachPolicy>      foreachPolicy;
+        std::unique_ptr<WhilePolicy>        whilePolicy;
+        std::unique_ptr<DoPolicy>           doPolicy;
 
-        std::unique_ptr<SwitchPolicy>   switchPolicy;
-        std::unique_ptr<CasePolicy>     casePolicy;
+        std::unique_ptr<TryPolicy>          tryPolicy;
 
-        std::unique_ptr<ClassPolicy>    classPolicy;
+        std::unique_ptr<SwitchPolicy>       switchPolicy;
+        std::unique_ptr<CasePolicy>         casePolicy;
+
+        std::unique_ptr<ClassPolicy>        classPolicy;
 
         std::unique_ptr<ConvertPlexerPolicy> plexer;
 

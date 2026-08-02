@@ -367,6 +367,18 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::block];
                     DispatchEvent(ParserState::block, ElementState::open);
                 } },
+                { "checked", [this]() { 
+                    ++ctx.triggerField[ParserState::checkedstmt];
+                    DispatchEvent(ParserState::checkedstmt, ElementState::open);
+                } },
+                { "unchecked", [this]() { 
+                    ++ctx.triggerField[ParserState::uncheckedstmt];
+                    DispatchEvent(ParserState::uncheckedstmt, ElementState::open);
+                } },
+                { "unsafe", [this]() { 
+                    ++ctx.triggerField[ParserState::unsafestmt];
+                    DispatchEvent(ParserState::unsafestmt, ElementState::open);
+                } },
                 { "init", [this]() {
                     ++ctx.triggerField[ParserState::init];
                     DispatchEvent(ParserState::init, ElementState::open);
@@ -673,6 +685,18 @@ namespace srcDispatch {
                 { "block", [this]() { 
                     DispatchEvent(ParserState::block, ElementState::close);
                     --ctx.triggerField[ParserState::block];
+                } },
+                { "checked", [this]() { 
+                    DispatchEvent(ParserState::checkedstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::checkedstmt];
+                } },
+                { "unchecked", [this]() { 
+                    DispatchEvent(ParserState::uncheckedstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::uncheckedstmt];
+                } },
+                { "unsafe", [this]() { 
+                    DispatchEvent(ParserState::unsafestmt, ElementState::close);
+                    --ctx.triggerField[ParserState::unsafestmt];
                 } },
                 { "init", [this]() {
                     DispatchEvent(ParserState::init, ElementState::close);

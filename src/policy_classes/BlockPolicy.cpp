@@ -23,6 +23,10 @@
 #include <TryPolicy.hpp>
 #include <ClassPolicy.hpp>
 
+#include <Checked.hpp>
+#include <Unchecked.hpp>
+#include <Unsafe.hpp>
+
 namespace srcDispatch {
 
     BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -66,8 +70,14 @@ namespace srcDispatch {
         } else if(typeid(ClassPolicy) == typeid(*policy)) {
             srcDispatch::DiffOperation operation = ctx.diffStack.back().isConvert? srcDispatch::COMMON : ctx.diffStack.back().operation;
             data.localClasses.emplace_back(operation, policy->Data<ClassData>());
-        }  else if(typeid(BlockPolicy) == typeid(*policy)) {
+        } else if(typeid(BlockPolicy) == typeid(*policy)) {
             data.blocks.emplace_back(ctx.diffStack.back().operation, policy->Data<BlockData>());
+        } else if(typeid(CheckedPolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<CheckedData>()));
+        } else if(typeid(UncheckedPolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<UncheckedData>()));
+        } else if(typeid(UnsafePolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<UnsafeData>()));
         } else if(typeid(CasePolicy) == typeid(*policy)) {
             data.cases.emplace_back(ctx.diffStack.back().operation, policy->Data<CaseData>());
         } else if(typeid(LabelPolicy) == typeid(*policy)) {
@@ -132,6 +142,32 @@ namespace srcDispatch {
             depth = 0;
             NotifyAll(ctx);
             InitializeBlockPolicyHandlers();
+        };
+
+        
+        openEventMap[ParserState::checkedstmt] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!checkedPolicy) {
+                checkedPolicy = make_unique_policy<CheckedPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(checkedPolicy.get());
+        };
+        openEventMap[ParserState::uncheckedstmt] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!uncheckedPolicy) {
+                uncheckedPolicy = make_unique_policy<UncheckedPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(uncheckedPolicy.get());
+        };
+        openEventMap[ParserState::unsafestmt] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!unsafePolicy) {
+                unsafePolicy = make_unique_policy<UnsafePolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(unsafePolicy.get());
         };
     }
 
