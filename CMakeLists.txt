@@ -42,6 +42,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(SRCDISPATCH_INCLUDE_DIR ${SRCSAX_INCLUDE_DIR}
                          src/policy_classes
                          src/policy_classes/cs
+                         src/policy_classes/java
                          src/dispatcher
     CACHE INTERNAL "Include directories for srcDispatch")
 

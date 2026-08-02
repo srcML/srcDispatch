@@ -27,6 +27,11 @@
 #include <Unchecked.hpp>
 #include <Unsafe.hpp>
 
+#include <LockStmtPolicy.hpp>
+#include <FixedStmtPolicy.hpp>
+#include <UsingStmtPolicy.hpp>
+#include <SyncStmtPolicy.hpp>
+
 namespace srcDispatch {
 
     BlockPolicy::BlockPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
@@ -78,6 +83,14 @@ namespace srcDispatch {
             data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<UncheckedData>()));
         } else if(typeid(UnsafePolicy) == typeid(*policy)) {
             data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<UnsafeData>()));
+        } else if(typeid(LockStmtPolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<LockStmtData>()));
+        } else if(typeid(FixedStmtPolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<FixedStmtData>()));
+        } else if(typeid(UsingStmtPolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<UsingStmtData>()));
+        } else if(typeid(SyncStmtPolicy) == typeid(*policy)) {
+            data.statements.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<SyncStmtData>()));
         } else if(typeid(CasePolicy) == typeid(*policy)) {
             data.cases.emplace_back(ctx.diffStack.back().operation, policy->Data<CaseData>());
         } else if(typeid(LabelPolicy) == typeid(*policy)) {
@@ -107,6 +120,7 @@ namespace srcDispatch {
         CollectClassHandlers();
         CollectCaseHandlers();
         CollectLabelHandlers();
+        CollectInitStmtHandlers();
     }
 
     template<typename type>
@@ -428,6 +442,45 @@ namespace srcDispatch {
                 labelPolicy = make_unique_policy<LabelPolicy>({this});
             }
             ctx.dispatcher->AddListenerDispatch(labelPolicy.get());
+        };
+    }
+
+    void BlockPolicy::CollectInitStmtHandlers() {
+        using namespace srcDispatch;
+        openEventMap[ParserState::lockstmt] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!lockStmtPolicy) {
+                lockStmtPolicy = make_unique_policy<LockStmtPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(lockStmtPolicy.get());
+        };
+        
+        openEventMap[ParserState::fixedstmt] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!fixedStmtPolicy) {
+                fixedStmtPolicy = make_unique_policy<FixedStmtPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(fixedStmtPolicy.get());
+        };
+        
+        openEventMap[ParserState::usingstmt] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!usingStmtPolicy) {
+                usingStmtPolicy = make_unique_policy<UsingStmtPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(usingStmtPolicy.get());
+        };
+        
+        openEventMap[ParserState::syncstmt] = [this](srcSAXEventContext& ctx) {
+            if(!depth) return;
+
+            if(!syncStmtPolicy) {
+                syncStmtPolicy = make_unique_policy<SyncStmtPolicy>({this});
+            }
+            ctx.dispatcher->AddListenerDispatch(syncStmtPolicy.get());
         };
     }
 

@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: GPL-3.0-only
+/**
+ * @file UsingStmtPolicy.hpp
+ *
+ * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
+ *
+ * This file is part of the Dispatch Infrastructure.
+ */
+
+#ifndef INCLUDED_USINGSTMT_POLICY_HPP
+#define INCLUDED_USINGSTMT_POLICY_HPP
+
+#include <srcSAXController.hpp>
+#include <srcDispatcher.hpp>
+#include <srcDispatchUtilities.hpp>
+
+#include <ElementData.hpp>
+#include <DeltaElement.hpp>
+
+#include <InitStmt.hpp>
+#include <BlockPolicy.hpp>
+
+#include <string>
+#include <vector>
+#include <iostream>
+
+namespace srcDispatch {
+
+    class BlockPolicy;
+    struct BlockData;
+    class InitPolicy;
+    struct InitData;
+
+    struct UsingStmtData : public ElementData {
+
+        DeltaElement<std::shared_ptr<BlockData>>   block;
+        DeltaElement<std::shared_ptr<InitData>>    init;
+
+        template<class type>
+        friend class DeltaElement;
+    };
+
+    class UsingStmtPolicy : public InitStmt<UsingStmtData, srcDispatch::ParserState::usingstmt> {
+    public:
+        UsingStmtPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+            : InitStmt<UsingStmtData, srcDispatch::ParserState::usingstmt>(listeners) {}
+    };
+
+}
+
+#endif

@@ -379,6 +379,22 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::unsafestmt];
                     DispatchEvent(ParserState::unsafestmt, ElementState::open);
                 } },
+                { "lock", [this]() { 
+                    ++ctx.triggerField[ParserState::lockstmt];
+                    DispatchEvent(ParserState::lockstmt, ElementState::open);
+                } },
+                { "fixed", [this]() { 
+                    ++ctx.triggerField[ParserState::fixedstmt];
+                    DispatchEvent(ParserState::fixedstmt, ElementState::open);
+                } },
+                { "using_stmt", [this]() { 
+                    ++ctx.triggerField[ParserState::usingstmt];
+                    DispatchEvent(ParserState::usingstmt, ElementState::open);
+                } },
+                { "synchronized", [this]() { 
+                    ++ctx.triggerField[ParserState::syncstmt];
+                    DispatchEvent(ParserState::syncstmt, ElementState::open);
+                } },
                 { "init", [this]() {
                     ++ctx.triggerField[ParserState::init];
                     DispatchEvent(ParserState::init, ElementState::open);
@@ -697,6 +713,22 @@ namespace srcDispatch {
                 { "unsafe", [this]() { 
                     DispatchEvent(ParserState::unsafestmt, ElementState::close);
                     --ctx.triggerField[ParserState::unsafestmt];
+                } },
+                { "lock", [this]() { 
+                    DispatchEvent(ParserState::lockstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::lockstmt];
+                } },
+                { "fixed", [this]() { 
+                    DispatchEvent(ParserState::fixedstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::fixedstmt];
+                } },
+                { "using_stmt", [this]() { 
+                    DispatchEvent(ParserState::usingstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::usingstmt];
+                } },
+                { "synchronized", [this]() { 
+                    DispatchEvent(ParserState::syncstmt, ElementState::close);
+                    --ctx.triggerField[ParserState::syncstmt];
                 } },
                 { "init", [this]() {
                     DispatchEvent(ParserState::init, ElementState::close);
