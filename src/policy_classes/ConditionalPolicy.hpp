@@ -18,7 +18,7 @@
 #include <DeltaElement.hpp>
 
 #include <ConditionPolicy.hpp>
-#include <BlockPolicy.hpp>
+#include <BlockStmtPolicy.hpp>
 
 #include <string>
 #include <vector>
@@ -54,7 +54,7 @@ namespace srcDispatch {
     public:
         ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
             : srcDispatch::PolicyDispatcher(listeners), data{} {
-            InitializeConditionalPolicyHandlers();
+            BlockStmt<InitStmtParam, DispatchEvent>::InitializeHandlers();
         }
 
         ~ConditionalPolicy() {}
@@ -76,33 +76,11 @@ namespace srcDispatch {
 
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {}
 
-        void InitializeConditionalPolicyHandlers() {
-
+        void CollectHandlers() override {
             using namespace srcDispatch;
+            
+            BlockStmt<ConditionalDataParam, DispatchEvent>::CollectHandlers();
 
-            openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(depth) return;
-
-                depth = ctx.depth;
-                data = ConditionalDataParam{};
-                data.startPosition = ctx.startPosition;
-                data.endPosition = ctx.endPosition;
-                CollectConditionHandlers();
-                CollectBlockHandlers();
-            };
-
-            // end of policy
-            closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(!depth || depth != ctx.depth) return ;
-
-                depth = 0;
-                NotifyAll(ctx);
-                InitializeConditionalPolicyHandlers();
-            };
-        }
-
-        void CollectConditionHandlers() {
-            using namespace srcDispatch;
             openEventMap[ParserState::condition] = [this](srcSAXEventContext& ctx) {
                 if(!depth) return; 
 
@@ -110,18 +88,6 @@ namespace srcDispatch {
                     conditionPolicy = make_unique_policy<ConditionPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(conditionPolicy.get());
-            };
-        }
-
-        void CollectBlockHandlers() {
-            using namespace srcDispatch;
-            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-                if(!depth) return; 
-
-                if(!blockPolicy) {
-                    blockPolicy = make_unique_policy<BlockPolicy>({this});
-                }
-                ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
             };
         }
     };
