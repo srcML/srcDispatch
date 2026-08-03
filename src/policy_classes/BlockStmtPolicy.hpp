@@ -34,10 +34,10 @@ namespace srcDispatch {
     public srcDispatch::PolicyDispatcher,
     public srcDispatch::PolicyListener {
 
-    private:
+    protected:
         BlockStmtParam data;
 
-        std::unique_ptr<BlockPolicy>   blockPolicy;
+        std::unique_ptr<BlockPolicy> blockPolicy;
 
     public:
         BlockStmt(std::initializer_list<srcDispatch::PolicyListener *> listeners)

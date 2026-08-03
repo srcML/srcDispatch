@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(block_replace_do) {
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{"void foo() { do { a; } while(1); }", "void foo() { do { b; } while(2); }"}});
 
-    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
+    BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
     BOOST_TEST(runner.GetClassInfo().size()    == 0);
 

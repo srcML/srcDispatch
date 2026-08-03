@@ -20,22 +20,12 @@
 
 namespace srcDispatch {
 
-    struct DoData : public ElementData {
-
-        DeltaElement<std::shared_ptr<ConditionData>> condition;
-        DeltaElement<std::shared_ptr<BlockData>>     block;
-
-        template<class type>
-        friend class DeltaElement;
-    private:
-        std::string ToString(srcDispatch::DiffOperation operation) const {
-            return condition.ToString(operation);
-        }
+    struct DoData : public ConditionalData {
     };
 
     class DoPolicy : public ConditionalPolicy<DoData, srcDispatch::ParserState::dostmt> {
     public:
-        DoPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
+        DoPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
             : ConditionalPolicy<DoData, srcDispatch::ParserState::dostmt>(listeners) {}
     };
 

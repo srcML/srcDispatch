@@ -38,6 +38,7 @@ namespace srcDispatch {
 
         std::unique_ptr<InitPolicy> initPolicy;
 
+        using EventListener::depth;
         using EventListener::openEventMap;
         using EventListener::closeEventMap;
 
@@ -66,15 +67,13 @@ namespace srcDispatch {
 
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
-    private:
-
         void CollectHandlers() override {
             using namespace srcDispatch;
             
             BlockStmt<InitStmtParam, DispatchEvent>::CollectHandlers();
 
             openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
-                if(!this->depth) return;
+                if(!depth) return;
 
                 if(!initPolicy) {
                     initPolicy = make_unique_policy<InitPolicy>({this});

@@ -40,27 +40,27 @@ namespace srcDispatch {
     };
 
     template <typename ConditionalDataParam, srcDispatch::ParserState DispatchEvent>
-    class ConditionalPolicy :
-    public srcDispatch::EventListener,
-    public srcDispatch::PolicyDispatcher,
-    public srcDispatch::PolicyListener {
+    class ConditionalPolicy : public BlockStmt<ConditionalDataParam, DispatchEvent> {
 
     protected:
-        ConditionalDataParam data;
 
         std::unique_ptr<ConditionPolicy> conditionPolicy;
-        std::unique_ptr<BlockPolicy>     blockPolicy;
+
+        using BlockStmt<ConditionalDataParam, DispatchEvent>::data;
+
+        using EventListener::depth;
+        using EventListener::openEventMap;
+        using EventListener::closeEventMap;
 
     public:
         ConditionalPolicy(std::initializer_list<srcDispatch::PolicyListener*> listeners)
-            : srcDispatch::PolicyDispatcher(listeners), data{} {
-            BlockStmt<InitStmtParam, DispatchEvent>::InitializeHandlers();
+            : BlockStmt<ConditionalDataParam, DispatchEvent>(listeners) {
+            BlockStmt<ConditionalDataParam, DispatchEvent>::InitializeHandlers();
         }
 
         ~ConditionalPolicy() {}
 
     protected:
-        std::any DataInner() const override { return std::make_shared<ConditionalDataParam>(data); }
 
         void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
             if(typeid(ConditionPolicy) == typeid(*policy)) {
