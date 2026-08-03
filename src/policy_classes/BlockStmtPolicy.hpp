@@ -42,7 +42,7 @@ namespace srcDispatch {
     public:
         BlockStmt(std::initializer_list<srcDispatch::PolicyListener *> listeners)
             : srcDispatch::PolicyDispatcher(listeners), data{} {
-            InitializeBlockStmtHandlers();
+            InitializeHandlers();
         }
 
         ~BlockStmt() {}
@@ -62,7 +62,7 @@ namespace srcDispatch {
 
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
-        void InitializeBlockStmtHandlers() {
+        void InitializeHandlers() {
             using namespace srcDispatch;
 
             openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
@@ -73,7 +73,7 @@ namespace srcDispatch {
                 data.startPosition = ctx.startPosition;
                 data.endPosition = ctx.endPosition;
                 
-                CollectBlockHandlers();
+                CollectHandlers();
             };
 
             // end of policy
@@ -82,11 +82,11 @@ namespace srcDispatch {
 
                 depth = 0;
                 NotifyAll(ctx);
-                InitializeBlockStmtHandlers();
+                InitializeHandlers();
             };
         }
 
-        void CollectBlockHandlers() {
+        virtual void CollectHandlers() {
             using namespace srcDispatch;
             openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
                 if(!depth) return;

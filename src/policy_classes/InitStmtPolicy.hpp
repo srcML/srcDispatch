@@ -44,7 +44,7 @@ namespace srcDispatch {
     public:
         InitStmt(std::initializer_list<srcDispatch::PolicyListener *> listeners)
             : BlockStmt<InitStmtParam, DispatchEvent>(listeners), data{} {
-            InitializeInitStmtHandlers();
+              BlockStmt<InitStmtParam, DispatchEvent>::InitializeHandlers();
         }
 
         ~InitStmt() {}
@@ -67,31 +67,12 @@ namespace srcDispatch {
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
     private:
-        void InitializeInitStmtHandlers() {
+
+        void CollectHandlers() override {
             using namespace srcDispatch;
-            openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(this->depth) return;
+            
+            BlockStmt<InitStmtParam, DispatchEvent>::CollectHandlers();
 
-                this->depth = ctx.depth;
-                data = InitStmtParam{};
-                data.startPosition = ctx.startPosition;
-                data.endPosition = ctx.endPosition;
-                CollectInitHandlers();
-                BlockStmt<InitStmtParam, DispatchEvent>::CollectBlockHandlers();
-            };
-
-            // end of policy
-            closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(!this->depth || this->depth != ctx.depth) return;
-
-                this->depth = 0;
-                this->NotifyAll(ctx);
-                InitializeInitStmtHandlers();
-            };
-        }
-
-        void CollectInitHandlers() {
-            using namespace srcDispatch;
             openEventMap[ParserState::init] = [this](srcSAXEventContext& ctx) {
                 if(!this->depth) return;
 

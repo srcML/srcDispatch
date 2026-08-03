@@ -41,7 +41,7 @@ namespace srcDispatch {
     public:
         ForLike(std::initializer_list<srcDispatch::PolicyListener *> listeners)
             : BlockStmt<ForLikeParam, DispatchEvent>(listeners), data{} {
-            InitializeForLikeHandlers();
+              BlockStmt<ForLikeParam, DispatchEvent>::InitializeHandlers();
         }
 
         ~ForLike() {}
@@ -64,30 +64,12 @@ namespace srcDispatch {
         void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
 
     private:
-        void InitializeForLikeHandlers() {
+
+        void CollectHandlers() override {
             using namespace srcDispatch;
-            openEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(this->depth) return;
+            
+            BlockStmt<ForLikeParam, DispatchEvent>::CollectHandlers();
 
-                this->depth = ctx.depth;
-                data = ForLikeParam{};
-                data.startPosition = ctx.startPosition;
-                data.endPosition = ctx.endPosition;
-                CollectControlHandlers();
-            };
-
-            // end of policy
-            closeEventMap[DispatchEvent] = [this](srcSAXEventContext& ctx) {
-                if(!this->depth || this->depth != ctx.depth) return;
-
-                this->depth = 0;
-                this->NotifyAll(ctx);
-                InitializeForLikeHandlers();
-            };
-        }
-
-        void CollectControlHandlers() {
-            using namespace srcDispatch;
             openEventMap[ParserState::control] = [this](srcSAXEventContext& ctx) {
                 if(!this->depth) return;
 
