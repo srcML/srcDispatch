@@ -507,3 +507,110 @@ BOOST_AUTO_TEST_CASE(catch_common_param_replace) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
+
+// @attention 'finally' is formatted the same between C# and Java
+
+BOOST_AUTO_TEST_CASE(finally_common) {
+
+    srcDispatch::DispatchRunner runner("C#");
+    runner.RunDispatcher({{"void foo() { try {} finally {} }", "void foo() { try {} finally {} }"}});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).OriginalType().name() == typeid(std::shared_ptr<srcDispatch::TryData>).name());
+
+    const srcDispatch::TryData& tryData = *std::any_cast<std::shared_ptr<srcDispatch::TryData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    BOOST_TEST(bool(tryData.block));
+    BOOST_TEST(bool(tryData.block.IsCommon()));
+
+    BOOST_TEST(tryData.clauses.size() == 1);
+    BOOST_TEST(tryData.clauses.at(0).IsCommon());
+
+    const srcDispatch::FinallyData& finallyData = *std::any_cast<std::shared_ptr<srcDispatch::FinallyData>>(
+        tryData.clauses.at(0).GetElement()
+    );
+    BOOST_TEST(finallyData.block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
+
+BOOST_AUTO_TEST_CASE(finally_insert) {
+
+    srcDispatch::DispatchRunner runner("C#");
+    runner.RunDispatcher({{"void foo() { try {} }", "void foo() { try {} finally {} }"}});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).OriginalType().name() == typeid(std::shared_ptr<srcDispatch::TryData>).name());
+
+    const srcDispatch::TryData& tryData = *std::any_cast<std::shared_ptr<srcDispatch::TryData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    BOOST_TEST(bool(tryData.block));
+    BOOST_TEST(bool(tryData.block.IsCommon()));
+
+    BOOST_TEST(tryData.clauses.size() == 1);
+    BOOST_TEST(tryData.clauses.at(0).IsInsert());
+
+    const srcDispatch::FinallyData& finallyData = *std::any_cast<std::shared_ptr<srcDispatch::FinallyData>>(
+        tryData.clauses.at(0).GetElement()
+    );
+    BOOST_TEST(finallyData.block.IsInsert());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
+
+BOOST_AUTO_TEST_CASE(finally_delete) {
+
+    srcDispatch::DispatchRunner runner("C#");
+    runner.RunDispatcher({{"void foo() { try {} finally {} }", "void foo() { try {} }"}});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size()     == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).OriginalType().name() == typeid(std::shared_ptr<srcDispatch::TryData>).name());
+
+    const srcDispatch::TryData& tryData = *std::any_cast<std::shared_ptr<srcDispatch::TryData>>(runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement());
+    BOOST_TEST(bool(tryData.block));
+    BOOST_TEST(bool(tryData.block.IsCommon()));
+
+    BOOST_TEST(tryData.clauses.size() == 1);
+    BOOST_TEST(tryData.clauses.at(0).IsDelete());
+
+    const srcDispatch::FinallyData& finallyData = *std::any_cast<std::shared_ptr<srcDispatch::FinallyData>>(
+        tryData.clauses.at(0).GetElement()
+    );
+    BOOST_TEST(finallyData.block.IsDelete());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}

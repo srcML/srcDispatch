@@ -19,6 +19,7 @@
 
 #include <BlockPolicy.hpp>
 #include <CatchPolicy.hpp>
+#include <FinallyPolicy.hpp>
 
 #include <string>
 #include <vector>
@@ -29,7 +30,7 @@ namespace srcDispatch {
     struct TryData : public ElementData {
 
         DeltaElement<std::shared_ptr<BlockData>> block;
-        std::vector<DeltaElement<std::any>>     clauses;
+        std::vector<DeltaElement<std::any>>      clauses;
     };
 
     class TryPolicy :
@@ -38,10 +39,11 @@ namespace srcDispatch {
     public srcDispatch::PolicyListener {
 
     private:
-        TryData     data;
+        TryData data;
 
-        std::unique_ptr<BlockPolicy> blockPolicy;
-        std::unique_ptr<CatchPolicy> catchPolicy;
+        std::unique_ptr<BlockPolicy>   blockPolicy;
+        std::unique_ptr<CatchPolicy>   catchPolicy;
+        std::unique_ptr<FinallyPolicy> finallyPolicy;
 
     public:
         TryPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
@@ -59,6 +61,8 @@ namespace srcDispatch {
                 data.block.Update(ctx.diffStack.back().operation, policy->Data<BlockData>());
             } else if(typeid(CatchPolicy) == typeid(*policy)) {
                 data.clauses.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<CatchData>()));
+            } else if(typeid(FinallyPolicy) == typeid(*policy)) {
+                data.clauses.push_back(DeltaElement<std::any>(ctx.diffStack.back().operation, policy->Data<FinallyData>()));
             } else {
                 throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
             }
@@ -80,7 +84,7 @@ namespace srcDispatch {
                 data.startPosition = ctx.startPosition;
                 data.endPosition   = ctx.endPosition;
                 CollectBlockHandlers();
-                CollectCatchHandlers();
+                CollectClauseHandlers();
             };
 
             // end of policy
@@ -105,8 +109,9 @@ namespace srcDispatch {
             };
         }
 
-        void CollectCatchHandlers() {
+        void CollectClauseHandlers() {
             using namespace srcDispatch;
+
             openEventMap[ParserState::catchstmt] = [this](srcSAXEventContext &ctx) {
                 if(!depth) return;
 
@@ -114,6 +119,15 @@ namespace srcDispatch {
                     catchPolicy = make_unique_policy<CatchPolicy>({this});
                 }
                 ctx.dispatcher->AddListenerDispatch(catchPolicy.get());
+            };
+
+            openEventMap[ParserState::finallystmt] = [this](srcSAXEventContext &ctx) {
+                if(!depth) return;
+
+                if(!finallyPolicy) {
+                    finallyPolicy = make_unique_policy<FinallyPolicy>({this});
+                }
+                ctx.dispatcher->AddListenerDispatch(finallyPolicy.get());
             };
         }
 

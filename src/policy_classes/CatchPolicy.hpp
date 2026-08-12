@@ -17,6 +17,7 @@
 #include <ElementData.hpp>
 #include <DeltaElement.hpp>
 
+#include <TryClausePolicy.hpp>
 #include <DeclPolicy.hpp>
 #include <BlockPolicy.hpp>
 
@@ -32,32 +33,22 @@ namespace srcDispatch {
         DeltaElement<std::shared_ptr<BlockData>> block;
     };
 
-    class CatchPolicy :
-    public srcDispatch::EventListener,
-    public srcDispatch::PolicyDispatcher,
-    public srcDispatch::PolicyListener {
+    class CatchPolicy : public TryClausePolicy<CatchData, srcDispatch::ParserState::catchstmt> {
 
     private:
-        CatchData   data;
-
         std::unique_ptr<DeclPolicy>  declPolicy;
-        std::unique_ptr<BlockPolicy> blockPolicy;
 
     public:
         CatchPolicy(std::initializer_list<srcDispatch::PolicyListener *> listeners)
-            : srcDispatch::PolicyDispatcher(listeners), data{} {
-            InitializeCatchPolicyHandlers();
-        }
+            : TryClausePolicy<CatchData, srcDispatch::ParserState::catchstmt>(listeners) {}
 
         ~CatchPolicy() {}
 
     protected:
-        std::any DataInner() const override { return std::make_shared<CatchData>(data); }
-
         void Notify(const PolicyDispatcher* policy, const srcDispatch::srcSAXEventContext& ctx) override {
             if(typeid(DeclPolicy) == typeid(*policy)) {
                 data.parameters.emplace_back(ctx.diffStack.back().operation, policy->Data<DeclData>());
-            } else if(typeid(BlockPolicy) == typeid(*policy)) {
+            } else if (typeid(BlockPolicy) == typeid(*policy)) {
                 data.block.Update(ctx.diffStack.back().operation, policy->Data<BlockData>());
             } else {
                 throw srcDispatch::PolicyError(std::string("Unhandled Policy '") + typeid(*policy).name() + '\'');
@@ -66,35 +57,13 @@ namespace srcDispatch {
             ctx.dispatcher->RemoveListener(nullptr);
         }
 
-        void NotifyWrite(const PolicyDispatcher* policy [[maybe_unused]], srcDispatch::srcSAXEventContext& ctx [[maybe_unused]]) override {} // doesn't use other parsers
-
     private:
-        void InitializeCatchPolicyHandlers() {
+
+       void CollectHandlers() override {
             using namespace srcDispatch;
 
-            openEventMap[ParserState::catchstmt] = [this](srcSAXEventContext& ctx) {
-                if(depth) return;
+            TryClausePolicy<CatchData, ParserState::catchstmt>::CollectHandlers();
 
-                depth = ctx.depth;
-                data = CatchData{};
-                data.startPosition = ctx.startPosition;
-                data.endPosition   = ctx.endPosition;
-                CollectParametersHandlers();
-                CollectBlockHandlers();
-            };
-
-            // end of policy
-            closeEventMap[ParserState::catchstmt] = [this](srcSAXEventContext& ctx) {
-                if(!depth || depth != ctx.depth) return;
-
-                depth = 0;
-                NotifyAll(ctx);
-                InitializeCatchPolicyHandlers();
-            };
-        }
-
-        void CollectParametersHandlers() {
-            using namespace srcDispatch;
             openEventMap[ParserState::parameterlist] = [this](srcSAXEventContext& ctx [[maybe_unused]]) {
                 if(!depth) return;
 
@@ -110,18 +79,6 @@ namespace srcDispatch {
                 if(!depth) return;
 
                 NopOpenEvents({ParserState::parameter});
-            };
-        }
-
-        void CollectBlockHandlers() {
-            using namespace srcDispatch;
-            openEventMap[ParserState::block] = [this](srcSAXEventContext& ctx) {
-                if(!depth) return;
-
-                if(!blockPolicy) {
-                    blockPolicy = make_unique_policy<BlockPolicy>({this});
-                }
-                ctx.dispatcher->AddListenerDispatch(blockPolicy.get());
             };
         }
 
