@@ -51,7 +51,7 @@ namespace srcDispatch {
         modifier, memberlist, classn, classdecl, structn, structdecl, enumn, enumdecl, unionn, uniondecl, namespacen, super_list, super, publicaccess, privateaccess, protectedaccess,
         preproc, whilestmt, forstmt, ifstmt, nonterminal, macro, switchstmt, switchcase, specifier, throws, 
         typedefdecl, userdefined, comment, annotation, condition, gotostmt, breakstmt, continuestmt, label, throwstmt,
-        trystmt, catchstmt, dostmt, incr, decr, control, ifgroup, range, returnstmt, 
+        trystmt, catchstmt, finallystmt, dostmt, incr, decr, control, ifgroup, range, returnstmt, 
 
         // preprocessor
         cppinclude, cppdirective, cppfile,

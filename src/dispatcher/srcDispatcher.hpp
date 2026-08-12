@@ -479,6 +479,10 @@ namespace srcDispatch {
                     ++ctx.triggerField[ParserState::catchstmt];
                     DispatchEvent(ParserState::catchstmt, ElementState::open);
                 } },
+                { "finally", [this]() {
+                    ++ctx.triggerField[ParserState::finallystmt];
+                    DispatchEvent(ParserState::finallystmt, ElementState::open);
+                } },
                 { "annotation", [this]() {
                     ++ctx.triggerField[ParserState::annotation];
                     DispatchEvent(ParserState::annotation, ElementState::open);
@@ -817,6 +821,10 @@ namespace srcDispatch {
                 { "catch", [this]() {
                     --ctx.triggerField[ParserState::catchstmt];
                     DispatchEvent(ParserState::catchstmt, ElementState::close);
+                } },
+                { "finally", [this]() {
+                    --ctx.triggerField[ParserState::finallystmt];
+                    DispatchEvent(ParserState::finallystmt, ElementState::close);
                 } },
                 { "annotation", [this]() {
                     --ctx.triggerField[ParserState::annotation];
