@@ -22,7 +22,7 @@
 namespace data = boost::unit_test;
 
 // // for and control
-BOOST_AUTO_TEST_CASE(block_common_for_cxx) {
+BOOST_AUTO_TEST_CASE(block_common_for) {
 
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{"void foo() { for(; 1; ) {} }", "void foo() { for(; 1; ) {} }"}});
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(block_common_for_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(block_insert_for_cxx) {
+BOOST_AUTO_TEST_CASE(block_insert_for) {
 
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{"void foo() {}", "void foo() { for(; 1; ) {} }"}});
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(block_insert_for_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(block_delete_for_cxx) {
+BOOST_AUTO_TEST_CASE(block_delete_for) {
 
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{"void foo() { for(; 1; ) {} }", "void foo() {}"}});

@@ -17,6 +17,7 @@
 #include <OperatorPolicy.hpp>
 
 #include <ForeachPolicy.hpp>
+#include <ForPolicy.hpp>
 
 // Define test data
 namespace data = boost::unit_test;

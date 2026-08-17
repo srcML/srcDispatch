@@ -399,6 +399,127 @@ BOOST_AUTO_TEST_CASE(block_decl_init_control_delete) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
+BOOST_AUTO_TEST_CASE(block_range_insert_condition_incr_delete) {
+    srcDispatch::DispatchRunner runner;
+    runner.RunDispatcher({{
+        "void foo() { for (int n = 0; n < 10; ++n) {} }",
+        "void foo() { for (int n : numbers) {} }"
+    }});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+
+    const auto& forData = std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+        runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
+    );
+
+    BOOST_TEST(forData->control->init.ToString() == "int n = 0|int n : numbers");
+
+    const auto& declData = std::any_cast<std::shared_ptr<srcDispatch::DeclData>>(
+        forData->control->init->inits.at(0).GetElement()
+    );
+    
+    BOOST_TEST(forData->control->condition);
+    BOOST_TEST(forData->control->condition.IsDelete());
+    BOOST_TEST(forData->control->condition.ToString() == "n < 10|");
+    
+    BOOST_TEST(forData->control->incr);
+    BOOST_TEST(forData->control->incr.IsDelete());
+    BOOST_TEST(forData->control->incr.ToString() == "++ n|");
+
+    BOOST_TEST(declData->range);
+    BOOST_TEST(declData->range.IsInsert());
+    BOOST_TEST(declData->range.ToString() == "|numbers");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
+
+BOOST_AUTO_TEST_CASE(block_range_replace) {
+    srcDispatch::DispatchRunner runner;
+    runner.RunDispatcher({{
+        "void foo() { for (int n : nums) {} }",
+        "void foo() { for (int n : numbers) {} }"
+    }});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+
+    const auto& forData = std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+        runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
+    );
+
+    BOOST_TEST(forData->control->init.ToString() == "int n : nums|int n : numbers");
+
+    const auto& declData = std::any_cast<std::shared_ptr<srcDispatch::DeclData>>(
+        forData->control->init->inits.at(0).GetElement()
+    );
+    BOOST_TEST(declData->range.ToString() == "nums|numbers");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
+
+BOOST_AUTO_TEST_CASE(block_range_delete_condition_incr_insert) {
+    srcDispatch::DispatchRunner runner;
+    runner.RunDispatcher({{
+        "void foo() { for (int n : numbers) {} }",
+        "void foo() { for (int n = 0; n < 10; ++n) {} }"
+    }});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+
+    const auto& forData = std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+        runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
+    );
+
+    BOOST_TEST(forData->control->init.ToString() == "int n : numbers|int n = 0");
+
+    const auto& declData = std::any_cast<std::shared_ptr<srcDispatch::DeclData>>(
+        forData->control->init->inits.at(0).GetElement()
+    );
+    
+    BOOST_TEST(forData->control->condition);
+    BOOST_TEST(forData->control->condition.IsInsert());
+    BOOST_TEST(forData->control->condition.ToString() == "|n < 10");
+    
+    BOOST_TEST(forData->control->incr);
+    BOOST_TEST(forData->control->incr.IsInsert());
+    BOOST_TEST(forData->control->incr.ToString() == "|++ n");
+
+    BOOST_TEST(declData->range);
+    BOOST_TEST(declData->range.IsDelete());
+    BOOST_TEST(declData->range.ToString() == "numbers|");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
+
 BOOST_AUTO_TEST_CASE(block_init_control_decl_to_expr) {
 
     srcDispatch::DispatchRunner runner;
