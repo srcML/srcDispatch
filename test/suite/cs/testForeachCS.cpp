@@ -17,19 +17,14 @@
 #include <OperatorPolicy.hpp>
 
 #include <ForeachPolicy.hpp>
-#include <ForPolicy.hpp>
 
 // Define test data
 namespace data = boost::unit_test;
-
-/**
- * @section Tests ranged-based for (C++ Foreach)
- */
-BOOST_AUTO_TEST_CASE(block_common_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
+BOOST_AUTO_TEST_CASE(block_common_foreach_cs) {
+    srcDispatch::DispatchRunner runner("C#");
     runner.RunDispatcher({{
-        "void foo() { for (int n : nums) {} }",
-        "void foo() { for (int n : nums) {} }"
+        "void foo() { foreach (string fruit in fruits) {} }",
+        "void foo() { foreach (string fruit in fruits) {} }"
     }});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
@@ -41,7 +36,7 @@ BOOST_AUTO_TEST_CASE(block_common_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsCommon());
 
-    const srcDispatch::ForData& foreachData = *std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+    const srcDispatch::ForeachData& foreachData = *std::any_cast<std::shared_ptr<srcDispatch::ForeachData>>(
         runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
     );
 
@@ -53,7 +48,7 @@ BOOST_AUTO_TEST_CASE(block_common_foreach_cxx) {
     BOOST_TEST(foreachData.control->condition.ToString() == "");
     
     const auto& deltaForeach = runner.GetFunctionInfo().at(0)->block->statements.at(0);
-    BOOST_TEST(deltaForeach.ToString<std::shared_ptr<srcDispatch::ForData>>() == "int n : nums");
+    BOOST_TEST(deltaForeach.ToString<std::shared_ptr<srcDispatch::ForeachData>>() == "string fruit : fruits");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -62,9 +57,9 @@ BOOST_AUTO_TEST_CASE(block_common_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(block_insert_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher({{"void foo() {}", "void foo() { for (int n : nums) {} }"}});
+BOOST_AUTO_TEST_CASE(block_insert_foreach_cs) {
+    srcDispatch::DispatchRunner runner("C#");
+    runner.RunDispatcher({{"void foo() {}", "void foo() { foreach (string fruit in fruits) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -75,7 +70,7 @@ BOOST_AUTO_TEST_CASE(block_insert_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsInsert());
 
-    const srcDispatch::ForData& foreachData = *std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+    const srcDispatch::ForeachData& foreachData = *std::any_cast<std::shared_ptr<srcDispatch::ForeachData>>(
         runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
     );
 
@@ -87,7 +82,7 @@ BOOST_AUTO_TEST_CASE(block_insert_foreach_cxx) {
     BOOST_TEST(foreachData.control->condition.ToString() == "");
 
     const auto& deltaForeach = runner.GetFunctionInfo().at(0)->block->statements.at(0);
-    BOOST_TEST(deltaForeach.ToString<std::shared_ptr<srcDispatch::ForData>>() == "|int n : nums");
+    BOOST_TEST(deltaForeach.ToString<std::shared_ptr<srcDispatch::ForeachData>>() == "|string fruit : fruits");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -96,9 +91,9 @@ BOOST_AUTO_TEST_CASE(block_insert_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(block_delete_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
-    runner.RunDispatcher({{"void foo() { for (int n : nums) {} }", "void foo() {}"}});
+BOOST_AUTO_TEST_CASE(block_delete_foreach_cs) {
+    srcDispatch::DispatchRunner runner("C#");
+    runner.RunDispatcher({{"void foo() { foreach (string fruit in fruits) {} }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().size() == 1);
@@ -109,7 +104,7 @@ BOOST_AUTO_TEST_CASE(block_delete_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.at(0).IsDelete());
 
-    const srcDispatch::ForData& foreachData = *std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+    const srcDispatch::ForeachData& foreachData = *std::any_cast<std::shared_ptr<srcDispatch::ForeachData>>(
         runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
     );
 
@@ -121,7 +116,7 @@ BOOST_AUTO_TEST_CASE(block_delete_foreach_cxx) {
     BOOST_TEST(foreachData.control->condition.ToString() == "");
 
     const auto& deltaForeach = runner.GetFunctionInfo().at(0)->block->statements.at(0);
-    BOOST_TEST(deltaForeach.ToString<std::shared_ptr<srcDispatch::ForData>>() == "int n : nums|");
+    BOOST_TEST(deltaForeach.ToString<std::shared_ptr<srcDispatch::ForeachData>>() == "string fruit : fruits|");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -130,11 +125,11 @@ BOOST_AUTO_TEST_CASE(block_delete_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(control_replace_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
+BOOST_AUTO_TEST_CASE(control_replace_foreach_cs) {
+    srcDispatch::DispatchRunner runner("C#");
     runner.RunDispatcher({{
-        "void foo() { for (int n : nums) {} }",
-        "void foo() { for (int num : catalanNums) {} }"
+        "void foo() { foreach (string fruit in fruits) {} }",
+        "void foo() { foreach (var obj in objects) {} }"
     }});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
@@ -145,11 +140,9 @@ BOOST_AUTO_TEST_CASE(control_replace_foreach_cxx) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
 
-    const auto& forData = std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+    const auto& foreachData = std::any_cast<std::shared_ptr<srcDispatch::ForeachData>>(
         runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
     );
-
-    BOOST_TEST(forData->control->init.ToString() == "int n : nums|int num : catalanNums");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -159,10 +152,10 @@ BOOST_AUTO_TEST_CASE(control_replace_foreach_cxx) {
 }
 
 BOOST_AUTO_TEST_CASE(range_replace_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
+    srcDispatch::DispatchRunner runner("C#");
     runner.RunDispatcher({{
-        "void foo() { for (int n : nums) {} }",
-        "void foo() { for (int n : numbers) {} }"
+        "void foo() { foreach (int n in nums) {} }",
+        "void foo() { foreach (int n in fibs) {} }"
     }});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
@@ -173,16 +166,16 @@ BOOST_AUTO_TEST_CASE(range_replace_foreach_cxx) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
 
-    const auto& forData = std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+    const auto& foreachData = std::any_cast<std::shared_ptr<srcDispatch::ForeachData>>(
         runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
     );
 
-    BOOST_TEST(forData->control->init.ToString() == "int n : nums|int n : numbers");
+    BOOST_TEST(foreachData->control->init.ToString() == "int n : nums|int n : fibs");
 
     const auto& declData = std::any_cast<std::shared_ptr<srcDispatch::DeclData>>(
-        forData->control->init->inits.at(0).GetElement()
+        foreachData->control->init->inits.at(0).GetElement()
     );
-    BOOST_TEST(declData->range.ToString() == "nums|numbers");
+    BOOST_TEST(declData->range.ToString() == "nums|fibs");
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
@@ -192,10 +185,10 @@ BOOST_AUTO_TEST_CASE(range_replace_foreach_cxx) {
 }
 
 BOOST_AUTO_TEST_CASE(init_replace_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
+    srcDispatch::DispatchRunner runner("C#");
     runner.RunDispatcher({{
-        "void foo() { for (int n : fibNums) {} }",
-        "void foo() { for (int num : fibNums) {} }"
+        "void foo() { foreach (int n in fibs) {} }",
+        "void foo() { foreach (int num in fibs) {} }"
     }});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
@@ -206,14 +199,14 @@ BOOST_AUTO_TEST_CASE(init_replace_foreach_cxx) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
 
-    const auto& forData = std::any_cast<std::shared_ptr<srcDispatch::ForData>>(
+    const auto& foreachData = std::any_cast<std::shared_ptr<srcDispatch::ForeachData>>(
         runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
     );
     
-    BOOST_TEST(forData->control->init.ToString() == "int n : fibNums|int num : fibNums");
+    BOOST_TEST(foreachData->control->init.ToString() == "int n : fibs|int num : fibs");
 
     const auto& declData = std::any_cast<std::shared_ptr<srcDispatch::DeclData>>(
-        forData->control->init->inits.at(0).GetElement()
+        foreachData->control->init->inits.at(0).GetElement()
     );
     BOOST_TEST(declData->name.ToString() == "n|num");
 

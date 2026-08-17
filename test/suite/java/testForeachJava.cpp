@@ -16,17 +16,12 @@
 #include <LiteralPolicy.hpp>
 #include <OperatorPolicy.hpp>
 
-#include <ForeachPolicy.hpp>
 #include <ForPolicy.hpp>
 
 // Define test data
 namespace data = boost::unit_test;
-
-/**
- * @section Tests ranged-based for (C++ Foreach)
- */
-BOOST_AUTO_TEST_CASE(block_common_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
+BOOST_AUTO_TEST_CASE(block_common_foreach_java) {
+    srcDispatch::DispatchRunner runner("Java");
     runner.RunDispatcher({{
         "void foo() { for (int n : nums) {} }",
         "void foo() { for (int n : nums) {} }"
@@ -62,8 +57,8 @@ BOOST_AUTO_TEST_CASE(block_common_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(block_insert_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
+BOOST_AUTO_TEST_CASE(block_insert_foreach_java) {
+    srcDispatch::DispatchRunner runner("Java");
     runner.RunDispatcher({{"void foo() {}", "void foo() { for (int n : nums) {} }"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
@@ -96,8 +91,8 @@ BOOST_AUTO_TEST_CASE(block_insert_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(block_delete_foreach_cxx) {
-    srcDispatch::DispatchRunner runner;
+BOOST_AUTO_TEST_CASE(block_delete_foreach_java) {
+    srcDispatch::DispatchRunner runner("Java");
     runner.RunDispatcher({{"void foo() { for (int n : nums) {} }", "void foo() {}"}});
 
     BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
@@ -130,7 +125,9 @@ BOOST_AUTO_TEST_CASE(block_delete_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(control_replace_foreach_cxx) {
+
+
+BOOST_AUTO_TEST_CASE(control_replace_foreach_java) {
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{
         "void foo() { for (int n : nums) {} }",
@@ -158,7 +155,7 @@ BOOST_AUTO_TEST_CASE(control_replace_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(range_replace_foreach_cxx) {
+BOOST_AUTO_TEST_CASE(range_replace_foreach_java) {
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{
         "void foo() { for (int n : nums) {} }",
@@ -191,7 +188,7 @@ BOOST_AUTO_TEST_CASE(range_replace_foreach_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(init_replace_foreach_cxx) {
+BOOST_AUTO_TEST_CASE(init_replace_foreach_java) {
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{
         "void foo() { for (int n : fibNums) {} }",

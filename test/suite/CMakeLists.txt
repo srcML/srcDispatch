@@ -19,8 +19,11 @@
 #  along with the srcDiffDispatch; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-file(GLOB TESTS *.cpp)
+file(GLOB_RECURSE TESTS
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+)
 
-foreach(TEST IN ITEMS ${TESTS})
-	add_unit_test(${TEST})
+foreach(TEST IN LISTS TESTS)
+    add_unit_test(${TEST})
 endforeach()
