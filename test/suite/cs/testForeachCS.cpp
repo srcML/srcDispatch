@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file testForeach.cpp
+ * @file testForeachCS.cpp
  *
  * @copyright Copyright (C) 2025-2025 SDML (www.srcML.org)
  *
  * This file is part of the srcDiff Infrastructure.
  */
 
-#define BOOST_TEST_MODULE for_each tests
+#define BOOST_TEST_MODULE for_each_cs tests
 #include <boost/test/included/unit_test.hpp>
 
 #include <DispatchRunner.hpp>
