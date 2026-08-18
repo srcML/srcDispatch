@@ -123,3 +123,30 @@ BOOST_AUTO_TEST_CASE(block_delete_lock_stmt) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
+
+BOOST_AUTO_TEST_CASE(init_replace_lock_stmt) {
+    srcDispatch::DispatchRunner runner("C#");
+    runner.RunDispatcher({{
+        "void foo() { lock (apples) {} }",
+        "void foo() { lock (oranges) {} }"
+    }});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+
+    const srcDispatch::LockStmtData& lockStmtData = *std::any_cast<std::shared_ptr<srcDispatch::LockStmtData>>(
+        runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
+    );
+
+    BOOST_TEST(lockStmtData.init.ToString() == "apples|oranges");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}

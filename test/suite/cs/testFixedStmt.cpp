@@ -123,3 +123,30 @@ BOOST_AUTO_TEST_CASE(block_delete_fixed_stmt) {
 
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
+
+BOOST_AUTO_TEST_CASE(init_replace_fixed_stmt) {
+    srcDispatch::DispatchRunner runner("C#");
+    runner.RunDispatcher({{
+        "void foo() { fixed (int* p = &pt.x) {} }",
+        "void foo() { fixed (int* nums = numbers) {} }"
+    }});
+
+    BOOST_TEST(runner.GetDeclStmtInfo().size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().size() == 1);
+    BOOST_TEST(runner.GetClassInfo().size()    == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block.IsCommon());
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->statements.size() == 1);
+
+    const srcDispatch::FixedStmtData& fixedStmtData = *std::any_cast<std::shared_ptr<srcDispatch::FixedStmtData>>(
+        runner.GetFunctionInfo().at(0)->block->statements.at(0).GetElement()
+    );
+
+    BOOST_TEST(fixedStmtData.init.ToString() == "int * p = & pt.x|int * nums = numbers");
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->labels.size() == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->cases.size()  == 0);
+    BOOST_TEST(runner.GetFunctionInfo().at(0)->block->blocks.size() == 0);
+
+    BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
+}
