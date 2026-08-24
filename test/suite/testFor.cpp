@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(block_delete_for) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(control_replace_for_cxx) {
+BOOST_AUTO_TEST_CASE(control_replace_for) {
 
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(control_replace_for_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(init_replace_for_cxx) {
+BOOST_AUTO_TEST_CASE(init_replace_for) {
 
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(init_replace_for_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(condition_replace_for_cxx) {
+BOOST_AUTO_TEST_CASE(condition_replace_for) {
 
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(condition_replace_for_cxx) {
     BOOST_TEST(runner.GetFunctionInfo().at(0).ToString() == "void foo() {}");
 }
 
-BOOST_AUTO_TEST_CASE(incr_replace_for_cxx) {
+BOOST_AUTO_TEST_CASE(incr_replace_for) {
 
     srcDispatch::DispatchRunner runner;
     runner.RunDispatcher({{
